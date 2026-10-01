@@ -17,3 +17,10 @@ Had meeting with Andrea, discussed on what should be submitted by Thursday.
 
 9:30 - 9:45 - 15 minutes
 Discussed on what to be done next
+
+30/09/2026 Wednesday (2:00 - 3:00) - 1 hour
+Discussed on what each of us did this week and overcame difficulties
+
+01/10/2026 Thursday (5:00 - 7:00) - 2 hours
+Meet in person in a cafe, completed this week's tasks and submitted our works.
+Had a rehersal for friday presentation. 
