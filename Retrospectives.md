@@ -10,10 +10,10 @@ What next?
 - Divide d1, d2, d3 by electoral division
 
 
-meeting 2 (4:46 to 5:05 pm) monday
-attended by shreyash, sowmya, santosh and catherine 
-what was discussed?
-progress on individual assigned tasks
-if anyone needs help or clearity
-what should be the next steps
-how is implementation on the feedback going on 
+**meeting 2 (4:46 to 5:05 pm) monday**
+- attended by shreyash, sowmya, santosh and catherine 
+**what was discussed?**
+- progress on individual assigned tasks
+- if anyone needs help or clearity
+- what should be the next steps
+- how is implementation on the feedback going on 
