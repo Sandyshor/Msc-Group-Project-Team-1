@@ -16,4 +16,11 @@ What next?
 - progress on individual assigned tasks
 - if anyone needs help or clearity
 - what should be the next steps
-- how is implementation on the feedback going on 
+- how is implementation on the feedback going on
+
+
+**meeting 3 (1:30 to 2:00 pm) tuesday**
+- attended by andrea, shreyash, sowmya, catherine, santosh, vignesh
+- updated andrea with the project status
+- discussed what each of us has done / is doing this week
+- took feedback from andrea
