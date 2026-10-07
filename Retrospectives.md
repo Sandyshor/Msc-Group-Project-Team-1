@@ -44,5 +44,5 @@ What next?
 - Sowmiya agreed to change UI and requirement specification as per Andrea's feedback
 - Sheryas listed out the topic to be covered on friday presentation
 
-\
+
 
