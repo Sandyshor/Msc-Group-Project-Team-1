@@ -1,0 +1,15 @@
+I researched our tech stack and proposed Microsoft Azure. I discussed it with the team and everyone agreed, so we are moving to Azure. This also responds to our mentors' feedback that Netlify and Neon were slow and that we should use an enterprise database. Another reason is that AWS's free tier changed in July 2025: new accounts now get $200 credit that expires in 6 months, so the database is no longer free for a year.
+
+Benefits of Azure:
+
+$100 free credit for students, valid for 12 months. I created an account with my TU Dublin email and received it.
+If the credit runs out, the student subscription is disabled, which protects us from unexpected charges.
+A small PostgreSQL server is free for 12 months, with PostGIS support.
+App Service runs our FastAPI app directly, and the North Europe region is in Dublin.
+
+We will use 3 Azure services, plus 1 optional:
+
+Azure Static Web Apps (hosts the React website): free plan
+Azure App Service (FastAPI and recommendation engine): F1 is free; B1 is about $13 per month from credit and is what we need for speed
+Azure Database for PostgreSQL, Flexible Server with PostGIS: free for 12 months on the B1MS size
+Azure Functions (optional): runs data update scripts on a schedule.
