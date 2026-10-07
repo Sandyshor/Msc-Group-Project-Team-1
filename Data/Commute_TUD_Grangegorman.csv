@@ -1,0 +1,110 @@
+District,Direction,Landmark,Latitude,Longitude,University,Departure,Travel_Time_Min,Distance_km,Walking_Distance_km,Transfers,Modes,Status,Distance_Source
+D1,Center,Custom House Quay,53.3485,-6.2515,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,25.22,2.635,1.206,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D1,North,Mountjoy Square Park,53.3562,-6.2585,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,23.53,2.368,1.257,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D1,South,O'Connell Street Upper,53.3505,-6.2605,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,14.67,1.771,0.66,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D1,East,Point Village,53.3477,-6.227,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,35.27,5.033,1.461,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D1,West,Jervis Shopping Centre,53.3487,-6.2669,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,16.6,1.633,0.955,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D2,Center,Grafton Street,53.341,-6.259,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,22.5,2.959,0.699,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D2,North,Merrion Square,53.3419,-6.2515,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,27.8,3.647,0.709,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D2,South,St Stephen's Green,53.337,-6.259,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,27.68,3.672,0.898,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D2,East,Pearse Street / Grand Canal,53.3448,-6.245,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,32.13,3.582,1.043,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D2,West,Great George's Street,53.3422,-6.2675,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,26.13,2.892,1.255,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D3,Center,Clontarf Road,53.364,-6.229,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,40.38,5.163,1.25,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D3,North,Marino,53.37,-6.23,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,46.85,5.999,1.741,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D3,South,Fairview Park,53.3625,-6.237,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,37.88,4.269,1.476,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D3,East,Clontarf Village,53.362,-6.22,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,41.0,5.846,1.796,1,WALK → RAIL → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D3,West,Clonliffe,53.365,-6.245,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,42.97,3.68,1.236,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D4,Center,Ballsbridge,53.323,-6.226,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,48.48,6.842,1.096,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D4,North,Sandymount,53.328,-6.224,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,44.18,6.191,0.988,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D4,South,Donnybrook,53.313,-6.23,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,54.45,8.338,1.503,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D4,East,Sandymount East,53.328,-6.214,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,46.32,6.547,0.806,2,WALK → BUS → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D4,West,Upper Leeson Street,53.3305,-6.2465,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,37.37,5.129,0.925,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D5,Center,Killester,53.372,-6.188,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,54.83,8.337,2.412,1,WALK → RAIL → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D5,North,Artane,53.381,-6.215,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,55.88,7.479,1.957,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D5,South,Raheny Village,53.379,-6.176,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,45.75,9.661,1.6,1,WALK → RAIL → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D5,East,Harmonstown,53.375,-6.176,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,55.93,10.23,1.879,1,WALK → RAIL → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D5,West,Artane Castle,53.379,-6.219,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,49.6,6.89,1.708,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6,Center,Rathmines Village,53.321,-6.264,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,40.07,6.271,1.235,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6,North,Ranelagh,53.326,-6.253,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,34.15,5.343,0.893,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6,South,Dartry,53.304,-6.268,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,56.73,8.384,1.74,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6,East,Milltown / D6 East,53.312,-6.249,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,43.62,7.559,1.255,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6,West,Rathgar Village,53.3085,-6.276,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,60.03,7.306,1.391,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6W,Center,Kimmage,53.311,-6.292,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,56.97,6.491,2.931,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6W,North,Harold's Cross,53.321,-6.28,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,48.12,4.451,2.81,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6W,South,Templeogue,53.3,-6.307,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,64.13,7.853,2.72,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6W,East,Terenure Village,53.309,-6.286,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,56.3,7.604,1.094,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D6W,West,Templeogue Village,53.301,-6.307,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,62.33,7.724,2.591,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D7,Center,Berkeley Road,53.359,-6.2685,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,15.92,2.047,0.782,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D7,North,Phibsborough Village,53.362,-6.273,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,14.28,1.639,0.91,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D7,South,Smithfield Square,53.348,-6.278,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,12.23,0.941,0.941,0,WALK,WALK_ONLY,Journey Planner
+D7,East,Broadstone,53.3545,-6.2675,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,15.18,1.105,1.105,0,WALK,WALK_ONLY,Journey Planner
+D7,West,Cabra,53.361,-6.293,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,18.47,1.436,1.436,0,WALK,WALK_ONLY,Journey Planner
+D8,Center,Thomas Street,53.343,-6.28,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,20.4,2.448,0.616,1,WALK → BUS → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D8,North,Usher's Quay,53.3458,-6.279,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,13.13,1.58,0.61,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D8,South,Rialto / D8 South,53.334,-6.298,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,28.62,4.196,1.618,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D8,East,Christchurch,53.343,-6.271,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,21.3,2.53,0.893,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D8,West,Kilmainham,53.341,-6.306,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,27.5,3.051,1.721,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D9,Center,Drumcondra Village,53.37,-6.258,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,32.6,3.609,1.553,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D9,North,Ballymun Road,53.38,-6.27,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,33.45,4.192,1.239,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D9,South,Drumcondra,53.369,-6.257,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,33.97,3.706,1.65,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D9,East,Beaumont,53.3745,-6.236,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,51.07,5.023,2.744,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D9,West,Glasnevin,53.365,-6.275,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,19.03,2.129,1.268,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D10,Center,Ballyfermot,53.342,-6.355,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,32.58,6.917,1.776,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D10,North,Ballyfermot North,53.345,-6.35,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,31.2,6.816,1.675,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D10,South,Cherry Orchard,53.338,-6.365,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,44.68,9.569,2.253,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D10,East,Ballyfermot East,53.341,-6.33,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,27.48,5.227,1.446,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D10,West,Ballyfermot West,53.342,-6.371,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,46.35,8.063,1.478,1,WALK → BUS → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D11,Center,Finglas East,53.386,-6.305,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,34.2,6.347,1.238,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D11,North,Finglas North,53.392,-6.3,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,31.2,6.613,0.814,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D11,South,Finglas Road,53.377,-6.299,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,21.18,3.546,0.91,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D11,East,Ballygall / D11,53.382,-6.315,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,33.98,5.707,0.774,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D11,West,Finglas Village,53.389,-6.32,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,42.18,7.791,0.976,2,WALK → BUS → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D12,Center,Crumlin,53.321,-6.312,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,49.57,7.562,1.997,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D12,North,Drimnagh,53.326,-6.316,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,40.17,6.855,1.29,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D12,South,Greenhills,53.308,-6.302,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,56.98,6.547,2.501,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D12,East,Crumlin East,53.318,-6.296,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,46.25,6.856,1.059,1,WALK → BUS → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D12,West,Walkinstown,53.3175,-6.337,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,47.23,8.402,2.336,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D13,Center,Donaghmede,53.397,-6.15,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,57.38,12.173,2.331,1,WALK → RAIL → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D13,North,Baldoyle Village,53.396,-6.115,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,63.28,14.533,1.616,2,WALK → RAIL → WALK → TRAM → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D13,South,Clongriffin (West),53.385,-6.17,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,53.02,10.159,2.098,1,WALK → RAIL → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D13,East,Baldoyle,53.398,-6.105,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,64.48,14.62,1.703,2,WALK → RAIL → WALK → TRAM → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D13,West,Clongriffin,53.387,-6.174,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,52.97,10.009,1.658,1,WALK → RAIL → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D14,Center,Churchtown South,53.288,-6.255,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,52.32,9.934,1.62,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D14,North,Churchtown,53.298,-6.257,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,43.35,8.323,1.137,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D14,South,Dundrum,53.29,-6.245,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,43.72,9.27,0.956,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D14,East,Dundrum East,53.288,-6.23,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,51.23,10.655,0.817,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D14,West,Rathfarnham,53.287,-6.294,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,60.83,10.61,2.061,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D15,Center,Castleknock,53.37,-6.365,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,38.5,7.613,1.028,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D15,North,Blanchardstown Village,53.388,-6.389,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,44.98,8.901,1.402,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D15,South,Blanchardstown,53.388,-6.39,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,45.48,8.952,1.453,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D15,East,Ashtown,53.373,-6.334,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,31.43,4.781,1.252,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D15,West,Clonsilla,53.368,-6.416,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,75.35,15.04,4.035,1,WALK → RAIL → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D16,Center,Scholarstown Road,53.284,-6.294,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,57.78,11.08,1.83,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D16,North,Ballyboden,53.286,-6.3,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,60.77,10.84,2.402,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D16,South,Knocklyon,53.27,-6.29,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,80.38,13.21,3.681,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D16,East,Ballinteer,53.2865,-6.273,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,65.62,11.5,2.12,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D16,West,Ballyboden Village,53.282,-6.32,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,61.17,17.82,2.32,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D17,Center,Coolock,53.39,-6.2,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,53.87,8.597,1.558,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D17,North,Coolock Village,53.389,-6.199,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,55.32,8.726,1.687,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D17,South,Priorswood,53.385,-6.235,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,50.42,7.813,1.036,1,WALK → BUS → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D17,East,Belcamp,53.397,-6.18,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,66.42,10.368,2.214,1,WALK → BUS → WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D17,West,Darndale,53.393,-6.24,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,53.7,5.938,2.27,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D18,Center,Leopardstown,53.2575,-6.198,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,54.07,15.308,0.682,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D18,North,Stillorgan,53.289,-6.2,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,58.0,10.697,0.964,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D18,South,Stepaside,53.2528,-6.2141,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,68.75,15.657,0.962,2,WALK → BUS → WALK → TRAM → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D18,East,Foxrock,53.259,-6.174,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,70.32,18.142,1.59,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D18,West,Sandyford,53.277,-6.225,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,52.4,11.452,1.311,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D20,Center,Palmerstown,53.344,-6.365,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,43.35,7.742,2.601,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D20,North,Chapelizod,53.347,-6.35,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,40.7,7.545,2.404,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D20,East,Chapelizod Village,53.347,-6.345,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,32.52,5.707,0.869,1,WALK → BUS → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D20,West,Palmerstown West,53.345,-6.38,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,45.8,9.453,1.406,1,WALK → BUS → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D22,Center,Clondalkin Village,53.321,-6.398,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,56.57,12.953,1.586,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D22,North,Clondalkin North,53.326,-6.41,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,52.9,11.62,2.992,0,WALK → RAIL → WALK,PUBLIC_TRANSPORT,Journey Planner
+D22,South,Clondalkin South,53.31,-6.4,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,67.55,11.654,3.435,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D22,East,Ballymount / Robinhood,53.315,-6.36,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,53.77,10.65,2.431,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D22,West,Nangor Road,53.315,-6.43,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,62.87,13.76,2.653,1,WALK → BUS → WALK → RAIL → WALK,PUBLIC_TRANSPORT,Journey Planner
+D24,Center,Tallaght Village,53.287,-6.373,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,48.85,14.195,1.184,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D24,North,Tallaght North,53.3,-6.38,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,47.73,12.505,1.531,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D24,South,Tallaght South,53.28,-6.38,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,66.42,16.036,1.846,1,WALK → BUS → WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
+D24,East,Tymon North,53.3,-6.33,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,72.95,8.83,2.941,0,WALK → BUS → WALK,PUBLIC_TRANSPORT,Journey Planner
+D24,West,Tallaght West,53.285,-6.42,TU Dublin - Grangegorman,2026-10-07T08:00:00+01:00,55.6,16.222,1.445,0,WALK → TRAM → WALK,PUBLIC_TRANSPORT,Journey Planner
