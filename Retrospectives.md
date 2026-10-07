@@ -29,5 +29,19 @@ What next?
 - updated andrea with the project status
 - discussed what each of us has done / is doing this week
 - took feedback from andrea
+- andrea mentioned to get user feedback on ui
+- andrea mentioned to update priorities to requirement specifications everything cant be a or b some has to be c
+- andrea addressed the following things to present on friday:
+- implementation explanation
+- address the stuff from last week
+- explain the implementation sprint or first part
+- explain what I'm doing so it will give foresight
+
+**meeting 4 (4:00 to 6:00 pm) wednesday**
+- attended by shreyash, santosh, catherine and sowmya
+- updated github
+- created video
+- started with ppt slides
+- analyse everybodys work 
 
 
