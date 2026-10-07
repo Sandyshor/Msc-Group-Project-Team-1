@@ -17,7 +17,7 @@ What next?
 - shreyash mentioned he will be looking into electorial division data and rental data and will handle the preprocessing
 - catherine mentioned she will be doing user persona
 - sowmy handling data collection task
-- vignesh used open trip planner it is a rooting engine where he feed the tfigtfs data and open street planner to calculate walking distance on the street this is used to calculate dist from north, south, east, west and center of electorial division to tud grangegroman 
+- vignesh used open trip planner it is a rooting engine where he feed the tfi gtfs data and open street planner to calculate walking distance on the street this is used to calculate dist from north, south, east, west and center of electorial division to tud grangegroman 
 - progress on individual assigned tasks
 - if anyone needs help or clearity
 - what should be the next steps
@@ -38,7 +38,7 @@ What next?
 - explain what I'm doing so it will give foresight
 
 **meeting 4 (4:00 to 6:00 pm) wednesday**
-- attended by shreyash, santosh, catherine and sowmya
+- attended by shreyash, santosh, catherine and sowmya. (vignesh was sick)
 - catherine agreed to take census data
 - Santhosh put the code online from local machine 
 - Sowmiya agreed to change UI and requirement specification as per Andrea's feedback
