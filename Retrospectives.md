@@ -39,9 +39,10 @@ What next?
 
 **meeting 4 (4:00 to 6:00 pm) wednesday**
 - attended by shreyash, santosh, catherine and sowmya
-- updated github
-- created video
-- started with ppt slides
-- analyse everybodys work 
+- catherine agreed to take census data
+- Santhosh put the code online from local machine 
+- Sowmiya agreed to change UI and requirement specification as per Andrea's feedback
+- Sheryas listed out the topic to be covered on friday presentation
 
+\
 
