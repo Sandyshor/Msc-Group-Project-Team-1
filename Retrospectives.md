@@ -13,6 +13,11 @@ What next?
 **meeting 2 (4:46 to 5:05 pm) monday**
 - attended by shreyash, sowmya, santosh and catherine 
 **what was discussed?**
+- santosh mentioned about using asure as a replacement to previous stack
+- shreyash mentioned he will be looking into electorial division data and rental data and will handle the preprocessing
+- catherine mentioned she will be doing user persona
+- sowmy handling data collection task
+- vignesh used open trip planner it is a rooting engine where he feed the tfigtfs data and open street planner to calculate walking distance on the street this is used to calculate dist from north, south, east, west and center of electorial division to tud grangegroman 
 - progress on individual assigned tasks
 - if anyone needs help or clearity
 - what should be the next steps
@@ -24,3 +29,5 @@ What next?
 - updated andrea with the project status
 - discussed what each of us has done / is doing this week
 - took feedback from andrea
+
+
