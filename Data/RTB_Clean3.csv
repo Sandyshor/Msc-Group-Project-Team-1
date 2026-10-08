@@ -1,0 +1,138 @@
+Year,Location,Number of Bedrooms,Property Type,VALUE
+2025,"Harolds Cross, Dublin 6",All bedrooms,All property types,2133.33
+2025,"Milltown, Dublin 6",All bedrooms,All property types,2322.26
+2025,"Ranelagh, Dublin 6",All bedrooms,All property types,2092.65
+2025,"Rathgar, Dublin 6",All bedrooms,All property types,1779.45
+2025,"Rathmines, Dublin 6",All bedrooms,All property types,1650.89
+2025,"Templeogue, Dublin 6W",All bedrooms,All property types,2528.24
+2025,"Terenure, Dublin 6W",All bedrooms,All property types,2119.38
+2025,"Arbour Hill, Dublin 7",All bedrooms,All property types,2159.56
+2025,"Cabra, Dublin 7",All bedrooms,All property types,1606.22
+2025,"North Circular Road, Dublin 7",All bedrooms,All property types,1893.65
+2025,"Smithfield, Dublin 7",All bedrooms,All property types,2099.92
+2025,"Stoneybatter, Dublin 7",All bedrooms,All property types,1868.0
+2025,"Christchurch, Dublin 8",All bedrooms,All property types,1753.82
+2025,"Cork Street, Dublin 8",All bedrooms,All property types,1885.47
+2025,"Inchicore, Dublin 8",All bedrooms,All property types,1984.27
+2025,"Islandbridge, Dublin 8",All bedrooms,All property types,2094.31
+2025,"Kilmainham , Dublin 8",All bedrooms,All property types,1925.64
+2025,"Portobello, Dublin 8",All bedrooms,All property types,1876.18
+2025,"Rialto, Dublin 8",All bedrooms,All property types,1782.66
+2025,"South Circular Road, Dublin 8",All bedrooms,All property types,1842.9
+2025,"Ballymun, Dublin 9",All bedrooms,All property types,1839.78
+2025,"Beaumont, Dublin 9",All bedrooms,All property types,2183.83
+2025,"Glasnevin, Dublin 9",All bedrooms,All property types,1999.14
+2025,"Santry, Dublin 9",All bedrooms,All property types,2113.26
+2025,"Whitehall, Dublin 9",All bedrooms,All property types,1933.09
+2025,"Ballyfermot, Dublin 10",All bedrooms,All property types,1928.4
+2025,"Cherry Orchard, Dublin 10",All bedrooms,All property types,1676.21
+2025,"Harolds Cross, Dublin 6",One bed,All property types,1601.43
+2025,"Milltown, Dublin 6",One bed,All property types,1848.6
+2025,"Ranelagh, Dublin 6",One bed,All property types,1585.07
+2025,"Rathgar, Dublin 6",One bed,All property types,1489.77
+2025,"Rathmines, Dublin 6",One bed,All property types,1407.81
+2025,"Terenure, Dublin 6W",One bed,All property types,1552.02
+2025,"Cabra, Dublin 7",One bed,All property types,1277.95
+2025,"North Circular Road, Dublin 7",One bed,All property types,1457.18
+2025,"Smithfield, Dublin 7",One bed,All property types,1685.46
+2025,"Christchurch, Dublin 8",One bed,All property types,1626.36
+2025,"Cork Street, Dublin 8",One bed,All property types,1611.31
+2025,"Inchicore, Dublin 8",One bed,All property types,1509.54
+2025,"Islandbridge, Dublin 8",One bed,All property types,1821.74
+2025,"Kilmainham , Dublin 8",One bed,All property types,1526.95
+2025,"Portobello, Dublin 8",One bed,All property types,1531.51
+2025,"Rialto, Dublin 8",One bed,All property types,1476.23
+2025,"South Circular Road, Dublin 8",One bed,All property types,1473.83
+2025,"Glasnevin, Dublin 9",One bed,All property types,1429.46
+2025,"Santry, Dublin 9",One bed,All property types,1676.82
+2025,"Whitehall, Dublin 9",One bed,All property types,1252.07
+2025,"Harolds Cross, Dublin 6",Two bed,All property types,2247.11
+2025,"Milltown, Dublin 6",Two bed,All property types,2369.95
+2025,"Ranelagh, Dublin 6",Two bed,All property types,2288.28
+2025,"Rathgar, Dublin 6",Two bed,All property types,2129.64
+2025,"Rathmines, Dublin 6",Two bed,All property types,2023.06
+2025,"Terenure, Dublin 6W",Two bed,All property types,2066.99
+2025,"Cabra, Dublin 7",Two bed,All property types,1928.72
+2025,"North Circular Road, Dublin 7",Two bed,All property types,2221.52
+2025,"Smithfield, Dublin 7",Two bed,All property types,2257.35
+2025,"Stoneybatter, Dublin 7",Two bed,All property types,1943.56
+2025,"Cork Street, Dublin 8",Two bed,All property types,1992.28
+2025,"Inchicore, Dublin 8",Two bed,All property types,1881.63
+2025,"Islandbridge, Dublin 8",Two bed,All property types,2139.92
+2025,"Kilmainham , Dublin 8",Two bed,All property types,2031.98
+2025,"Rialto, Dublin 8",Two bed,All property types,1899.44
+2025,"South Circular Road, Dublin 8",Two bed,All property types,2076.26
+2025,"Beaumont, Dublin 9",Two bed,All property types,2068.97
+2025,"Glasnevin, Dublin 9",Two bed,All property types,1948.52
+2025,"Santry, Dublin 9",Two bed,All property types,2068.82
+2025,"Harolds Cross, Dublin 6",Three bed,All property types,2611.89
+2025,"Milltown, Dublin 6",Three bed,All property types,2885.24
+2025,"Ranelagh, Dublin 6",Three bed,All property types,3286.61
+2025,"Rathgar, Dublin 6",Three bed,All property types,2861.8
+2025,"Rathmines, Dublin 6",Three bed,All property types,2667.34
+2025,"Terenure, Dublin 6W",Three bed,All property types,2551.98
+2025,"Cabra, Dublin 7",Three bed,All property types,2232.03
+2025,"Inchicore, Dublin 8",Three bed,All property types,2420.2
+2025,"Islandbridge, Dublin 8",Three bed,All property types,2796.67
+2025,"Beaumont, Dublin 9",Three bed,All property types,2460.23
+2025,"Glasnevin, Dublin 9",Three bed,All property types,2388.91
+2025,"Santry, Dublin 9",Three bed,All property types,2281.8
+2025,"Harolds Cross, Dublin 6",1 to 2 bed,All property types,1933.16
+2025,"Milltown, Dublin 6",1 to 2 bed,All property types,2179.16
+2025,"Ranelagh, Dublin 6",1 to 2 bed,All property types,1783.61
+2025,"Rathgar, Dublin 6",1 to 2 bed,All property types,1634.89
+2025,"Rathmines, Dublin 6",1 to 2 bed,All property types,1524.52
+2025,"Terenure, Dublin 6W",1 to 2 bed,All property types,1787.87
+2025,"Arbour Hill, Dublin 7",1 to 2 bed,All property types,2033.13
+2025,"Cabra, Dublin 7",1 to 2 bed,All property types,1422.86
+2025,"North Circular Road, Dublin 7",1 to 2 bed,All property types,1760.03
+2025,"Smithfield, Dublin 7",1 to 2 bed,All property types,2030.01
+2025,"Stoneybatter, Dublin 7",1 to 2 bed,All property types,1832.2
+2025,"Christchurch, Dublin 8",1 to 2 bed,All property types,1753.82
+2025,"Cork Street, Dublin 8",1 to 2 bed,All property types,1791.33
+2025,"Inchicore, Dublin 8",1 to 2 bed,All property types,1763.65
+2025,"Islandbridge, Dublin 8",1 to 2 bed,All property types,1994.52
+2025,"Kilmainham , Dublin 8",1 to 2 bed,All property types,1825.7
+2025,"Portobello, Dublin 8",1 to 2 bed,All property types,1833.93
+2025,"Rialto, Dublin 8",1 to 2 bed,All property types,1681.26
+2025,"South Circular Road, Dublin 8",1 to 2 bed,All property types,1693.68
+2025,"Ballymun, Dublin 9",1 to 2 bed,All property types,1734.92
+2025,"Beaumont, Dublin 9",1 to 2 bed,All property types,1900.1
+2025,"Glasnevin, Dublin 9",1 to 2 bed,All property types,1643.19
+2025,"Santry, Dublin 9",1 to 2 bed,All property types,1955.63
+2025,"Whitehall, Dublin 9",1 to 2 bed,All property types,1588.76
+2025,"Ballyfermot, Dublin 10",1 to 2 bed,All property types,1812.66
+2025,"Cherry Orchard, Dublin 10",1 to 2 bed,All property types,1657.68
+2025,"Harolds Cross, Dublin 6",1 to 3 bed,All property types,2108.61
+2025,"Milltown, Dublin 6",1 to 3 bed,All property types,2277.44
+2025,"Ranelagh, Dublin 6",1 to 3 bed,All property types,1955.75
+2025,"Rathgar, Dublin 6",1 to 3 bed,All property types,1704.49
+2025,"Rathmines, Dublin 6",1 to 3 bed,All property types,1577.44
+2025,"Templeogue, Dublin 6W",1 to 3 bed,All property types,2181.3
+2025,"Terenure, Dublin 6W",1 to 3 bed,All property types,1947.8
+2025,"Arbour Hill, Dublin 7",1 to 3 bed,All property types,2117.59
+2025,"Cabra, Dublin 7",1 to 3 bed,All property types,1510.5
+2025,"North Circular Road, Dublin 7",1 to 3 bed,All property types,1816.38
+2025,"Smithfield, Dublin 7",1 to 3 bed,All property types,2099.92
+2025,"Stoneybatter, Dublin 7",1 to 3 bed,All property types,1868.0
+2025,"Christchurch, Dublin 8",1 to 3 bed,All property types,1753.82
+2025,"Cork Street, Dublin 8",1 to 3 bed,All property types,1859.92
+2025,"Inchicore, Dublin 8",1 to 3 bed,All property types,1937.36
+2025,"Islandbridge, Dublin 8",1 to 3 bed,All property types,2083.42
+2025,"Kilmainham , Dublin 8",1 to 3 bed,All property types,1879.68
+2025,"Portobello, Dublin 8",1 to 3 bed,All property types,1833.93
+2025,"Rialto, Dublin 8",1 to 3 bed,All property types,1782.66
+2025,"South Circular Road, Dublin 8",1 to 3 bed,All property types,1797.37
+2025,"Ballymun, Dublin 9",1 to 3 bed,All property types,1756.79
+2025,"Beaumont, Dublin 9",1 to 3 bed,All property types,2115.53
+2025,"Glasnevin, Dublin 9",1 to 3 bed,All property types,1812.67
+2025,"Santry, Dublin 9",1 to 3 bed,All property types,2024.46
+2025,"Whitehall, Dublin 9",1 to 3 bed,All property types,1841.23
+2025,"Ballyfermot, Dublin 10",1 to 3 bed,All property types,1873.4
+2025,"Cherry Orchard, Dublin 10",1 to 3 bed,All property types,1676.21
+2025,"Ranelagh, Dublin 6",Four plus bed,All property types,4803.93
+2025,"Rathmines, Dublin 6",Four plus bed,All property types,4253.67
+2025,"Templeogue, Dublin 6W",Four plus bed,All property types,2998.29
+2025,"Terenure, Dublin 6W",Four plus bed,All property types,3443.59
+2025,"Glasnevin, Dublin 9",Four plus bed,All property types,3024.7
+2025,"Santry, Dublin 9",Four plus bed,All property types,3114.11
