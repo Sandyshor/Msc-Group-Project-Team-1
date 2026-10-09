@@ -18,3 +18,11 @@
 - presented it in the form of ppt
 
 **week 3**
+- assigned tasks to each members and updated it on jira
+- collected regular updates
+- gathered rtb rent data
+- did cleaning and preprocessing on it
+- scrapped data from daft ie for d6 to d10
+- sorted github and implemented feedbacks
+- added d6-d10 new regions in code
+- presented everyones work in ppt 
