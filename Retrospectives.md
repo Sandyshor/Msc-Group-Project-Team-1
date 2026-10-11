@@ -1,3 +1,4 @@
+Week 3
 9:30 to 10:15 PM (45 minutes)
 Catherine, Sowmiya, Santhosh, and Vignesh attended the meeting, Shreyas was unavailable. 
 What we talked?
