@@ -1,4 +1,4 @@
-Week 3
+**Week 3: Lead Shreyas**
 9:30 to 10:15 PM (45 minutes)
 Catherine, Sowmiya, Santhosh, and Vignesh attended the meeting, Shreyas was unavailable. 
 What we talked?
@@ -45,5 +45,23 @@ What next?
 - Sowmiya agreed to change UI and requirement specification as per Andrea's feedback
 - Sheryas listed out the topic to be covered on friday presentation
 
+**Week 4: Lead: Catherine** 
+**Meeting 1: Friday (2 hours)**
+- Our team(Catherine, Santhosh, Shreyas, Sowmiya, Viknesh)  gathered at the university campus to discuss who would lead the project for this week and how the tasks would be distributed among the team members.
+- What was discussed: 
+- Data Collection:
+Viknesh agreed to continue collecting and organising data for the remaining Dublin districts, ensuring that the required rent and amenity , census information is complete and consistent.
+- Recommendation Algorithm Development:
+ Santhosh and Shreyas agreed to extend the existing recommendation code by integrating the remaining district datasets. They will review the scoring and ranking logic and test whether the recommended areas reflect students' budgets, accommodation preferences, commute requirements, and amenity ratings.
+- Frontend Development:
+Catherine and Sowmiya agreed to work on developing the frontend interface, allowing students to enter their accommodation preferences, budget, university details, and amenity priorities. Discussed the initial requirements and design of the frontend interface for the Dublin Area Recommendation System.
+- Catherine assigned the task to each team member. 
 
-
+**Meeting 2: Sunday (9pm-10pm)**
+- Attended by Catherine, Santhosh, Viknesh, Sowmiya
+- Connected on a group call and discussed the progress of each task that has been assigned to each team member. 
+- Catherine and Sowmiya started working on the initial frontend planning for the Dublin Area Recommendation System by identifying the required input fields and outlining the structure of the user interface. We also planned how the recommended Dublin districts, match percentages, and explanations would be displayed to users. 
+- Viknesh collected amenity data for Dublin districts D11 to D15, along with rental data for the remaining Dublin districts. He also collecting the relevant census data to support the recommendation system. He shared the collected data with Santhosh and Shreyas.
+- Santhosh developed the recommendation prototype using the additional district data and tested the recommendation logic to evaluate the accuracy and relevance of the results. He will continue improving the prototype by grouping common factors
+- Shreyas updated in the chat that he has created a server on Azure and is also working on building the prototype.
+  
