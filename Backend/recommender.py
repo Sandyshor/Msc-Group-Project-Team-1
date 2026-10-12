@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 # Data folder: <repo>/Data by default, or set the DATA_DIR environment variable.
-DATA_DIR = Path(os.environ.get("DATA_DIR", Path(__file__).resolve().parents[2] / "Data"))
+DATA_DIR = Path(os.environ.get("DATA_DIR", Path(__file__).resolve().parents[1] / "Data"))
 
 AREAS = ["D1", "D2", "D3", "D6", "D7", "D8", "D9", "D10"]
 RTB_FILES = ["RTB_Clean.csv", "RTB_Clean1.csv", "RTB_Clean2.csv", "RTB_Clean3.csv"]
