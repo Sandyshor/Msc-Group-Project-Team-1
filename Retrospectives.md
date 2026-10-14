@@ -66,10 +66,10 @@ Catherine and Sowmiya agreed to work on developing the frontend interface, allow
 - Shreyas updated in the chat that he has created a server on Azure and is also working on building the prototype.
 
 **Meeting 3: Monday(9pm-10pm)**
-Attendees: Catherine, Santhosh, Viknesh, and Sowmiya
-Connected via a group call to discuss the progress of each member’s assigned tasks.
--Viknesh collected the remaining amenities data for all Dublin districts (D1–D24) and is working on collecting walking commute distance data.
--Santhosh is working on updating the recommendation system code by integrating the newly collected amenities data.
--Catherine is working on developing the frontend for the district profile page.
--Sowmiya is working on developing the frontend for the homepage.
+- Attendees: Catherine, Santhosh, Viknesh, and Sowmiya
+- Connected via a group call to discuss the progress of each member’s assigned tasks.
+- Viknesh collected the remaining amenities data for all Dublin districts (D1–D24) and is working on collecting walking commute distance data.
+- Santhosh is working on updating the recommendation system code by integrating the newly collected amenities data.
+- Catherine is working on developing the frontend for the district profile page.
+- Sowmiya is working on developing the frontend for the homepage.
   
