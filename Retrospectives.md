@@ -65,7 +65,7 @@ Catherine and Sowmiya agreed to work on developing the frontend interface, allow
 - Santhosh developed the recommendation prototype using the additional district data and tested the recommendation logic to evaluate the accuracy and relevance of the results. He will continue improving the prototype by grouping common factors
 - Shreyas updated in the chat that he has created a server on Azure and is also working on building the prototype.
 
-**Meeting 3: Monday(9pm-10pm)
+**Meeting 3: Monday(9pm-10pm)**
 Attendees: Catherine, Santhosh, Viknesh, and Sowmiya
 Connected via a group call to discuss the progress of each member’s assigned tasks.
 -Viknesh collected the remaining amenities data for all Dublin districts (D1–D24) and is working on collecting walking commute distance data.
