@@ -1,11 +1,18 @@
 import './App.css'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import Home from './Home.jsx'
 import HowItWorks from './Howitworks.jsx'
 import Questionnaire from './Questionnaire.jsx'
 import Login from './Login.jsx'
 import Signup from './Signup.jsx'
 import DistrictProfile from './District Profile/App.jsx'
+import Results from './Results.jsx'
+
+// Opens on the district picked from a result card, if any.
+function DistrictsPage() {
+  const location = useLocation()
+  return <DistrictProfile key={location.key} initialDistrictId={location.state?.district} />
+}
 
 function App() {
   return (
@@ -40,7 +47,8 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/districts" element={<DistrictProfile />} />
+          <Route path="/districts" element={<DistrictsPage />} />
+          <Route path="/results" element={<Results />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/login" element={<Login />} />
