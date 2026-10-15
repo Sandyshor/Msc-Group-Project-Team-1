@@ -89,8 +89,8 @@ function FamousPlaceCard({ place }) {
   );
 }
 
-export default function App() {
-  const [selectedDistrictId, setSelectedDistrictId] = useState('D1');
+export default function App({ initialDistrictId = 'D1' }) {
+  const [selectedDistrictId, setSelectedDistrictId] = useState(initialDistrictId);
 
   const selectedDistrict =
     districts.find((district) => district.id === selectedDistrictId) ??
