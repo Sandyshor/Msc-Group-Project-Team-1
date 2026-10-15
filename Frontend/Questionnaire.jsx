@@ -1,19 +1,22 @@
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Questionnaire() {
   const [budget, setBudget] = useState(1000)
   const [destination, setDestination] = useState('')
   const [roomType, setRoomType] = useState('Private room')
+  const navigate = useNavigate()
 
   function handleContinue(event) {
     event.preventDefault()
 
-    console.log({
-      monthlyBudget: budget,
-      commuteDestination: destination,
-      accommodationType: roomType,
+    navigate('/districts', {
+      state: {
+        monthlyBudget: budget,
+        commuteDestination: destination,
+        accommodationType: roomType,
+      },
     })
   }
 
