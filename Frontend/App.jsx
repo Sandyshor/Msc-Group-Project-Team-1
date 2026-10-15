@@ -1,10 +1,10 @@
 import './App.css'
 import { Routes, Route, Link } from 'react-router-dom'
-import Home from './pages/Home'
-import HowItWorks from './pages/Howitworks'
-import Questionnaire from './pages/Questionnaire'
-import Login from './pages/Login'
-import Signup from './pages/Signup'
+import Home from './Home.jsx'
+import HowItWorks from './Howitworks.jsx'
+import Questionnaire from './Questionnaire.jsx'
+import Login from './Login.jsx'
+import Signup from './Signup.jsx'
 
 function App() {
   return (
