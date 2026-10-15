@@ -1,7 +1,7 @@
 """
 Web API for the Dublin area recommender.
 
-Run locally:   uvicorn app:app --reload        (from the Backend/api folder)
+Run locally:   uvicorn app:app --reload        (from the Backend folder)
 Then open:     http://127.0.0.1:8000/docs      (interactive test page)
 """
 from typing import Dict
@@ -26,9 +26,8 @@ class RecommendRequest(BaseModel):
                                description="shared_room | private_room | one_bed | two_bed")
     ratings: Dict[str, int] = Field(
         ..., description="1 = Very important, 2 = Important, 3 = Slightly important, 4 = Not important",
-        examples=[{"Rent": 1, "Commute": 2, "Supermarkets": 2, "Groceries": 2, "Restaurants": 3,
-                   "Asian Restaurants": 3, "Cafes": 4, "Gyms": 3, "Parks": 4, "Pharmacies": 2,
-                   "Hospitals": 4, "Shopping Malls": 3}])
+        examples=[{"Rent": 1, "Commute": 2, "Shopping & Groceries": 2, "Restaurants": 3,
+                   "Healthcare": 4, "Recreation & Wellness": 3}])
 
 
 @app.get("/")
