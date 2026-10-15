@@ -17,10 +17,9 @@ DATA_FOLDER = os.environ.get(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Data"),
 )
 
-# Only the TU Dublin Grangegorman commute file is in the repo so far, so the API
-# recommends for that campus.
-UNIVERSITY_NAME = "TU Dublin - Grangegorman"
-COMMUTE_FILE = "Commute_TUD_Grangegorman.csv"
+# Same commute file as "Recommendation system.py" (all universities). Until it's
+# uploaded to Data/, fall back to the TU Dublin Grangegorman-only file.
+COMMUTE_FILES = ["Dublin_D1_D24_All_University_Commutes_clean_updated.csv", "Commute_TUD_Grangegorman.csv"]
 
 AREA_CODES_ROOMS = ["D1", "D2", "D3", "D6", "D7", "D8", "D9", "D10"]
 AREA_CODES_AMENITIES = AREA_CODES_ROOMS + ["D4", "D5", "D11", "D12", "D13", "D14", "D15",
@@ -94,13 +93,14 @@ def load_data():
     census = _clean_columns(pd.read_excel(_path("Dublin_Census_Filled.xlsx")))
     ethnicity = _clean_columns(pd.read_excel(_path("Dublin_Ethnicity_D1_D24.xlsx")))
 
-    commutes = _clean_columns(pd.read_csv(_path(COMMUTE_FILE))).rename(columns={"District": "Area"})
-    commutes = commutes[commutes["University"] == UNIVERSITY_NAME]
-    commute = (
-        commutes.groupby("Area", as_index=False)
+    commute_file = next(f for f in COMMUTE_FILES if os.path.exists(_path(f)))
+    commutes = _clean_columns(pd.read_csv(_path(commute_file))).rename(columns={"District": "Area"})
+    # Several landmark rows per area/university pair - average them into one typical commute.
+    commute_by_university = (
+        commutes.groupby(["Area", "University"], as_index=False)
         .agg(**{"Commute Minutes": ("Travel_Time_Min", "mean"), "Distance_km": ("Distance_km", "mean")})
     )
-    commute["Distance"] = commute["Distance_km"].round(1).astype(str) + " km"
+    commute_by_university["Distance"] = commute_by_university["Distance_km"].round(1).astype(str) + " km"
 
     walking = _clean_columns(pd.read_excel(_path("Dublin_D1_D24_Walking_Distance_and_Time_to_University.xlsx")))
     walking = walking.rename(columns={
@@ -108,7 +108,6 @@ def load_data():
         "Walking_Distance_to_University_km": "Walking km",
         "Walking_Time_to_University_Min": "Walking Minutes",
     })
-    walking = walking[walking["University"] == UNIVERSITY_NAME]
 
     # Rent tables
     shared_room_rent = room_data[room_data["Room type"].isin(SHARED_ROOM_LABELS)].groupby("Area")["Rent"].mean()
@@ -126,7 +125,6 @@ def load_data():
         census
         .merge(amenities, on="Area", how="left")
         .merge(ethnicity, on="Area", how="left")
-        .merge(commute[["Area", "Commute Minutes", "Distance"]], on="Area", how="left")
     )
     for factor in FACTORS:
         if factor["kind"] == "group":
@@ -137,6 +135,8 @@ def load_data():
         "census": census,
         "ethnicity": ethnicity,
         "walking": walking,
+        "commute_by_university": commute_by_university,
+        "universities": sorted(commute_by_university["University"].unique()),
         "rent_tables": {
             "shared_room": ("Shared Room", shared_room_rent),
             "private_room": ("Private Room", private_room_rent),
@@ -185,12 +185,16 @@ def _compare_word(value, average):
 
 # 3. MAIN ENTRY POINT
 
-def recommend(data, budget, accommodation, ratings, top_n=3):
+def recommend(data, university, budget, accommodation, ratings, top_n=3):
     """
+    university:    one of data["universities"], e.g. "TU Dublin - Grangegorman"
     budget:        max monthly budget in euro
     accommodation: shared_room | private_room | one_bed | two_bed
-    ratings:       {factor name: 1-4}; factors left out count as "Not important"
+    ratings:       {factor name: 1-4} for every factor, as in "Recommendation system.py"
     """
+    if university not in data["universities"]:
+        raise RecommendationError(
+            f"No commute data for '{university}'. Available: {', '.join(data['universities'])}")
     if accommodation not in data["rent_tables"]:
         raise RecommendationError(
             f"Unknown accommodation '{accommodation}'. Use one of: {', '.join(data['rent_tables'])}")
@@ -198,16 +202,28 @@ def recommend(data, budget, accommodation, ratings, top_n=3):
     if unknown:
         raise RecommendationError(
             f"Unknown factor(s): {', '.join(unknown)}. Use: {', '.join(FACTOR_LOOKUP)}")
+    missing = [name for name in FACTOR_LOOKUP if name not in ratings]
+    if missing:
+        raise RecommendationError(f"Please rate every factor. Missing: {', '.join(missing)}")
 
     accommodation_name, selected_rent = data["rent_tables"][accommodation]
-    ratings = {f["name"]: int(ratings.get(f["name"], 4)) for f in FACTORS}
+    ratings = {f["name"]: int(ratings[f["name"]]) for f in FACTORS}
     weights = {name: RATING_TO_WEIGHT[r] for name, r in ratings.items()}
     active_factors = [name for name, w in weights.items() if w > 0]
     if not active_factors:
         raise RecommendationError("You rated every factor as 'Not important', so there is nothing to rank on.")
 
     census, ethnicity, walking = data["census"], data["ethnicity"], data["walking"]
-    area_data = data["area_data"].copy()
+    commute_by_university = data["commute_by_university"]
+    area_data = data["area_data"].merge(
+        commute_by_university.loc[
+            commute_by_university["University"] == university,
+            ["Area", "Commute Minutes", "Distance"],
+        ],
+        on="Area",
+        how="left",
+    )
+    walking = walking[walking["University"] == university]
 
     # Rent + budget
     area_data["Rent"] = area_data["Area"].map(selected_rent)
@@ -266,8 +282,8 @@ def recommend(data, budget, accommodation, ratings, top_n=3):
         value = row[col]
         if factor["kind"] == "commute":
             if value == ranked[col].min():
-                return f"is the closest to {UNIVERSITY_NAME} (only {value:.0f} minutes away)"
-            return f"has a short commute to {UNIVERSITY_NAME} (about {value:.0f} minutes)"
+                return f"is the closest to {university} (only {value:.0f} minutes away)"
+            return f"has a short commute to {university} (about {value:.0f} minutes)"
         if factor["kind"] == "rent":
             if value == ranked[col].min():
                 return f"is the cheapest area for a {accommodation_name.lower()} (€{value:,.0f} a month)"
@@ -281,7 +297,7 @@ def recommend(data, budget, accommodation, ratings, top_n=3):
         col = factor["column"]
         value = row[col]
         if factor["kind"] == "commute":
-            return f"The commute is longer – about {value:.0f} minutes to {UNIVERSITY_NAME}."
+            return f"The commute is longer – about {value:.0f} minutes to {university}."
         if factor["kind"] == "rent":
             return f"The rent is higher than in most areas (€{value:,.0f} a month)."
         if value == ranked[col].min():
@@ -422,7 +438,7 @@ def recommend(data, budget, accommodation, ratings, top_n=3):
         })
 
     return {
-        "university": UNIVERSITY_NAME,
+        "university": university,
         "accommodation": accommodation_name,
         "budget": budget,
         "areas_compared": len(ranked),

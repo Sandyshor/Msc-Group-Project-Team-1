@@ -26,17 +26,19 @@ so it can't run on a server. `Backend/recommender.py` is the same logic as impor
 
 Endpoints:
 - `GET /` – health check
-- `GET /options` – accommodation types, factor names and rating labels for the form
+- `GET /options` – universities, accommodation types, factor names and rating labels for the form
 - `POST /recommend` – e.g.
   ```json
-  {"budget": 900, "accommodation": "private_room",
+  {"university": "TU Dublin - Grangegorman", "budget": 900, "accommodation": "private_room",
    "ratings": {"Rent": 1, "Commute": 2, "Shopping & Groceries": 2,
                "Restaurants": 3, "Healthcare": 4, "Recreation & Wellness": 3}}
   ```
-  `accommodation` is `shared_room | private_room | one_bed | two_bed`; ratings are 1 (very important) to
-  4 (not important); factors left out count as 4.
+  `accommodation` is `shared_room | private_room | one_bed | two_bed`; every factor must be rated
+  1 (very important) to 4 (not important), as in `Recommendation system.py`.
 
 Note: the free Render plan sleeps after ~15 min idle, so the first request after that takes ~30–60 s.
-Only the TU Dublin Grangegorman commute file is in `Data/`, so commutes are to that campus.
+Commutes use `Data/Dublin_D1_D24_All_University_Commutes_clean_updated.csv` (all universities, same file
+as `Recommendation system.py`). Until that file is uploaded, the API falls back to
+`Data/Commute_TUD_Grangegorman.csv`, so only TU Dublin Grangegorman is available.
 
 Run locally: `pip install -r requirements.txt && cd Backend && uvicorn app:app --reload`
