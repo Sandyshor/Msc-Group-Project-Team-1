@@ -21,6 +21,7 @@ DATA = recommender.load_data()   # loaded once when the server starts
 
 
 class RecommendRequest(BaseModel):
+    university: str = Field(..., examples=["TU Dublin - Grangegorman"])
     budget: float = Field(..., gt=0, examples=[900])
     accommodation: str = Field(..., examples=["private_room"],
                                description="shared_room | private_room | one_bed | two_bed")
@@ -39,7 +40,7 @@ def health():
 def options():
     """Everything the frontend needs to build the form."""
     return {
-        "university": recommender.UNIVERSITY_NAME,
+        "universities": DATA["universities"],
         "accommodation": {k: v[0] for k, v in DATA["rent_tables"].items()},
         "factors": [f["name"] for f in recommender.FACTORS],
         "ratings": recommender.RATING_LABELS,
@@ -51,6 +52,6 @@ def recommend(req: RecommendRequest):
     if any(r not in (1, 2, 3, 4) for r in req.ratings.values()):
         raise HTTPException(422, "Each rating must be 1, 2, 3 or 4")
     try:
-        return recommender.recommend(DATA, req.budget, req.accommodation, req.ratings)
+        return recommender.recommend(DATA, req.university, req.budget, req.accommodation, req.ratings)
     except recommender.RecommendationError as e:
         raise HTTPException(422, str(e))
