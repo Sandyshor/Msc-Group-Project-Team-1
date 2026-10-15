@@ -5,6 +5,7 @@ import HowItWorks from './Howitworks.jsx'
 import Questionnaire from './Questionnaire.jsx'
 import Login from './Login.jsx'
 import Signup from './Signup.jsx'
+import DistrictProfile from './District Profile/App.jsx'
 
 function App() {
   return (
@@ -39,10 +40,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route
-            path="/districts"
-            element={<h1>Explore Dublin's neighbourhoods</h1>}
-          />
+          <Route path="/districts" element={<DistrictProfile />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/login" element={<Login />} />
