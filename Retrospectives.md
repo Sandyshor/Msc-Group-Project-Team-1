@@ -91,5 +91,20 @@ Catherine and Sowmiya agreed to work on developing the frontend interface, allow
 - Sowmiya agreed to work on the technical problem.
 - Santhosh agreed to work on the technical solution.
 - Shreyas agreed to work on the evaluation. 
-- Viknesh agreed to work on the Conclusion. 
+- Viknesh agreed to work on the Conclusion.
+
+
+**Week 5: Lead: Vikneshwaran ** 
+**Meeting 1: Friday (1 hour)**
+- Our team(Catherine, Santhosh, Shreyas, Sowmiya, Vikneshwaran)  joined a teams meeting and discussed on the feedback given on this week and assigned the respective tasks for the upcoming week.
+- What was discussed:
+- Data Collection and Video editing:
+Vikneshwaran agreed to edit a video for our home page showing what Dublin looks like for a new person coming to Dublin and agreed to collect the rent data for the remaining places
+- Recommendation Algorithm Development:
+ Santhosh agreed to alter the changes on amenities grouping by including a subdivision for specific amenities ( gyms, parks)
+- Frontend Development:
+Catherine agreed to work on the district profile. She will add an animated map in the map section, add remaining areas data in frontend.
+Sowmiya agreed to work on the home page making it more attractive and user specific.
+- Vikneshwaran assigned the task to each team member and updated on Jira. We also agreed to complete the interim report (each member is assigned with a topic to work) by this Sunday night and do a complete check on the whole document. 
+
   
