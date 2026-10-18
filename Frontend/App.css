@@ -811,6 +811,42 @@ fieldset.question-group {
   }
 }
 
+.question-group > .separate-toggle {
+  display: flex;
+  font-family: inherit;
+  line-height: 1.5;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  color: #245b48;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.separate-toggle input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #173f32;
+  cursor: pointer;
+}
+
+.item-ratings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #e0d8c9;
+}
+
+.item-name {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* RESULTS PAGE */
 
 .results-container {

@@ -29,14 +29,38 @@ const ROOM_TYPES = [
   ['Student accommodation', '⌂', null],
 ]
 
+// name, hint, items that can be rated separately instead (as in the backend)
 const FACTORS = [
   ['Rent', 'Cheaper rent'],
   ['Commute', 'A short commute to your university'],
-  ['Shopping & Groceries', 'Supermarkets, grocery shops and shopping centres'],
+  ['Shopping & Groceries', 'Supermarkets, grocery shops and shopping centres',
+    ['Supermarkets', 'Grocery Shops', 'Shopping Malls']],
   ['Restaurants', 'Places to eat out'],
-  ['Healthcare', 'Hospitals and pharmacies'],
-  ['Recreation & Wellness', 'Gyms and parks'],
+  ['Healthcare', 'Hospitals and pharmacies', ['Hospitals', 'Pharmacies']],
+  ['Recreation & Wellness', 'Gyms and parks', ['Gyms', 'Parks']],
 ]
+
+function joinWords(items) {
+  return items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`
+}
+
+function RatingButtons({ name, value, onChange }) {
+  return (
+    <div className="rating-options" role="group" aria-label={name}>
+      {RATINGS.map(([rating, label]) => (
+        <button
+          key={rating}
+          type="button"
+          aria-pressed={value === rating}
+          className={value === rating ? 'rating-option selected' : 'rating-option'}
+          onClick={() => onChange(rating)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 const RATINGS = [
   [1, 'Very important'],
@@ -50,13 +74,27 @@ function Questionnaire() {
   const [budget, setBudget] = useState(1000)
   const [destination, setDestination] = useState('')
   const [roomType, setRoomType] = useState('Private room')
+  // Every category and every item starts at "Important"; only the ones in use are sent.
   const [ratings, setRatings] = useState(
-    Object.fromEntries(FACTORS.map(([name]) => [name, 2]))
+    Object.fromEntries(
+      FACTORS.flatMap(([name, , items = []]) => [name, ...items]).map((name) => [name, 2])
+    )
   )
+  const [separately, setSeparately] = useState({})
   const navigate = useNavigate()
 
   const accommodation = ROOM_TYPES.find(([label]) => label === roomType)[2]
-  const allNotImportant = Object.values(ratings).every((r) => r === 4)
+  // A category rated "separately" is replaced by its items, as in the backend.
+  const activeRatings = Object.fromEntries(
+    FACTORS.flatMap(([name, , items]) =>
+      items && separately[name] ? items.map((item) => [item, ratings[item]]) : [[name, ratings[name]]]
+    )
+  )
+  const allNotImportant = Object.values(activeRatings).every((r) => r === 4)
+
+  function setRating(name, value) {
+    setRatings({ ...ratings, [name]: value })
+  }
 
   function handleContinue(event) {
     event.preventDefault()
@@ -72,7 +110,7 @@ function Questionnaire() {
         budget,
         accommodation,
         accommodationLabel: roomType,
-        ratings,
+        ratings: activeRatings,
       },
     })
   }
@@ -212,24 +250,46 @@ function Questionnaire() {
             </p>
 
             <form onSubmit={handleSubmit}>
-              {FACTORS.map(([name, hint]) => (
+              {FACTORS.map(([name, hint, items]) => (
                 <fieldset className="question-group" key={name}>
                   <legend className="factor-name">{name}</legend>
                   <p className="field-hint">{hint}</p>
 
-                  <div className="rating-options">
-                    {RATINGS.map(([value, label]) => (
-                      <button
-                        key={value}
-                        type="button"
-                        aria-pressed={ratings[name] === value}
-                        className={ratings[name] === value ? 'rating-option selected' : 'rating-option'}
-                        onClick={() => setRatings({ ...ratings, [name]: value })}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
+                  {!(items && separately[name]) && (
+                    <RatingButtons
+                      name={name}
+                      value={ratings[name]}
+                      onChange={(value) => setRating(name, value)}
+                    />
+                  )}
+
+                  {items && (
+                    <label className="separate-toggle">
+                      <input
+                        type="checkbox"
+                        checked={!!separately[name]}
+                        onChange={(event) =>
+                          setSeparately({ ...separately, [name]: event.target.checked })
+                        }
+                      />
+                      Set priorities for {joinWords(items)} separately
+                    </label>
+                  )}
+
+                  {items && separately[name] && (
+                    <div className="item-ratings">
+                      {items.map((item) => (
+                        <div className="item-rating" key={item}>
+                          <p className="item-name">{item}</p>
+                          <RatingButtons
+                            name={item}
+                            value={ratings[item]}
+                            onChange={(value) => setRating(item, value)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </fieldset>
               ))}
 
