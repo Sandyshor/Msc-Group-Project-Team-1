@@ -26,7 +26,9 @@ class RecommendRequest(BaseModel):
     accommodation: str = Field(..., examples=["private_room"],
                                description="shared_room | private_room | one_bed | two_bed")
     ratings: Dict[str, int] = Field(
-        ..., description="1 = Very important, 2 = Important, 3 = Slightly important, 4 = Not important",
+        ..., description="1 = Very important, 2 = Important, 3 = Slightly important, 4 = Not important. "
+                         "A category (e.g. Healthcare) can instead be rated by its items "
+                         "(e.g. Hospitals, Pharmacies) - see factor_items in /options.",
         examples=[{"Rent": 1, "Commute": 2, "Shopping & Groceries": 2, "Restaurants": 3,
                    "Healthcare": 4, "Recreation & Wellness": 3}])
 
@@ -43,6 +45,9 @@ def options():
         "universities": DATA["universities"],
         "accommodation": {k: v[0] for k, v in DATA["rent_tables"].items()},
         "factors": [f["name"] for f in recommender.FACTORS],
+        # Categories that can optionally be rated per amenity instead of as a whole.
+        "factor_items": {f["name"]: [i["name"] for i in f["items"]]
+                         for f in recommender.FACTORS if f["kind"] == "group"},
         "ratings": recommender.RATING_LABELS,
     }
 

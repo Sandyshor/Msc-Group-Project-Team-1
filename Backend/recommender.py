@@ -29,21 +29,33 @@ AREAS = AREA_CODES_AMENITIES
 PRIVATE_ROOM_LABELS = ["single", "single & twin"]
 SHARED_ROOM_LABELS = ["double", "twin", "shared", "double & twin", "twin & shared"]
 
+# "group" factors are scored as one category by default (the average of their
+# amenities' 0-1 sub-scores). A student can instead rate a category's "items"
+# separately; those items then replace the category in the scoring as individual
+# factors - same as "Recommendation system.py".
 FACTORS = [
     {"name": "Rent",                   "column": "Rent",               "kind": "rent"},
     {"name": "Commute",                "column": "Commute Minutes",    "kind": "commute"},
     {"name": "Shopping & Groceries",   "column": "Shopping & Groceries",
-     "columns": ["Supermarkets", "Groceries", "Shopping_Malls"],
-     "kind": "group", "noun": "shopping and grocery options"},
+     "kind": "group", "noun": "shopping and grocery options",
+     "items": [{"name": "Supermarkets",   "column": "Supermarkets",   "noun": "supermarkets"},
+               {"name": "Grocery Shops",  "column": "Groceries",      "noun": "grocery shops"},
+               {"name": "Shopping Malls", "column": "Shopping_Malls", "noun": "shopping malls"}]},
     {"name": "Restaurants",            "column": "Restaurants",        "kind": "count", "noun": "restaurants"},
     {"name": "Healthcare",             "column": "Healthcare",
-     "columns": ["Hospitals", "Pharmacies"],
-     "kind": "group", "noun": "healthcare amenities"},
+     "kind": "group", "noun": "healthcare amenities",
+     "items": [{"name": "Hospitals",  "column": "Hospitals",  "noun": "hospitals"},
+               {"name": "Pharmacies", "column": "Pharmacies", "noun": "pharmacies"}]},
     {"name": "Recreation & Wellness",  "column": "Recreation & Wellness",
-     "columns": ["Gyms", "Parks"],
-     "kind": "group", "noun": "recreation and wellness amenities"},
+     "kind": "group", "noun": "recreation and wellness amenities",
+     "items": [{"name": "Gyms",  "column": "Gyms",  "noun": "gyms"},
+               {"name": "Parks", "column": "Parks", "noun": "parks"}]},
 ]
-FACTOR_LOOKUP = {f["name"]: f for f in FACTORS}
+for _factor in FACTORS:
+    if _factor["kind"] == "group":
+        _factor["columns"] = [item["column"] for item in _factor["items"]]
+ITEM_FACTORS = [dict(item, kind="count") for f in FACTORS if f["kind"] == "group" for item in f["items"]]
+FACTOR_LOOKUP = {f["name"]: f for f in FACTORS + ITEM_FACTORS}
 
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
 RATING_TO_WEIGHT = {1: 3, 2: 2, 3: 1, 4: 0}
@@ -202,12 +214,30 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
     if unknown:
         raise RecommendationError(
             f"Unknown factor(s): {', '.join(unknown)}. Use: {', '.join(FACTOR_LOOKUP)}")
-    missing = [name for name in FACTOR_LOOKUP if name not in ratings]
+    # Every factor needs a rating; a group is rated either as a whole or by all of
+    # its items (which then replace it), never both.
+    missing = []
+    for factor in FACTORS:
+        if factor["kind"] != "group":
+            if factor["name"] not in ratings:
+                missing.append(factor["name"])
+            continue
+        item_names = [item["name"] for item in factor["items"]]
+        rated_items = [name for name in item_names if name in ratings]
+        if factor["name"] in ratings and rated_items:
+            raise RecommendationError(
+                f"Rate {factor['name']} either as a whole or by {', '.join(item_names)} - not both.")
+        if factor["name"] in ratings:
+            continue
+        if rated_items:
+            missing.extend(name for name in item_names if name not in ratings)
+        else:
+            missing.append(factor["name"])
     if missing:
         raise RecommendationError(f"Please rate every factor. Missing: {', '.join(missing)}")
 
     accommodation_name, selected_rent = data["rent_tables"][accommodation]
-    ratings = {f["name"]: int(ratings[f["name"]]) for f in FACTORS}
+    ratings = {name: int(rating) for name, rating in ratings.items()}
     weights = {name: RATING_TO_WEIGHT[r] for name, r in ratings.items()}
     active_factors = [name for name, w in weights.items() if w > 0]
     if not active_factors:
@@ -264,7 +294,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
     candidates["Match Score"] = candidates[[f"{n} Contribution" for n in active_factors]].sum(axis=1)
     ranked = candidates.sort_values("Match Score", ascending=False).reset_index(drop=True)
 
-    averages = ranked[[f["column"] for f in FACTORS if f["column"] in ranked]].mean()
+    averages = ranked[[f["column"] for f in FACTOR_LOOKUP.values() if f["column"] in ranked]].mean()
 
     # Explanation helpers (closures over this request's state)
     def better_or_worse(name, row):
