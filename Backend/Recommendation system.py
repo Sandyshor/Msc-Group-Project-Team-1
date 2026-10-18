@@ -93,31 +93,39 @@ area_data = (
 )
 
 # 5. FACTOR DEFINITIONS
-# "group" factors combine several amenity columns into one student-facing category.
-# Their score is the average of the normalized (0-1) sub-scores, so a category isn't
-# dominated by whichever amenity naturally has the largest raw counts. The "column"
-# on a group is a combined raw count used only for display text (e.g. "has the most
+# "group" factors combine several amenities into one student-facing category. By
+# default the category is scored as one factor: the average of its amenities'
+# normalized (0-1) sub-scores, so no single amenity dominates. The "column" on a
+# group is a combined raw count used only for display text (e.g. "has the most
 # shopping and grocery options (62)").
+# A student can optionally rate a category's "items" separately instead; those
+# items then replace the category in the scoring as individual factors.
 FACTORS = [
     {"name": "Rent",                   "column": "Rent",               "kind": "rent"},
     {"name": "Commute",                "column": "Commute Minutes",    "kind": "commute"},
     {"name": "Shopping & Groceries",   "column": "Shopping & Groceries",
-     "columns": ["Supermarkets", "Groceries", "Shopping_Malls"],
-     "kind": "group", "noun": "shopping and grocery options"},
+     "kind": "group", "noun": "shopping and grocery options",
+     "items": [{"name": "Supermarkets",   "column": "Supermarkets",   "noun": "supermarkets"},
+               {"name": "Grocery Shops",  "column": "Groceries",      "noun": "grocery shops"},
+               {"name": "Shopping Malls", "column": "Shopping_Malls", "noun": "shopping malls"}]},
     {"name": "Restaurants",            "column": "Restaurants",        "kind": "count", "noun": "restaurants"},
     {"name": "Healthcare",             "column": "Healthcare",
-     "columns": ["Hospitals", "Pharmacies"],
-     "kind": "group", "noun": "healthcare amenities"},
+     "kind": "group", "noun": "healthcare amenities",
+     "items": [{"name": "Hospitals",  "column": "Hospitals",  "noun": "hospitals"},
+               {"name": "Pharmacies", "column": "Pharmacies", "noun": "pharmacies"}]},
     {"name": "Recreation & Wellness",  "column": "Recreation & Wellness",
-     "columns": ["Gyms", "Parks"],
-     "kind": "group", "noun": "recreation and wellness amenities"},
+     "kind": "group", "noun": "recreation and wellness amenities",
+     "items": [{"name": "Gyms",  "column": "Gyms",  "noun": "gyms"},
+               {"name": "Parks", "column": "Parks", "noun": "parks"}]},
 ]
-FACTOR_LOOKUP = {f["name"]: f for f in FACTORS}
+ITEM_FACTORS = [dict(item, kind="count") for f in FACTORS if f["kind"] == "group" for item in f["items"]]
+FACTOR_LOOKUP = {f["name"]: f for f in FACTORS + ITEM_FACTORS}
 
 # Build the combined raw-count column for each group factor (NaN propagates if any
 # sub-amenity is missing, so the "has complete data" check in Section 8 still works).
 for factor in FACTORS:
     if factor["kind"] == "group":
+        factor["columns"] = [item["column"] for item in factor["items"]]
         area_data[factor["column"]] = area_data[factor["columns"]].sum(axis=1, skipna=False)
 
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
@@ -183,9 +191,24 @@ print("\nRate the importance of each factor.")
 for k, v in RATING_LABELS.items():
     print(f"{k} = {v.capitalize()}")
 
+# Only the factors that end up in the scoring get a rating: a category, or - if the
+# student chose to rate its amenities separately - those amenities in its place.
 ratings = {}
 for factor in FACTORS:
-    ratings[factor["name"]] = int(ask_choice(f"{factor['name']}: ", ["1", "2", "3", "4"]))
+    rating = int(ask_choice(f"{factor['name']}: ", ["1", "2", "3", "4"]))
+    if factor["kind"] != "group":
+        ratings[factor["name"]] = rating
+        continue
+
+    item_names = [item["name"] for item in factor["items"]]
+    item_text = ", ".join(item_names[:-1]) + " and " + item_names[-1]
+    separately = ask_choice(f"  Set priorities for {item_text} separately? (y/n): ",
+                            ["y", "n", "Y", "N"]).lower() == "y"
+    if not separately:
+        ratings[factor["name"]] = rating
+    else:
+        for name in item_names:
+            ratings[name] = int(ask_choice(f"    {name}: ", ["1", "2", "3", "4"]))
 
 weights = {name: RATING_TO_WEIGHT[r] for name, r in ratings.items()}
 active_factors = [name for name, w in weights.items() if w > 0]
@@ -483,7 +506,7 @@ def show_walking_distances(area):
 
 # 11. DISPLAY TOP 3 RECOMMENDATION
 
-column_averages = recommendations[[f["column"] for f in FACTORS if f["column"] in recommendations]].mean()
+column_averages = recommendations[[f["column"] for f in FACTOR_LOOKUP.values() if f["column"] in recommendations]].mean()
 
 print("\n\n==========================================")
 print(" TOP 3 RECOMMENDED AREAS")
