@@ -34,7 +34,9 @@ Endpoints:
                "Restaurants": 3, "Healthcare": 4, "Recreation & Wellness": 3}}
   ```
   `accommodation` is `shared_room | private_room | one_bed | two_bed`; every factor must be rated
-  1 (very important) to 4 (not important), as in `Recommendation system.py`.
+  1 (very important) to 4 (not important), as in `Recommendation system.py`. A category can instead
+  be rated by its amenities (e.g. `"Hospitals": 4, "Pharmacies": 1` in place of `"Healthcare"`);
+  `GET /options` lists them under `factor_items`.
 
 Note: the free Render plan sleeps after ~15 min idle, so the first request after that takes ~30–60 s.
 Commutes use `Data/Dublin_D1_D24_All_University_Commutes_clean_updated.csv` (all universities, same file
