@@ -5,6 +5,19 @@
 | Main site | `Frontend/` | Vercel (already deployed) |
 | District Profile | `Frontend/District Profile/` | Vercel (separate project) |
 | Recommender API | `Backend/app.py` + `Backend/recommender.py` | Render |
+| Website + API together | `Frontend/` built into `Frontend/dist`, served by `Backend/app.py` | Azure App Service (`Crib-Crew-api-1`, France Central) |
+
+## Azure App Service (website + API on one address)
+
+Azure for Students only allows a few regions (here: France Central, Sweden Central, Italy North,
+Austria East, Denmark East). Static Web Apps isn't offered in any of them, so the App Service serves
+the website too: `.github/workflows/main_crib-crew-api-1.yml` builds `Frontend/` (with
+`VITE_API_URL=''`, i.e. same address) and deploys the whole repo; `app.py` serves `Frontend/dist` for
+any path that isn't an API route. Every push to `main` redeploys.
+
+App Service settings: Python **3.12** (not the 3.15 preview), startup command
+`gunicorn --bind=0.0.0.0:8000 --timeout 600 --chdir Backend -k uvicorn.workers.UvicornWorker app:app`,
+`SCM_DO_BUILD_DURING_DEPLOYMENT=true`, Always On.
 
 ## District Profile (Vercel)
 
@@ -25,7 +38,7 @@ so it can't run on a server. `Backend/recommender.py` is the same logic as impor
 2. When it's live, open `https://<your-service>.onrender.com/docs` to try it.
 
 Endpoints:
-- `GET /` – health check
+- `GET /health` – health check (also `GET /` when the website isn't built, e.g. on Render)
 - `GET /options` – universities, accommodation types, factor names and rating labels for the form
 - `POST /recommend` – e.g.
   ```json

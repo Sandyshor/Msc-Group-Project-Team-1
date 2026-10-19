@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { districts } from './District Profile/districtData.js'
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://crib-crew-recommender-api.onrender.com'
+// '' = same address as the website (Azure serves both); unset = the Render API.
+const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
 const ANSWERS_KEY = 'questionnaireAnswers'
 
 // Keep the answers for this tab so refreshing /results still works.

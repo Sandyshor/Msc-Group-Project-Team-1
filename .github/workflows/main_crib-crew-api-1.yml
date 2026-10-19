@@ -19,6 +19,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Build the website; Backend/app.py serves Frontend/dist alongside the API.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Build website
+        working-directory: Frontend
+        env:
+          VITE_API_URL: ''   # call the API on the same address as the website
+        run: |
+          npm ci
+          npm run build
+
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
@@ -40,6 +56,7 @@ jobs:
           path: |
             .
             !antenv/
+            !Frontend/node_modules/
 
       # 🚫 Opting Out of Oryx Build
       # If you prefer to disable the Oryx build process during deployment, follow these steps:
