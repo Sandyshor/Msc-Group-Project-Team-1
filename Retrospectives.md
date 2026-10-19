@@ -106,6 +106,17 @@ Vikneshwaran agreed to edit a video for our home page showing what Dublin looks 
 Catherine agreed to work on the district profile. She will add an animated map in the map section, add remaining areas data in frontend.
 Sowmiya agreed to work on the home page making it more attractive and user specific.
 - Shreyas agreed to work on implementing different languages for our website.
-- Vikneshwaran assigned the task to each team member and updated on Jira. We also agreed to complete the interim report (each member is assigned with a topic to work) by this Sunday night and do a complete check on the whole document. 
+- Vikneshwaran assigned the task to each team member and updated on Jira. We also agreed to complete the interim report (each member is assigned with a topic to work) by this Sunday night and do a complete check on the whole document.
+
+
+**Meeting 2: Sunday (9pm-10pm)**
+- Attended by Shreyas, Santhosh, Viknesh, Sowmiya
+- Connected on a google meet and discussed the progress of interim report. 
+- Sowmiya almost completed her writing on Technical problem.
+- Viknesh completed his part conclusion.
+- Santhosh completed his part Technical solutions.
+- Shreyas completed his part Evaluation.
+
+  
 
   
