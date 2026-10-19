@@ -3,11 +3,16 @@ Web API for the Dublin area recommender.
 
 Run locally:   uvicorn app:app --reload        (from the Backend folder)
 Then open:     http://127.0.0.1:8000/docs      (interactive test page)
+
+If the website has been built (Frontend/dist exists, as in the Azure deployment),
+this app also serves it, so the site and the API share one address.
 """
+from pathlib import Path
 from typing import Dict
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 import recommender
@@ -33,7 +38,7 @@ class RecommendRequest(BaseModel):
                    "Healthcare": 4, "Recreation & Wellness": 3}])
 
 
-@app.get("/")
+@app.get("/health")
 def health():
     return {"status": "ok", "areas": recommender.AREAS}
 
@@ -60,3 +65,18 @@ def recommend(req: RecommendRequest):
         return recommender.recommend(DATA, req.university, req.budget, req.accommodation, req.ratings)
     except recommender.RecommendationError as e:
         raise HTTPException(422, str(e))
+
+
+# Website (Frontend/dist). Registered last so the API routes above take priority.
+FRONTEND_DIR = (Path(__file__).resolve().parent.parent / "Frontend" / "dist")
+
+if FRONTEND_DIR.is_dir():
+    @app.get("/{path:path}", include_in_schema=False)
+    def website(path: str):
+        file = (FRONTEND_DIR / path).resolve()
+        if path and file.is_file() and file.is_relative_to(FRONTEND_DIR):
+            return FileResponse(file)
+        # App routes like /results or /districts are handled by React.
+        return FileResponse(FRONTEND_DIR / "index.html")
+else:
+    app.get("/")(health)
