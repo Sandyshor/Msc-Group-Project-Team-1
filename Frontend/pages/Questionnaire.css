@@ -1,0 +1,114 @@
+/* Questionnaire step 2 (priorities) and shared questionnaire extras.
+   Kept out of App.css so replacing App.css does not drop them. */
+
+.back-button {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.progress-fill {
+  transition: width 0.3s ease;
+}
+
+.field-note {
+  margin: 16px 0 0;
+  color: #a8753f;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.questionnaire-next:disabled {
+  background: #9aa89f;
+  cursor: not-allowed;
+}
+
+/* Priorities step */
+
+fieldset.question-group {
+  margin: 0;
+  min-width: 0;
+}
+
+.factor-name {
+  float: left;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0;
+  font-family: Georgia, serif;
+  font-size: 21px;
+  line-height: 1.4;
+}
+
+.factor-name + .field-hint {
+  clear: both;
+}
+
+.rating-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rating-option {
+  padding: 12px 10px;
+  border: 1px solid #e0d8c9;
+  border-radius: 8px;
+  background: #fffdf7;
+  color: #173f32;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.rating-option.selected {
+  border: 2px solid #173f32;
+  background: #edf0e6;
+  padding: 11px 9px;
+  font-weight: 600;
+}
+
+@media (max-width: 520px) {
+  .rating-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.question-group > .separate-toggle {
+  display: flex;
+  font-family: inherit;
+  line-height: 1.5;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  color: #245b48;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.separate-toggle input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #173f32;
+  cursor: pointer;
+}
+
+.item-ratings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #e0d8c9;
+}
+
+.item-name {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}

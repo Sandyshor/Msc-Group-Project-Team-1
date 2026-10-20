@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import './Results.css'
 import { districts } from '../District Profile/districtData.js'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
