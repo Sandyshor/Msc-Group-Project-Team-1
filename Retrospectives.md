@@ -115,7 +115,26 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Sowmiya almost completed her writing on Technical problem.
 - Viknesh completed his part conclusion.
 - Santhosh completed his part Technical solutions.
-- Shreyas completed his part Evaluation.
+- Shreyas completed his part Evaluation. 
+
+
+**Meeting 3: Monday(9pm-9:30pm)**
+- Attendees: Catherine, Santhosh, Viknesh, and Sowmiya
+- Connected via a group call to discuss the progress of each member’s assigned tasks.
+- Viknesh is working on the intro video for Dublin.
+- Santhosh deployed the website to Azure from vercel.
+- Catherine completed user scenario in interim report.
+- Sowmiya completed her Technical solutions fully.
+
+
+**Meeting 4: Tuesday(4pm-6:30pm)**
+- Attendees: Catherine, Santhosh, Viknesh, Sowmiya, and Shreyas. 
+- Met at Shake dog, ILAC shopping center and discussed the feedback that Andrea gave and other tasks to do.
+- Viknesh assigned the interim presentation topics for each person to be done this week. And he completed the intro video for Dublin to be added in the home page of the website.
+- Santhosh rearranged the directory structure and deployed the website on Azure again.
+- Sowmiya improved the home page in the website based on last week's feedback.
+- Catherine worked on adding luas lines to maps in the website.
+- Shreyas reworked on Evaluation as there were some corrections to do.
 
   
 
