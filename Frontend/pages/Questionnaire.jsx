@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import './Questionnaire.css'
 
 // Values match the university names in the backend's commute data.
 const UNIVERSITIES = [

@@ -1,0 +1,230 @@
+/* Results page (top 3 matches). Uses the questionnaire layout classes from App.css.
+   Kept out of App.css so replacing App.css does not drop them. */
+
+/* RESULTS PAGE */
+
+.results-container {
+  max-width: 820px;
+}
+
+.results-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 36px 24px;
+  border: 1px solid #e7dfd0;
+  border-radius: 12px;
+  background: #fffdf7;
+  color: #617067;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.results-error {
+  color: #8a3b2b;
+}
+
+.results-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #e3ddcf;
+  border-top-color: #173f32;
+  border-radius: 50%;
+  animation: results-spin 0.9s linear infinite;
+}
+
+@keyframes results-spin {
+  to { transform: rotate(360deg); }
+}
+
+.results-warning {
+  margin: 0 0 24px;
+  padding: 16px 18px;
+  border-left: 4px solid #a8753f;
+  border-radius: 6px;
+  background: #fbf3e6;
+  color: #6d4c27;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.result-card {
+  padding: 26px;
+  border: 1px solid #e7dfd0;
+  border-radius: 12px;
+  background: #fffdf7;
+  color: #173f32;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.result-card h3 {
+  margin: 22px 0 6px;
+  font-family: Georgia, serif;
+  font-size: 18px;
+}
+
+.result-card p {
+  margin: 0;
+  color: #4d5e53;
+}
+
+.result-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.result-header h2 {
+  margin: 4px 0 0;
+  font-family: Georgia, serif;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.result-rank {
+  color: #a8753f;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.result-lea {
+  color: #8a9d7a;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.result-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #173f32;
+  color: #fffdf7;
+  line-height: 1.2;
+}
+
+.result-score strong {
+  font-family: Georgia, serif;
+  font-size: 24px;
+}
+
+.result-score span {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.result-stats > div {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f4efe4;
+}
+
+.result-stats dt {
+  color: #718075;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.result-stats dd {
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.budget-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.budget-tag.within {
+  background: #dbe4d4;
+  color: #245b48;
+}
+
+.budget-tag.above {
+  background: #f6e1d6;
+  color: #8a3b2b;
+}
+
+.result-muted {
+  color: #718075;
+  font-weight: 400;
+}
+
+.result-walking details {
+  margin-top: 4px;
+}
+
+.result-walking summary {
+  color: #245b48;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.result-walking ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: #4d5e53;
+}
+
+.result-profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 11px 16px;
+  border: 1px solid #173f32;
+  border-radius: 7px;
+  background: transparent;
+  color: #173f32;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.result-profile-link:hover {
+  background: #173f32;
+  color: #fffdf7;
+}
+
+@media (max-width: 520px) {
+  .result-card {
+    padding: 19px;
+  }
+
+  .result-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .result-header h2 {
+    font-size: 24px;
+  }
+}
