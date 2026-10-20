@@ -1,27 +1,27 @@
 import './App.css'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
-import Home from './Home.jsx'
-import HowItWorks from './Howitworks.jsx'
-import Questionnaire from './Questionnaire.jsx'
-import Login from './Login.jsx'
-import Signup from './Signup.jsx'
-import DistrictProfile from './District Profile/App.jsx'
-import Results from './Results.jsx'
-
-// Opens on the district picked from a result card, if any.
-function DistrictsPage() {
-  const location = useLocation()
-  return <DistrictProfile key={location.key} initialDistrictId={location.state?.district} />
-}
+import Home from './pages/Home'
+import HowItWorks from './pages/Howitworks'
+import Questionnaire from './pages/Questionnaire'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import Districts from './pages/Districts'
 
 function App() {
+  const location = useLocation()
   return (
     <div className="site-shell">
-      <header className="navbar">
-        <Link className="brand" to="/">
-          <span className="brand-mark">⌂</span>
-          <span>Find Your Dublin</span>
-        </Link>
+      <header className={`navbar ${location.pathname === '/' ? 'navbar-home' : ''}`}>
+        
+<Link className="brand" to="/">
+  <img
+    className="brand-logo"
+    src="/images/find-your-dublin-logo.png"
+    alt=""
+  />
+  <span>Find Your Dublin</span>
+</Link>
+
 
         
 <nav className="nav-links">
@@ -47,8 +47,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/districts" element={<DistrictsPage />} />
-          <Route path="/results" element={<Results />} />
+          <Route path="/districts" element={<Districts />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/login" element={<Login />} />
