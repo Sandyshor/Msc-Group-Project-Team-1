@@ -75,8 +75,12 @@ if FRONTEND_DIR.is_dir():
     def website(path: str):
         file = (FRONTEND_DIR / path).resolve()
         if path and file.is_file() and file.is_relative_to(FRONTEND_DIR):
-            return FileResponse(file)
-        # App routes like /results or /districts are handled by React.
-        return FileResponse(FRONTEND_DIR / "index.html")
+            if file.parent.name == "assets":
+                # Vite gives these a new hashed name on every build, so they never go stale.
+                return FileResponse(file, headers={"Cache-Control": "public, max-age=31536000, immutable"})
+            return FileResponse(file, headers={"Cache-Control": "no-cache"})
+        # App routes like /results or /districts are handled by React. no-cache makes
+        # browsers re-check index.html, so a new deploy shows up on the next visit.
+        return FileResponse(FRONTEND_DIR / "index.html", headers={"Cache-Control": "no-cache"})
 else:
     app.get("/")(health)
