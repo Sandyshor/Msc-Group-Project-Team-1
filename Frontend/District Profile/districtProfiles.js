@@ -178,13 +178,13 @@ const famousPlacesByDistrict = {
       name: "Herbert Park",
       description: "A popular public park in Ballsbridge.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/A_scene_in_Herbert_Park,_Dublin.jpg",
-      imageCredit: "Wikimedia Commons",
+    
     },
     {
       name: "Aviva Stadium",
       description: "A major sports stadium in Dublin 4.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/Aviva_Stadium_Dublin.jpg",
-      imageCredit: "Wikimedia Commons",
+      
     },
   ],
   D5: [
@@ -192,14 +192,14 @@ const famousPlacesByDistrict = {
       name: "St Anne's Park",
       description: "A large park with gardens and walking routes.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/St._Anne%27s_Park_-_Dublin.jpg",
-      imageCredit: "Wikimedia Commons",
+    
     },
     {
       name: "North Bull Island",
       description: "A coastal nature area in Dublin Bay.",
       image:
         "https://commons.wikimedia.org/wiki/Special:FilePath/North_Bull_Island.jpg",
-      imageCredit: "Wikimedia Commons",
+      
     },
   ],
   D6: [
@@ -207,13 +207,13 @@ const famousPlacesByDistrict = {
       name: "Rathmines Town Hall",
       description: "A distinctive landmark in Rathmines.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rathmines_in_Dublin.jpg",
-      imageCredit: "Wikimedia Commons",
+     
     },
     {
       name: "Ranelagh",
       description: "A lively neighbourhood with cafes and local shops.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/Ranelagh_Main_Street.jpg",
-      imageCredit: "Wikimedia Commons",
+      
     },
   ],
   D7: [
@@ -221,13 +221,13 @@ const famousPlacesByDistrict = {
       name: "Phoenix Park",
       description: "One of Europe's largest enclosed city parks.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/Phoenix_Park_-_Dublin_%282506342801%29.jpg",
-      imageCredit: "Wikimedia Commons",
+      
     },
     {
       name: "National Museum at Collins Barracks",
       description: "A museum in a historic military building.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/Main_entrance_to_the_National_Museum_of_Ireland-_Decorative_Arts_%26_History-_Collins_Barracks,_Dublin_%282019%29.jpg",
-      imageCredit: "Wikimedia Commons",
+   
     },
   ],
   D8: [
@@ -235,13 +235,13 @@ const famousPlacesByDistrict = {
       name: "Kilmainham Gaol",
       description: "A historic prison and museum.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kilmainham_Gaol_Prison.jpg",
-      imageCredit: "Wikimedia Commons",
+      
     },
     {
       name: "Guinness Storehouse",
       description: "A well-known visitor attraction at St James's Gate.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/Dublin_Guinness_Storehouse.JPG",
-      imageCredit: "Wikimedia Commons",
+     
     },
   ],
   D9: [
@@ -249,14 +249,14 @@ const famousPlacesByDistrict = {
       name: "National Botanic Gardens",
       description: "Historic botanical gardens in Glasnevin.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/Botanic_Gardens_In_Glasnevin_(Dublin)_(7951851502).jpg",
-      imageCredit: "Wikimedia Commons",
+      
     },
     {
       name: "Croke Park",
       description: "A major stadium and home of Gaelic games.",
       image:
         "https://commons.wikimedia.org/wiki/Special:FilePath/Croke_Park.jpg",
-      imageCredit: "Wikimedia Commons",
+   
     },
   ],
   D10: [
@@ -264,14 +264,14 @@ const famousPlacesByDistrict = {
       name: "Ballyfermot",
       description: "A residential neighbourhood on Dublin's west side.",
       image: "https://commons.wikimedia.org/wiki/Special:FilePath/Cherry_Orchard_Park_Lake.jpg",
-      imageCredit: "Wikimedia Commons",
+      
     },
     {
       name: "Cherry Orchard",
       description: "A neighbourhood in the Dublin 10 area.",
       image:
         "https://commons.wikimedia.org/wiki/Special:FilePath/Cherry_Orchard_Dublin.jpg",
-      imageCredit: "Wikimedia Commons",
+     
     },
   ],
 };
