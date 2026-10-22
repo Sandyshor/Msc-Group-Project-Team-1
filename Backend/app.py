@@ -81,9 +81,8 @@ class TranslateRequest(BaseModel):
 def translate_texts(req: TranslateRequest):
     try:
         return {"translations": translator.translate(req.texts, req.language)}
-    except Exception:
-        raise HTTPException(502, "Translation service is not available")
-
+    except Exception as e:
+        raise HTTPException(502, f"Translation failed: {e!r}")
 FRONTEND_DIR = (Path(__file__).resolve().parent.parent / "Frontend" / "dist")
 
 if FRONTEND_DIR.is_dir():
