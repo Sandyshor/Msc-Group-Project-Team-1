@@ -1,66 +1,98 @@
 
-import { useState } from 'react';
-import { districts } from './districtData';
-import DistrictMap from './DistrictMap';
-import './App.css';
+import { useState } from "react";
+import { districts } from "./districtData";
+import { districtProfiles } from "./districtProfiles";
+import DistrictMap from "./DistrictMap";
+import "./App.css";
 
 const amenityLabels = [
-  ['groceries', 'Groceries'],
-  ['restaurants', 'Restaurants'],
-  ['asianRestaurants', 'Asian Restaurants'],
-  ['cafes', 'Cafes'],
-  ['gyms', 'Gyms'],
-  ['parks', 'Parks'],
-  ['pharmacies', 'Pharmacies'],
+  ["supermarkets", "Supermarkets"],
+  ["groceries", "Groceries"],
+  ["restaurants", "Restaurants"],
+  ["asianRestaurants", "Asian Restaurants"],
+  ["cafes", "Cafes"],
+  ["gyms", "Gyms"],
+  ["parks", "Parks"],
+  ["pharmacies", "Pharmacies"],
+  ["hospitals", "Hospitals"],
+  ["shoppingMalls", "Shopping Malls"],
 ];
 
+// Merge profile data while preserving existing famous-place details.
+const profileDistricts = districts.map((district) => {
+  const data = districtProfiles[district.id];
+
+  if (!data) return district;
+
+  return {
+    ...district,
+    name: data.name || district.name,
+    rent: {
+      ...(district.rent && typeof district.rent === "object"
+        ? district.rent
+        : {}),
+      ...(data.rent || {}),
+    },
+    transport: data.transport ?? district.transport,
+    amenities: {
+      ...(district.amenities || {}),
+      ...(data.amenities || {}),
+    },
+    famousPlaces: data.famousPlaces?.length
+  ? data.famousPlaces
+  : (district.famousPlaces || []),
+  };
+});
+
+const visibleDistricts = profileDistricts.filter((district) =>
+  /^D([1-9]|10)$/.test(district.id)
+);
+
 function formatValue(value) {
-  if (value === null || value === undefined || value === '') {
-    return 'Data not available';
+  if (value === null || value === undefined || value === "") {
+    return "Data not available";
   }
 
   return value;
 }
 
 function formatRent(rent) {
-  if (rent === null || rent === undefined || rent === '') {
-    return 'Data not available';
-  }
+  if (!rent) return "Data not available";
 
-  if (typeof rent === 'number') {
-    return `€${rent.toLocaleString('en-IE', {
+  if (typeof rent === "number") {
+    return `€${rent.toLocaleString("en-IE", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}/month`;
   }
 
-  if (typeof rent === 'object') {
-    const rentDetails = [];
+  if (typeof rent === "object") {
+    const details = [];
 
-    if (rent.oneBed != null && rent.oneBed !== '') {
-      rentDetails.push(
-        `1-bedroom: €${Number(rent.oneBed).toLocaleString('en-IE', {
+    if (rent.oneBed != null) {
+      details.push(
+        `1-bedroom: €${Number(rent.oneBed).toLocaleString("en-IE", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}/month`
       );
     }
 
-    if (rent.twoBed != null && rent.twoBed !== '') {
-      rentDetails.push(
-        `2-bedroom: €${Number(rent.twoBed).toLocaleString('en-IE', {
+    if (rent.twoBed != null) {
+      details.push(
+        `2-bedroom: €${Number(rent.twoBed).toLocaleString("en-IE", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}/month`
       );
     }
 
-    return rentDetails.length
-  ? rentDetails.join('\n')
-  : 'Data not available';
+    return details.length
+      ? details.join(" | ")
+      : "Data not available";
   }
 
-  return 'Data not available';
+  return "Data not available";
 }
 
 function FamousPlaceCard({ place }) {
@@ -84,20 +116,23 @@ function FamousPlaceCard({ place }) {
 
       <div className="place-content">
         <h4>{place.name}</h4>
+        {place.description && <p>{place.description}</p>}
+        {place.imageCredit && <small>{place.imageCredit}</small>}
       </div>
     </article>
   );
 }
 
-export default function App({ initialDistrictId = 'D1' }) {
-  const [selectedDistrictId, setSelectedDistrictId] = useState(initialDistrictId);
+export default function App() {
+  const [selectedDistrictId, setSelectedDistrictId] = useState("D1");
 
   const selectedDistrict =
-    districts.find((district) => district.id === selectedDistrictId) ??
-    districts[0];
+    visibleDistricts.find(
+      (district) => district.id === selectedDistrictId
+    ) ?? visibleDistricts[0];
 
   function handleMapSelection(districtId) {
-    const district = districts.find(
+    const district = visibleDistricts.find(
       (item) =>
         item.id.toUpperCase() === String(districtId).toUpperCase()
     );
@@ -119,7 +154,7 @@ export default function App({ initialDistrictId = 'D1' }) {
           <div className="section-heading">
             <div>
               <h2>Explore the map</h2>
-              <p>Select a D1, D2 or D3 boundary.</p>
+              <p>Select a district to view its profile.</p>
             </div>
 
             <span className="map-badge">Interactive map</span>
@@ -129,6 +164,26 @@ export default function App({ initialDistrictId = 'D1' }) {
             selectedDistrict={selectedDistrict.id}
             onSelectDistrict={handleMapSelection}
           />
+
+          <div className="district-picker">
+            <label htmlFor="district-select">
+              Choose a district (D1–D10)
+            </label>
+
+            <select
+              id="district-select"
+              value={selectedDistrict.id}
+              onChange={(event) =>
+                setSelectedDistrictId(event.target.value)
+              }
+            >
+              {visibleDistricts.map((district) => (
+                <option key={district.id} value={district.id}>
+                  {district.id} — {district.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="profile-card" key={selectedDistrict.id}>
@@ -144,24 +199,24 @@ export default function App({ initialDistrictId = 'D1' }) {
           </div>
 
           <div className="profile-detail">
-            <span>Average rent</span>
-            <strong>{formatRent(selectedDistrict.rent)}</strong>
+            <span>Average rent (RTB 2025)</span>
+            <strong className="rent-value">
+              {formatRent(selectedDistrict.rent)}
+            </strong>
           </div>
 
           <section className="amenities-section">
             <h3>Available Amenities</h3>
 
             <div className="amenities-list">
-              {amenityLabels.map(([key, label]) => {
-                const value = selectedDistrict.amenities?.[key];
-
-                return (
-                  <div className="amenity-row" key={key}>
-                    <span>{label}</span>
-                    <strong>{formatValue(value)}</strong>
-                  </div>
-                );
-              })}
+              {amenityLabels.map(([key, label]) => (
+                <div className="amenity-row" key={key}>
+                  <span>{label}</span>
+                  <strong>
+                    {formatValue(selectedDistrict.amenities?.[key])}
+                  </strong>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -174,7 +229,7 @@ export default function App({ initialDistrictId = 'D1' }) {
               </span>
             </div>
 
-            {selectedDistrict.famousPlaces?.length ? (
+            {selectedDistrict.famousPlaces?.length > 0 ? (
               <div className="places-list">
                 {selectedDistrict.famousPlaces.map((place) => (
                   <FamousPlaceCard
@@ -184,7 +239,7 @@ export default function App({ initialDistrictId = 'D1' }) {
                 ))}
               </div>
             ) : (
-              <p>No famous places available.</p>
+              <p>No famous places available for this district yet.</p>
             )}
           </section>
         </div>
