@@ -72,6 +72,18 @@ def recommend(req: RecommendRequest):
     return result
 
 
+class TranslateRequest(BaseModel):
+    texts: List[str] = Field(..., max_length=100)
+    language: str
+
+
+@app.post("/translate")
+def translate_texts(req: TranslateRequest):
+    try:
+        return {"translations": translator.translate(req.texts, req.language)}
+    except Exception:
+        raise HTTPException(502, "Translation service is not available")
+
 FRONTEND_DIR = (Path(__file__).resolve().parent.parent / "Frontend" / "dist")
 
 if FRONTEND_DIR.is_dir():
