@@ -282,11 +282,11 @@ candidates["Commute Score"] = rank_score(candidates["Commute Minutes"], ascendin
 for factor in FACTORS:
     if factor["kind"] == "count":
         col = factor["column"]
-        candidates[f"{col} Score"] = rank_score(candidates[col], ascending=False)
+        candidates[f"{col} Score"] = rank_score(candidates[col] / candidates["Population"], ascending=False)
     elif factor["kind"] == "group":
         sub_score_cols = []
         for col in factor["columns"]:
-            candidates[f"{col} Score"] = rank_score(candidates[col], ascending=False)
+            candidates[f"{col} Score"] = rank_score(candidates[col] / candidates["Population"], ascending=False)
             sub_score_cols.append(f"{col} Score")
         # Category score = average of its sub-amenities' rank-based scores, so no single
         # sub-amenity dominates the category.

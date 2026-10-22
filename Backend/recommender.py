@@ -275,16 +275,16 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
         raise RecommendationError("No area has complete data for your accommodation type and chosen factors.")
 
     # Scores
-    candidates["Rent Score"] = _rank_score(candidates["Rent"], ascending=True)
+    candidates["Rent Score"] = (1 - (candidates["Rent"] - budget).clip(lower=0) / (0.5 * budget)).clip(lower=0)
     if "Commute" in active_factors:
         candidates["Commute Score"] = _rank_score(candidates["Commute Minutes"], ascending=True)
     for factor in FACTORS:
         if factor["kind"] == "count":
-            candidates[f"{factor['column']} Score"] = _rank_score(candidates[factor["column"]], ascending=False)
+            candidates[f"{factor['column']} Score"] = _rank_score(candidates[factor["column"]] / candidates["Population"], ascending=False)
         elif factor["kind"] == "group":
             sub_cols = []
             for col in factor["columns"]:
-                candidates[f"{col} Score"] = _rank_score(candidates[col], ascending=False)
+                candidates[f"{col} Score"] = _rank_score(candidates[col] / candidates["Population"], ascending=False)
                 sub_cols.append(f"{col} Score")
             candidates[f"{factor['name']} Score"] = candidates[sub_cols].mean(axis=1)
 
