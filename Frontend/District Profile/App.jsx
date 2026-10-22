@@ -164,26 +164,6 @@ export default function App() {
             selectedDistrict={selectedDistrict.id}
             onSelectDistrict={handleMapSelection}
           />
-
-          <div className="district-picker">
-            <label htmlFor="district-select">
-              Choose a district (D1–D10)
-            </label>
-
-            <select
-              id="district-select"
-              value={selectedDistrict.id}
-              onChange={(event) =>
-                setSelectedDistrictId(event.target.value)
-              }
-            >
-              {visibleDistricts.map((district) => (
-                <option key={district.id} value={district.id}>
-                  {district.id} — {district.name}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
         <div className="profile-card" key={selectedDistrict.id}>
