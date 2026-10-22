@@ -27,7 +27,7 @@ export const districts = [
           "A well-known pedestrian bridge across the River Liffey in central Dublin.",
         image:
           "https://commons.wikimedia.org/wiki/Special:FilePath/Ha%27Penny_Bridge_in_Dublin%2C_Ireland.jpg?width=800",
-        imageCredit: "Photo: Chris Rycroft / Wikimedia Commons",
+        
         sourceUrl:
           "https://commons.wikimedia.org/wiki/File:Ha%27Penny_Bridge_in_Dublin,_Ireland.jpg",
       },
@@ -37,7 +37,7 @@ export const districts = [
           "The river running through Dublin city, with walkways and bridges along the city centre.",
         image:
           "https://commons.wikimedia.org/wiki/Special:FilePath/Ha%27Penny_Bridge_in_Dublin%2C_Ireland.jpg?width=800",
-        imageCredit: "Photo: Chris Rycroft / Wikimedia Commons",
+        
         sourceUrl:
           "https://commons.wikimedia.org/wiki/File:Ha%27Penny_Bridge_in_Dublin,_Ireland.jpg",
       },
@@ -45,7 +45,7 @@ export const districts = [
         name: "The Spire of Dublin",
         description: "A landmark stainless-steel monument on O'Connell Street in Dublin city centre.",
         image: "https://commons.wikimedia.org/wiki/Special:FilePath/The_Spire,_Dublin.jpg",
-        imageCredit: "Wikimedia Commons"
+        
       }
     ],
   },
@@ -77,7 +77,7 @@ export const districts = [
           "Historic university campus in the city centre, known for its architecture and cultural attractions.",
         image:
           "https://commons.wikimedia.org/wiki/Special:FilePath/Trinity_College_%28Dublin%29.JPG?width=800",
-        imageCredit: "Photo: Etiennekd / Wikimedia Commons",
+       
         sourceUrl:
           "https://commons.wikimedia.org/wiki/File:Trinity_College_(Dublin).JPG",
       },
@@ -87,7 +87,7 @@ export const districts = [
           "The River Liffey is a major feature of central Dublin, with pedestrian routes and bridges nearby.",
         image:
           "https://commons.wikimedia.org/wiki/Special:FilePath/Ha%27Penny_Bridge_in_Dublin%2C_Ireland.jpg?width=800",
-        imageCredit: "Photo: Chris Rycroft / Wikimedia Commons",
+        
         sourceUrl:
           "https://commons.wikimedia.org/wiki/File:Ha%27Penny_Bridge_in_Dublin,_Ireland.jpg",
       },
@@ -121,7 +121,7 @@ export const districts = [
           "A large public park on Dublin's northside, with walking routes, open green spaces and gardens.",
         image:
           "https://commons.wikimedia.org/wiki/Special:FilePath/St._Anne%27s_Park_-_Dublin.jpg?width=800",
-        imageCredit: "Photo: Wikimedia Commons",
+        
         sourceUrl:
           "https://commons.wikimedia.org/wiki/File:St._Anne's_Park_-_Dublin.jpg",
       },
