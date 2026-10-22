@@ -136,6 +136,15 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Catherine worked on adding luas lines to maps in the website.
 - Shreyas reworked on Evaluation as there were some corrections to do.
 
+
+**Meeting 5: Thursday(9:30pm-10pm)**
+- Attendees: Catherine, Santhosh, Viknesh, Sowmiya, and Shreyas.
+- Did rehearsal on Friday's presentation.
+- Shreyas implemented the multiple language option in the website
+- Catherine implemented the luas lines in the map in website.
+- Viknesh, Sowmiya, Santhosh discussed on what to include in the website furthermore in future.
+
+
   
 
   
