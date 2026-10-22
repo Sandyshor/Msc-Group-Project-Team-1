@@ -140,6 +140,7 @@ function Results() {
         budget: answers.budget,
         accommodation: answers.accommodation,
         ratings: answers.ratings,
+        language: answers.language ?? 'en',
       }),
       signal: controller.signal,
     })
