@@ -334,6 +334,76 @@ export default function DistrictMap({
               },
             });
 
+            // Luas route lines. The downloaded GeoJSON files contain route
+            // features with ref values 'Luas Red Line' and 'Luas Green Line'.
+            map.addSource('luas-red-route', {
+              type: 'geojson',
+              data: '/data/luas-red-line.geojson',
+            });
+
+            map.addLayer({
+              id: 'luas-red-route-line',
+              type: 'line',
+              source: 'luas-red-route',
+              filter: [
+                'all',
+                [
+                  'any',
+                  ['==', ['geometry-type'], 'LineString'],
+                  ['==', ['geometry-type'], 'MultiLineString'],
+                ],
+                ['==', ['get', 'ref'], 'Luas Red Line'],
+              ],
+              layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+              },
+              paint: {
+                'line-color': '#d71920',
+                'line-width': [
+                  'interpolate', ['linear'], ['zoom'],
+                  8, 2.5,
+                  12, 4,
+                  15, 6,
+                ],
+                'line-opacity': 1,
+              },
+            });
+
+            map.addSource('luas-green-route', {
+              type: 'geojson',
+              data: '/data/luas-green-line.geojson',
+            });
+
+            map.addLayer({
+              id: 'luas-green-route-line',
+              type: 'line',
+              source: 'luas-green-route',
+              filter: [
+                'all',
+                [
+                  'any',
+                  ['==', ['geometry-type'], 'LineString'],
+                  ['==', ['geometry-type'], 'MultiLineString'],
+                ],
+                ['==', ['get', 'ref'], 'Luas Green Line'],
+              ],
+              layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+              },
+              paint: {
+                'line-color': '#008531',
+                'line-width': [
+                  'interpolate', ['linear'], ['zoom'],
+                  8, 2.5,
+                  12, 4,
+                  15, 6,
+                ],
+                'line-opacity': 1,
+              },
+            });
+
             // Add visible labels for districts where GeoJSON data exists.
             map.addLayer({
               id: 'district-labels',
@@ -351,10 +421,10 @@ export default function DistrictMap({
                   'interpolate',
                   ['linear'],
                   ['zoom'],
-                  9,
-                  11,
+                  8,
+                  12,
                   13,
-                  16,
+                  17,
                 ],
                 'text-allow-overlap': true,
                 'text-ignore-placement': true,
@@ -365,6 +435,67 @@ export default function DistrictMap({
                 'text-halo-width': 2,
               },
             });
+
+            // Luas stop locations. These files must be in public/data/.
+            map.addSource('luas-red-stops', {
+              type: 'geojson',
+              data: '/data/luas-red-stops.geojson',
+            });
+
+            map.addLayer({
+              id: 'luas-red-stops-points',
+              type: 'circle',
+              source: 'luas-red-stops',
+              paint: {
+                'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 3, 13, 5.5],
+                'circle-color': '#e31b23',
+                'circle-stroke-color': '#ffffff',
+                'circle-stroke-width': 1.5,
+              },
+            });
+
+            map.addSource('luas-green-stops', {
+              type: 'geojson',
+              data: '/data/luas-green-stops.geojson',
+            });
+
+            map.addLayer({
+              id: 'luas-green-stops-points',
+              type: 'circle',
+              source: 'luas-green-stops',
+              paint: {
+                'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 3, 13, 5.5],
+                'circle-color': '#008531',
+                'circle-stroke-color': '#ffffff',
+                'circle-stroke-width': 1.5,
+              },
+            });
+
+            // Keep district labels above the Luas lines and stop circles.
+            map.moveLayer('district-labels');
+
+            // Show stop names when a marker is clicked.
+            const addStopPopup = (layerId, lineName) => {
+              map.on('click', layerId, (event) => {
+                const feature = event.features?.[0];
+                if (!feature) return;
+                const props = feature.properties ?? {};
+                const stopName = props.name ?? props.Name ?? props.ref ?? 'Luas stop';
+                new maplibregl.Popup({ closeButton: true, offset: 8 })
+                  .setLngLat(event.lngLat)
+                  .setText(`${stopName} — ${lineName}`)
+                  .addTo(map);
+              });
+              map.on('mouseenter', layerId, () => {
+                map.getCanvas().style.cursor = 'pointer';
+              });
+              map.on('mouseleave', layerId, () => {
+                map.getCanvas().style.cursor = '';
+              });
+            };
+
+            addStopPopup('luas-red-stops-points', 'Red Line');
+            addStopPopup('luas-green-stops-points', 'Green Line');
 
             map.on('click', 'district-fill', (event) => {
               const id = event.features?.[0]?.properties?.districtId;
