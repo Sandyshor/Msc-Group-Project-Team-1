@@ -58,7 +58,7 @@ def recommend(req: RecommendRequest):
 
     if req.language != "en":
         recs = result["recommendations"]
-        texts = [r["why"] for r in recs] + [r["about"] for r in recs]
+        texts = [r["why"] for r in recs] + [r["profile"] for r in recs]
         if result.get("warning"):
             texts.append(result["warning"])
         try:
@@ -67,7 +67,7 @@ def recommend(req: RecommendRequest):
             return result
         for i, r in enumerate(recs):
             r["why"] = done[i]
-            r["about"] = done[len(recs) + i]
+            r["profile"] = done[len(recs) + i]
         if result.get("warning"):
             result["warning"] = done[-1]
     return result
