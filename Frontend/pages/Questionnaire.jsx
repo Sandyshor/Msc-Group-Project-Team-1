@@ -70,12 +70,20 @@ const RATINGS = [
   [4, 'Not important'],
 ]
 
+const LANGUAGES = [
+  ['en', 'English'],
+  ['es', 'Español'],
+  ['pt', 'Português'],
+  ['hi', 'हिन्दी'],
+  ['zh-Hans', '中文'],
+  ['ar', 'العربية'],
+]
 function Questionnaire() {
   const [step, setStep] = useState(1)
   const [budget, setBudget] = useState(1000)
   const [destination, setDestination] = useState('')
   const [roomType, setRoomType] = useState('Private room')
-  // Every category and every item starts at "Important"; only the ones in use are sent.
+  const [language, setLanguage] = useState('en')
   const [ratings, setRatings] = useState(
     Object.fromEntries(
       FACTORS.flatMap(([name, , items = []]) => [name, ...items]).map((name) => [name, 2])
@@ -112,6 +120,7 @@ function Questionnaire() {
         accommodation,
         accommodationLabel: roomType,
         ratings: activeRatings,
+        language,
       },
     })
   }
@@ -207,6 +216,24 @@ function Questionnaire() {
                 </select>
               </div>
 
+              <div className="question-group">
+                <label htmlFor="language">
+                  Which language should we explain your results in?
+                </label>
+
+                <select
+                  id="language"
+                  value={language}
+                  onChange={(event) => setLanguage(event.target.value)}
+                >
+                  {LANGUAGES.map(([code, label]) => (
+                    <option key={code} value={code}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
               <div className="question-group">
                 <label>What type of accommodation do you prefer?</label>
 
