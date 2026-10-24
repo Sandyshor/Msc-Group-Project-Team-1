@@ -144,6 +144,27 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Catherine implemented the luas lines in the map in website.
 - Viknesh, Sowmiya, Santhosh discussed on what to include in the website furthermore in future.
 
+  **Week 6: Lead: Santhosh**
+  **Meeting 1 (1:00 - 2:00)**
+  - Attendees: Catherine, Santhosh, Sowmiya, Vignesh and Sheryas
+  - Met after the lecture hour at TU Dublin campus, and discussed about feedback given by Brenden, Andrea and Damian
+  - Feedback were organized in an Excel file, and started splitting tasks among the team.
+  - Discussed how we gonna make the map more interactive
+  - How we gonna fix the calculation issue,
+  - Steps to be taken for Evaluating.
+  - How we gonna make recommendation more dynamic
+
+  **Meeting 2 (7:30 - 8:30)**
+  - Attendees: Santhosh, Sowmiya, Catherine, Vignesh and Sheryas.
+  - Connected on google meet and discussed deeply about the feedback.
+  - Task has been assigned to all team members via JIRA
+  - Catherine agreed to work on maps
+  - Sowmiya agreed to make the frontend more intractive
+  - Santhosh agreed to work on Calculation
+  - Vignesh agreed to work on security and safety of the area, permission access to the data.
+  - Sheryas agreed to evaluate the system, providing details for letting agencies
+  
+
 
   
 
