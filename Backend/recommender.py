@@ -57,6 +57,10 @@ for _factor in FACTORS:
 ITEM_FACTORS = [dict(item, kind="count") for f in FACTORS if f["kind"] == "group" for item in f["items"]]
 FACTOR_LOOKUP = {f["name"]: f for f in FACTORS + ITEM_FACTORS}
 
+# How a student can travel. Each key is a minutes column in data["commute_points"].
+TRAVEL_MODES = {"public_transport": "by public transport", "walk": "on foot", "cycle": "by bike"}
+CYCLING_KMH = 15  # typical city cycling speed, applied to the walking route distance
+
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
 RATING_TO_WEIGHT = {1: 3, 2: 2, 3: 1, 4: 0}
 
@@ -121,6 +125,13 @@ def load_data():
         "Walking_Time_to_University_Min": "Walking Minutes",
     })
 
+    # One row per landmark (5 per area) and university, with minutes for every travel mode,
+    # so each search can work out the commute for the mode and time limit the student picks.
+    commute_points = commutes.merge(walking, on=["Area", "Direction", "Landmark", "University"], how="left")
+    commute_points["public_transport"] = commute_points["Travel_Time_Min"]
+    commute_points["walk"] = commute_points["Walking Minutes"]
+    commute_points["cycle"] = commute_points["Walking km"] / CYCLING_KMH * 60
+
     # Rent tables
     shared_room_rent = room_data[room_data["Room type"].isin(SHARED_ROOM_LABELS)].groupby("Area")["Rent"].mean()
     private_room_rent = room_data[room_data["Room type"].isin(PRIVATE_ROOM_LABELS)].groupby("Area")["Rent"].mean()
@@ -148,6 +159,7 @@ def load_data():
         "ethnicity": ethnicity,
         "walking": walking,
         "commute_by_university": commute_by_university,
+        "commute_points": commute_points,
         "universities": sorted(commute_by_university["University"].unique()),
         "rent_tables": {
             "shared_room": ("Shared Room", shared_room_rent),
@@ -197,12 +209,15 @@ def _compare_word(value, average):
 
 # 3. MAIN ENTRY POINT
 
-def recommend(data, university, budget, accommodation, ratings, top_n=3):
+def recommend(data, university, budget, accommodation, ratings, top_n=3,
+              travel_mode="public_transport", max_commute=None):
     """
     university:    one of data["universities"], e.g. "TU Dublin - Grangegorman"
     budget:        max monthly budget in euro
     accommodation: shared_room | private_room | one_bed | two_bed
     ratings:       {factor name: 1-4} for every factor, as in "Recommendation system.py"
+    travel_mode:   public_transport | walk | cycle
+    max_commute:   longest commute in minutes the student accepts (None = no limit)
     """
     if university not in data["universities"]:
         raise RecommendationError(
@@ -210,6 +225,9 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
     if accommodation not in data["rent_tables"]:
         raise RecommendationError(
             f"Unknown accommodation '{accommodation}'. Use one of: {', '.join(data['rent_tables'])}")
+    if travel_mode not in TRAVEL_MODES:
+        raise RecommendationError(
+            f"Unknown travel mode '{travel_mode}'. Use one of: {', '.join(TRAVEL_MODES)}")
     unknown = [name for name in ratings if name not in FACTOR_LOOKUP]
     if unknown:
         raise RecommendationError(
@@ -244,15 +262,23 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
         raise RecommendationError("You rated every factor as 'Not important', so there is nothing to rank on.")
 
     census, ethnicity, walking = data["census"], data["ethnicity"], data["walking"]
-    commute_by_university = data["commute_by_university"]
-    area_data = data["area_data"].merge(
-        commute_by_university.loc[
-            commute_by_university["University"] == university,
-            ["Area", "Commute Minutes", "Distance"],
-        ],
-        on="Area",
-        how="left",
-    )
+    mode_words = TRAVEL_MODES[travel_mode]
+
+    # Commute for this search: the chosen travel mode, from each of the 5 parts of every area
+    points = data["commute_points"]
+    points = points[(points["University"] == university) & points[travel_mode].notna()].copy()
+    points["Minutes"] = points[travel_mode]
+    points["Within Limit"] = points["Minutes"] <= max_commute if max_commute else True
+    distance_column = "Distance_km" if travel_mode == "public_transport" else "Walking km"
+    commute = points.groupby("Area").agg(**{
+        "Commute Minutes": ("Minutes", "mean"),
+        "Parts": ("Minutes", "size"),
+        "Parts Within Limit": ("Within Limit", "sum"),
+        "Distance_km": (distance_column, "mean"),
+    }).reset_index()
+    commute["Distance"] = commute["Distance_km"].map(lambda km: f"{km:.1f} km" if pd.notna(km) else None)
+    fastest = points.loc[points.groupby("Area")["Minutes"].idxmin()].set_index("Area")
+    area_data = data["area_data"].merge(commute, on="Area", how="left")
     walking = walking[walking["University"] == university]
 
     # Rent + budget
@@ -273,6 +299,13 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
     candidates = area_data[has_data].copy()
     if candidates.empty:
         raise RecommendationError("No area has complete data for your accommodation type and chosen factors.")
+    if max_commute:
+        # Keep an area if at least one part of it is within the student's limit
+        candidates = candidates[candidates["Parts Within Limit"] > 0]
+        if candidates.empty:
+            raise RecommendationError(
+                f"No area is within {max_commute} minutes of {university} {mode_words}. "
+                "Try a longer commute or another way to travel.")
 
     # Scores
     candidates["Rent Score"] = (1 - (candidates["Rent"] - budget).clip(lower=0) / (0.5 * budget)).clip(lower=0)
@@ -312,8 +345,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
         value = row[col]
         if factor["kind"] == "commute":
             if value == ranked[col].min():
-                return f"is the closest to {university} (only {value:.0f} minutes away)"
-            return f"has a short commute to {university} (about {value:.0f} minutes)"
+                return f"is the closest to {university} (only {value:.0f} minutes {mode_words})"
+            return f"has a short commute to {university} (about {value:.0f} minutes {mode_words})"
         if factor["kind"] == "rent":
             if value == ranked[col].min():
                 return f"is the cheapest area for a {accommodation_name.lower()} (€{value:,.0f} a month)"
@@ -327,7 +360,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
         col = factor["column"]
         value = row[col]
         if factor["kind"] == "commute":
-            return f"The commute is longer – about {value:.0f} minutes to {university}."
+            return f"The commute is longer – about {value:.0f} minutes to {university} {mode_words}."
         if factor["kind"] == "rent":
             return f"The rent is higher than in most areas (€{value:,.0f} a month)."
         if value == ranked[col].min():
@@ -449,6 +482,20 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
             warning += (f" The cheapest compared area is {cheapest['Area']} at €{cheapest['Rent']:,.0f}/month "
                         f"(€{cheapest['Rent'] - budget:,.0f} over budget).")
 
+    def commute_info(area, row):
+        """Fastest part of the area (a pin for the map) and how much of it is within the limit."""
+        if area not in fastest.index:
+            return None
+        spot = fastest.loc[area]
+        return {
+            "fastest_from": spot["Landmark"],
+            "fastest_minutes": round(float(spot["Minutes"])),
+            "lat": float(spot["Origin_Latitude"]),
+            "lon": float(spot["Origin_Longitude"]),
+            "parts": int(row["Parts"]),
+            "parts_within_limit": int(row["Parts Within Limit"]) if max_commute else None,
+        }
+
     results = []
     for idx, row in top.iterrows():
         position = idx + 1
@@ -461,6 +508,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
             "budget_difference": round(float(row["Budget Difference"]), 2),
             "commute_minutes": None if pd.isna(row["Commute Minutes"]) else round(float(row["Commute Minutes"])),
             "distance": _none_if_nan(row.get("Distance")),
+            "commute": commute_info(row["Area"], row),
             "match_score": round(float(row["Match Score"]), 1),
             "walking": walking_info(row["Area"]),
             "why": " ".join(explain(position, row)),
@@ -471,6 +519,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3):
         "university": university,
         "accommodation": accommodation_name,
         "budget": budget,
+        "travel_mode": travel_mode,
+        "max_commute": max_commute,
         "areas_compared": len(ranked),
         "warning": warning,
         "recommendations": results,

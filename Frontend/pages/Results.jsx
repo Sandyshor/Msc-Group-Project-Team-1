@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Results.css'
 import { districts } from '../District Profile/districtData.js'
+import CommuteFields, { TRAVEL_MODES } from './CommuteFields'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
@@ -52,7 +53,19 @@ function WalkingDistance({ area, walking, university }) {
   )
 }
 
-function ResultCard({ result, university }) {
+function CommuteDetails({ area, commute, maxCommute }) {
+  if (!commute) return null
+
+  return (
+    <p className="result-muted">
+      Quickest from {commute.fastest_from} ({commute.fastest_minutes} min)
+      {commute.parts_within_limit != null &&
+        ` · ${commute.parts_within_limit} of ${commute.parts} parts of ${area} are within ${maxCommute} min`}
+    </p>
+  )
+}
+
+function ResultCard({ result, university, modeWords, maxCommute }) {
   const navigate = useNavigate()
   const hasProfile = districts.some((d) => d.id === result.area)
   const withinBudget = result.budget_status === 'Within budget'
@@ -88,11 +101,13 @@ function ResultCard({ result, university }) {
         <div>
           <dt>Commute</dt>
           <dd>
-            {result.commute_minutes != null ? `${result.commute_minutes} min` : 'Not available'}
+            {result.commute_minutes != null ? `${result.commute_minutes} min ${modeWords}` : 'Not available'}
             {result.distance && <span className="result-muted"> · {result.distance}</span>}
           </dd>
         </div>
       </dl>
+
+      <CommuteDetails area={result.area} commute={result.commute} maxCommute={maxCommute} />
 
       <WalkingDistance area={result.area} walking={result.walking} university={university} />
 
@@ -121,18 +136,32 @@ function ResultCard({ result, university }) {
 
 function Results() {
   const location = useLocation()
-  const [answers] = useState(() => loadAnswers(location.state))
+  const navigate = useNavigate()
+  const [answers, setAnswers] = useState(() => loadAnswers(location.state))
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
   const [attempt, setAttempt] = useState(0)
+
+  const travelMode = answers?.travelMode ?? 'public_transport'
+  const maxCommute = answers?.maxCommute ?? null
+  const modeWords = TRAVEL_MODES.find(([value]) => value === travelMode)[2]
+
+  // Changing the commute on this page searches again straight away.
+  function updateCommute(commute) {
+    const updated = loadAnswers({ ...answers, ...commute })
+    setAnswers(updated)
+    navigate('/results', { replace: true, state: updated }) // so a refresh keeps the new choice
+  }
 
   useEffect(() => {
     if (!answers) return
     const controller = new AbortController()
-    setData(null)
     setError(null)
+    setLoading(true)
 
-    fetch(`${API_URL}/recommend`, {
+    // Wait until the slider stops moving before searching.
+    const timer = setTimeout(() => fetch(`${API_URL}/recommend`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -141,6 +170,8 @@ function Results() {
         accommodation: answers.accommodation,
         ratings: answers.ratings,
         language: answers.language ?? 'en',
+        travel_mode: travelMode,
+        max_commute: maxCommute,
       }),
       signal: controller.signal,
     })
@@ -153,13 +184,18 @@ function Results() {
       })
       .catch((err) => {
         if (err.name !== 'AbortError') {
+          setData(null)
           setError(err.message === 'Failed to fetch'
             ? "We couldn't reach the recommendation service. Please try again."
             : err.message)
         }
       })
+      .finally(() => setLoading(false)), 300)
 
-    return () => controller.abort()
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
   }, [answers, attempt])
 
   if (!answers) {
@@ -207,6 +243,10 @@ function Results() {
           {data && <> · compared {data.areas_compared} areas</>}
         </p>
 
+        <div className="commute-controls">
+          <CommuteFields travelMode={travelMode} maxCommute={maxCommute} onChange={updateCommute} />
+        </div>
+
         {!data && !error && (
           <div className="results-status" role="status">
             <span className="results-spinner" aria-hidden="true" />
@@ -229,9 +269,15 @@ function Results() {
         {data && (
           <>
             {data.warning && <p className="results-warning">{data.warning}</p>}
-            <div className="results-list">
+            <div className={loading ? 'results-list results-updating' : 'results-list'}>
               {data.recommendations.map((result) => (
-                <ResultCard key={result.area} result={result} university={data.university} />
+                <ResultCard
+                  key={result.area}
+                  result={result}
+                  university={data.university}
+                  modeWords={modeWords}
+                  maxCommute={maxCommute}
+                />
               ))}
             </div>
           </>

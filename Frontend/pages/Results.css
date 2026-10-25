@@ -228,3 +228,14 @@
     font-size: 24px;
   }
 }
+
+/* Commute controls on the results page */
+
+.commute-controls {
+  margin: 24px 0;
+}
+
+.results-updating {
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
