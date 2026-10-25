@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './Questionnaire.css'
+import CommuteFields from './CommuteFields'
 
 // Values match the university names in the backend's commute data.
 const UNIVERSITIES = [
@@ -76,6 +77,7 @@ function Questionnaire() {
   const [budget, setBudget] = useState(1000)
   const [destination, setDestination] = useState('')
   const [roomType, setRoomType] = useState('Private room')
+  const [commute, setCommute] = useState({ travelMode: 'public_transport', maxCommute: null })
   const [ratings, setRatings] = useState(
     Object.fromEntries(
       FACTORS.flatMap(([name, , items = []]) => [name, ...items]).map((name) => [name, 2])
@@ -112,6 +114,8 @@ function Questionnaire() {
         accommodation,
         accommodationLabel: roomType,
         ratings: activeRatings,
+        travelMode: commute.travelMode,
+        maxCommute: commute.maxCommute,
       },
     })
   }
@@ -207,8 +211,8 @@ function Questionnaire() {
                 </select>
               </div>
 
-            
-              
+              <CommuteFields {...commute} onChange={setCommute} />
+
               <div className="question-group">
                 <label>What type of accommodation do you prefer?</label>
 

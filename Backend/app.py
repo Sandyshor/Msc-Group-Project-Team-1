@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -26,6 +26,10 @@ class RecommendRequest(BaseModel):
                          "(e.g. Hospitals, Pharmacies) - see factor_items in /options.",
         examples=[{"Rent": 1, "Commute": 2, "Shopping & Groceries": 2, "Restaurants": 3,
                    "Healthcare": 4, "Recreation & Wellness": 3}])
+    travel_mode: str = Field("public_transport", examples=["public_transport"],
+                             description="public_transport | walk | cycle")
+    max_commute: Optional[int] = Field(None, gt=0, le=180, examples=[30],
+                                       description="Longest commute in minutes the student accepts")
 
 
 @app.get("/health")
@@ -43,6 +47,7 @@ def options():
         "factor_items": {f["name"]: [i["name"] for i in f["items"]]
                          for f in recommender.FACTORS if f["kind"] == "group"},
         "ratings": recommender.RATING_LABELS,
+        "travel_modes": list(recommender.TRAVEL_MODES),
     }
 
 
@@ -51,7 +56,8 @@ def recommend(req: RecommendRequest):
     if any(r not in (1, 2, 3, 4) for r in req.ratings.values()):
         raise HTTPException(422, "Each rating must be 1, 2, 3 or 4")
     try:
-        result = recommender.recommend(DATA, req.university, req.budget, req.accommodation, req.ratings)
+        result = recommender.recommend(DATA, req.university, req.budget, req.accommodation, req.ratings,
+                                       travel_mode=req.travel_mode, max_commute=req.max_commute)
     except recommender.RecommendationError as e:
         raise HTTPException(422, str(e))
 

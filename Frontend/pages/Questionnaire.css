@@ -112,3 +112,9 @@ fieldset.question-group {
   font-size: 14px;
   font-weight: 600;
 }
+
+/* Travel mode buttons (3 options) */
+
+.rating-options.mode-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
