@@ -41,12 +41,12 @@ let traveller = null;
 let travelFrame = null;
 let travelTimer = null;
 
-// Basemap. Stadia needs no key on localhost/127.0.0.1; on Azure, register the site's domain in the
-// Stadia dashboard (Authentication Configuration) — no key goes in this file.
+// Basemap: CARTO's light map, which needs no account or domain registration (Stadia Maps answered
+// the Azure site with "401 Invalid Authentication" tiles until its domain was registered).
 const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
-const STADIA_ATTRIBUTION = '&copy; <a href="https://stadiamaps.com/attribution/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> ' + OSM_ATTRIBUTION;
-const BASEMAP = { url: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png", maxZoom: 20, attribution: STADIA_ATTRIBUTION };
-// Used automatically if Stadia refuses the tiles (e.g. the Azure domain isn't registered yet).
+const CARTO_ATTRIBUTION = OSM_ATTRIBUTION + ' &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>';
+const BASEMAP = { url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", maxZoom: 20, attribution: CARTO_ATTRIBUTION };
+// Used automatically if CARTO refuses the tiles.
 const FALLBACK_BASEMAP = { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", maxZoom: 19, attribution: OSM_ATTRIBUTION, className: "tiles-osm" };
 
 const map = L.map("routeMap", { zoomControl: false, zoomSnap: 0.25 }).setView(DUBLIN_CENTRE, REDUCED_MOTION ? 12.5 : 11);
@@ -148,14 +148,14 @@ function setBasemap() {
   baseLayer.addTo(map).bringToBack();
 }
 
-// If Stadia rejects every tile (unregistered domain, rate limit), switch to OpenStreetMap so the map still works.
+// If CARTO rejects every tile (outage, rate limit), switch to OpenStreetMap so the map still works.
 function watchForRefusal(layer) {
   let loaded = 0, failed = 0;
   layer.on("tileload", () => { loaded++; });
   layer.on("tileerror", () => {
     if (++failed >= 4 && loaded === 0 && !usingFallback) {
       usingFallback = true;
-      console.warn("Stadia Maps refused the map tiles; using OpenStreetMap instead. Register this site's domain in the Stadia Maps dashboard.");
+      console.warn("CARTO refused the map tiles; using OpenStreetMap instead.");
       setBasemap();
     }
   });
