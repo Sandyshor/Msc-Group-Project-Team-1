@@ -26,8 +26,16 @@ AREA_CODES_AMENITIES = AREA_CODES_ROOMS + ["D4", "D5", "D11", "D12", "D13", "D14
                                            "D16", "D17", "D18", "D20", "D22", "D24"]
 AREAS = AREA_CODES_AMENITIES
 
+# Room listings per file, and what "double" means in that file. The D1-D5 files were collected
+# separately from the D6-D10 Daft listings: in D1-D5 a double is cheaper than a single in every
+# area, so it is a room shared by two people; in the Daft files it is a private room with a double bed.
+ROOM_FILES = {
+    "D1.xlsx": "shared", "D2.xlsx": "shared", "D3.xlsx": "shared",
+    "D4_rent.xlsx": "shared", "D5_rent.xlsx": "shared",
+    "D6.xlsx": "private", "D7.xlsx": "private", "D8.xlsx": "private", "D9.xlsx": "private", "D10.xlsx": "private",
+}
 PRIVATE_ROOM_LABELS = ["single", "single & twin"]
-SHARED_ROOM_LABELS = ["double", "twin", "shared", "double & twin", "twin & shared"]
+SHARED_ROOM_LABELS = ["twin", "shared", "double & twin", "twin & shared"]
 
 # "group" factors are scored as one category by default (the average of their
 # amenities' 0-1 sub-scores). A student can instead rate a category's "items"
@@ -96,7 +104,8 @@ def load_data():
         ignore_index=True,
     )
     room_data = pd.concat(
-        [_clean_columns(pd.read_excel(_path(f"{a}.xlsx"))) for a in AREA_CODES_ROOMS],
+        [_clean_columns(pd.read_excel(_path(file))).rename(columns={"Room Type": "Room type"}).assign(**{"Double Is": meaning})
+         for file, meaning in ROOM_FILES.items()],
         ignore_index=True,
     )
     room_data["Room type"] = room_data["Room type"].astype(str).str.strip().str.lower()
@@ -133,13 +142,17 @@ def load_data():
     commute_points["cycle"] = commute_points["Walking km"] / CYCLING_KMH * 60
 
     # Rent tables
-    shared_room_rent = room_data[room_data["Room type"].isin(SHARED_ROOM_LABELS)].groupby("Area")["Rent"].mean()
-    private_room_rent = room_data[room_data["Room type"].isin(PRIVATE_ROOM_LABELS)].groupby("Area")["Rent"].mean()
+    is_double = room_data["Room type"] == "double"
+    is_private = room_data["Room type"].isin(PRIVATE_ROOM_LABELS) | (is_double & (room_data["Double Is"] == "private"))
+    is_shared = room_data["Room type"].isin(SHARED_ROOM_LABELS) | (is_double & (room_data["Double Is"] == "shared"))
+    shared_room_rent = room_data[is_shared].groupby("Area")["Rent"].mean()
+    private_room_rent = room_data[is_private].groupby("Area")["Rent"].mean()
 
     rtb["Area"] = "D" + rtb["Location"].astype(str).str.extract(
         r"Dublin\s*(\d+W?)", flags=re.IGNORECASE, expand=False
     ).str.upper()
     rtb["VALUE"] = pd.to_numeric(rtb["VALUE"], errors="coerce")
+    rtb = rtb[rtb["Property Type"].str.strip() == "Apartment"]  # same property type for every district
     bedrooms = rtb["Number of Bedrooms"].astype(str).str.strip().str.lower()
     one_bed_rent = rtb[bedrooms == "one bed"].groupby("Area")["VALUE"].mean()
     two_bed_rent = rtb[bedrooms == "two bed"].groupby("Area")["VALUE"].mean()
