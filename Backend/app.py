@@ -5,11 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 import recommender
+import routing
 import translator
 
 app = FastAPI(title="Crib Crew – Dublin Area Recommender API", version="1.0")
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.include_router(routing.router)  # GET /route - journey planner (OpenTripPlanner)
 
 DATA = recommender.load_data() 
 

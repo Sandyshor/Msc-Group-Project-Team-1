@@ -232,6 +232,8 @@ function Home() {
           </p>
           <div className="fd-hero-actions">
             <Link className="fd-button fd-button-cream" to="/districts">Explore districts <span>↗</span></Link>
+            {/* Separate page (not React) served from Frontend/public/journey-planner */}
+            <a className="fd-hero-watch" href="/journey-planner/route.html"><span className="fd-play">⇄</span> Plan a journey</a>
             <a className="fd-hero-watch" href="#explore-dublin"><span className="fd-play">▶</span> Meet Dublin through film</a>
           </div>
         </div>

@@ -1,0 +1,26 @@
+# systemd unit for OpenTripPlanner on the Azure VM. Installed by setup-otp-vm.sh.
+# Settings (heap size) live in /etc/default/otp.
+[Unit]
+Description=OpenTripPlanner journey planner (Find Your Dublin)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=otp
+Group=otp
+WorkingDirectory=/opt/otp
+Environment=OTP_HEAP=4G
+EnvironmentFile=-/etc/default/otp
+ExecStart=/opt/otp/java -Xmx${OTP_HEAP} -jar /opt/otp/otp-shaded.jar --load --serve /opt/otp/graph
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=300
+# Hardening: OTP only needs to read its jar and graph.
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
