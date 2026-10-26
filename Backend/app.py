@@ -99,6 +99,11 @@ def translate_texts(req: TranslateRequest):
         return {"translations": translator.translate(req.texts, req.language)}
     except Exception as e:
         raise HTTPException(502, f"Translation failed: {e!r}")
+
+@app.get("/agencies")
+def agencies():
+    """All letting agencies in our list."""
+    return DATA["agencies"].to_dict(orient="records")
 FRONTEND_DIR = (Path(__file__).resolve().parent.parent / "Frontend" / "dist")
 
 if FRONTEND_DIR.is_dir():
