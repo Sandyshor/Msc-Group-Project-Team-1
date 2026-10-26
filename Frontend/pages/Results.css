@@ -246,30 +246,112 @@
 
 .agencies-panel {
   margin-top: 14px;
-  padding: 18px 20px;
-  border: 1px solid #e0d8c9;
-  border-radius: 8px;
-  background: #fffdf7;
   color: #173f32;
   font-size: 14px;
   line-height: 1.6;
 }
 
-.agencies-panel ul {
-  margin: 10px 0 0;
-  padding-left: 18px;
+.agencies-intro {
+  margin: 0 0 16px;
+  color: #4f6158;
 }
 
-.agencies-panel li {
-  margin-bottom: 12px;
+.agent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
 }
 
-.agencies-panel a {
-  color: #173f32;
+.agent-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid #e0d8c9;
+  border-radius: 12px;
+  background: #fffdf7;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.agency-areas,
-.agencies-note {
-  color: #6b7c72;
+.agent-card:hover {
+  box-shadow: 0 8px 22px rgba(23, 63, 50, 0.1);
+  transform: translateY(-2px);
+}
+
+.agent-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.agent-initial {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #173f32;
+  color: #fffdf7;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.agent-name {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.agent-area {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 1px 9px;
+  border-radius: 20px;
+  background: #e8efe9;
+  color: #2f5d50;
+  font-size: 12px;
+}
+
+.agent-address {
+  margin: 0;
+  color: #4f6158;
   font-size: 13px;
+}
+
+.agent-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #efe8da;
+}
+
+.agent-psra {
+  color: #6b7c72;
+  font-size: 12px;
+}
+
+.agent-link {
+  padding: 6px 12px;
+  border: 1px solid #173f32;
+  border-radius: 7px;
+  color: #173f32;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.agent-link:hover {
+  background: #173f32;
+  color: #fffdf7;
+}
+
+.agencies-note {
+  margin: 16px 0 0;
+  color: #6b7c72;
+  font-size: 12px;
 }
