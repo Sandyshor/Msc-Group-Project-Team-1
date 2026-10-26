@@ -152,32 +152,48 @@ function LettingAgents() {
   return (
     <div className="agencies">
       <button type="button" className="questionnaire-next" onClick={toggle} aria-expanded={open}>
-        {open ? 'Hide letting agents' : 'Talk to a letting agent'} <span>{open ? '↑' : '↓'}</span>
+        {open ? 'Hide letting agents' : 'Letting agents in Dublin'} <span>{open ? '↑' : '↓'}</span>
       </button>
 
       {open && (
         <div className="agencies-panel">
-          <p>
-            Found an area you like? These Dublin letting agents can help you find a place.
-            Many have offices and listings across the city.
+          <p className="agencies-intro">
+            A selection of licensed letting agents operating in Dublin. This is not a complete
+            list, and agents are shown in alphabetical order. Being listed here does not mean we
+            recommend them.
           </p>
           {failed && <p>We couldn't load the letting agents. Please try again later.</p>}
           {!agents && !failed && <p>Loading…</p>}
           {agents && agents.length > 0 && (
-            <ul>
-              {agents.map((a) => (
-                <li key={a.Name}>
-                  <a href={a.Website} target="_blank" rel="noreferrer"><strong>{a.Name}</strong> ↗</a>
-                  {a.Areas && <span className="agency-areas"> · {a.Areas}</span>}
-                  {a.Address && <div>{a.Address}</div>}
-                  {a.PSRA_Licence && <div className="agency-areas">PSRA licence {a.PSRA_Licence}</div>}
-                </li>
+            <div className="agent-grid">
+              {[...agents].sort((a, b) => a.Name.localeCompare(b.Name)).map((a) => (
+                <article className="agent-card" key={a.Name}>
+                  <div className="agent-top">
+                    <span className="agent-initial" aria-hidden="true">{a.Name.charAt(0)}</span>
+                    <div>
+                      <h3 className="agent-name">{a.Name}</h3>
+                      {a.Areas && <span className="agent-area">{a.Areas}</span>}
+                    </div>
+                  </div>
+                  {a.Address && <p className="agent-address">📍 {a.Address}</p>}
+                  <div className="agent-bottom">
+                    {a.PSRA_Licence && <span className="agent-psra">✓ PSRA {a.PSRA_Licence}</span>}
+                    {a.Website && (
+                      <a className="agent-link" href={a.Website} target="_blank" rel="noreferrer">
+                        Visit website ↗
+                      </a>
+                    )}
+                  </div>
+                </article>
               ))}
-            </ul>
+            </div>
           )}
           {agents && agents.length > 0 && (
             <p className="agencies-note">
-              Listed for information only. We are not affiliated with these agents.
+              Find Your Dublin is a student project and is not affiliated with, endorsed by or paid
+              by any of these agents. Details were correct when checked in October 2026, so please
+              confirm them directly with the agent. Never pay a deposit before viewing a property
+              and checking the agent's PSRA licence.
             </p>
           )}
         </div>
