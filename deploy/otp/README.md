@@ -73,6 +73,11 @@ TFI changes timetables regularly. Every few months:
    `cd ~/dublin-otp && java -Xmx6G -jar otp-shaded-2.10.0.jar --build --save .`
 3. Upload it: `bash deploy/otp/deploy-otp.sh azureuser@<vm-public-ip>`
    (only the changed graph is sent; OTP restarts with the new timetables).
+4. Refresh the recommender's commute times with the same graph (local OTP running on port 8080):
+   `cd Backend && OTP_URL=http://localhost:8080/otp/gtfs/v1 python tools/build_commute_matrix.py`
+   This writes `Data/commute_otp.csv` (public transport arriving by 09:00 on a weekday, walking and
+   cycling, from 5 points in every district to every university). Commit it in a pull request; the
+   recommender uses it automatically and falls back to the older Journey Planner data without it.
 
 ## Security
 
