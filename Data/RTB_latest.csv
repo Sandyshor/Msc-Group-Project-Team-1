@@ -1,0 +1,979 @@
+STATISTIC,Statistic Label,TLIST(A1),Year,C02970V03592,Number of Bedrooms,C02969V03591,Property Type,C03004V03625,Location,UNIT,VALUE
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,123500,"I.F.S.C., Dublin 1",Euro,2136.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,123600,"Parnell Street, Dublin 1",Euro,1959.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,123700,"Spencer Dock, Dublin 1",Euro,2375.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,123800,"Summerhill, Dublin 1",Euro,1789.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,124100,"Charlemont Street, Dublin 2",Euro,2226.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,124600,"Pearse Street, Dublin 2",Euro,1959.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,124700,"Tara Street, Dublin 2",Euro,2805.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,124800,"Temple Bar, Dublin 2",Euro,2164.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,124900,"Townsend Street, Dublin 2",Euro,2075.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,125200,"Clonliffe, Dublin 3",Euro,1638.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,125300,"Clontarf, Dublin 3",Euro,2083.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,125400,"Drumcondra, Dublin 3",Euro,1843.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,125500,"East Wall, Dublin 3",Euro,2072.17
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,125700,"Fairview, Dublin 3",Euro,1861.48
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,126000,"North Strand, Dublin 3",Euro,1830.21
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,126200,"Ballsbridge, Dublin 4",Euro,2569.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,126300,"Donnybrook, Dublin 4",Euro,2588.49
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,126400,"Irishtown, Dublin 4",Euro,2212.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,126500,"Merrion, Dublin 4",Euro,2357.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,126600,"Pembroke, Dublin 4",Euro,2589.74
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,126700,"Ringsend, Dublin 4",Euro,2300.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,126800,"Sandymount, Dublin 4",Euro,2634.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,127000,"Artane, Dublin 5",Euro,2226.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,127400,"Killester, Dublin 5",Euro,2434.12
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,127500,"Raheny, Dublin 5",Euro,2184.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,127900,"Harolds Cross, Dublin 6",Euro,2133.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,128000,"Milltown, Dublin 6",Euro,2322.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,128100,"Ranelagh, Dublin 6",Euro,2092.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,128200,"Rathgar, Dublin 6",Euro,1779.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,128300,"Rathmines, Dublin 6",Euro,1650.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,128900,"Templeogue, Dublin 6W",Euro,2528.24
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,129000,"Terenure, Dublin 6W",Euro,2119.38
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,129200,"Arbour Hill, Dublin 7",Euro,2159.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,129300,"Cabra, Dublin 7",Euro,1606.22
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,129500,"North Circular Road, Dublin 7",Euro,1893.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,129700,"Smithfield, Dublin 7",Euro,2099.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,129800,"Stoneybatter, Dublin 7",Euro,1868.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,130000,"Christchurch, Dublin 8",Euro,1753.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,130100,"Cork Street, Dublin 8",Euro,1885.47
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,130300,"Inchicore, Dublin 8",Euro,1984.27
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,130400,"Islandbridge, Dublin 8",Euro,2094.31
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,130500,"Kilmainham , Dublin 8",Euro,1925.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,130600,"Portobello, Dublin 8",Euro,1876.18
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,130700,"Rialto, Dublin 8",Euro,1782.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,130800,"South Circular Road, Dublin 8",Euro,1842.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,131100,"Ballymun, Dublin 9",Euro,1839.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,131200,"Beaumont, Dublin 9",Euro,2183.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,131500,"Glasnevin, Dublin 9",Euro,1999.14
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,131600,"Santry, Dublin 9",Euro,2113.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,131700,"Whitehall, Dublin 9",Euro,1933.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,131900,"Ballyfermot, Dublin 10",Euro,1928.4
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,132000,"Cherry Orchard, Dublin 10",Euro,1676.21
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,132300,"Finglas, Dublin 11",Euro,1934.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,132900,"Crumlin, Dublin 12",Euro,2063.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,133000,"Drimnagh, Dublin 12",Euro,2089.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,133100,"Kimmage, Dublin 12",Euro,1909.4
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,133200,"Walkinstown, Dublin 12",Euro,2302.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,133500,"Baldoyle, Dublin 13",Euro,2114.21
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,133600,"Balgriffin, Dublin 13",Euro,1919.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,133900,"Clongriffin, Dublin 13",Euro,1949.25
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,134200,"Sutton, Dublin 13",Euro,2461.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,134400,"Churchtown, Dublin 14",Euro,2573.47
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,134500,"Clonskeagh, Dublin 14",Euro,2623.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,134700,"Goatstown, Dublin 14",Euro,3210.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,135100,"Ashtown, Dublin 15",Euro,2021.02
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,135200,"Blanchardstown, Dublin 15",Euro,1960.02
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,135400,"Castleknock, Dublin 15",Euro,2169.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,135500,"Clonee, Dublin 15",Euro,1985.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,135600,"Clonsilla, Dublin 15",Euro,2063.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,135900,"Mulhuddart, Dublin 15",Euro,1800.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,136000,"Ongar, Dublin 15",Euro,1876.96
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,136100,"Porterstown, Dublin 15",Euro,1820.21
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,136200,"Royal Canal Park, Dublin 15",Euro,1976.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,136500,"Ballinteer, Dublin 16",Euro,2265.88
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,136600,"Dundrum, Dublin 16",Euro,2336.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,136700,"Knocklyon, Dublin 16",Euro,2228.24
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,136800,"Rathfarnham, Dublin 16",Euro,2243.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,137500,"Malahide Road, Dublin 17",Euro,1828.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,137900,"Cabinteely, Dublin 18",Euro,2323.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,138000,"Carrickmines, Dublin 18",Euro,2288.27
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,138100,"Foxrock, Dublin 18",Euro,3448.41
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,138300,"Leopardstown, Dublin 18",Euro,2176.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,138600,"Sandyford, Dublin 18",Euro,2309.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,138900,"Stepaside, Dublin 18",Euro,2006.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,139200,"Chapelizod, Dublin 20",Euro,1880.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,139300,"Palmerstown, Dublin 20",Euro,2070.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,139400,"Clondalkin, Dublin 22",Euro,1862.35
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,139600,"Ballycullen, Dublin 24",Euro,2095.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,139700,"Citywest, Dublin 24",Euro,2126.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,139800,"Firhouse, Dublin 24",Euro,2149.25
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,-,All property types,140100,"Tallaght, Dublin 24",Euro,1815.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,01,Detached house,126200,"Ballsbridge, Dublin 4",Euro,4784.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,125300,"Clontarf, Dublin 3",Euro,2897.7
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,125400,"Drumcondra, Dublin 3",Euro,2446.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,126200,"Ballsbridge, Dublin 4",Euro,3487.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,126300,"Donnybrook, Dublin 4",Euro,3718.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,126800,"Sandymount, Dublin 4",Euro,3271.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,127000,"Artane, Dublin 5",Euro,2382.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,127500,"Raheny, Dublin 5",Euro,2500.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,128100,"Ranelagh, Dublin 6",Euro,3970.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,128900,"Templeogue, Dublin 6W",Euro,2752.54
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,129000,"Terenure, Dublin 6W",Euro,3171.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,131200,"Beaumont, Dublin 9",Euro,2430.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,131500,"Glasnevin, Dublin 9",Euro,2843.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,131600,"Santry, Dublin 9",Euro,2502.86
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,132300,"Finglas, Dublin 11",Euro,2235.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,132900,"Crumlin, Dublin 12",Euro,2440.05
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,134500,"Clonskeagh, Dublin 14",Euro,3176.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,135200,"Blanchardstown, Dublin 15",Euro,2156.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,135400,"Castleknock, Dublin 15",Euro,2357.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,135500,"Clonee, Dublin 15",Euro,2189.1
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,135600,"Clonsilla, Dublin 15",Euro,2283.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,136600,"Dundrum, Dublin 16",Euro,2969.27
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,136800,"Rathfarnham, Dublin 16",Euro,2576.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,138300,"Leopardstown, Dublin 18",Euro,2550.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,139400,"Clondalkin, Dublin 22",Euro,2056.08
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,139700,"Citywest, Dublin 24",Euro,2383.4
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,02,Semi detached house,140100,"Tallaght, Dublin 24",Euro,2039.95
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,125300,"Clontarf, Dublin 3",Euro,2507.12
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,125400,"Drumcondra, Dublin 3",Euro,2451.25
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,125500,"East Wall, Dublin 3",Euro,2172.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,126200,"Ballsbridge, Dublin 4",Euro,3903.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,126300,"Donnybrook, Dublin 4",Euro,2814.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,126700,"Ringsend, Dublin 4",Euro,2309.47
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,126800,"Sandymount, Dublin 4",Euro,3127.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,127500,"Raheny, Dublin 5",Euro,2377.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,127900,"Harolds Cross, Dublin 6",Euro,2282.11
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,128000,"Milltown, Dublin 6",Euro,2635.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,128100,"Ranelagh, Dublin 6",Euro,3320.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,128200,"Rathgar, Dublin 6",Euro,2809.62
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,128300,"Rathmines, Dublin 6",Euro,3163.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,129000,"Terenure, Dublin 6W",Euro,2384.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,129200,"Arbour Hill, Dublin 7",Euro,2236.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,129300,"Cabra, Dublin 7",Euro,2274.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,129800,"Stoneybatter, Dublin 7",Euro,1940.94
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,130300,"Inchicore, Dublin 8",Euro,2298.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,130500,"Kilmainham , Dublin 8",Euro,2319.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,130700,"Rialto, Dublin 8",Euro,2235.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,130800,"South Circular Road, Dublin 8",Euro,2565.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,131500,"Glasnevin, Dublin 9",Euro,2295.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,131900,"Ballyfermot, Dublin 10",Euro,1943.62
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,132300,"Finglas, Dublin 11",Euro,2102.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,132900,"Crumlin, Dublin 12",Euro,2242.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,133000,"Drimnagh, Dublin 12",Euro,2253.35
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,133100,"Kimmage, Dublin 12",Euro,2128.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,133200,"Walkinstown, Dublin 12",Euro,2418.29
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,135400,"Castleknock, Dublin 15",Euro,2118.35
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,135600,"Clonsilla, Dublin 15",Euro,1886.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,136600,"Dundrum, Dublin 16",Euro,2562.11
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,136800,"Rathfarnham, Dublin 16",Euro,2410.38
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,139400,"Clondalkin, Dublin 22",Euro,1974.48
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,03,Terrace house,140100,"Tallaght, Dublin 24",Euro,2084.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,123500,"I.F.S.C., Dublin 1",Euro,2136.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,123600,"Parnell Street, Dublin 1",Euro,1959.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,123700,"Spencer Dock, Dublin 1",Euro,2375.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,123800,"Summerhill, Dublin 1",Euro,1864.96
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,124100,"Charlemont Street, Dublin 2",Euro,2226.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,124600,"Pearse Street, Dublin 2",Euro,1961.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,124700,"Tara Street, Dublin 2",Euro,2805.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,124800,"Temple Bar, Dublin 2",Euro,2157.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,124900,"Townsend Street, Dublin 2",Euro,2075.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,125200,"Clonliffe, Dublin 3",Euro,1636.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,125300,"Clontarf, Dublin 3",Euro,1964.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,125400,"Drumcondra, Dublin 3",Euro,1908.12
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,125500,"East Wall, Dublin 3",Euro,1960.87
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,125700,"Fairview, Dublin 3",Euro,1810.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,126200,"Ballsbridge, Dublin 4",Euro,2399.21
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,126300,"Donnybrook, Dublin 4",Euro,2274.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,126400,"Irishtown, Dublin 4",Euro,2046.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,126500,"Merrion, Dublin 4",Euro,2320.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,126600,"Pembroke, Dublin 4",Euro,2506.57
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,126700,"Ringsend, Dublin 4",Euro,2306.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,126800,"Sandymount, Dublin 4",Euro,2248.31
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,127500,"Raheny, Dublin 5",Euro,1897.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,127900,"Harolds Cross, Dublin 6",Euro,2164.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,128000,"Milltown, Dublin 6",Euro,2221.48
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,128100,"Ranelagh, Dublin 6",Euro,1955.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,128200,"Rathgar, Dublin 6",Euro,1744.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,128300,"Rathmines, Dublin 6",Euro,1770.96
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,129000,"Terenure, Dublin 6W",Euro,1979.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,129300,"Cabra, Dublin 7",Euro,1513.22
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,129500,"North Circular Road, Dublin 7",Euro,1971.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,129700,"Smithfield, Dublin 7",Euro,2115.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,130000,"Christchurch, Dublin 8",Euro,1753.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,130100,"Cork Street, Dublin 8",Euro,1931.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,130300,"Inchicore, Dublin 8",Euro,1768.24
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,130400,"Islandbridge, Dublin 8",Euro,2082.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,130500,"Kilmainham , Dublin 8",Euro,1844.37
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,130700,"Rialto, Dublin 8",Euro,1794.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,130800,"South Circular Road, Dublin 8",Euro,1788.54
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,131100,"Ballymun, Dublin 9",Euro,1744.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,131200,"Beaumont, Dublin 9",Euro,1953.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,131500,"Glasnevin, Dublin 9",Euro,1771.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,131600,"Santry, Dublin 9",Euro,2015.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,132000,"Cherry Orchard, Dublin 10",Euro,1689.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,132300,"Finglas, Dublin 11",Euro,1880.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,132900,"Crumlin, Dublin 12",Euro,1793.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,133000,"Drimnagh, Dublin 12",Euro,1953.16
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,133100,"Kimmage, Dublin 12",Euro,1716.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,133500,"Baldoyle, Dublin 13",Euro,1958.53
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,133600,"Balgriffin, Dublin 13",Euro,1698.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,133900,"Clongriffin, Dublin 13",Euro,1916.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,134200,"Sutton, Dublin 13",Euro,2088.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,134400,"Churchtown, Dublin 14",Euro,2468.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,134500,"Clonskeagh, Dublin 14",Euro,2149.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,135100,"Ashtown, Dublin 15",Euro,1935.16
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,135200,"Blanchardstown, Dublin 15",Euro,1878.42
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,135400,"Castleknock, Dublin 15",Euro,2047.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,135600,"Clonsilla, Dublin 15",Euro,1875.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,136000,"Ongar, Dublin 15",Euro,1653.62
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,136100,"Porterstown, Dublin 15",Euro,1788.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,136200,"Royal Canal Park, Dublin 15",Euro,1969.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,136500,"Ballinteer, Dublin 16",Euro,2123.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,136600,"Dundrum, Dublin 16",Euro,2295.08
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,136800,"Rathfarnham, Dublin 16",Euro,1952.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,137500,"Malahide Road, Dublin 17",Euro,1809.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,137900,"Cabinteely, Dublin 18",Euro,2167.22
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,138000,"Carrickmines, Dublin 18",Euro,2094.37
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,138300,"Leopardstown, Dublin 18",Euro,2135.05
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,138600,"Sandyford, Dublin 18",Euro,2289.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,138900,"Stepaside, Dublin 18",Euro,1929.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,139200,"Chapelizod, Dublin 20",Euro,1781.97
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,139400,"Clondalkin, Dublin 22",Euro,1732.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,139600,"Ballycullen, Dublin 24",Euro,1851.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,139700,"Citywest, Dublin 24",Euro,2089.14
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,04,Apartment,140100,"Tallaght, Dublin 24",Euro,1689.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,125200,"Clonliffe, Dublin 3",Euro,1460.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,125300,"Clontarf, Dublin 3",Euro,1343.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,125400,"Drumcondra, Dublin 3",Euro,1295.24
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,125700,"Fairview, Dublin 3",Euro,1400.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,126200,"Ballsbridge, Dublin 4",Euro,1776.11
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,126300,"Donnybrook, Dublin 4",Euro,1488.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,128100,"Ranelagh, Dublin 6",Euro,1530.24
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,128200,"Rathgar, Dublin 6",Euro,1455.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,128300,"Rathmines, Dublin 6",Euro,1416.7
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,129000,"Terenure, Dublin 6W",Euro,1426.2
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,129300,"Cabra, Dublin 7",Euro,1276.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,129500,"North Circular Road, Dublin 7",Euro,1451.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,130700,"Rialto, Dublin 8",Euro,1280.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,130800,"South Circular Road, Dublin 8",Euro,1384.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,-,All bedrooms,05,Other flats,131500,"Glasnevin, Dublin 9",Euro,1199.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,123500,"I.F.S.C., Dublin 1",Euro,1850.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,123600,"Parnell Street, Dublin 1",Euro,1712.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,123800,"Summerhill, Dublin 1",Euro,1432.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,124600,"Pearse Street, Dublin 2",Euro,1680.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,124900,"Townsend Street, Dublin 2",Euro,1917.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,125200,"Clonliffe, Dublin 3",Euro,1494.01
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,125300,"Clontarf, Dublin 3",Euro,1519.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,125400,"Drumcondra, Dublin 3",Euro,1313.31
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,125500,"East Wall, Dublin 3",Euro,1623.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,125700,"Fairview, Dublin 3",Euro,1471.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,126200,"Ballsbridge, Dublin 4",Euro,1774.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,126300,"Donnybrook, Dublin 4",Euro,1637.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,126500,"Merrion, Dublin 4",Euro,1867.02
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,126600,"Pembroke, Dublin 4",Euro,1745.5
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,126800,"Sandymount, Dublin 4",Euro,1796.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,127500,"Raheny, Dublin 5",Euro,1558.5
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,127900,"Harolds Cross, Dublin 6",Euro,1601.43
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,128000,"Milltown, Dublin 6",Euro,1848.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,128100,"Ranelagh, Dublin 6",Euro,1585.07
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,128200,"Rathgar, Dublin 6",Euro,1489.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,128300,"Rathmines, Dublin 6",Euro,1407.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,129000,"Terenure, Dublin 6W",Euro,1552.02
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,129300,"Cabra, Dublin 7",Euro,1277.95
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,129500,"North Circular Road, Dublin 7",Euro,1457.18
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,129700,"Smithfield, Dublin 7",Euro,1685.46
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,130000,"Christchurch, Dublin 8",Euro,1626.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,130100,"Cork Street, Dublin 8",Euro,1611.31
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,130300,"Inchicore, Dublin 8",Euro,1509.54
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,130400,"Islandbridge, Dublin 8",Euro,1821.74
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,130500,"Kilmainham , Dublin 8",Euro,1526.95
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,130600,"Portobello, Dublin 8",Euro,1531.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,130700,"Rialto, Dublin 8",Euro,1476.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,130800,"South Circular Road, Dublin 8",Euro,1473.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,131500,"Glasnevin, Dublin 9",Euro,1429.46
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,131600,"Santry, Dublin 9",Euro,1676.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,131700,"Whitehall, Dublin 9",Euro,1252.07
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,132300,"Finglas, Dublin 11",Euro,1574.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,132900,"Crumlin, Dublin 12",Euro,1447.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,133100,"Kimmage, Dublin 12",Euro,1456.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,133900,"Clongriffin, Dublin 13",Euro,1610.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,134400,"Churchtown, Dublin 14",Euro,2014.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,135100,"Ashtown, Dublin 15",Euro,1674.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,135400,"Castleknock, Dublin 15",Euro,1567.55
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,136200,"Royal Canal Park, Dublin 15",Euro,1588.01
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,136600,"Dundrum, Dublin 16",Euro,2042.05
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,136800,"Rathfarnham, Dublin 16",Euro,1563.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,137500,"Malahide Road, Dublin 17",Euro,1442.49
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,138300,"Leopardstown, Dublin 18",Euro,1835.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,138600,"Sandyford, Dublin 18",Euro,2034.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,139400,"Clondalkin, Dublin 22",Euro,1406.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,139700,"Citywest, Dublin 24",Euro,1783.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,-,All property types,140100,"Tallaght, Dublin 24",Euro,1407.27
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,123500,"I.F.S.C., Dublin 1",Euro,1850.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,123600,"Parnell Street, Dublin 1",Euro,1712.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,123800,"Summerhill, Dublin 1",Euro,1485.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,124600,"Pearse Street, Dublin 2",Euro,1675.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,124900,"Townsend Street, Dublin 2",Euro,1917.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,125200,"Clonliffe, Dublin 3",Euro,1575.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,125300,"Clontarf, Dublin 3",Euro,1631.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,125400,"Drumcondra, Dublin 3",Euro,1520.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,125500,"East Wall, Dublin 3",Euro,1612.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,125700,"Fairview, Dublin 3",Euro,1586.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,126200,"Ballsbridge, Dublin 4",Euro,1810.27
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,126300,"Donnybrook, Dublin 4",Euro,1790.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,126500,"Merrion, Dublin 4",Euro,1878.87
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,126800,"Sandymount, Dublin 4",Euro,1882.05
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,127500,"Raheny, Dublin 5",Euro,1567.2
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,127900,"Harolds Cross, Dublin 6",Euro,1756.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,128000,"Milltown, Dublin 6",Euro,1863.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,128100,"Ranelagh, Dublin 6",Euro,1734.22
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,128200,"Rathgar, Dublin 6",Euro,1571.14
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,128300,"Rathmines, Dublin 6",Euro,1578.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,129000,"Terenure, Dublin 6W",Euro,1708.49
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,129300,"Cabra, Dublin 7",Euro,1378.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,129700,"Smithfield, Dublin 7",Euro,1700.43
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,130000,"Christchurch, Dublin 8",Euro,1626.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,130100,"Cork Street, Dublin 8",Euro,1695.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,130300,"Inchicore, Dublin 8",Euro,1541.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,130400,"Islandbridge, Dublin 8",Euro,1821.74
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,130500,"Kilmainham , Dublin 8",Euro,1536.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,130700,"Rialto, Dublin 8",Euro,1555.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,130800,"South Circular Road, Dublin 8",Euro,1571.86
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,131500,"Glasnevin, Dublin 9",Euro,1572.41
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,131600,"Santry, Dublin 9",Euro,1717.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,132300,"Finglas, Dublin 11",Euro,1621.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,133100,"Kimmage, Dublin 12",Euro,1524.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,133900,"Clongriffin, Dublin 13",Euro,1610.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,134400,"Churchtown, Dublin 14",Euro,2027.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,135100,"Ashtown, Dublin 15",Euro,1674.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,135400,"Castleknock, Dublin 15",Euro,1567.55
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,136200,"Royal Canal Park, Dublin 15",Euro,1588.01
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,136600,"Dundrum, Dublin 16",Euro,2052.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,136800,"Rathfarnham, Dublin 16",Euro,1603.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,137500,"Malahide Road, Dublin 17",Euro,1391.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,138300,"Leopardstown, Dublin 18",Euro,1842.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,138600,"Sandyford, Dublin 18",Euro,2042.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,139400,"Clondalkin, Dublin 22",Euro,1477.29
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,139700,"Citywest, Dublin 24",Euro,1782.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,04,Apartment,140100,"Tallaght, Dublin 24",Euro,1427.05
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,125200,"Clonliffe, Dublin 3",Euro,1408.29
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,125300,"Clontarf, Dublin 3",Euro,1220.86
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,125400,"Drumcondra, Dublin 3",Euro,1198.97
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,125700,"Fairview, Dublin 3",Euro,1307.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,126200,"Ballsbridge, Dublin 4",Euro,1695.88
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,126300,"Donnybrook, Dublin 4",Euro,1347.02
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,128100,"Ranelagh, Dublin 6",Euro,1432.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,128200,"Rathgar, Dublin 6",Euro,1389.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,128300,"Rathmines, Dublin 6",Euro,1311.14
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,129000,"Terenure, Dublin 6W",Euro,1339.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,129300,"Cabra, Dublin 7",Euro,1261.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,129500,"North Circular Road, Dublin 7",Euro,1416.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,130700,"Rialto, Dublin 8",Euro,1243.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,130800,"South Circular Road, Dublin 8",Euro,1353.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,01,One bed,05,Other flats,131500,"Glasnevin, Dublin 9",Euro,1141.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,123500,"I.F.S.C., Dublin 1",Euro,2294.86
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,123600,"Parnell Street, Dublin 1",Euro,2078.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,123700,"Spencer Dock, Dublin 1",Euro,2413.4
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,123800,"Summerhill, Dublin 1",Euro,2118.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,124600,"Pearse Street, Dublin 2",Euro,2215.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,124900,"Townsend Street, Dublin 2",Euro,2167.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,125300,"Clontarf, Dublin 3",Euro,2115.54
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,125400,"Drumcondra, Dublin 3",Euro,2019.53
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,125500,"East Wall, Dublin 3",Euro,2091.01
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,125700,"Fairview, Dublin 3",Euro,2157.22
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,126200,"Ballsbridge, Dublin 4",Euro,2676.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,126300,"Donnybrook, Dublin 4",Euro,2433.88
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,126400,"Irishtown, Dublin 4",Euro,2199.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,126500,"Merrion, Dublin 4",Euro,2514.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,126600,"Pembroke, Dublin 4",Euro,2664.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,126700,"Ringsend, Dublin 4",Euro,2196.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,126800,"Sandymount, Dublin 4",Euro,2335.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,127500,"Raheny, Dublin 5",Euro,2013.07
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,127900,"Harolds Cross, Dublin 6",Euro,2247.11
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,128000,"Milltown, Dublin 6",Euro,2369.95
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,128100,"Ranelagh, Dublin 6",Euro,2288.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,128200,"Rathgar, Dublin 6",Euro,2129.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,128300,"Rathmines, Dublin 6",Euro,2023.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,129000,"Terenure, Dublin 6W",Euro,2066.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,129300,"Cabra, Dublin 7",Euro,1928.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,129500,"North Circular Road, Dublin 7",Euro,2221.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,129700,"Smithfield, Dublin 7",Euro,2257.35
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,129800,"Stoneybatter, Dublin 7",Euro,1943.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,130100,"Cork Street, Dublin 8",Euro,1992.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,130300,"Inchicore, Dublin 8",Euro,1881.63
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,130400,"Islandbridge, Dublin 8",Euro,2139.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,130500,"Kilmainham , Dublin 8",Euro,2031.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,130700,"Rialto, Dublin 8",Euro,1899.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,130800,"South Circular Road, Dublin 8",Euro,2076.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,131200,"Beaumont, Dublin 9",Euro,2068.97
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,131500,"Glasnevin, Dublin 9",Euro,1948.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,131600,"Santry, Dublin 9",Euro,2068.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,132300,"Finglas, Dublin 11",Euro,1934.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,132900,"Crumlin, Dublin 12",Euro,1959.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,133000,"Drimnagh, Dublin 12",Euro,1977.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,133100,"Kimmage, Dublin 12",Euro,1977.55
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,133900,"Clongriffin, Dublin 13",Euro,1989.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,134200,"Sutton, Dublin 13",Euro,2048.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,134400,"Churchtown, Dublin 14",Euro,2567.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,134500,"Clonskeagh, Dublin 14",Euro,2079.02
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,135100,"Ashtown, Dublin 15",Euro,2005.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,135200,"Blanchardstown, Dublin 15",Euro,1847.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,135400,"Castleknock, Dublin 15",Euro,2026.1
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,135500,"Clonee, Dublin 15",Euro,1736.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,135600,"Clonsilla, Dublin 15",Euro,1878.88
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,136000,"Ongar, Dublin 15",Euro,1671.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,136100,"Porterstown, Dublin 15",Euro,1768.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,136200,"Royal Canal Park, Dublin 15",Euro,2165.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,136500,"Ballinteer, Dublin 16",Euro,2091.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,136600,"Dundrum, Dublin 16",Euro,2338.35
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,136800,"Rathfarnham, Dublin 16",Euro,1996.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,137500,"Malahide Road, Dublin 17",Euro,1921.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,137900,"Cabinteely, Dublin 18",Euro,2087.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,138000,"Carrickmines, Dublin 18",Euro,2162.49
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,138300,"Leopardstown, Dublin 18",Euro,2136.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,138600,"Sandyford, Dublin 18",Euro,2390.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,138900,"Stepaside, Dublin 18",Euro,1969.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,139200,"Chapelizod, Dublin 20",Euro,1871.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,139400,"Clondalkin, Dublin 22",Euro,1777.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,139600,"Ballycullen, Dublin 24",Euro,1848.37
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,139700,"Citywest, Dublin 24",Euro,2142.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,-,All property types,140100,"Tallaght, Dublin 24",Euro,1790.46
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,03,Terrace house,125500,"East Wall, Dublin 3",Euro,1984.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,03,Terrace house,126300,"Donnybrook, Dublin 4",Euro,2369.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,03,Terrace house,126700,"Ringsend, Dublin 4",Euro,2240.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,03,Terrace house,126800,"Sandymount, Dublin 4",Euro,2495.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,03,Terrace house,129800,"Stoneybatter, Dublin 7",Euro,1930.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,03,Terrace house,130300,"Inchicore, Dublin 8",Euro,1976.21
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,03,Terrace house,132900,"Crumlin, Dublin 12",Euro,2038.1
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,03,Terrace house,139400,"Clondalkin, Dublin 22",Euro,1861.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,123500,"I.F.S.C., Dublin 1",Euro,2294.86
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,123600,"Parnell Street, Dublin 1",Euro,2078.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,123700,"Spencer Dock, Dublin 1",Euro,2413.4
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,124600,"Pearse Street, Dublin 2",Euro,2215.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,124900,"Townsend Street, Dublin 2",Euro,2167.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,125300,"Clontarf, Dublin 3",Euro,2101.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,125400,"Drumcondra, Dublin 3",Euro,2033.25
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,125500,"East Wall, Dublin 3",Euro,2188.38
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,125700,"Fairview, Dublin 3",Euro,2211.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,126200,"Ballsbridge, Dublin 4",Euro,2707.01
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,126300,"Donnybrook, Dublin 4",Euro,2440.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,126500,"Merrion, Dublin 4",Euro,2549.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,126600,"Pembroke, Dublin 4",Euro,2643.5
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,126700,"Ringsend, Dublin 4",Euro,2191.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,126800,"Sandymount, Dublin 4",Euro,2231.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,127500,"Raheny, Dublin 5",Euro,1996.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,127900,"Harolds Cross, Dublin 6",Euro,2348.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,128000,"Milltown, Dublin 6",Euro,2392.46
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,128100,"Ranelagh, Dublin 6",Euro,2252.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,128200,"Rathgar, Dublin 6",Euro,2249.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,128300,"Rathmines, Dublin 6",Euro,2050.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,129000,"Terenure, Dublin 6W",Euro,2075.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,129700,"Smithfield, Dublin 7",Euro,2257.35
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,130100,"Cork Street, Dublin 8",Euro,2054.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,130300,"Inchicore, Dublin 8",Euro,1830.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,130400,"Islandbridge, Dublin 8",Euro,2139.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,130500,"Kilmainham , Dublin 8",Euro,2008.47
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,130700,"Rialto, Dublin 8",Euro,1845.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,130800,"South Circular Road, Dublin 8",Euro,2012.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,131200,"Beaumont, Dublin 9",Euro,2079.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,131500,"Glasnevin, Dublin 9",Euro,1974.63
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,131600,"Santry, Dublin 9",Euro,2066.42
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,132300,"Finglas, Dublin 11",Euro,1935.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,133000,"Drimnagh, Dublin 12",Euro,2014.16
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,133900,"Clongriffin, Dublin 13",Euro,1990.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,134400,"Churchtown, Dublin 14",Euro,2582.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,134500,"Clonskeagh, Dublin 14",Euro,2165.7
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,135100,"Ashtown, Dublin 15",Euro,1999.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,135200,"Blanchardstown, Dublin 15",Euro,1852.96
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,135400,"Castleknock, Dublin 15",Euro,2062.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,135600,"Clonsilla, Dublin 15",Euro,1940.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,136100,"Porterstown, Dublin 15",Euro,1768.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,136200,"Royal Canal Park, Dublin 15",Euro,2165.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,136500,"Ballinteer, Dublin 16",Euro,2079.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,136600,"Dundrum, Dublin 16",Euro,2352.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,136800,"Rathfarnham, Dublin 16",Euro,2006.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,137500,"Malahide Road, Dublin 17",Euro,1943.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,137900,"Cabinteely, Dublin 18",Euro,2090.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,138000,"Carrickmines, Dublin 18",Euro,2161.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,138300,"Leopardstown, Dublin 18",Euro,2134.07
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,138600,"Sandyford, Dublin 18",Euro,2391.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,138900,"Stepaside, Dublin 18",Euro,1981.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,139200,"Chapelizod, Dublin 20",Euro,1845.08
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,139400,"Clondalkin, Dublin 22",Euro,1778.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,139600,"Ballycullen, Dublin 24",Euro,1848.37
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,139700,"Citywest, Dublin 24",Euro,2138.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,04,Apartment,140100,"Tallaght, Dublin 24",Euro,1797.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,05,Other flats,128100,"Ranelagh, Dublin 6",Euro,1992.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,05,Other flats,128200,"Rathgar, Dublin 6",Euro,1799.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,02,Two bed,05,Other flats,128300,"Rathmines, Dublin 6",Euro,1908.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,125300,"Clontarf, Dublin 3",Euro,2794.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,125400,"Drumcondra, Dublin 3",Euro,2378.17
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,126200,"Ballsbridge, Dublin 4",Euro,3805.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,126300,"Donnybrook, Dublin 4",Euro,3356.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,126800,"Sandymount, Dublin 4",Euro,3519.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,127000,"Artane, Dublin 5",Euro,2442.54
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,127500,"Raheny, Dublin 5",Euro,2479.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,127900,"Harolds Cross, Dublin 6",Euro,2611.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,128000,"Milltown, Dublin 6",Euro,2885.24
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,128100,"Ranelagh, Dublin 6",Euro,3286.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,128200,"Rathgar, Dublin 6",Euro,2861.8
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,128300,"Rathmines, Dublin 6",Euro,2667.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,129000,"Terenure, Dublin 6W",Euro,2551.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,129300,"Cabra, Dublin 7",Euro,2232.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,130300,"Inchicore, Dublin 8",Euro,2420.2
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,130400,"Islandbridge, Dublin 8",Euro,2796.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,131200,"Beaumont, Dublin 9",Euro,2460.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,131500,"Glasnevin, Dublin 9",Euro,2388.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,131600,"Santry, Dublin 9",Euro,2281.8
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,132300,"Finglas, Dublin 11",Euro,2105.41
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,132900,"Crumlin, Dublin 12",Euro,2377.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,133000,"Drimnagh, Dublin 12",Euro,2230.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,133900,"Clongriffin, Dublin 13",Euro,2384.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,134200,"Sutton, Dublin 13",Euro,2503.53
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,134400,"Churchtown, Dublin 14",Euro,2725.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,134500,"Clonskeagh, Dublin 14",Euro,2602.08
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,135200,"Blanchardstown, Dublin 15",Euro,2081.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,135400,"Castleknock, Dublin 15",Euro,2310.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,135600,"Clonsilla, Dublin 15",Euro,2058.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,135900,"Mulhuddart, Dublin 15",Euro,1921.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,136500,"Ballinteer, Dublin 16",Euro,2346.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,136600,"Dundrum, Dublin 16",Euro,2933.57
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,136800,"Rathfarnham, Dublin 16",Euro,2377.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,138300,"Leopardstown, Dublin 18",Euro,2658.63
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,138600,"Sandyford, Dublin 18",Euro,2728.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,139300,"Palmerstown, Dublin 20",Euro,2087.97
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,139400,"Clondalkin, Dublin 22",Euro,2009.37
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,139700,"Citywest, Dublin 24",Euro,2464.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,139800,"Firhouse, Dublin 24",Euro,2236.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,-,All property types,140100,"Tallaght, Dublin 24",Euro,2054.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,02,Semi detached house,127500,"Raheny, Dublin 5",Euro,2479.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,02,Semi detached house,131600,"Santry, Dublin 9",Euro,2104.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,02,Semi detached house,135400,"Castleknock, Dublin 15",Euro,2249.5
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,02,Semi detached house,135600,"Clonsilla, Dublin 15",Euro,2085.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,02,Semi detached house,136800,"Rathfarnham, Dublin 16",Euro,2315.16
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,02,Semi detached house,139400,"Clondalkin, Dublin 22",Euro,1972.2
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,02,Semi detached house,139700,"Citywest, Dublin 24",Euro,2343.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,02,Semi detached house,140100,"Tallaght, Dublin 24",Euro,2055.24
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,03,Terrace house,125400,"Drumcondra, Dublin 3",Euro,2457.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,03,Terrace house,126200,"Ballsbridge, Dublin 4",Euro,3902.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,03,Terrace house,128100,"Ranelagh, Dublin 6",Euro,3204.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,03,Terrace house,130300,"Inchicore, Dublin 8",Euro,2525.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,03,Terrace house,132300,"Finglas, Dublin 11",Euro,2028.41
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,03,Terrace house,133000,"Drimnagh, Dublin 12",Euro,2327.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,03,Terrace house,139400,"Clondalkin, Dublin 22",Euro,1944.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,03,Terrace house,140100,"Tallaght, Dublin 24",Euro,2044.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,04,Apartment,128300,"Rathmines, Dublin 6",Euro,2505.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,04,Apartment,130400,"Islandbridge, Dublin 8",Euro,2832.71
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,04,Apartment,131600,"Santry, Dublin 9",Euro,2379.18
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,04,Apartment,132300,"Finglas, Dublin 11",Euro,2187.48
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,04,Apartment,136600,"Dundrum, Dublin 16",Euro,3029.49
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,04,Apartment,138300,"Leopardstown, Dublin 18",Euro,2778.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,04,Apartment,138600,"Sandyford, Dublin 18",Euro,2859.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,03,Three bed,04,Apartment,139700,"Citywest, Dublin 24",Euro,2688.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,123500,"I.F.S.C., Dublin 1",Euro,2098.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,123600,"Parnell Street, Dublin 1",Euro,1876.8
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,123700,"Spencer Dock, Dublin 1",Euro,2334.41
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,123800,"Summerhill, Dublin 1",Euro,1707.27
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,124100,"Charlemont Street, Dublin 2",Euro,2118.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,124600,"Pearse Street, Dublin 2",Euro,1935.17
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,124700,"Tara Street, Dublin 2",Euro,2805.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,124800,"Temple Bar, Dublin 2",Euro,2085.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,124900,"Townsend Street, Dublin 2",Euro,2051.87
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,125200,"Clonliffe, Dublin 3",Euro,1568.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,125300,"Clontarf, Dublin 3",Euro,1858.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,125400,"Drumcondra, Dublin 3",Euro,1593.1
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,125500,"East Wall, Dublin 3",Euro,1972.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,125700,"Fairview, Dublin 3",Euro,1663.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,126000,"North Strand, Dublin 3",Euro,1683.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,126200,"Ballsbridge, Dublin 4",Euro,2222.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,126300,"Donnybrook, Dublin 4",Euro,2144.95
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,126400,"Irishtown, Dublin 4",Euro,2076.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,126500,"Merrion, Dublin 4",Euro,2177.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,126600,"Pembroke, Dublin 4",Euro,2376.94
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,126700,"Ringsend, Dublin 4",Euro,2135.16
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,126800,"Sandymount, Dublin 4",Euro,2170.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,127000,"Artane, Dublin 5",Euro,1744.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,127500,"Raheny, Dublin 5",Euro,1832.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,127900,"Harolds Cross, Dublin 6",Euro,1933.16
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,128000,"Milltown, Dublin 6",Euro,2179.16
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,128100,"Ranelagh, Dublin 6",Euro,1783.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,128200,"Rathgar, Dublin 6",Euro,1634.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,128300,"Rathmines, Dublin 6",Euro,1524.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,129000,"Terenure, Dublin 6W",Euro,1787.87
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,129200,"Arbour Hill, Dublin 7",Euro,2033.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,129300,"Cabra, Dublin 7",Euro,1422.86
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,129500,"North Circular Road, Dublin 7",Euro,1760.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,129700,"Smithfield, Dublin 7",Euro,2030.01
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,129800,"Stoneybatter, Dublin 7",Euro,1832.2
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,130000,"Christchurch, Dublin 8",Euro,1753.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,130100,"Cork Street, Dublin 8",Euro,1791.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,130300,"Inchicore, Dublin 8",Euro,1763.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,130400,"Islandbridge, Dublin 8",Euro,1994.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,130500,"Kilmainham , Dublin 8",Euro,1825.7
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,130600,"Portobello, Dublin 8",Euro,1833.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,130700,"Rialto, Dublin 8",Euro,1681.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,130800,"South Circular Road, Dublin 8",Euro,1693.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,131100,"Ballymun, Dublin 9",Euro,1734.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,131200,"Beaumont, Dublin 9",Euro,1900.1
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,131500,"Glasnevin, Dublin 9",Euro,1643.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,131600,"Santry, Dublin 9",Euro,1955.63
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,131700,"Whitehall, Dublin 9",Euro,1588.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,131900,"Ballyfermot, Dublin 10",Euro,1812.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,132000,"Cherry Orchard, Dublin 10",Euro,1657.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,132300,"Finglas, Dublin 11",Euro,1820.71
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,132900,"Crumlin, Dublin 12",Euro,1785.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,133000,"Drimnagh, Dublin 12",Euro,1896.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,133100,"Kimmage, Dublin 12",Euro,1727.63
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,133500,"Baldoyle, Dublin 13",Euro,1812.87
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,133600,"Balgriffin, Dublin 13",Euro,1612.8
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,133900,"Clongriffin, Dublin 13",Euro,1843.97
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,134200,"Sutton, Dublin 13",Euro,1996.5
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,134400,"Churchtown, Dublin 14",Euro,2412.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,134500,"Clonskeagh, Dublin 14",Euro,1962.35
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,135100,"Ashtown, Dublin 15",Euro,1880.35
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,135200,"Blanchardstown, Dublin 15",Euro,1822.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,135400,"Castleknock, Dublin 15",Euro,1967.11
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,135500,"Clonee, Dublin 15",Euro,1728.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,135600,"Clonsilla, Dublin 15",Euro,1756.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,135900,"Mulhuddart, Dublin 15",Euro,1677.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,136000,"Ongar, Dublin 15",Euro,1611.2
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,136100,"Porterstown, Dublin 15",Euro,1766.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,136200,"Royal Canal Park, Dublin 15",Euro,1923.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,136500,"Ballinteer, Dublin 16",Euro,2084.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,136600,"Dundrum, Dublin 16",Euro,2227.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,136800,"Rathfarnham, Dublin 16",Euro,1881.43
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,137500,"Malahide Road, Dublin 17",Euro,1766.18
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,137900,"Cabinteely, Dublin 18",Euro,2040.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,138000,"Carrickmines, Dublin 18",Euro,2031.5
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,138300,"Leopardstown, Dublin 18",Euro,2049.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,138600,"Sandyford, Dublin 18",Euro,2252.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,138900,"Stepaside, Dublin 18",Euro,1902.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,139200,"Chapelizod, Dublin 20",Euro,1743.48
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,139400,"Clondalkin, Dublin 22",Euro,1684.38
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,139600,"Ballycullen, Dublin 24",Euro,1830.88
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,139700,"Citywest, Dublin 24",Euro,2043.12
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,-,All property types,140100,"Tallaght, Dublin 24",Euro,1655.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,125500,"East Wall, Dublin 3",Euro,1984.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,126300,"Donnybrook, Dublin 4",Euro,2355.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,126700,"Ringsend, Dublin 4",Euro,2164.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,126800,"Sandymount, Dublin 4",Euro,2467.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,128100,"Ranelagh, Dublin 6",Euro,2513.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,129300,"Cabra, Dublin 7",Euro,1944.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,129800,"Stoneybatter, Dublin 7",Euro,1902.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,130300,"Inchicore, Dublin 8",Euro,1951.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,132900,"Crumlin, Dublin 12",Euro,2038.1
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,03,Terrace house,139400,"Clondalkin, Dublin 22",Euro,1864.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,123500,"I.F.S.C., Dublin 1",Euro,2098.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,123600,"Parnell Street, Dublin 1",Euro,1876.8
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,123700,"Spencer Dock, Dublin 1",Euro,2334.41
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,123800,"Summerhill, Dublin 1",Euro,1772.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,124100,"Charlemont Street, Dublin 2",Euro,2118.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,124600,"Pearse Street, Dublin 2",Euro,1936.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,124700,"Tara Street, Dublin 2",Euro,2805.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,124800,"Temple Bar, Dublin 2",Euro,2075.86
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,124900,"Townsend Street, Dublin 2",Euro,2051.87
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,125200,"Clonliffe, Dublin 3",Euro,1636.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,125300,"Clontarf, Dublin 3",Euro,1922.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,125400,"Drumcondra, Dublin 3",Euro,1822.7
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,125500,"East Wall, Dublin 3",Euro,1960.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,125700,"Fairview, Dublin 3",Euro,1787.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,126200,"Ballsbridge, Dublin 4",Euro,2321.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,126300,"Donnybrook, Dublin 4",Euro,2214.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,126400,"Irishtown, Dublin 4",Euro,2011.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,126500,"Merrion, Dublin 4",Euro,2206.95
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,126600,"Pembroke, Dublin 4",Euro,2389.41
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,126700,"Ringsend, Dublin 4",Euro,2129.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,126800,"Sandymount, Dublin 4",Euro,2102.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,127500,"Raheny, Dublin 5",Euro,1846.42
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,127900,"Harolds Cross, Dublin 6",Euro,2047.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,128000,"Milltown, Dublin 6",Euro,2181.96
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,128100,"Ranelagh, Dublin 6",Euro,1910.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,128200,"Rathgar, Dublin 6",Euro,1728.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,128300,"Rathmines, Dublin 6",Euro,1714.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,129000,"Terenure, Dublin 6W",Euro,1904.1
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,129300,"Cabra, Dublin 7",Euro,1493.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,129500,"North Circular Road, Dublin 7",Euro,1971.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,129700,"Smithfield, Dublin 7",Euro,2044.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,130000,"Christchurch, Dublin 8",Euro,1753.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,130100,"Cork Street, Dublin 8",Euro,1871.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,130300,"Inchicore, Dublin 8",Euro,1713.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,130400,"Islandbridge, Dublin 8",Euro,1994.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,130500,"Kilmainham , Dublin 8",Euro,1809.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,130700,"Rialto, Dublin 8",Euro,1726.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,130800,"South Circular Road, Dublin 8",Euro,1753.46
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,131100,"Ballymun, Dublin 9",Euro,1755.29
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,131200,"Beaumont, Dublin 9",Euro,1913.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,131500,"Glasnevin, Dublin 9",Euro,1747.57
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,131600,"Santry, Dublin 9",Euro,1970.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,132000,"Cherry Orchard, Dublin 10",Euro,1657.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,132300,"Finglas, Dublin 11",Euro,1840.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,132900,"Crumlin, Dublin 12",Euro,1723.29
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,133000,"Drimnagh, Dublin 12",Euro,1900.74
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,133100,"Kimmage, Dublin 12",Euro,1716.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,133600,"Balgriffin, Dublin 13",Euro,1583.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,133900,"Clongriffin, Dublin 13",Euro,1839.5
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,134400,"Churchtown, Dublin 14",Euro,2424.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,134500,"Clonskeagh, Dublin 14",Euro,2046.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,135100,"Ashtown, Dublin 15",Euro,1875.35
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,135200,"Blanchardstown, Dublin 15",Euro,1826.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,135400,"Castleknock, Dublin 15",Euro,1993.31
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,135600,"Clonsilla, Dublin 15",Euro,1846.02
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,136000,"Ongar, Dublin 15",Euro,1577.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,136100,"Porterstown, Dublin 15",Euro,1766.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,136200,"Royal Canal Park, Dublin 15",Euro,1923.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,136500,"Ballinteer, Dublin 16",Euro,2072.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,136600,"Dundrum, Dublin 16",Euro,2239.1
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,136800,"Rathfarnham, Dublin 16",Euro,1895.42
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,137500,"Malahide Road, Dublin 17",Euro,1771.55
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,137900,"Cabinteely, Dublin 18",Euro,2042.7
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,138000,"Carrickmines, Dublin 18",Euro,2024.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,138300,"Leopardstown, Dublin 18",Euro,2049.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,138600,"Sandyford, Dublin 18",Euro,2257.48
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,138900,"Stepaside, Dublin 18",Euro,1910.55
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,139200,"Chapelizod, Dublin 20",Euro,1730.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,139400,"Clondalkin, Dublin 22",Euro,1704.71
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,139600,"Ballycullen, Dublin 24",Euro,1830.88
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,139700,"Citywest, Dublin 24",Euro,2042.43
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,04,Apartment,140100,"Tallaght, Dublin 24",Euro,1666.21
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,125200,"Clonliffe, Dublin 3",Euro,1431.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,125300,"Clontarf, Dublin 3",Euro,1324.49
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,125400,"Drumcondra, Dublin 3",Euro,1260.95
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,125700,"Fairview, Dublin 3",Euro,1400.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,126200,"Ballsbridge, Dublin 4",Euro,1760.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,126300,"Donnybrook, Dublin 4",Euro,1488.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,128100,"Ranelagh, Dublin 6",Euro,1502.62
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,128200,"Rathgar, Dublin 6",Euro,1452.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,128300,"Rathmines, Dublin 6",Euro,1366.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,129000,"Terenure, Dublin 6W",Euro,1415.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,129300,"Cabra, Dublin 7",Euro,1269.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,129500,"North Circular Road, Dublin 7",Euro,1451.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,130700,"Rialto, Dublin 8",Euro,1280.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,130800,"South Circular Road, Dublin 8",Euro,1384.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,06,1 to 2 bed,05,Other flats,131500,"Glasnevin, Dublin 9",Euro,1165.87
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,123500,"I.F.S.C., Dublin 1",Euro,2136.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,123600,"Parnell Street, Dublin 1",Euro,1959.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,123700,"Spencer Dock, Dublin 1",Euro,2375.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,123800,"Summerhill, Dublin 1",Euro,1789.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,124100,"Charlemont Street, Dublin 2",Euro,2226.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,124600,"Pearse Street, Dublin 2",Euro,1959.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,124700,"Tara Street, Dublin 2",Euro,2805.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,124800,"Temple Bar, Dublin 2",Euro,2164.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,124900,"Townsend Street, Dublin 2",Euro,2075.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,125200,"Clonliffe, Dublin 3",Euro,1614.54
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,125300,"Clontarf, Dublin 3",Euro,2006.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,125400,"Drumcondra, Dublin 3",Euro,1733.18
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,125500,"East Wall, Dublin 3",Euro,2038.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,125700,"Fairview, Dublin 3",Euro,1779.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,126000,"North Strand, Dublin 3",Euro,1765.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,126200,"Ballsbridge, Dublin 4",Euro,2399.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,126300,"Donnybrook, Dublin 4",Euro,2294.86
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,126400,"Irishtown, Dublin 4",Euro,2167.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,126500,"Merrion, Dublin 4",Euro,2294.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,126600,"Pembroke, Dublin 4",Euro,2526.95
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,126700,"Ringsend, Dublin 4",Euro,2260.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,126800,"Sandymount, Dublin 4",Euro,2419.97
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,127000,"Artane, Dublin 5",Euro,2117.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,127400,"Killester, Dublin 5",Euro,2347.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,127500,"Raheny, Dublin 5",Euro,2069.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,127900,"Harolds Cross, Dublin 6",Euro,2108.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,128000,"Milltown, Dublin 6",Euro,2277.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,128100,"Ranelagh, Dublin 6",Euro,1955.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,128200,"Rathgar, Dublin 6",Euro,1704.49
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,128300,"Rathmines, Dublin 6",Euro,1577.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,128900,"Templeogue, Dublin 6W",Euro,2181.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,129000,"Terenure, Dublin 6W",Euro,1947.8
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,129200,"Arbour Hill, Dublin 7",Euro,2117.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,129300,"Cabra, Dublin 7",Euro,1510.5
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,129500,"North Circular Road, Dublin 7",Euro,1816.38
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,129700,"Smithfield, Dublin 7",Euro,2099.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,129800,"Stoneybatter, Dublin 7",Euro,1868.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,130000,"Christchurch, Dublin 8",Euro,1753.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,130100,"Cork Street, Dublin 8",Euro,1859.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,130300,"Inchicore, Dublin 8",Euro,1937.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,130400,"Islandbridge, Dublin 8",Euro,2083.42
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,130500,"Kilmainham , Dublin 8",Euro,1879.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,130600,"Portobello, Dublin 8",Euro,1833.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,130700,"Rialto, Dublin 8",Euro,1782.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,130800,"South Circular Road, Dublin 8",Euro,1797.37
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,131100,"Ballymun, Dublin 9",Euro,1756.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,131200,"Beaumont, Dublin 9",Euro,2115.53
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,131500,"Glasnevin, Dublin 9",Euro,1812.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,131600,"Santry, Dublin 9",Euro,2024.46
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,131700,"Whitehall, Dublin 9",Euro,1841.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,131900,"Ballyfermot, Dublin 10",Euro,1873.4
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,132000,"Cherry Orchard, Dublin 10",Euro,1676.21
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,132300,"Finglas, Dublin 11",Euro,1884.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,132900,"Crumlin, Dublin 12",Euro,1960.41
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,133000,"Drimnagh, Dublin 12",Euro,2028.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,133100,"Kimmage, Dublin 12",Euro,1812.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,133200,"Walkinstown, Dublin 12",Euro,2058.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,133500,"Baldoyle, Dublin 13",Euro,1970.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,133600,"Balgriffin, Dublin 13",Euro,1822.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,133900,"Clongriffin, Dublin 13",Euro,1946.12
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,134200,"Sutton, Dublin 13",Euro,2202.05
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,134400,"Churchtown, Dublin 14",Euro,2485.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,134500,"Clonskeagh, Dublin 14",Euro,2175.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,134700,"Goatstown, Dublin 14",Euro,2699.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,135100,"Ashtown, Dublin 15",Euro,1984.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,135200,"Blanchardstown, Dublin 15",Euro,1888.11
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,135400,"Castleknock, Dublin 15",Euro,2075.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,135500,"Clonee, Dublin 15",Euro,1746.57
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,135600,"Clonsilla, Dublin 15",Euro,1891.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,135900,"Mulhuddart, Dublin 15",Euro,1806.49
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,136000,"Ongar, Dublin 15",Euro,1813.27
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,136100,"Porterstown, Dublin 15",Euro,1812.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,136200,"Royal Canal Park, Dublin 15",Euro,1966.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,136500,"Ballinteer, Dublin 16",Euro,2188.16
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,136600,"Dundrum, Dublin 16",Euro,2302.7
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,136700,"Knocklyon, Dublin 16",Euro,2129.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,136800,"Rathfarnham, Dublin 16",Euro,2036.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,137500,"Malahide Road, Dublin 17",Euro,1818.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,137900,"Cabinteely, Dublin 18",Euro,2197.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,138000,"Carrickmines, Dublin 18",Euro,2103.8
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,138100,"Foxrock, Dublin 18",Euro,2785.17
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,138300,"Leopardstown, Dublin 18",Euro,2158.56
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,138600,"Sandyford, Dublin 18",Euro,2292.18
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,138900,"Stepaside, Dublin 18",Euro,1980.08
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,139200,"Chapelizod, Dublin 20",Euro,1859.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,139300,"Palmerstown, Dublin 20",Euro,1970.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,139400,"Clondalkin, Dublin 22",Euro,1811.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,139600,"Ballycullen, Dublin 24",Euro,1914.17
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,139700,"Citywest, Dublin 24",Euro,2115.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,139800,"Firhouse, Dublin 24",Euro,2048.74
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,-,All property types,140100,"Tallaght, Dublin 24",Euro,1787.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,125300,"Clontarf, Dublin 3",Euro,2605.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,125400,"Drumcondra, Dublin 3",Euro,2182.1
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,126200,"Ballsbridge, Dublin 4",Euro,2931.61
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,126800,"Sandymount, Dublin 4",Euro,2973.36
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,127500,"Raheny, Dublin 5",Euro,2287.74
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,131600,"Santry, Dublin 9",Euro,2037.28
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,132900,"Crumlin, Dublin 12",Euro,2245.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,135400,"Castleknock, Dublin 15",Euro,2180.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,135600,"Clonsilla, Dublin 15",Euro,2053.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,136800,"Rathfarnham, Dublin 16",Euro,2243.55
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,139400,"Clondalkin, Dublin 22",Euro,1933.43
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,139700,"Citywest, Dublin 24",Euro,2343.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,02,Semi detached house,140100,"Tallaght, Dublin 24",Euro,2000.63
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,125300,"Clontarf, Dublin 3",Euro,2505.72
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,125400,"Drumcondra, Dublin 3",Euro,2262.79
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,125500,"East Wall, Dublin 3",Euro,2089.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,126200,"Ballsbridge, Dublin 4",Euro,3263.49
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,126300,"Donnybrook, Dublin 4",Euro,2572.8
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,126700,"Ringsend, Dublin 4",Euro,2217.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,126800,"Sandymount, Dublin 4",Euro,2822.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,127500,"Raheny, Dublin 5",Euro,2296.97
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,127900,"Harolds Cross, Dublin 6",Euro,2269.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,128000,"Milltown, Dublin 6",Euro,2549.53
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,128100,"Ranelagh, Dublin 6",Euro,2911.11
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,128200,"Rathgar, Dublin 6",Euro,2650.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,128300,"Rathmines, Dublin 6",Euro,2508.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,129000,"Terenure, Dublin 6W",Euro,2277.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,129200,"Arbour Hill, Dublin 7",Euro,2192.27
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,129300,"Cabra, Dublin 7",Euro,2057.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,129800,"Stoneybatter, Dublin 7",Euro,1940.94
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,130300,"Inchicore, Dublin 8",Euro,2227.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,130700,"Rialto, Dublin 8",Euro,2235.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,130800,"South Circular Road, Dublin 8",Euro,2429.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,131500,"Glasnevin, Dublin 9",Euro,2150.18
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,131900,"Ballyfermot, Dublin 10",Euro,1943.62
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,132300,"Finglas, Dublin 11",Euro,1985.0
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,132900,"Crumlin, Dublin 12",Euro,2148.21
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,133000,"Drimnagh, Dublin 12",Euro,2157.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,133100,"Kimmage, Dublin 12",Euro,2057.17
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,135400,"Castleknock, Dublin 15",Euro,1999.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,135600,"Clonsilla, Dublin 15",Euro,1842.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,136600,"Dundrum, Dublin 16",Euro,2519.9
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,136800,"Rathfarnham, Dublin 16",Euro,2241.4
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,139400,"Clondalkin, Dublin 22",Euro,1918.65
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,03,Terrace house,140100,"Tallaght, Dublin 24",Euro,2022.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,123500,"I.F.S.C., Dublin 1",Euro,2136.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,123600,"Parnell Street, Dublin 1",Euro,1959.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,123700,"Spencer Dock, Dublin 1",Euro,2375.19
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,123800,"Summerhill, Dublin 1",Euro,1864.96
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,124100,"Charlemont Street, Dublin 2",Euro,2226.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,124600,"Pearse Street, Dublin 2",Euro,1961.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,124700,"Tara Street, Dublin 2",Euro,2805.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,124800,"Temple Bar, Dublin 2",Euro,2157.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,124900,"Townsend Street, Dublin 2",Euro,2075.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,125200,"Clonliffe, Dublin 3",Euro,1636.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,125300,"Clontarf, Dublin 3",Euro,1964.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,125400,"Drumcondra, Dublin 3",Euro,1879.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,125500,"East Wall, Dublin 3",Euro,1960.87
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,125700,"Fairview, Dublin 3",Euro,1802.5
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,126200,"Ballsbridge, Dublin 4",Euro,2395.54
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,126300,"Donnybrook, Dublin 4",Euro,2274.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,126400,"Irishtown, Dublin 4",Euro,2046.91
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,126500,"Merrion, Dublin 4",Euro,2297.43
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,126600,"Pembroke, Dublin 4",Euro,2506.57
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,126700,"Ringsend, Dublin 4",Euro,2290.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,126800,"Sandymount, Dublin 4",Euro,2221.44
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,127500,"Raheny, Dublin 5",Euro,1897.64
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,127900,"Harolds Cross, Dublin 6",Euro,2164.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,128000,"Milltown, Dublin 6",Euro,2221.48
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,128100,"Ranelagh, Dublin 6",Euro,1943.09
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,128200,"Rathgar, Dublin 6",Euro,1735.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,128300,"Rathmines, Dublin 6",Euro,1756.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,129000,"Terenure, Dublin 6W",Euro,1979.75
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,129300,"Cabra, Dublin 7",Euro,1493.51
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,129500,"North Circular Road, Dublin 7",Euro,1971.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,129700,"Smithfield, Dublin 7",Euro,2115.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,130000,"Christchurch, Dublin 8",Euro,1753.82
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,130100,"Cork Street, Dublin 8",Euro,1931.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,130300,"Inchicore, Dublin 8",Euro,1768.24
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,130400,"Islandbridge, Dublin 8",Euro,2079.46
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,130500,"Kilmainham , Dublin 8",Euro,1836.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,130700,"Rialto, Dublin 8",Euro,1794.69
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,130800,"South Circular Road, Dublin 8",Euro,1788.54
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,131100,"Ballymun, Dublin 9",Euro,1744.03
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,131200,"Beaumont, Dublin 9",Euro,1953.34
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,131500,"Glasnevin, Dublin 9",Euro,1771.81
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,131600,"Santry, Dublin 9",Euro,2015.85
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,132000,"Cherry Orchard, Dublin 10",Euro,1689.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,132300,"Finglas, Dublin 11",Euro,1877.92
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,132900,"Crumlin, Dublin 12",Euro,1799.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,133000,"Drimnagh, Dublin 12",Euro,1953.16
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,133100,"Kimmage, Dublin 12",Euro,1716.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,133600,"Balgriffin, Dublin 13",Euro,1660.76
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,133900,"Clongriffin, Dublin 13",Euro,1916.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,134200,"Sutton, Dublin 13",Euro,2088.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,134400,"Churchtown, Dublin 14",Euro,2468.26
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,134500,"Clonskeagh, Dublin 14",Euro,2149.98
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,135100,"Ashtown, Dublin 15",Euro,1933.54
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,135200,"Blanchardstown, Dublin 15",Euro,1852.55
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,135400,"Castleknock, Dublin 15",Euro,2047.83
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,135600,"Clonsilla, Dublin 15",Euro,1875.6
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,136000,"Ongar, Dublin 15",Euro,1647.52
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,136100,"Porterstown, Dublin 15",Euro,1788.39
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,136200,"Royal Canal Park, Dublin 15",Euro,1960.23
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,136500,"Ballinteer, Dublin 16",Euro,2123.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,136600,"Dundrum, Dublin 16",Euro,2295.08
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,136800,"Rathfarnham, Dublin 16",Euro,1937.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,137500,"Malahide Road, Dublin 17",Euro,1809.89
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,137900,"Cabinteely, Dublin 18",Euro,2132.87
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,138000,"Carrickmines, Dublin 18",Euro,2056.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,138300,"Leopardstown, Dublin 18",Euro,2135.05
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,138600,"Sandyford, Dublin 18",Euro,2289.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,138900,"Stepaside, Dublin 18",Euro,1929.08
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,139200,"Chapelizod, Dublin 20",Euro,1781.97
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,139400,"Clondalkin, Dublin 22",Euro,1730.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,139600,"Ballycullen, Dublin 24",Euro,1851.78
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,139700,"Citywest, Dublin 24",Euro,2088.04
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,04,Apartment,140100,"Tallaght, Dublin 24",Euro,1689.06
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,125200,"Clonliffe, Dublin 3",Euro,1460.32
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,125300,"Clontarf, Dublin 3",Euro,1343.73
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,125400,"Drumcondra, Dublin 3",Euro,1286.08
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,125700,"Fairview, Dublin 3",Euro,1400.99
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,126200,"Ballsbridge, Dublin 4",Euro,1776.11
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,126300,"Donnybrook, Dublin 4",Euro,1488.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,128100,"Ranelagh, Dublin 6",Euro,1530.24
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,128200,"Rathgar, Dublin 6",Euro,1455.3
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,128300,"Rathmines, Dublin 6",Euro,1387.15
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,129000,"Terenure, Dublin 6W",Euro,1426.2
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,129300,"Cabra, Dublin 7",Euro,1276.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,129500,"North Circular Road, Dublin 7",Euro,1451.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,130700,"Rialto, Dublin 8",Euro,1280.77
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,130800,"South Circular Road, Dublin 8",Euro,1384.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,07,1 to 3 bed,05,Other flats,131500,"Glasnevin, Dublin 9",Euro,1199.58
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,125400,"Drumcondra, Dublin 3",Euro,3013.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,126200,"Ballsbridge, Dublin 4",Euro,5280.02
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,126300,"Donnybrook, Dublin 4",Euro,5248.97
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,126800,"Sandymount, Dublin 4",Euro,4882.13
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,128100,"Ranelagh, Dublin 6",Euro,4803.93
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,128300,"Rathmines, Dublin 6",Euro,4253.67
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,128900,"Templeogue, Dublin 6W",Euro,2998.29
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,129000,"Terenure, Dublin 6W",Euro,3443.59
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,131500,"Glasnevin, Dublin 9",Euro,3024.7
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,131600,"Santry, Dublin 9",Euro,3114.11
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,132300,"Finglas, Dublin 11",Euro,2536.42
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,134500,"Clonskeagh, Dublin 14",Euro,4053.25
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,135400,"Castleknock, Dublin 15",Euro,2887.33
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,135600,"Clonsilla, Dublin 15",Euro,2595.84
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,136600,"Dundrum, Dublin 16",Euro,3305.45
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,136800,"Rathfarnham, Dublin 16",Euro,3002.29
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,-,All property types,138100,"Foxrock, Dublin 18",Euro,4111.66
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,02,Semi detached house,135400,"Castleknock, Dublin 15",Euro,2737.94
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,02,Semi detached house,135600,"Clonsilla, Dublin 15",Euro,2553.68
+RIA02,RTB Average Monthly Rent Report,2025,2025,08,Four plus bed,02,Semi detached house,136800,"Rathfarnham, Dublin 16",Euro,2974.5

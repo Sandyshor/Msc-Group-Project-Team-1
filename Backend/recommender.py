@@ -99,10 +99,8 @@ def _none_if_nan(value):
 # 1. LOAD DATA (once, at server start)
 
 def load_data():
-    amenities = pd.concat(
-        [_clean_columns(pd.read_csv(_path(f"{a}_Amenities_Counts.csv"))) for a in AREA_CODES_AMENITIES],
-        ignore_index=True,
-    )
+    # Refreshed weekly from OpenStreetMap by refresh_amenities.py
+    amenities = _clean_columns(pd.read_csv(_path("amenity_counts_osm.csv")))
     room_data = pd.concat(
         [_clean_columns(pd.read_excel(_path(file))).rename(columns={"Room Type": "Room type"}).assign(**{"Double Is": meaning})
          for file, meaning in ROOM_FILES.items()],
@@ -110,11 +108,8 @@ def load_data():
     )
     room_data["Room type"] = room_data["Room type"].astype(str).str.strip().str.lower()
 
-    rtb = pd.concat(
-        [_clean_columns(pd.read_csv(_path(f)))
-         for f in ["RTB_Clean.csv", "RTB_Clean1.csv", "RTB_Clean2.csv", "RTB_Clean3.csv"]],
-        ignore_index=True,
-    )
+    # Refreshed from the CSO (table RIA02) by refresh_rents.py
+    rtb = _clean_columns(pd.read_csv(_path("RTB_latest.csv"), low_memory=False))
     census = _clean_columns(pd.read_excel(_path("Dublin_Census_Filled.xlsx")))
     ethnicity = _clean_columns(pd.read_excel(_path("Dublin_Ethnicity_D1_D24.xlsx")))
 
