@@ -163,7 +163,14 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
   - Santhosh agreed to work on Calculation
   - Vignesh agreed to work on security and safety of the area, permission access to the data.
   - Sheryas agreed to evaluate the system, providing details for letting agencies
-  
+
+  **Meeting 3 (9:00 - 9:30)**
+  - Attended by Sheryas, Catherine, Santhosh, Vignesh and Sowmiya
+  - connected on a conference call discussed about the work progress.
+  - Sowmiya started collecting landmark data by Dublin Postal districts
+  - Sheryas started collecting Rent data from D14 - D20
+  - Santhosh integrated commute time slider and type of transportation option in the questionnaire part of the website
+  - Vignesh started collecting crime and safety data of Dublin
 
 
   
