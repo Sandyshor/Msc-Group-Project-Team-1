@@ -187,7 +187,7 @@ function setHint(html, loading = false) {
 }
 
 function updateHint() {
-  if (!startMarker) setHint("Click the map to set your <strong>start</strong> point");
+  if (!startMarker) setHint("Click the map or a 🎓 university to set your <strong>start</strong> point");
   else if (!endMarker) setHint("Now click to set your <strong>destination</strong>");
   else setHint("Drag either pin to change the route");
 }
@@ -209,17 +209,58 @@ function addMarker(latlng, isStart) {
   return marker;
 }
 
-map.on("click", event => {
+function choosePoint(latlng) {
   if (!startMarker) {
-    ripple(event.latlng);
-    startMarker = addMarker(event.latlng, true);
+    ripple(latlng);
+    startMarker = addMarker(latlng, true);
   } else if (!endMarker) {
-    ripple(event.latlng);
-    endMarker = addMarker(event.latlng, false);
+    ripple(latlng);
+    endMarker = addMarker(latlng, false);
     planRoute();
   }
   if (!inFlight || !endMarker) updateHint();
-});
+}
+
+map.on("click", event => choosePoint(event.latlng));
+
+// ---------------------------------------------------------------- universities
+// 🎓 markers from the backend's /universities. Clicking one uses it as the start or destination,
+// or moves the destination there once both pins are set. Campuses within 60 m share a marker.
+const universityLayer = L.layerGroup().addTo(map);
+
+function addUniversities(list) {
+  const groups = [];
+  list.forEach(uni => {
+    const latlng = L.latLng(uni.lat, uni.lon);
+    const group = groups.find(g => map.distance(g.latlng, latlng) < 60);
+    if (group) group.names.push(uni.name);
+    else groups.push({ latlng, names: [uni.name] });
+  });
+  groups.forEach(({ latlng, names }) => {
+    const label = names.map(escapeHtml).join("<br>");
+    L.marker(latlng, {
+      icon: L.divIcon({ className: "", html: '<div class="uni-marker" aria-hidden="true">🎓</div>', iconSize: [30, 30], iconAnchor: [15, 15] }),
+      title: names.join(" / "),
+      keyboard: true,
+    })
+      .bindTooltip(label, { direction: "top", offset: [0, -14], className: "uni-tooltip" })
+      .on("click", () => {
+        if (startMarker && endMarker) {
+          endMarker.setLatLng(latlng);
+          ripple(latlng);
+          planRoute();
+        } else {
+          choosePoint(latlng);
+        }
+      })
+      .addTo(universityLayer);
+  });
+}
+
+fetch(`${API_BASE}/universities`, { headers: { Accept: "application/json" } })
+  .then(response => (response.ok ? response.json() : []))
+  .then(addUniversities)
+  .catch(() => {});  // the planner still works without the markers
 
 // ---------------------------------------------------------------- panel states
 function showLoading() {
