@@ -1,0 +1,34 @@
+name: Refresh data
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"   # every Monday 03:00 UTC
+  workflow_dispatch:       # adds a "Run workflow" button
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pandas requests pyproj shapely numpy
+      - run: python Backend/refresh_rents.py
+      - run: python Backend/refresh_amenities.py
+      - name: Save and redeploy if anything changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "Sandyshor"
+          git config user.email "91480843+Sandyshor@users.noreply.github.com"
+          git add Data/RTB_latest.csv Data/amenities_osm.csv Data/amenity_counts_osm.csv
+          if ! git diff --cached --quiet; then
+            git commit -m "Weekly data refresh (CSO rents, OpenStreetMap amenities)"
+            git push
+            gh workflow run main_crib-crew-api-1.yml --ref main
+          fi
