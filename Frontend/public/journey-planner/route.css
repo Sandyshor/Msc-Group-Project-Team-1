@@ -165,7 +165,11 @@
   .route-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* University markers */
-.uni-marker { display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid var(--forest-deep); border-radius: 50%; background: #fff; box-shadow: 0 4px 12px rgba(16,47,42,.28); font-size: 15px; line-height: 1; cursor: pointer; transition: transform .15s; }
-.uni-marker:hover { transform: scale(1.15); }
-.uni-tooltip { padding: 6px 9px; border: 0; border-radius: 8px; color: var(--forest-deep); box-shadow: 0 6px 16px rgba(16,47,42,.18); font: 700 12px/1.4 "DM Sans", sans-serif; }
+/* University and famous-place markers */
+.landmark { display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid var(--forest-deep); border-radius: 50%; background: #fff; box-shadow: 0 4px 12px rgba(16,47,42,.28); font-size: 15px; line-height: 1; cursor: pointer; transition: transform .15s; }
+.landmark:hover { transform: scale(1.15); }
+.landmark-place { border-color: #b8862f; background: #fffaf0; }
+.landmark-airport { width: 38px; height: 38px; margin: -4px 0 0 -4px; border-width: 3px; font-size: 19px; }
+.landmark-tooltip { padding: 6px 9px; border: 0; border-radius: 8px; color: var(--forest-deep); box-shadow: 0 6px 16px rgba(16,47,42,.18); font: 700 12px/1.4 "DM Sans", sans-serif; }
+.landmark-category { color: #7a877f; font-weight: 500; }
+.route-map .leaflet-control-layers { border: 0; border-radius: 10px; box-shadow: 0 8px 22px rgba(16,47,42,.12); font: 600 12px "DM Sans", sans-serif; color: #43524a; }
