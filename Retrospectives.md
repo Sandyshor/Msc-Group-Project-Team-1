@@ -172,7 +172,12 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
   - Santhosh integrated commute time slider and type of transportation option in the questionnaire part of the website
   - Vignesh started collecting crime and safety data of Dublin
 
-
+**Meeting 4 (9:00 - 9:30)**
+- Attended by Santhosh, Vignesh, Catherine and Sowmiya. Sheryas couldn't join the meeting
+- Sowmiya has replaced the video with British Accent, and working on map visualization
+- Catherine has updated the district profile map till D10, now the map can be viewed district wise rather than entire map.
+-  Vignesh has implemented new feature called Journey Planner, where distance, commute time, transportation between any two points can be viewed.
+- Santhosh deployed the map feature, and highlighted all universities, famous places across Dublin on the map, and also automated the amenities count by setting up a code which connect to api and updates the count every week.
   
 
   
