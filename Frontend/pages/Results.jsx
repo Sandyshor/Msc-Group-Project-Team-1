@@ -134,6 +134,58 @@ function ResultCard({ result, university, modeWords, maxCommute }) {
   )
 }
 
+function LettingAgents() {
+  const [open, setOpen] = useState(false)
+  const [agents, setAgents] = useState(null)
+  const [failed, setFailed] = useState(false)
+
+  function toggle() {
+    setOpen(!open)
+    if (!agents) {
+      fetch(`${API_URL}/agencies`)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then(setAgents)
+        .catch(() => setFailed(true))
+    }
+  }
+
+  return (
+    <div className="agencies">
+      <button type="button" className="questionnaire-next" onClick={toggle} aria-expanded={open}>
+        {open ? 'Hide letting agents' : 'Talk to a letting agent'} <span>{open ? '↑' : '↓'}</span>
+      </button>
+
+      {open && (
+        <div className="agencies-panel">
+          <p>
+            Found an area you like? These Dublin letting agents can help you find a place.
+            Many have offices and listings across the city.
+          </p>
+          {failed && <p>We couldn't load the letting agents. Please try again later.</p>}
+          {!agents && !failed && <p>Loading…</p>}
+          {agents && agents.length > 0 && (
+            <ul>
+              {agents.map((a) => (
+                <li key={a.Name}>
+                  <a href={a.Website} target="_blank" rel="noreferrer"><strong>{a.Name}</strong> ↗</a>
+                  {a.Areas && <span className="agency-areas"> · {a.Areas}</span>}
+                  {a.Address && <div>{a.Address}</div>}
+                  {a.PSRA_Licence && <div className="agency-areas">PSRA licence {a.PSRA_Licence}</div>}
+                </li>
+              ))}
+            </ul>
+          )}
+          {agents && agents.length > 0 && (
+            <p className="agencies-note">
+              Listed for information only. We are not affiliated with these agents.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function Results() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -280,6 +332,7 @@ function Results() {
                 />
               ))}
             </div>
+            <LettingAgents />
           </>
         )}
       </div>
