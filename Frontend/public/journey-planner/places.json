@@ -1,0 +1,23 @@
+[
+  {"name": "Dublin Airport", "category": "Airport", "icon": "✈️", "lat": 53.4270, "lon": -6.2440},
+  {"name": "Heuston Station", "category": "Train station", "icon": "🚆", "lat": 53.3464, "lon": -6.2924},
+  {"name": "Connolly Station", "category": "Train station", "icon": "🚆", "lat": 53.3510, "lon": -6.2499},
+  {"name": "Busáras (Central Bus Station)", "category": "Bus station", "icon": "🚌", "lat": 53.3502, "lon": -6.2525},
+  {"name": "The Spire, O'Connell Street", "category": "Landmark", "icon": "📍", "lat": 53.3498, "lon": -6.2603},
+  {"name": "Temple Bar", "category": "Nightlife", "icon": "🎶", "lat": 53.3455, "lon": -6.2642},
+  {"name": "Grafton Street", "category": "Shopping", "icon": "🛍️", "lat": 53.3418, "lon": -6.2600},
+  {"name": "St Stephen's Green", "category": "Park", "icon": "🌳", "lat": 53.3381, "lon": -6.2592},
+  {"name": "Dublin Castle", "category": "History", "icon": "🏰", "lat": 53.3429, "lon": -6.2674},
+  {"name": "Christ Church Cathedral", "category": "History", "icon": "⛪", "lat": 53.3434, "lon": -6.2710},
+  {"name": "St Patrick's Cathedral", "category": "History", "icon": "⛪", "lat": 53.3395, "lon": -6.2715},
+  {"name": "Guinness Storehouse", "category": "Attraction", "icon": "🍺", "lat": 53.3419, "lon": -6.2867},
+  {"name": "Kilmainham Gaol", "category": "History", "icon": "🏛️", "lat": 53.3419, "lon": -6.3095},
+  {"name": "Phoenix Park", "category": "Park", "icon": "🌳", "lat": 53.3562, "lon": -6.3295},
+  {"name": "Dublin Zoo", "category": "Attraction", "icon": "🦁", "lat": 53.3561, "lon": -6.3052},
+  {"name": "Croke Park", "category": "Stadium", "icon": "🏟️", "lat": 53.3607, "lon": -6.2512},
+  {"name": "Aviva Stadium", "category": "Stadium", "icon": "🏟️", "lat": 53.3352, "lon": -6.2284},
+  {"name": "3Arena", "category": "Concerts", "icon": "🎤", "lat": 53.3475, "lon": -6.2286},
+  {"name": "Dundrum Town Centre", "category": "Shopping", "icon": "🛍️", "lat": 53.2876, "lon": -6.2416},
+  {"name": "Howth", "category": "Seaside", "icon": "⚓", "lat": 53.3893, "lon": -6.0659},
+  {"name": "Dún Laoghaire Pier", "category": "Seaside", "icon": "⚓", "lat": 53.2943, "lon": -6.1337}
+]

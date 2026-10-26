@@ -3,6 +3,9 @@
 // Only the Vite dev server (npm run dev, port 5173) needs to point at the backend on port 8000.
 const API_BASE = location.port === "5173" ? "http://127.0.0.1:8000" : "";
 const DUBLIN_CENTRE = [53.3498, -6.2603];
+// First view: the city centre and Dublin Airport together
+const START_VIEW = [[53.330, -6.300], [53.430, -6.215]];
+const START_PADDING = { paddingTopLeft: [30, 90], paddingBottomRight: [30, 70] };  // clear of the hint and legend
 const DUBLIN_TZ = "Europe/Dublin";
 const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const DRAW_MS = 1100;          // time to draw the whole selected route
@@ -50,14 +53,15 @@ const BASEMAP = { url: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x
 // Used automatically if Stadia refuses the tiles (e.g. the Azure domain isn't registered yet).
 const FALLBACK_BASEMAP = { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", maxZoom: 19, attribution: OSM_ATTRIBUTION, className: "tiles-osm" };
 
-const map = L.map("routeMap", { zoomControl: false, zoomSnap: 0.25 }).setView(DUBLIN_CENTRE, REDUCED_MOTION ? 12.5 : 11);
+const map = L.map("routeMap", { zoomControl: false, zoomSnap: 0.25 }).setView(DUBLIN_CENTRE, 11);
+if (REDUCED_MOTION) map.fitBounds(START_VIEW, START_PADDING);
 L.control.zoom({ position: "bottomright" }).addTo(map);
 let baseLayer = null;
 let usingFallback = false;
 setBasemap();
 const altLayer = L.layerGroup().addTo(map);
 const routeLayer = L.layerGroup().addTo(map);
-if (!REDUCED_MOTION) setTimeout(() => map.flyTo(DUBLIN_CENTRE, 12.5, { duration: 1.6 }), 250);
+if (!REDUCED_MOTION) setTimeout(() => map.flyToBounds(START_VIEW, { ...START_PADDING, duration: 1.6 }), 250);
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -187,7 +191,7 @@ function setHint(html, loading = false) {
 }
 
 function updateHint() {
-  if (!startMarker) setHint("Click the map or a 🎓 university to set your <strong>start</strong> point");
+  if (!startMarker) setHint("Click the map, a 🎓 university or a famous place to set your <strong>start</strong> point");
   else if (!endMarker) setHint("Now click to set your <strong>destination</strong>");
   else setHint("Drag either pin to change the route");
 }
@@ -223,44 +227,60 @@ function choosePoint(latlng) {
 
 map.on("click", event => choosePoint(event.latlng));
 
-// ---------------------------------------------------------------- universities
-// 🎓 markers from the backend's /universities. Clicking one uses it as the start or destination,
-// or moves the destination there once both pins are set. Campuses within 60 m share a marker.
+// ---------------------------------------------------------------- universities and famous places
+// 🎓 universities come from the backend's /universities; famous places (airport, stations, sights)
+// from places.json next to this page, so the team can add places without touching the code.
+// Clicking a marker uses it as the start or destination, or moves the destination there once both
+// pins are set. Points within 60 m of each other share a marker.
 const universityLayer = L.layerGroup().addTo(map);
+const placeLayer = L.layerGroup().addTo(map);
+L.control.layers(null, { "🎓 Universities": universityLayer, "📍 Famous places": placeLayer },
+  { position: "topright", collapsed: false }).addTo(map);
 
-function addUniversities(list) {
+function useLandmark(latlng) {
+  if (startMarker && endMarker) {
+    endMarker.setLatLng(latlng);
+    ripple(latlng);
+    planRoute();
+  } else {
+    choosePoint(latlng);
+  }
+}
+
+function addLandmarks(list, layer, kind) {
   const groups = [];
-  list.forEach(uni => {
-    const latlng = L.latLng(uni.lat, uni.lon);
+  list.forEach(item => {
+    const latlng = L.latLng(item.lat, item.lon);
     const group = groups.find(g => map.distance(g.latlng, latlng) < 60);
-    if (group) group.names.push(uni.name);
-    else groups.push({ latlng, names: [uni.name] });
+    if (group) group.items.push(item);
+    else groups.push({ latlng, items: [item] });
   });
-  groups.forEach(({ latlng, names }) => {
-    const label = names.map(escapeHtml).join("<br>");
+  groups.forEach(({ latlng, items }) => {
+    const icon = items[0].icon || "🎓";
+    const label = items.map(item => escapeHtml(item.name) +
+      (item.category && !item.name.includes(item.category)
+        ? ` <span class="landmark-category">${escapeHtml(item.category)}</span>` : "")).join("<br>");
+    const extra = items.some(item => item.category === "Airport") ? " landmark-airport" : "";
     L.marker(latlng, {
-      icon: L.divIcon({ className: "", html: '<div class="uni-marker" aria-hidden="true">🎓</div>', iconSize: [30, 30], iconAnchor: [15, 15] }),
-      title: names.join(" / "),
+      icon: L.divIcon({ className: "", html: `<div class="landmark landmark-${kind}${extra}" aria-hidden="true">${escapeHtml(icon)}</div>`, iconSize: [30, 30], iconAnchor: [15, 15] }),
+      title: items.map(item => item.name).join(" / "),
       keyboard: true,
     })
-      .bindTooltip(label, { direction: "top", offset: [0, -14], className: "uni-tooltip" })
-      .on("click", () => {
-        if (startMarker && endMarker) {
-          endMarker.setLatLng(latlng);
-          ripple(latlng);
-          planRoute();
-        } else {
-          choosePoint(latlng);
-        }
-      })
-      .addTo(universityLayer);
+      .bindTooltip(label, { direction: "top", offset: [0, -14], className: "landmark-tooltip" })
+      .on("click", () => useLandmark(latlng))
+      .addTo(layer);
   });
 }
 
-fetch(`${API_BASE}/universities`, { headers: { Accept: "application/json" } })
-  .then(response => (response.ok ? response.json() : []))
-  .then(addUniversities)
-  .catch(() => {});  // the planner still works without the markers
+function loadLandmarks(url, layer, kind) {
+  fetch(url, { headers: { Accept: "application/json" } })
+    .then(response => (response.ok ? response.json() : []))
+    .then(list => addLandmarks(list, layer, kind))
+    .catch(() => {});  // the planner still works without the markers
+}
+
+loadLandmarks(`${API_BASE}/universities`, universityLayer, "uni");
+loadLandmarks("places.json", placeLayer, "place");
 
 // ---------------------------------------------------------------- panel states
 function showLoading() {
