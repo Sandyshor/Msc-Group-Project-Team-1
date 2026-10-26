@@ -182,7 +182,7 @@ def load_data():
     for factor in FACTORS:
         if factor["kind"] == "group":
             area_data[factor["column"]] = area_data[factor["columns"]].sum(axis=1, skipna=False)
-            agencies_file = _path("letting_agencies.csv")
+    agencies_file = _path("letting_agencies.csv")
     if os.path.exists(agencies_file):
         agencies = _clean_columns(pd.read_csv(agencies_file, dtype=str)).fillna("")
         agencies = agencies.apply(lambda col: col.str.strip())
