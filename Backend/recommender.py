@@ -20,6 +20,9 @@ DATA_FOLDER = os.environ.get(
 # Same commute file as "Recommendation system.py" (all universities). Until it's
 # uploaded to Data/, fall back to the TU Dublin Grangegorman-only file.
 COMMUTE_FILES = ["Dublin_D1_D24_All_University_Commutes_clean_updated.csv", "Commute_TUD_Grangegorman.csv"]
+# Commute times calculated with OpenTripPlanner by Backend/tools/build_commute_matrix.py. When the
+# file exists it replaces the Journey Planner export and the cycling estimate below.
+OTP_COMMUTE_FILE = "commute_otp.csv"
 
 AREA_CODES_ROOMS = ["D1", "D2", "D3", "D6", "D7", "D8", "D9", "D10"]
 AREA_CODES_AMENITIES = AREA_CODES_ROOMS + ["D4", "D5", "D11", "D12", "D13", "D14", "D15",
@@ -68,6 +71,8 @@ FACTOR_LOOKUP = {f["name"]: f for f in FACTORS + ITEM_FACTORS}
 # How a student can travel. Each key is a minutes column in data["commute_points"].
 TRAVEL_MODES = {"public_transport": "by public transport", "walk": "on foot", "cycle": "by bike"}
 CYCLING_KMH = 15  # typical city cycling speed, applied to the walking route distance
+# Route distance column in data["commute_points"] for each travel mode
+MODE_DISTANCE = {"public_transport": "Distance_km", "walk": "Walking km", "cycle": "Cycle km"}
 
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
 RATING_TO_WEIGHT = {1: 3, 2: 2, 3: 1, 4: 0}
@@ -135,6 +140,23 @@ def load_data():
     commute_points["public_transport"] = commute_points["Travel_Time_Min"]
     commute_points["walk"] = commute_points["Walking Minutes"]
     commute_points["cycle"] = commute_points["Walking km"] / CYCLING_KMH * 60
+    commute_points["Cycle km"] = commute_points["Walking km"]
+    commute_source = "TFI Journey Planner export (public transport) and walking routes; cycling estimated"
+
+    if os.path.exists(_path(OTP_COMMUTE_FILE)):
+        otp = _clean_columns(pd.read_csv(_path(OTP_COMMUTE_FILE)))
+        keys = ["Area", "Direction", "Landmark", "University"]
+        minutes = otp.pivot_table(index=keys, columns="Mode", values="Minutes")
+        km = otp.pivot_table(index=keys, columns="Mode", values="Distance_km")
+        commute_points = commute_points.set_index(keys)
+        for mode, km_column in MODE_DISTANCE.items():
+            if mode in minutes:
+                # Where OTP found no route, keep the older figure
+                commute_points[mode] = minutes[mode].reindex(commute_points.index).fillna(commute_points[mode])
+                commute_points[km_column] = km[mode].reindex(commute_points.index).fillna(commute_points[km_column])
+        commute_points = commute_points.reset_index()
+        commute_source = (f"OpenTripPlanner (TFI timetables), public transport arriving by "
+                          f"{otp['Arrive_By'].iloc[0][-5:]} on a weekday; calculated {otp['Calculated_At'].iloc[0][:10]}")
 
     # Rent tables
     is_double = room_data["Room type"] == "double"
@@ -168,6 +190,7 @@ def load_data():
         "walking": walking,
         "commute_by_university": commute_by_university,
         "commute_points": commute_points,
+        "commute_source": commute_source,
         "universities": sorted(commute_by_university["University"].unique()),
         "rent_tables": {
             "shared_room": ("Shared Room", shared_room_rent),
@@ -277,7 +300,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     points = points[(points["University"] == university) & points[travel_mode].notna()].copy()
     points["Minutes"] = points[travel_mode]
     points["Within Limit"] = points["Minutes"] <= max_commute if max_commute else True
-    distance_column = "Distance_km" if travel_mode == "public_transport" else "Walking km"
+    distance_column = MODE_DISTANCE[travel_mode]
     commute = points.groupby("Area").agg(**{
         "Commute Minutes": ("Minutes", "mean"),
         "Parts": ("Minutes", "size"),
@@ -529,6 +552,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         "budget": budget,
         "travel_mode": travel_mode,
         "max_commute": max_commute,
+        "commute_source": data["commute_source"],
         "areas_compared": len(ranked),
         "warning": warning,
         "recommendations": results,
