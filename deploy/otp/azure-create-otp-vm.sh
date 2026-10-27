@@ -18,6 +18,9 @@ ADMIN_IP="${ADMIN_IP:-}"                             # your public IP for SSH (c
 VM_NAME="${VM_NAME:-otp-vm}"
 VM_SIZE="${VM_SIZE:-Standard_B2ms}"                  # 8 GB RAM; OTP uses ~2.6 GB plus the OS
 ADMIN_USER="${ADMIN_USER:-azureuser}"
+# Public SSH key of the person who will run deploy-otp.sh (the laptop with graph.obj), e.g. the contents of
+# ~/.ssh/id_ed25519.pub on that laptop. If empty, a key is generated on the machine running this script.
+SSH_PUBLIC_KEY="${SSH_PUBLIC_KEY:-}"
 
 # Optional: if the backend runs on App Service, set these and the script connects it to the VNet
 # and sets OTP_URL for you. Leave WEBAPP_NAME empty if the backend runs on a VM.
@@ -60,11 +63,17 @@ az network nsg rule create -g "$RESOURCE_GROUP" --nsg-name "$NSG_NAME" -n allow-
   --source-address-prefixes "$ADMIN_IP/32" --destination-port-ranges 22 -o none
 
 # ---------------------------------------------------------------- VM
+if [[ -n $SSH_PUBLIC_KEY ]]; then
+  ssh_args=(--ssh-key-values "$SSH_PUBLIC_KEY")
+else
+  echo "NOTE: SSH_PUBLIC_KEY not set - generating a key on THIS machine; only it can run deploy-otp.sh." >&2
+  ssh_args=(--generate-ssh-keys)
+fi
 echo "Creating VM $VM_NAME ($VM_SIZE, Ubuntu 24.04)... this takes a few minutes."
 az vm create -g "$RESOURCE_GROUP" -n "$VM_NAME" -l "$LOCATION" \
   --image Canonical:ubuntu-24_04-lts:server:latest --size "$VM_SIZE" \
   --vnet-name "$VNET_NAME" --subnet "$OTP_SUBNET_NAME" --nsg "$NSG_NAME" \
-  --public-ip-sku Standard --admin-username "$ADMIN_USER" --generate-ssh-keys \
+  --public-ip-sku Standard --admin-username "$ADMIN_USER" "${ssh_args[@]}" \
   --os-disk-size-gb 30 -o none
 
 PRIVATE_IP=$(az vm show -d -g "$RESOURCE_GROUP" -n "$VM_NAME" --query privateIps -o tsv)
