@@ -6,6 +6,7 @@ Same data, factors, scoring and explanations as the notebook/terminal script, bu
   * there are no input() prompts - the student's answers are passed to recommend(),
   * results are returned as JSON-friendly dicts instead of printed.
 """
+import json
 import os
 import re
 
@@ -17,12 +18,33 @@ DATA_FOLDER = os.environ.get(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Data"),
 )
 
+# Street safety score per district (robbery, public order, Garda distance; 50 = Dublin average), written by
+# safety_pipeline.py (refreshed weekly by .github/workflows/refresh-safety-data.yml). Shown on each result; not
+# used for ranking.
+SAFETY_CSV = os.environ.get(
+    "SAFETY_CSV",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "safety", "safety_indicators.csv"),
+)
+# Other safety factors (street lighting, night public transport), from build_safety_context.py.
+# Shown with the safety score as context; they are not part of it.
+SAFETY_CONTEXT_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "safety_context.csv")
+# Street safety score per named neighbourhood (safety_pipeline.py), on the same Dublin-average scale.
+SAFETY_NEIGHBOURHOODS_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "safety_neighbourhoods.csv")
+# Safety heat map: ED shapes per district (build_safety_map.py), ED scores (safety_pipeline.py) and where each
+# named neighbourhood is (build_neighbourhoods.py).
+SAFETY_MAP_GEOJSON = os.path.join(os.path.dirname(SAFETY_CSV), "safety_map_areas.geojson")
+SAFETY_MAP_DISTRICTS_GEOJSON = os.path.join(os.path.dirname(SAFETY_CSV), "safety_map_districts.geojson")
+SAFETY_EDS_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "safety_eds.csv")
+NEIGHBOURHOOD_PLACES_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "neighbourhoods.csv")
+
+# Student residences per district, from OpenStreetMap plus a hand-checked list (build_accommodation.py). Rent listings aren't stored:
+# each result links to Daft.ie / Rent.ie searches for its district instead.
+RESIDENCES_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "accommodation",
+                              "student_residences.csv")
+
 # Same commute file as "Recommendation system.py" (all universities). Until it's
 # uploaded to Data/, fall back to the TU Dublin Grangegorman-only file.
 COMMUTE_FILES = ["Dublin_D1_D24_All_University_Commutes_clean_updated.csv", "Commute_TUD_Grangegorman.csv"]
-# Commute times calculated with OpenTripPlanner by Backend/tools/build_commute_matrix.py. When the
-# file exists it replaces the Journey Planner export and the cycling estimate below.
-OTP_COMMUTE_FILE = "commute_otp.csv"
 
 AREA_CODES_ROOMS = ["D1", "D2", "D3", "D6", "D7", "D8", "D9", "D10"]
 AREA_CODES_AMENITIES = AREA_CODES_ROOMS + ["D4", "D5", "D11", "D12", "D13", "D14", "D15",
@@ -71,8 +93,6 @@ FACTOR_LOOKUP = {f["name"]: f for f in FACTORS + ITEM_FACTORS}
 # How a student can travel. Each key is a minutes column in data["commute_points"].
 TRAVEL_MODES = {"public_transport": "by public transport", "walk": "on foot", "cycle": "by bike"}
 CYCLING_KMH = 15  # typical city cycling speed, applied to the walking route distance
-# Route distance column in data["commute_points"] for each travel mode
-MODE_DISTANCE = {"public_transport": "Distance_km", "walk": "Walking km", "cycle": "Cycle km"}
 
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
 RATING_TO_WEIGHT = {1: 3, 2: 2, 3: 1, 4: 0}
@@ -102,6 +122,144 @@ def _none_if_nan(value):
 
 
 # 1. LOAD DATA (once, at server start)
+
+def _round_or_none(value, digits=0):
+    value = _none_if_nan(value)
+    return None if value is None else round(float(value), digits) if digits else round(float(value))
+
+
+def _percent(value):
+    value = _none_if_nan(value)
+    return None if value is None else round(float(value) * 100)
+
+
+def load_neighbourhoods(path=SAFETY_NEIGHBOURHOODS_CSV):
+    """{area: [neighbourhood safety figures, safest first]}; {} if the file isn't there."""
+    if not os.path.exists(path):
+        return {}
+    nb = pd.read_csv(path).sort_values(["safety_index_0_100", "Neighbourhood"], ascending=[False, True])
+    return {
+        area: [{"name": row["Neighbourhood"],
+                "score": _round_or_none(row["safety_index_0_100"], 1),
+                "robbery_per_100k": _round_or_none(row["robbery_per_100k"]),
+                "public_order_per_100k": _round_or_none(row["public_order_per_100k"]),
+                "garda_nearest_km": _round_or_none(row["garda_nearest_km"], 1)}
+               for _, row in group.iterrows()]
+        for area, group in nb.groupby("District", sort=False)
+    }
+
+
+def load_safety(path=SAFETY_CSV, context_path=SAFETY_CONTEXT_CSV, neighbourhoods_path=SAFETY_NEIGHBOURHOODS_CSV):
+    """{area: safety figures} from safety_indicators.csv (+ context and neighbourhoods if present); {} without the first."""
+    if not os.path.exists(path):
+        return {}
+    neighbourhoods = load_neighbourhoods(neighbourhoods_path)
+    safety = pd.read_csv(path)
+    if os.path.exists(context_path):
+        context = pd.read_csv(context_path)[["District", "lit_share_tagged", "night_transit_coverage"]]
+        safety = safety.merge(context, on="District", how="left")
+    out = {}
+    for _, row in safety.iterrows():
+        out[row["District"]] = {
+            "index": _round_or_none(row.get("safety_index_0_100"), 1),
+            "robbery_per_100k": _round_or_none(row.get("robbery_per_100k")),
+            "public_order_per_100k": _round_or_none(row.get("public_order_per_100k")),
+            "dublin_robbery_per_100k": _round_or_none(row.get("dublin_robbery_per_100k")),
+            "dublin_public_order_per_100k": _round_or_none(row.get("dublin_public_order_per_100k")),
+            "crime_period": _none_if_nan(row.get("crime_reference_period")),
+            "garda_nearest_km": _round_or_none(row.get("garda_nearest_km"), 1),
+            "lit_streets_pct": _percent(row.get("lit_share_tagged")),
+            "night_transit_pct": _percent(row.get("night_transit_coverage")),
+            "neighbourhoods": neighbourhoods.get(row["District"], []),
+        }
+    return out
+
+
+def _bounds(features):
+    xs, ys = [], []
+
+    def walk(coords):
+        if isinstance(coords[0], (int, float)):
+            xs.append(coords[0])
+            ys.append(coords[1])
+        else:
+            for c in coords:
+                walk(c)
+    for f in features:
+        walk(f["geometry"]["coordinates"])
+    return [min(xs), min(ys), max(xs), max(ys)]
+
+
+def load_safety_maps(shapes_path=SAFETY_MAP_GEOJSON, eds_path=SAFETY_EDS_CSV,
+                     places_path=NEIGHBOURHOOD_PLACES_CSV, neighbourhoods_path=SAFETY_NEIGHBOURHOODS_CSV,
+                     outlines_path=SAFETY_MAP_DISTRICTS_GEOJSON):
+    """{area: heat map} - the district's ED areas with their safety scores, its outline (or None), and its named
+    neighbourhoods (name, score, lon/lat) for labels. {} if the shapes or ED scores aren't there."""
+    if not (os.path.exists(shapes_path) and os.path.exists(eds_path)):
+        return {}
+    with open(shapes_path) as f:
+        shapes = json.load(f)["features"]
+    eds = pd.read_csv(eds_path).set_index("ED_GUID")
+    places = {}
+    if os.path.exists(places_path) and os.path.exists(neighbourhoods_path):
+        nb = pd.read_csv(neighbourhoods_path).merge(
+            pd.read_csv(places_path)[["District", "Neighbourhood", "lon", "lat"]], on=["District", "Neighbourhood"])
+        for area, group in nb.groupby("District"):
+            places[area] = [{"name": r["Neighbourhood"], "score": _round_or_none(r["safety_index_0_100"], 1),
+                             "lon": r["lon"], "lat": r["lat"]} for _, r in group.iterrows()]
+    outlines = {}
+    if os.path.exists(outlines_path):
+        with open(outlines_path) as f:
+            outlines = {o["properties"]["District"]: o["geometry"] for o in json.load(f)["features"]}
+    maps = {}
+    for f in shapes:
+        guid = f["properties"]["ED_GUID"]
+        if guid not in eds.index:
+            continue
+        ed = eds.loc[guid]
+        feature = {"type": "Feature", "geometry": f["geometry"], "properties": {
+            "ed": f["properties"]["ED"].title(),
+            "score": _round_or_none(ed["safety_index_0_100"], 1),
+            "robbery_per_100k": _round_or_none(ed["robbery_per_100k"]),
+            "public_order_per_100k": _round_or_none(ed["public_order_per_100k"]),
+            "garda_nearest_km": _round_or_none(ed["garda_nearest_km"], 1)}}
+        maps.setdefault(f["properties"]["District"], []).append(feature)
+    return {area: {"areas": {"type": "FeatureCollection", "features": features},
+                   "bounds": _bounds(features),
+                   "outline": outlines.get(area),
+                   "places": places.get(area, [])}
+            for area, features in maps.items()}
+
+
+def load_residences(path=RESIDENCES_CSV):
+    """{area: [student residences]} (name, operator, website, address, lon/lat); {} if the file isn't there."""
+    if not os.path.exists(path):
+        return {}
+    res = pd.read_csv(path)
+    return {area: [{"name": r["Name"], "operator": _none_if_nan(r["Operator"]), "website": _none_if_nan(r["Website"]),
+                    "address": _none_if_nan(r.get("Address")), "lon": _none_if_nan(r["lon"]), "lat": _none_if_nan(r["lat"]),
+                    "approximate_position": str(r.get("Position", "")).startswith("street")}
+                   for _, r in group.iterrows()]
+            for area, group in res.groupby("District")}
+
+
+def search_links(area, accommodation, budget):
+    """Rental searches for the district on Daft.ie and Rent.ie, both filtered to the budget and room type."""
+    n = area[1:].lower()  # "D6W" -> "6w"
+    budget = int(budget)
+    if accommodation in ("shared_room", "private_room"):
+        daft = f"https://www.daft.ie/sharing/dublin-{n}-dublin?rentalPrice_to={budget}"
+        rent_ie = f"https://www.rent.ie/rooms-to-rent/renting_dublin/dublin-{n}/rent_0-{budget}/"
+        what = "Rooms"
+    else:
+        beds = 1 if accommodation == "one_bed" else 2
+        daft = (f"https://www.daft.ie/property-for-rent/dublin-{n}-dublin?rentalPrice_to={budget}"
+                f"&numBeds_from={beds}&numBeds_to={beds}")
+        rent_ie = f"https://www.rent.ie/houses-to-let/renting_dublin/dublin-{n}/{beds}_beds/rent_0-{budget}/"
+        what = f"{beds}-bed homes"
+    label = f"{what} in {area} up to €{budget:,}"
+    return [{"site": "Daft.ie", "label": label, "url": daft}, {"site": "Rent.ie", "label": label, "url": rent_ie}]
+
 
 def load_data():
     # Refreshed weekly from OpenStreetMap by refresh_amenities.py
@@ -140,23 +298,6 @@ def load_data():
     commute_points["public_transport"] = commute_points["Travel_Time_Min"]
     commute_points["walk"] = commute_points["Walking Minutes"]
     commute_points["cycle"] = commute_points["Walking km"] / CYCLING_KMH * 60
-    commute_points["Cycle km"] = commute_points["Walking km"]
-    commute_source = "TFI Journey Planner export (public transport) and walking routes; cycling estimated"
-
-    if os.path.exists(_path(OTP_COMMUTE_FILE)):
-        otp = _clean_columns(pd.read_csv(_path(OTP_COMMUTE_FILE)))
-        keys = ["Area", "Direction", "Landmark", "University"]
-        minutes = otp.pivot_table(index=keys, columns="Mode", values="Minutes")
-        km = otp.pivot_table(index=keys, columns="Mode", values="Distance_km")
-        commute_points = commute_points.set_index(keys)
-        for mode, km_column in MODE_DISTANCE.items():
-            if mode in minutes:
-                # Where OTP found no route, keep the older figure
-                commute_points[mode] = minutes[mode].reindex(commute_points.index).fillna(commute_points[mode])
-                commute_points[km_column] = km[mode].reindex(commute_points.index).fillna(commute_points[km_column])
-        commute_points = commute_points.reset_index()
-        commute_source = (f"OpenTripPlanner (TFI timetables), public transport arriving by "
-                          f"{otp['Arrive_By'].iloc[0][-5:]} on a weekday; calculated {otp['Calculated_At'].iloc[0][:10]}")
 
     # Rent tables
     is_double = room_data["Room type"] == "double"
@@ -182,24 +323,18 @@ def load_data():
     for factor in FACTORS:
         if factor["kind"] == "group":
             area_data[factor["column"]] = area_data[factor["columns"]].sum(axis=1, skipna=False)
-    agencies_file = _path("letting_agencies.csv")
-    if os.path.exists(agencies_file):
-        agencies = _clean_columns(pd.read_csv(agencies_file, dtype=str)).fillna("")
-        agencies = agencies.apply(lambda col: col.str.strip())
-        agencies["PSRA_Licence"] = agencies["PSRA_Licence"].apply(lambda x: x.zfill(6) if x else "")
-    else:
-        agencies = pd.DataFrame(columns=["Name", "Areas", "Address", "Website", "PSRA_Licence"])
 
     return {
         "area_data": area_data,
-        "agencies": agencies,
         "census": census,
         "ethnicity": ethnicity,
         "walking": walking,
         "commute_by_university": commute_by_university,
         "commute_points": commute_points,
-        "commute_source": commute_source,
         "universities": sorted(commute_by_university["University"].unique()),
+        "safety": load_safety(),
+        "safety_maps": load_safety_maps(),
+        "residences": load_residences(),
         "rent_tables": {
             "shared_room": ("Shared Room", shared_room_rent),
             "private_room": ("Private Room", private_room_rent),
@@ -308,7 +443,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     points = points[(points["University"] == university) & points[travel_mode].notna()].copy()
     points["Minutes"] = points[travel_mode]
     points["Within Limit"] = points["Minutes"] <= max_commute if max_commute else True
-    distance_column = MODE_DISTANCE[travel_mode]
+    distance_column = "Distance_km" if travel_mode == "public_transport" else "Walking km"
     commute = points.groupby("Area").agg(**{
         "Commute Minutes": ("Minutes", "mean"),
         "Parts": ("Minutes", "size"),
@@ -550,6 +685,9 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             "commute": commute_info(row["Area"], row),
             "match_score": round(float(row["Match Score"]), 1),
             "walking": walking_info(row["Area"]),
+            "safety": data.get("safety", {}).get(row["Area"]),
+            "places_to_live": {"residences": data.get("residences", {}).get(row["Area"], []),
+                               "search_links": search_links(row["Area"], accommodation, budget)},
             "why": " ".join(explain(position, row)),
             "profile": " ".join(area_profile(row)),
         })
@@ -560,7 +698,6 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         "budget": budget,
         "travel_mode": travel_mode,
         "max_commute": max_commute,
-        "commute_source": data["commute_source"],
         "areas_compared": len(ranked),
         "warning": warning,
         "recommendations": results,

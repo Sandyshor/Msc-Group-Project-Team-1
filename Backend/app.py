@@ -53,14 +53,6 @@ def options():
     }
 
 
-@app.get("/universities")
-def universities():
-    """University locations (the commute destinations), for the journey planner map."""
-    points = DATA["commute_points"].groupby("University")[["Destination_Latitude", "Destination_Longitude"]].first()
-    return [{"name": name, "lat": float(row.Destination_Latitude), "lon": float(row.Destination_Longitude)}
-            for name, row in points.iterrows()]
-
-
 @app.post("/recommend")
 def recommend(req: RecommendRequest):
     if any(r not in (1, 2, 3, 4) for r in req.ratings.values()):
@@ -88,6 +80,16 @@ def recommend(req: RecommendRequest):
     return result
 
 
+@app.get("/safety-map/{area}")
+def safety_map(area: str):
+    """Safety heat map for one district: its Census ED areas with their street safety scores (GeoJSON) and its
+    named neighbourhoods. Same scale as the district score: 50 = Dublin average, higher is safer."""
+    found = DATA.get("safety_maps", {}).get(area.upper())
+    if not found:
+        raise HTTPException(404, f"No safety map for {area}")
+    return found
+
+
 class TranslateRequest(BaseModel):
     texts: List[str] = Field(..., max_length=100)
     language: str
@@ -99,11 +101,6 @@ def translate_texts(req: TranslateRequest):
         return {"translations": translator.translate(req.texts, req.language)}
     except Exception as e:
         raise HTTPException(502, f"Translation failed: {e!r}")
-
-@app.get("/agencies")
-def agencies():
-    """All letting agencies in our list."""
-    return DATA["agencies"].to_dict(orient="records")
 FRONTEND_DIR = (Path(__file__).resolve().parent.parent / "Frontend" / "dist")
 
 if FRONTEND_DIR.is_dir():
