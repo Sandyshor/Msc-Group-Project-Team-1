@@ -1,2 +1,9 @@
 __pycache__/
 *.pyc
+
+# Safety pipeline raw inputs (large downloads; only the small files in Backend/data/safety are committed)
+Backend/data/raw/
+
+# Python virtual environments
+.venv/
+venv/
