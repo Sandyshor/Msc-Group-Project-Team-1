@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Results.css'
 import { districts } from '../District Profile/districtData.js'
 import CommuteFields, { TRAVEL_MODES } from './CommuteFields'
+
+const SafetyHeatMap = lazy(() => import('./SafetyHeatMap'))
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
@@ -50,6 +52,194 @@ function WalkingDistance({ area, walking, university }) {
         </ul>
       </details>
     </div>
+  )
+}
+
+// One safety score per postal district, straight from safety_indicators.csv (via the API).
+// The wording comes from the district's rank among the 22 districts; no colours for areas.
+// Street safety scores: 50 = the Dublin average; twice the average crime rate = 25, half = 75.
+function safetyLevel(raw) {
+  const score = Math.round(raw)   // label the number people see (39.8 shows as 40)
+  if (score >= 60) return ['good', 'Safer than Dublin average']
+  if (score >= 40) return ['mid', 'Around Dublin average']
+  return ['low', 'Below Dublin average']
+}
+
+function SafetyScore({ label, score }) {
+  if (score == null) return null
+  const [tone, words] = safetyLevel(score)
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd>
+        {Math.round(score)}<span className="result-muted">/100</span>
+        <span className={`safety-tag ${tone}`}>{words}</span>
+        <span className="safety-meter" role="img" aria-label={`${label}: ${Math.round(score)} out of 100`}>
+          <span className={tone} style={{ width: `${Math.max(4, Math.min(100, score))}%` }} />
+        </span>
+      </dd>
+    </div>
+  )
+}
+
+// The district's safety heat map (GET /safety-map/{area}). maplibre is loaded only when a card scrolls into view.
+function SafetyMap({ area, score, residences }) {
+  const box = useRef(null)
+  const [visible, setVisible] = useState(false)
+  const [data, setData] = useState(null)
+  const [missing, setMissing] = useState(false)
+
+  useEffect(() => {
+    if (!box.current || !('IntersectionObserver' in window)) { setVisible(true); return undefined }
+    const seen = new IntersectionObserver(([entry]) => entry.isIntersecting && setVisible(true), { rootMargin: '300px' })
+    seen.observe(box.current)
+    return () => seen.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!visible) return undefined
+    let cancelled = false
+    fetch(`${API_URL}/safety-map/${encodeURIComponent(area)}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
+      .then((d) => { if (!cancelled) setData(d) })
+      .catch(() => { if (!cancelled) setMissing(true) })
+    return () => { cancelled = true }
+  }, [visible, area])
+
+  if (missing) return null
+  return (
+    <div ref={box} className="heat-map-slot">
+      {data && (
+        <Suspense fallback={null}>
+          <SafetyHeatMap area={area} data={data} score={score} residences={residences} />
+        </Suspense>
+      )}
+    </div>
+  )
+}
+
+function SafetyScores({ area, safety, residences }) {
+  if (!safety) return null
+
+  return (
+    <section className="result-safety" aria-label={`Safety in ${area}`}>
+      <h3>Safety</h3>
+      <p className="result-muted">50 = Dublin average · higher is safer</p>
+      <dl className="result-stats safety-stats">
+        <SafetyScore label="Street safety score" score={safety.index} />
+      </dl>
+      <SafetyMap area={area} score={safety.index} residences={residences} />
+      <details>
+        <summary>What&apos;s behind this score</summary>
+        <h4>Used in the score</h4>
+        <ul>
+          {safety.robbery_per_100k != null && (
+            <li>
+              Robberies: {safety.robbery_per_100k.toLocaleString('en-IE')} per 100,000 people a year
+              {safety.dublin_robbery_per_100k != null && ` (Dublin average ${safety.dublin_robbery_per_100k.toLocaleString('en-IE')})`}
+            </li>
+          )}
+          {safety.public_order_per_100k != null && (
+            <li>
+              Public order offences: {safety.public_order_per_100k.toLocaleString('en-IE')} per 100,000 people a year
+              {safety.dublin_public_order_per_100k != null && ` (Dublin average ${safety.dublin_public_order_per_100k.toLocaleString('en-IE')})`}
+            </li>
+          )}
+          {safety.garda_nearest_km != null && (
+            <li>Nearest Garda station: {safety.garda_nearest_km.toFixed(1)} km on average</li>
+          )}
+        </ul>
+        {(safety.lit_streets_pct != null || safety.night_transit_pct != null) && (
+          <>
+            <h4>Other safety factors</h4>
+            <ul>
+              {safety.lit_streets_pct != null && <li>Street lighting (where mapped): {safety.lit_streets_pct}% of streets lit</li>}
+              {safety.night_transit_pct != null && (
+                <li>Night bus, Luas or train within a 5-minute walk: {safety.night_transit_pct}% of streets</li>
+              )}
+            </ul>
+          </>
+        )}
+      </details>
+      <p className="home-credits">
+        Crime data: Central Statistics Office (CSO), Garda recorded crime, CC BY 4.0. Population and boundaries: CSO
+        Census and Tailte Éireann, CC BY 4.0. Map data: ©{' '}
+        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>.
+      </p>
+    </section>
+  )
+}
+
+const RESIDENCES_SHOWN = 4
+
+// Student residences in the district (OpenStreetMap) and rental searches for it (Daft.ie, Rent.ie).
+function PlacesToLive({ area, places }) {
+  const [showAll, setShowAll] = useState(false)
+  if (!places) return null
+  const { residences = [], search_links: links = [] } = places
+  const shown = showAll ? residences : residences.slice(0, RESIDENCES_SHOWN)
+
+  return (
+    <section className="result-homes" aria-label={`Places to live in ${area}`}>
+      <h3>Places to live in {area}</h3>
+      <p className="result-muted">Live listings open on Daft.ie and Rent.ie, filtered to {area}, your room type and budget.</p>
+      <div className="home-search">
+        {links.map((l) => (
+          <a key={l.site} className="home-search-link" href={l.url} target="_blank" rel="noopener noreferrer">
+            <strong>{l.site}</strong>
+            <span>{l.label}</span>
+            <span aria-hidden="true" className="home-search-arrow">↗</span>
+          </a>
+        ))}
+      </div>
+
+      <h4>Student residences {residences.length > 0 && <span>{residences.length} in {area}</span>}</h4>
+      {residences.length === 0 ? (
+        <p className="result-muted">
+          No purpose-built student residences in {area} on OpenStreetMap. Most students here rent a room in a
+          shared house or apartment - try the searches above.
+        </p>
+      ) : (
+        <>
+          <ul className="home-list">
+            {shown.map((r) => {
+              return (
+                <li key={r.name} className="home-card">
+                  <span className="home-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z" fill="currentColor" /></svg>
+                  </span>
+                  <span className="home-body">
+                    <strong>{r.name}</strong>
+                    <span className="result-muted">
+                      {[r.operator || 'Student residence', r.address].filter(Boolean).join(' · ')}
+                    </span>
+                  </span>
+                  {r.website ? (
+                    <a className="home-link" href={r.website} target="_blank" rel="noopener noreferrer">Website ↗</a>
+                  ) : (
+                    <span className="home-link muted">No website listed</span>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+          {residences.length > RESIDENCES_SHOWN && (
+            <button type="button" className="home-more" onClick={() => setShowAll((v) => !v)}>
+              {showAll ? 'Show fewer' : `Show all ${residences.length} residences`}
+            </button>
+          )}
+          <p className="home-note">
+            Switch the safety map above to <strong>Student homes</strong> to see where they are. Check rooms, prices
+            and who can apply on each website.
+          </p>
+        </>
+      )}
+      <p className="home-credits">
+        Residences: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap
+        contributors</a> (ODbL), the official websites of the operators and universities, and Amber Student, checked October 2026.
+        Find Your Dublin is not affiliated with Daft.ie, Rent.ie or any residence listed.
+      </p>
+    </section>
   )
 }
 
@@ -111,6 +301,10 @@ function ResultCard({ result, university, modeWords, maxCommute }) {
 
       <WalkingDistance area={result.area} walking={result.walking} university={university} />
 
+      <SafetyScores area={result.area} safety={result.safety} residences={result.places_to_live?.residences} />
+
+      <PlacesToLive area={result.area} places={result.places_to_live} />
+
       <h3>Why {result.area} is #{result.rank}</h3>
       <p>{result.why}</p>
 
@@ -131,74 +325,6 @@ function ResultCard({ result, university, modeWords, maxCommute }) {
         </button>
       )}
     </article>
-  )
-}
-
-function LettingAgents() {
-  const [open, setOpen] = useState(false)
-  const [agents, setAgents] = useState(null)
-  const [failed, setFailed] = useState(false)
-
-  function toggle() {
-    setOpen(!open)
-    if (!agents) {
-      fetch(`${API_URL}/agencies`)
-        .then((r) => (r.ok ? r.json() : Promise.reject()))
-        .then(setAgents)
-        .catch(() => setFailed(true))
-    }
-  }
-
-  return (
-    <div className="agencies">
-      <button type="button" className="questionnaire-next" onClick={toggle} aria-expanded={open}>
-        {open ? 'Hide letting agents' : 'Letting agents in Dublin'} <span>{open ? '↑' : '↓'}</span>
-      </button>
-
-      {open && (
-        <div className="agencies-panel">
-          <p className="agencies-intro">
-            A selection of licensed letting agents operating in Dublin. This is not a complete
-            list, and agents are shown in alphabetical order. Being listed here does not mean we
-            recommend them.
-          </p>
-          {failed && <p>We couldn't load the letting agents. Please try again later.</p>}
-          {!agents && !failed && <p>Loading…</p>}
-          {agents && agents.length > 0 && (
-            <div className="agent-grid">
-              {[...agents].sort((a, b) => a.Name.localeCompare(b.Name)).map((a) => (
-                <article className="agent-card" key={a.Name}>
-                  <div className="agent-top">
-                    <span className="agent-initial" aria-hidden="true">{a.Name.charAt(0)}</span>
-                    <div>
-                      <h3 className="agent-name">{a.Name}</h3>
-                      {a.Areas && <span className="agent-area">{a.Areas}</span>}
-                    </div>
-                  </div>
-                  {a.Address && <p className="agent-address">📍 {a.Address}</p>}
-                  <div className="agent-bottom">
-                    {a.PSRA_Licence && <span className="agent-psra">✓ PSRA {a.PSRA_Licence}</span>}
-                    {a.Website && (
-                      <a className="agent-link" href={a.Website} target="_blank" rel="noreferrer">
-                        Visit website ↗
-                      </a>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-          {agents && agents.length > 0 && (
-            <p className="agencies-note">
-              Find Your Dublin is a student project and is not affiliated with, endorsed by or paid
-              by any of these agents. Details were correct when checked in October 2026, so please
-              confirm them directly with the agent. Never pay a deposit before viewing a property
-              and checking the agent's PSRA licence.
-            </p>
-          )}
-        </div>
-      )}
-    </div>
   )
 }
 
@@ -348,7 +474,6 @@ function Results() {
                 />
               ))}
             </div>
-            <LettingAgents />
           </>
         )}
       </div>
