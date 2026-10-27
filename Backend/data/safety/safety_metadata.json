@@ -1,0 +1,13 @@
+{
+  "crime": {
+    "last_success_utc": "2026-10-27T15:18:22+00:00",
+    "status": "ok",
+    "note": "2023-2025 average",
+    "sha256": "3ad219a7ca691912"
+  },
+  "garda": {
+    "last_success_utc": "2026-10-27T15:18:22+00:00",
+    "status": "ok",
+    "note": "39 public DMR stations (OSM)"
+  }
+}

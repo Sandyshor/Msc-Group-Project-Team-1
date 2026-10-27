@@ -1,0 +1,129 @@
+District,Neighbourhood,Station,robbery_per_100k,public_order_per_100k,garda_nearest_km,safety_index_0_100,confidence
+D1,Ballybough,fitzgibbon street,184.8,1170.9,0.724,35.7,1.0
+D1,Hardwicke Street Flats,fitzgibbon street,184.8,1170.9,0.5,37.7,1.0
+D1,North Strand,fitzgibbon street,184.8,1170.9,0.912,34.5,1.0
+D1,East Wall,store street,284.6,4406.6,1.304,13.3,1.0
+D1,International Financial Services Centre,store street,284.6,4406.6,0.442,19.1,1.0
+D1,North Wall,store street,284.6,4406.6,0.857,15.5,1.0
+D2,Temple Bar,pearse street,278.4,2229.8,0.458,23.1,1.0
+D3,Clontarf,clontarf,50.9,404.4,1.582,68.6,1.0
+D3,Fairview,clontarf,50.9,404.4,1.099,70.6,1.0
+D3,Marino,clontarf,50.9,404.4,1.018,71.0,1.0
+D4,Ballsbridge,donnybrook,39.7,433.7,0.901,75.8,1.0
+D4,Irishtown,irishtown,64.6,754.6,0.057,65.2,1.0
+D4,Merrion,irishtown,64.6,754.6,1.847,56.3,1.0
+D4,Ringsend,irishtown,64.6,754.6,0.465,63.7,1.0
+D4,Sandymount,irishtown,64.6,754.6,0.883,60.3,1.0
+D5,Artane,coolock,92.6,511.7,0.868,57.4,1.0
+D5,Coolock,coolock,92.6,511.7,0.124,62.3,1.0
+D5,Coolock Village,coolock,92.6,511.7,0.26,62.3,1.0
+D5,Edenmore,coolock,92.6,511.7,1.039,56.5,1.0
+D5,Killester,raheny,46.7,314.3,1.263,74.2,1.0
+D5,Raheny,raheny,46.7,314.3,0.229,81.2,1.0
+D6,Donnybrook,donnybrook,39.7,433.7,0.05,80.9,1.0
+D6,Milltown,donnybrook,39.7,433.7,1.188,74.3,1.0
+D6,Ranelagh,donnybrook,39.7,433.7,0.907,75.8,1.0
+D6,Dartry,rathmines,62.4,884.9,1.279,57.2,1.0
+D6,Harold's Cross,rathmines,62.4,884.9,0.932,58.9,1.0
+D6,Rathgar,rathmines,62.4,884.9,0.931,58.9,1.0
+D6,Rathmines,rathmines,62.4,884.9,0.605,61.3,1.0
+D6,Terenure,terenure,54.6,366.4,0.315,76.4,1.0
+D6W,Kimmage,crumlin,62.2,565.3,1.02,63.4,1.0
+D6W,Templeogue,terenure,54.6,366.4,1.082,70.3,1.0
+D7,Grangegorman,bridewell,192.1,2103.3,0.919,27.3,1.0
+D7,Oxmantown,bridewell,192.1,2103.3,1.035,26.7,1.0
+D7,Smithfield,bridewell,192.1,2103.3,0.319,32.5,1.0
+D7,Stoneybatter,bridewell,192.1,2103.3,0.776,28.3,1.0
+D7,Ashtown,cabra,80.7,364.6,2.092,59.1,1.0
+D7,Cabra,cabra,80.7,364.6,0.944,63.4,1.0
+D7,Cabra West,cabra,80.7,364.6,0.782,64.4,1.0
+D7,Cabra East,mountjoy,138.7,1137.5,1.289,38.6,1.0
+D7,Glasnevin,mountjoy,138.7,1137.5,0.443,44.4,1.0
+D7,Phibsborough,mountjoy,138.7,1137.5,0.306,45.6,1.0
+D8,Dolphin's Barn,kevin street,286.2,1646.5,0.606,24.3,1.0
+D8,Portobello,kevin street,286.2,1646.5,0.844,22.5,1.0
+D8,The Liberties,kevin street,286.2,1646.5,0.544,24.9,1.0
+D8,Inchicore,kilmainham,149.2,1152.6,1.115,37.8,1.0
+D8,Kilmainham,kilmainham,149.2,1152.6,0.201,44.0,1.0
+D8,Rialto,kilmainham,149.2,1152.6,0.627,40.9,1.0
+D9,Ballymun,ballymun,133.0,654.4,0.116,52.5,1.0
+D9,Poppintree,ballymun,133.0,654.4,1.449,44.8,1.0
+D9,Wadelai,ballymun,133.0,654.4,0.999,46.8,1.0
+D9,Donnycarney,clontarf,50.9,404.4,1.244,69.9,1.0
+D9,Finglas,finglas,102.0,479.4,0.64,57.9,1.0
+D9,Finglas East,finglas,102.0,479.4,1.268,54.2,1.0
+D9,Drumcondra,mountjoy,138.7,1137.5,1.133,39.3,1.0
+D9,Beaumont,santry,58.3,427.9,1.265,66.5,1.0
+D9,Glasnevin,santry,58.3,427.9,1.653,65.1,1.0
+D9,Santry,santry,58.3,427.9,0.879,68.5,1.0
+D9,Whitehall,santry,58.3,427.9,0.95,68.1,1.0
+D10,Cherry Orchard,ballyfermot,67.0,597.9,1.275,60.1,1.0
+D11,Finglas West,finglas,102.0,479.4,0.382,60.7,1.0
+D12,Crumlin,crumlin,62.2,565.3,0.111,69.1,1.0
+D12,Greenhills,crumlin,62.2,565.3,1.577,61.0,1.0
+D12,Walkinstown,crumlin,62.2,565.3,1.04,63.3,1.0
+D12,Bluebell,kilmainham,149.2,1152.6,1.959,34.8,1.0
+D12,Drimnagh,sundrive,80.3,867.7,1.289,52.4,1.0
+D12,Perrystown,terenure,54.6,366.4,1.398,68.9,1.0
+D13,Clongriffin,coolock,92.6,511.7,3.183,50.4,1.0
+D13,Baldoyle,howth,43.3,264.5,3.783,71.7,1.0
+D13,Bayside,howth,43.3,264.5,2.73,73.4,1.0
+D13,Howth,howth,43.3,264.5,0.3,84.5,1.0
+D13,Sutton,howth,43.3,264.5,2.73,73.4,1.0
+D13,Kilbarrack,raheny,46.7,314.3,1.675,72.7,1.0
+D14,Clonskeagh,dundrum,54.1,290.9,1.787,70.3,1.0
+D14,Dundrum,dundrum,54.1,290.9,0.068,79.1,1.0
+D14,Windy Arbour,dundrum,54.1,290.9,1.519,71.2,1.0
+D14,Ballyroan,rathfarnham,38.8,286.2,1.091,79.7,1.0
+D14,Churchtown,rathfarnham,38.8,286.2,1.335,78.6,1.0
+D14,Nutgrove,rathfarnham,38.8,286.2,1.284,78.9,1.0
+D14,Rathfarnham,rathfarnham,38.8,286.2,0.232,85.8,1.0
+D14,Willbrook,rathfarnham,38.8,286.2,0.386,85.3,1.0
+D15,Blanchardstown,blanchardstown,75.4,315.2,0.622,68.5,1.0
+D15,Carpenterstown,blanchardstown,75.4,315.2,1.435,64.0,1.0
+D15,Castleknock,blanchardstown,75.4,315.2,2.247,61.6,1.0
+D15,Clonsilla,blanchardstown,75.4,315.2,2.493,61.0,1.0
+D15,Hartstown,blanchardstown,75.4,315.2,2.589,60.8,1.0
+D15,Huntstown,blanchardstown,75.4,315.2,2.258,61.6,1.0
+D15,Mulhuddart,blanchardstown,75.4,315.2,1.841,62.7,1.0
+D15,Ongar,blanchardstown,75.4,315.2,3.902,58.6,1.0
+D16,Ballinteer,dundrum,54.1,290.9,1.607,70.9,1.0
+D16,Ballyboden,rathfarnham,38.8,286.2,1.584,77.7,1.0
+D16,Knocklyon,rathfarnham,38.8,286.2,2.509,75.2,1.0
+D16,Rockbrook,rathfarnham,38.8,286.2,4.026,72.7,1.0
+D16,Scholarstown,rathfarnham,38.8,286.2,2.731,74.8,1.0
+D16,Whitechurch,rathfarnham,38.8,286.2,2.168,76.0,1.0
+D16,Woodstown,rathfarnham,38.8,286.2,3.116,74.1,1.0
+D17,Belmayne,coolock,92.6,511.7,2.485,51.7,1.0
+D17,Donaghmede,coolock,92.6,511.7,2.007,52.9,1.0
+D17,Coyne Woods,santry,58.3,427.9,0.838,68.7,1.0
+D18,Carrickmines,cabinteely,42.8,243.0,1.634,77.4,1.0
+D18,Cherrywood,cabinteely,42.8,243.0,1.693,77.2,1.0
+D18,Ballyogan,dundrum,54.1,290.9,1.283,72.1,1.0
+D18,Glencullen,dundrum,54.1,290.9,3.494,66.7,1.0
+D18,Kilternan,dundrum,54.1,290.9,2.449,68.6,1.0
+D18,Sandyford,dundrum,54.1,290.9,1.938,69.9,1.0
+D18,Stepaside,dundrum,54.1,290.9,0.043,79.1,1.0
+D18,Old Connaught,shankill,84.9,357.8,2.84,56.6,1.0
+D18,Rathmichael,shankill,84.9,357.8,1.101,61.7,1.0
+D18,Shankill,shankill,84.9,357.8,0.425,66.9,1.0
+D20,Ballyfermot,ballyfermot,67.0,597.9,0.663,63.6,1.0
+D20,Chapelizod,ballyfermot,67.0,597.9,0.923,61.8,1.0
+D20,Palmerstown,ballyfermot,67.0,597.9,1.504,59.2,1.0
+D22,Clondalkin,clondalkin,90.1,564.5,0.138,61.8,1.0
+D22,Adamstown,lucan,55.5,311.2,2.089,68.2,1.0
+D22,Lucan,lucan,55.5,311.2,0.091,77.8,1.0
+D22,Newcastle,rathcoole,25.3,258.0,3.196,83.5,1.0
+D24,Rathcoole,rathcoole,25.3,258.0,0.232,95.4,1.0
+D24,Saggart,rathcoole,25.3,258.0,1.346,88.2,1.0
+D24,Ballycullen,rathfarnham,38.8,286.2,3.18,73.9,1.0
+D24,Firhouse,rathfarnham,38.8,286.2,1.954,76.6,1.0
+D24,Brittas,tallaght,75.3,662.9,5.122,49.1,1.0
+D24,Deerpark,tallaght,75.3,662.9,1.883,54.5,1.0
+D24,Fettercairn,tallaght,75.3,662.9,2.066,54.0,1.0
+D24,Fortunestown,tallaght,75.3,662.9,2.905,52.2,1.0
+D24,Jobstown,tallaght,75.3,662.9,2.377,53.3,1.0
+D24,Kiltipper,tallaght,75.3,662.9,1.733,55.0,1.0
+D24,Old Bawn,tallaght,75.3,662.9,0.895,58.6,1.0
+D24,Springfield,tallaght,75.3,662.9,1.138,57.3,1.0
+D24,Tallaght,tallaght,75.3,662.9,0.375,63.3,1.0

@@ -1,0 +1,23 @@
+District,robbery_per_100k,public_order_per_100k,dublin_robbery_per_100k,dublin_public_order_per_100k,crime_reference_period,garda_nearest_km,stations_used,safety_index_0_100,confidence,indicators_used,generated_utc
+D1,245.631,3142.313,93.2,787.9,2023-2025 average,0.567,39,20.7,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D2,278.445,2229.768,93.2,787.9,2023-2025 average,0.578,39,21.9,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D3,61.899,467.386,93.2,787.9,2023-2025 average,1.005,39,65.6,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D4,89.343,856.411,93.2,787.9,2023-2025 average,1.153,39,51.0,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D5,66.838,409.885,93.2,787.9,2023-2025 average,1.028,39,65.4,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D6,55.064,708.759,93.2,787.9,2023-2025 average,0.802,39,64.6,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D6W,58.3,443.262,93.2,787.9,2023-2025 average,1.211,39,66.4,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D7,138.069,1221.304,93.2,787.9,2023-2025 average,0.916,39,39.8,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D8,217.799,1400.003,93.2,787.9,2023-2025 average,0.72,39,30.6,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D9,93.511,560.171,93.2,787.9,2023-2025 average,1.128,39,54.8,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D10,75.616,585.48,93.2,787.9,2023-2025 average,1.141,39,58.5,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D11,101.967,479.387,93.2,787.9,2023-2025 average,2.135,39,51.4,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D12,75.927,728.403,93.2,787.9,2023-2025 average,1.112,39,56.2,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D13,53.591,323.604,93.2,787.9,2023-2025 average,2.302,39,68.0,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D14,45.611,288.326,93.2,787.9,2023-2025 average,1.11,39,76.3,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D15,75.041,315.146,93.2,787.9,2023-2025 average,2.398,39,61.3,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D16,48.455,326.97,93.2,787.9,2023-2025 average,2.753,39,68.9,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D17,86.414,496.598,93.2,787.9,2023-2025 average,1.687,39,55.5,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D18,56.791,293.838,93.2,787.9,2023-2025 average,1.968,39,68.7,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D20,80.158,717.093,93.2,787.9,2023-2025 average,1.411,39,54.0,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D22,63.931,400.519,93.2,787.9,2023-2025 average,1.798,39,63.5,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00
+D24,60.062,526.759,93.2,787.9,2023-2025 average,2.107,39,60.9,1.0,"robbery_per_100k,public_order_per_100k,garda_nearest_km",2026-10-27T15:18:22+00:00

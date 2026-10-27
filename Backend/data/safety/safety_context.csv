@@ -1,0 +1,23 @@
+District,night_transit_coverage,night_stops,lit_share_tagged,lit_tag_coverage,street_km,night_checked,gtfs_feed,osm_extract
+D1,0.763,105,0.993,0.464,198.0,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D2,1.0,102,0.945,0.464,128.2,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D3,0.451,32,0.937,0.225,174.5,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D4,0.907,98,0.943,0.276,365.9,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D5,0.563,36,0.971,0.261,196.1,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D6,0.893,69,0.971,0.492,218.6,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D6W,0.899,87,0.955,0.425,251.5,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D7,0.807,105,0.933,0.482,281.2,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D8,0.955,89,0.955,0.281,208.4,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D9,0.91,193,0.968,0.404,517.2,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D10,0.8,37,0.954,0.158,138.2,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D11,0.434,53,0.923,0.307,339.2,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D12,0.813,90,0.983,0.325,335.4,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D13,0.311,22,0.845,0.27,309.4,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D14,0.602,41,0.974,0.388,353.0,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D15,0.523,105,0.909,0.162,1192.4,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D16,0.536,65,0.994,0.345,704.2,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D17,0.566,24,0.978,0.408,145.8,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D18,0.337,31,0.788,0.161,614.8,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D20,0.807,69,0.99,0.388,294.3,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D22,0.641,172,0.941,0.471,1241.4,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf
+D24,0.572,118,0.979,0.37,1269.6,Wed 28 Oct 2026 23:00-05:00,National Transport Authority 20261005-20271005,Dublin.osm.pbf

@@ -1,0 +1,129 @@
+Neighbourhood,Place_Type,District,Station,lon,lat
+Ballybough,suburb,D1,fitzgibbon street,-6.246191,53.36135
+Hardwicke Street Flats,neighbourhood,D1,fitzgibbon street,-6.263611,53.356451
+North Strand,suburb,D1,fitzgibbon street,-6.241618,53.358428
+East Wall,suburb,D1,store street,-6.233519,53.354069
+International Financial Services Centre,quarter,D1,store street,-6.245863,53.349394
+North Wall,suburb,D1,store street,-6.239608,53.348955
+Temple Bar,quarter,D2,pearse street,-6.263114,53.345496
+Clontarf,suburb,D3,clontarf,-6.196854,53.360814
+Fairview,suburb,D3,clontarf,-6.236656,53.362846
+Marino,suburb,D3,clontarf,-6.234749,53.36631
+Ballsbridge,suburb,D4,donnybrook,-6.231332,53.329195
+Irishtown,suburb,D4,irishtown,-6.222469,53.337964
+Merrion,suburb,D4,irishtown,-6.209184,53.317692
+Ringsend,suburb,D4,irishtown,-6.226389,53.341944
+Sandymount,suburb,D4,irishtown,-6.215346,53.331834
+Artane,suburb,D5,coolock,-6.205268,53.382993
+Coolock,suburb,D5,coolock,-6.200352,53.389321
+Coolock Village,neighbourhood,D5,coolock,-6.200968,53.388027
+Edenmore,quarter,D5,coolock,-6.182471,53.387935
+Killester,suburb,D5,raheny,-6.206241,53.371214
+Raheny,suburb,D5,raheny,-6.175146,53.380198
+Donnybrook,suburb,D6,donnybrook,-6.236355,53.322042
+Milltown,suburb,D6,donnybrook,-6.246992,53.313165
+Ranelagh,suburb,D6,donnybrook,-6.25505,53.325219
+Dartry,suburb,D6,rathmines,-6.263107,53.309956
+Harold's Cross,suburb,D6,rathmines,-6.278004,53.32631
+Rathgar,suburb,D6,rathmines,-6.274469,53.311848
+Rathmines,suburb,D6,rathmines,-6.264857,53.32652
+Terenure,suburb,D6,terenure,-6.28327,53.309829
+Kimmage,suburb,D6W,crumlin,-6.299095,53.316056
+Templeogue,suburb,D6W,terenure,-6.304288,53.297873
+Grangegorman,suburb,D7,bridewell,-6.279672,53.354667
+Oxmantown,suburb,D7,bridewell,-6.288505,53.350403
+Smithfield,quarter,D7,bridewell,-6.278237,53.348431
+Stoneybatter,suburb,D7,bridewell,-6.283045,53.351512
+Ashtown,suburb,D7,cabra,-6.332896,53.375711
+Cabra,suburb,D7,cabra,-6.293394,53.366949
+Cabra West,neighbourhood,D7,cabra,-6.296052,53.36721
+Cabra East,neighbourhood,D7,mountjoy,-6.285912,53.362466
+Glasnevin,part (ED BOTANIC C),D7,mountjoy,-6.264612,53.364262
+Phibsborough,suburb,D7,mountjoy,-6.271319,53.361088
+Dolphin's Barn,suburb,D8,kevin street,-6.291426,53.333422
+Portobello,suburb,D8,kevin street,-6.268826,53.331265
+The Liberties,suburb,D8,kevin street,-6.277904,53.339993
+Inchicore,suburb,D8,kilmainham,-6.320923,53.339464
+Kilmainham,suburb,D8,kilmainham,-6.307278,53.341046
+Rialto,suburb,D8,kilmainham,-6.296931,53.335774
+Ballymun,suburb,D9,ballymun,-6.265194,53.394862
+Poppintree,quarter,D9,ballymun,-6.280768,53.402564
+Wadelai,neighbourhood,D9,ballymun,-6.270809,53.386796
+Donnycarney,suburb,D9,clontarf,-6.219742,53.374693
+Finglas,suburb,D9,finglas,-6.296944,53.389167
+Finglas East,quarter,D9,finglas,-6.28753,53.390275
+Drumcondra,suburb,D9,mountjoy,-6.255473,53.368099
+Beaumont,suburb,D9,santry,-6.233252,53.385461
+Glasnevin,suburb,D9,santry,-6.266201,53.378287
+Santry,suburb,D9,santry,-6.245472,53.397158
+Whitehall,suburb,D9,santry,-6.243194,53.382668
+Cherry Orchard,quarter,D10,ballyfermot,-6.372482,53.337241
+Finglas West,quarter,D11,finglas,-6.312123,53.390261
+Crumlin,suburb,D12,crumlin,-6.316167,53.320232
+Greenhills,suburb,D12,crumlin,-6.335441,53.312617
+Walkinstown,suburb,D12,crumlin,-6.330118,53.321613
+Bluebell,suburb,D12,kilmainham,-6.341016,53.33035
+Drimnagh,suburb,D12,sundrive,-6.323652,53.329926
+Perrystown,suburb,D12,terenure,-6.319269,53.307328
+Clongriffin,suburb,D13,coolock,-6.151014,53.40264
+Baldoyle,suburb,D13,howth,-6.12855,53.39583
+Bayside,suburb,D13,howth,-6.140244,53.38869
+Howth,town,D13,howth,-6.065119,53.385834
+Sutton,village,D13,howth,-6.109809,53.389387
+Kilbarrack,suburb,D13,raheny,-6.156059,53.386431
+Clonskeagh,suburb,D14,dundrum,-6.236861,53.30557
+Dundrum,town,D14,dundrum,-6.243376,53.289146
+Windy Arbour,suburb,D14,dundrum,-6.246972,53.302851
+Ballyroan,suburb,D14,rathfarnham,-6.299039,53.290109
+Churchtown,suburb,D14,rathfarnham,-6.259486,53.295814
+Nutgrove,quarter,D14,rathfarnham,-6.270987,53.292071
+Rathfarnham,village,D14,rathfarnham,-6.285539,53.29881
+Willbrook,suburb,D14,rathfarnham,-6.287083,53.293967
+Blanchardstown,town,D15,blanchardstown,-6.382942,53.384459
+Carpenterstown,neighbourhood,D15,blanchardstown,-6.376882,53.377228
+Castleknock,village,D15,blanchardstown,-6.362474,53.372958
+Clonsilla,village,D15,blanchardstown,-6.416667,53.383333
+Hartstown,neighbourhood,D15,blanchardstown,-6.419443,53.392859
+Huntstown,neighbourhood,D15,blanchardstown,-6.408387,53.40175
+Mulhuddart,village,D15,blanchardstown,-6.398205,53.402783
+Ongar,village,D15,blanchardstown,-6.438779,53.395369
+Ballinteer,suburb,D16,dundrum,-6.252836,53.276427
+Ballyboden,village,D16,rathfarnham,-6.295573,53.283887
+Knocklyon,suburb,D16,rathfarnham,-6.31819,53.283879
+Rockbrook,neighbourhood,D16,rathfarnham,-6.297708,53.261676
+Scholarstown,suburb,D16,rathfarnham,-6.311399,53.277214
+Whitechurch,suburb,D16,rathfarnham,-6.28939,53.277921
+Woodstown,neighbourhood,D16,rathfarnham,-6.325479,53.274851
+Belmayne,suburb,D17,coolock,-6.173186,53.405267
+Donaghmede,suburb,D17,coolock,-6.163578,53.394861
+Coyne Woods,neighbourhood,D17,santry,-6.23949,53.3933
+Carrickmines,suburb,D18,cabinteely,-6.171892,53.253235
+Cherrywood,suburb,D18,cabinteely,-6.14628,53.245666
+Ballyogan,village,D18,dundrum,-6.19717,53.258295
+Glencullen,village,D18,dundrum,-6.218085,53.222141
+Kilternan,village,D18,dundrum,-6.193399,53.235519
+Sandyford,village,D18,dundrum,-6.224571,53.269834
+Stepaside,village,D18,dundrum,-6.214374,53.25311
+Old Connaught,village,D18,shankill,-6.133467,53.209116
+Rathmichael,quarter,D18,shankill,-6.137344,53.234366
+Shankill,village,D18,shankill,-6.124181,53.230228
+Ballyfermot,suburb,D20,ballyfermot,-6.348884,53.34232
+Chapelizod,suburb,D20,ballyfermot,-6.345197,53.347916
+Palmerstown,village,D20,ballyfermot,-6.370496,53.355982
+Clondalkin,town,D22,clondalkin,-6.394269,53.321962
+Adamstown,suburb,D22,lucan,-6.45869,53.337819
+Lucan,town,D22,lucan,-6.450153,53.356716
+Newcastle,village,D22,rathcoole,-6.501358,53.299984
+Rathcoole,village,D24,rathcoole,-6.467942,53.2813
+Saggart,village,D24,rathcoole,-6.444448,53.280278
+Ballycullen,suburb,D24,rathfarnham,-6.32847,53.270592
+Firhouse,suburb,D24,rathfarnham,-6.340185,53.280806
+Brittas,village,D24,tallaght,-6.454197,53.236011
+Deerpark,neighbourhood,D24,tallaght,-6.374069,53.270314
+Fettercairn,quarter,D24,tallaght,-6.397581,53.291747
+Fortunestown,suburb,D24,tallaght,-6.421162,53.284141
+Jobstown,suburb,D24,tallaght,-6.400948,53.279083
+Kiltipper,quarter,D24,tallaght,-6.372425,53.271493
+Old Bawn,suburb,D24,tallaght,-6.35991,53.280262
+Springfield,quarter,D24,tallaght,-6.38478,53.286758
+Tallaght,town,D24,tallaght,-6.362355,53.287808
