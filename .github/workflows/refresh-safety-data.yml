@@ -1,0 +1,36 @@
+name: refresh-safety-data
+on:
+  schedule:
+    - cron: "0 5 * * 1"   # Mondays 05:00 UTC; each source only refreshes when due
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  actions: write   # to start the Azure deploy after a refresh
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Backend   # safety_pipeline.py and data/safety live here
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install geopandas shapely pandas numpy requests pyproj
+      - run: python safety_pipeline.py
+        continue-on-error: true   # exit 2 = published from last validated data with a stale source
+      - name: Commit refreshed data and redeploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "data-bot"
+          git config user.email "data-bot@users.noreply.github.com"
+          git add data/safety
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh safety data $(date -u +%F)"
+            git pull --rebase
+            git push
+            # A push made with GITHUB_TOKEN doesn't trigger other workflows, so start the deploy explicitly.
+            gh workflow run main_crib-crew-api-1.yml --ref main
+          fi
