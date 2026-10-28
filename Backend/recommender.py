@@ -383,6 +383,7 @@ def load_data():
         if factor["kind"] == "group":
             area_data[factor["column"]] = area_data[factor["columns"]].sum(axis=1, skipna=False)
 
+    neighbourhood_commute = _load_neighbourhood_commute()
     return {
         "area_data": area_data,
         "census": census,
@@ -394,8 +395,8 @@ def load_data():
         # Dublin-wide "enough" level for each amenity, so amenity scores don't depend on the search
         "amenity_targets": {col: float(AMENITY_ENOUGH[col]) for col in AMENITY_COLUMNS},
         # Parts of each district (neighbourhoods and commute points) that are scored individually
-        "parts": _district_parts(commute_points, places),
-        "neighbourhood_commute": _load_neighbourhood_commute(),
+        "parts": _district_parts(commute_points, places, prefer_neighbourhoods=not neighbourhood_commute.empty),
+        "neighbourhood_commute": neighbourhood_commute,
         "rent_listings": {"shared_room": shared_listings, "private_room": private_listings},
         "universities": sorted(commute_by_university["University"].unique()),
         "safety": load_safety(),
@@ -454,7 +455,7 @@ def _same_name(neighbourhood, point):
     return point == neighbourhood or point.startswith(neighbourhood + " ")
 
 
-def _district_parts(commute_points, places):
+def _district_parts(commute_points, places, prefer_neighbourhoods=False):
     """Named parts of each district a student could live in: the safety data's neighbourhoods plus the commute
     points not within SAME_PLACE_KM of one. Each has the amenities around it, the commute point whose times it
     uses (itself, or a neighbourhood's nearest) and its neighbourhood safety score (display only)."""
@@ -485,14 +486,18 @@ def _district_parts(commute_points, places):
     hoods["Safety Score"] = [scores.get(key, np.nan) for key in zip(hoods["Area"], hoods["Part"])]
     hoods["Commute Point"] = None
 
-    # A neighbourhood with the same name as a commute point is that point (which has exact commute times)
+    # A neighbourhood and a commute point with the same name are one place. Keep the neighbourhood when it has
+    # its own OTP times (prefer_neighbourhoods); otherwise keep the point, whose times are exact.
     duplicate = [any(_same_name(hood["Part"], name) for name in landmarks.loc[landmarks["Area"] == hood["Area"], "Part"])
                  for _, hood in hoods.iterrows()]
+    same_as_hood = pd.Series(False, index=landmarks.index)
     for (_, hood), dup in zip(hoods.iterrows(), duplicate):
         if dup:
             same = (landmarks["Area"] == hood["Area"]) & landmarks["Part"].map(lambda name: _same_name(hood["Part"], name))
             landmarks.loc[same, "Safety Score"] = hood["Safety Score"]
-    hoods = hoods[~np.array(duplicate, dtype=bool)].reset_index(drop=True)
+            same_as_hood |= same
+    if not prefer_neighbourhoods:
+        hoods = hoods[~np.array(duplicate, dtype=bool)].reset_index(drop=True)
 
     keep = []
     for area, points in landmarks.groupby("Area"):
@@ -512,6 +517,9 @@ def _district_parts(commute_points, places):
                      points["Origin_Latitude"], points["Origin_Longitude"])
             hoods.at[j, "Commute Point"] = points["Part"].iloc[km.argmin()]
 
+    if prefer_neighbourhoods:
+        # dropped only now, so neighbourhoods could still use these points as their nearest commute point
+        keep = [i for i in keep if not same_as_hood[i]]
     parts = pd.concat([hoods.dropna(subset=["Commute Point"]), landmarks.loc[keep]], ignore_index=True)
     parts = pd.concat([parts, _amenity_counts(parts, places)], axis=1)
     for factor in FACTORS:
