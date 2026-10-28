@@ -3,12 +3,14 @@ import DistrictMap, { ACTIVE_DISTRICTS, ALL_DISTRICTS, strongColor } from './Dis
 import DistrictProfile from './DistrictProfile';
 import { districtProfiles } from './districtProfiles';
 import './App.css';
-import profilesUrl from './data/district-profiles.json?url';
+// Bundled with the page, so it always loads with the right path
+import profilesUrl from './district-profiles.json?url';
 
 const DATA_URL = profilesUrl;
 const DEFAULT_UNIVERSITY = 'TU Dublin - Grangegorman';
 const TOUR_MS = 4500;
 
+// Coordinates for team famous places that are not in the profile data. Format: [lng, lat]
 const LANDMARK_LOCATIONS = {
   'Herbert Park': [-6.2352, 53.3261],
   'Aviva Stadium': [-6.2285, 53.3352],
@@ -26,6 +28,7 @@ const LANDMARK_LOCATIONS = {
   'Cherry Orchard': [-6.3780, 53.3440],
 };
 
+// Icons for the team's places (any place not listed gets the landmark icon)
 const PLACE_ICONS = {
   'Herbert Park': 'park', 'Aviva Stadium': 'stadium', "St Anne's Park": 'park', 'North Bull Island': 'nature',
   'Rathmines Town Hall': 'tower', Ranelagh: 'village', 'Phoenix Park': 'park', 'National Museum at Collins Barracks': 'museum',
@@ -38,6 +41,7 @@ const storage = {
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
 };
 
+// Team famous places (from districtProfiles.js) win; the sample places fill the gaps.
 function buildPlaces(profileData) {
   const byDistrict = {};
   ACTIVE_DISTRICTS.forEach((code) => {
@@ -59,6 +63,7 @@ function buildPlaces(profileData) {
   return byDistrict;
 }
 
+/* ---------------- page ---------------- */
 
 export default function App() {
   const [data, setData] = useState(null);
