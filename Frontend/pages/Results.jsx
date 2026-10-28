@@ -255,19 +255,19 @@ function CommuteDetails({ area, commute, maxCommute }) {
   )
 }
 
-// The recommended part of the district (a neighbourhood or commute point) and its other good parts
+// The recommended place (a neighbourhood or commute point in the district) and the district's other options
 function NeighbourhoodDetails({ area, neighbourhood }) {
   if (!neighbourhood) return null
   const others = neighbourhood.others ?? []
 
   return (
     <p className="result-muted">
-      Best part of {area} for you: <strong>{neighbourhood.name}</strong>
+      Recommended place: <strong>{neighbourhood.name}, {area}</strong>
       {neighbourhood.safety_score != null && ` (safety ${Math.round(neighbourhood.safety_score)}/100)`}
       {neighbourhood.commute_estimated_from &&
         ` (commute estimated from nearby ${neighbourhood.commute_estimated_from})`}
       {others.length > 0 &&
-        ` · Also good in ${area}: ${others.map((o) => `${o.name} (${o.commute_minutes} min)`).join(', ')}`}
+        ` · Other options in ${area}: ${others.map((o) => `${o.name} (${o.commute_minutes} min)`).join(', ')}`}
     </p>
   )
 }
@@ -487,7 +487,7 @@ function Results() {
             <div className={loading ? 'results-list results-updating' : 'results-list'}>
               {data.recommendations.map((result) => (
                 <ResultCard
-                  key={result.area}
+                  key={`${result.area}-${result.neighbourhood?.name ?? result.rank}`}
                   result={result}
                   university={data.university}
                   modeWords={modeWords}
