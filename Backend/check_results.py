@@ -29,6 +29,7 @@ for university, budget, accommodation, mode, limit in TESTS:
         continue
     print(f"   areas compared: {result['areas_compared']}")
     for rec in result["recommendations"]:
-        print(f"   #{rec['rank']} {rec['area']:<4} rent EUR{rec['rent']:>7,.0f}  "
+        place = rec.get("neighbourhood", {}).get("name", "")
+        print(f"   #{rec['rank']} {rec['area']:<4} {place[:22]:<22} rent EUR{rec['rent']:>7,.0f}  "
               f"commute {rec['commute_minutes']:>3} min  match {rec['match_score']:.1f}%")
     print()

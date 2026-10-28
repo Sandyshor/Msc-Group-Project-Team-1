@@ -113,7 +113,10 @@ MODE_DISTANCE = {"public_transport": "Distance_km", "walk": "Walking km", "cycle
 AMENITY_RADIUS_KM = 1.0       # everyday amenities counted within ~12 minutes' walk of a place
 # ... but hospitals and shopping centres are trips, not walks, so they count from further away
 AMENITY_RADIUS_OVERRIDES_KM = {"Hospitals": 3.0, "Shopping_Malls": 2.0}
-AMENITY_TARGET_PERCENTILE = 0.5  # having as many as a typical (median) Dublin district scores 1
+# How many of each amenity within reach is "enough for daily life" and scores 1. More than that doesn't help:
+# a student needs a couple of supermarkets nearby, not twenty, so quieter suburbs aren't marked down for it.
+AMENITY_ENOUGH = {"Supermarkets": 2, "Groceries": 3, "Shopping_Malls": 1, "Restaurants": 5,
+                  "Hospitals": 1, "Pharmacies": 2, "Gyms": 1, "Parks": 2}
 COMMUTE_BEST_MIN = 10         # 10 minutes or less scores 1 ...
 COMMUTE_WORST_MIN = 60        # ... falling to 0 at an hour (or at the student's own limit, if lower)
 RENT_COMFORT = 0.75           # rent at 75% of the budget or less scores 1 ...
@@ -389,8 +392,7 @@ def load_data():
         "commute_points": commute_points,
         "commute_source": commute_source,
         # Dublin-wide "enough" level for each amenity, so amenity scores don't depend on the search
-        "amenity_targets": {col: max(float(amenities[col].quantile(AMENITY_TARGET_PERCENTILE)), 1.0)
-                            for col in AMENITY_COLUMNS},
+        "amenity_targets": {col: float(AMENITY_ENOUGH[col]) for col in AMENITY_COLUMNS},
         # Parts of each district (neighbourhoods and commute points) that are scored individually
         "parts": _district_parts(commute_points, places),
         "neighbourhood_commute": _load_neighbourhood_commute(),
@@ -707,9 +709,10 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         strength = weights["Commute"] / max(RATING_TO_WEIGHT.values())
         candidates["Commute Penalty"] = 1 - (1 - LONG_COMMUTE_KEEP) * long_commute * strength
         candidates["Match Score"] *= candidates["Commute Penalty"]
-    # Each district is represented by its best part, and districts are ranked by it
+    # Places are ranked directly, so the top picks can be several parts of the same district (Blanchardstown,
+    # Castleknock and Clonsilla in D15) when they suit the student better than other districts
     candidates = candidates.sort_values("Match Score", ascending=False)
-    ranked = candidates.drop_duplicates("Area").reset_index(drop=True)
+    ranked = candidates.reset_index(drop=True)
     ranked["Label"] = ranked["Part"] + " (" + ranked["Area"] + ")"
 
     averages = ranked[[f["column"] for f in FACTOR_LOOKUP.values() if f["column"] in ranked]].mean()
@@ -892,7 +895,9 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
 
     def neighbourhood_info(row):
         """The recommended part of the district, and the district's other good parts."""
-        others = candidates[(candidates["Area"] == row["Area"]) & (candidates["Part"] != row["Part"])].head(4)
+        shown = set(zip(top["Area"], top["Part"]))
+        others = candidates[(candidates["Area"] == row["Area"])
+                            & ~candidates["Part"].map(lambda part: (row["Area"], part) in shown)].head(4)
         return {
             "name": row["Part"],
             "kind": row["Kind"],
@@ -939,7 +944,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         "travel_mode": travel_mode,
         "max_commute": max_commute,
         "commute_source": data["commute_source"],
-        "areas_compared": len(ranked),
+        "areas_compared": int(ranked["Area"].nunique()),
         "parts_compared": len(candidates),
         "warning": warning,
         "recommendations": results,
