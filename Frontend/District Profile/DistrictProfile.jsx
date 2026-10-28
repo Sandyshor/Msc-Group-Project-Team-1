@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, ICONS, iconFor, strongColor, bannerColor, safetyLabel } from './DistrictMap';
 
 const TABS = [['places', 'Places'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['commute', 'Commute'], ['area', 'Area']];
@@ -23,10 +23,67 @@ function SectionTitle({ eyebrow, title, icon, extra }) {
   );
 }
 
+
+const WIKI_TITLES = {
+  'Croke Park': 'Croke Park', 'The Spire': 'Spire of Dublin', GPO: 'General Post Office, Dublin',
+  'Custom House': 'Custom House, Dublin', 'Moore Street Market': 'Moore Street', 'Garden of Remembrance': 'Garden of Remembrance (Dublin)',
+  'Trinity College': 'Trinity College Dublin', "St Stephen's Green": "St Stephen's Green", 'Grafton Street': 'Grafton Street',
+  'National Gallery': 'National Gallery of Ireland', 'Merrion Square': 'Merrion Square',
+  'Casino at Marino': 'Casino at Marino', 'Clontarf Promenade': 'Clontarf, Dublin', 'Bull Island': 'North Bull Island', 'Fairview Park': 'Fairview Park',
+  'Herbert Park': 'Herbert Park', 'Aviva Stadium': 'Aviva Stadium', "St Anne's Park": "St. Anne's Park", 'North Bull Island': 'North Bull Island',
+  'Rathmines Town Hall': 'Rathmines', Ranelagh: 'Ranelagh, Dublin', 'Phoenix Park': 'Phoenix Park',
+  'National Museum at Collins Barracks': 'Collins Barracks', 'Kilmainham Gaol': 'Kilmainham Gaol', 'Guinness Storehouse': 'Guinness Storehouse',
+  'National Botanic Gardens': 'National Botanic Gardens (Ireland)', Ballyfermot: 'Ballyfermot', 'Cherry Orchard': 'Cherry Orchard, Dublin',
+  'Bushy Park': 'Bushy Park, Dublin', 'Terenure Village': 'Terenure', "Harold's Cross Park": "Harold's Cross", 'Kimmage Cross': 'Kimmage',
+  'Tolka Valley Park': 'River Tolka', 'Finglas Village': 'Finglas',
+  'Drimnagh Castle': 'Drimnagh Castle', 'CHI at Crumlin': "Children's Health Ireland at Crumlin", 'Crumlin Village': 'Crumlin, Dublin',
+  'Grand Canal Way': 'Grand Canal (Ireland)',
+  'Howth Harbour': 'Howth', 'Howth Castle': 'Howth Castle', 'Sutton Strand': 'Sutton, Dublin', 'Howth Cliff Path': 'Howth Head',
+  'Rathfarnham Castle': 'Rathfarnham Castle', 'Dodder Linear Park': 'River Dodder', 'Churchtown Village': 'Churchtown, Dublin',
+  'Blanchardstown Centre': 'Blanchardstown Centre', 'National Aquatic Centre': 'National Aquatic Centre', 'Castleknock Village': 'Castleknock',
+  'TU Dublin Blanchardstown': 'Technological University Dublin', 'Dunsink Observatory': 'Dunsink Observatory',
+  'Marlay Park': 'Marlay Park', 'Dundrum Town Centre': 'Dundrum Town Centre',
+  'Northside Shopping Centre': 'Coolock', 'Darndale Park': 'Darndale', 'Clarehall Shopping Centre': 'Clarehall',
+  'Leopardstown Racecourse': 'Leopardstown Racecourse', 'Cabinteely Park': 'Cabinteely', 'Sandyford Business District': 'Sandyford',
+  'Ticknock Forest': 'Ticknock',
+  'Chapelizod Village': 'Chapelizod', 'Waterstown Park': 'Palmerstown', 'Palmerstown Village': 'Palmerstown', 'Liffey Valley Centre': 'Liffey Valley',
+  'Clondalkin Round Tower': 'Clondalkin Round Tower', 'Corkagh Park': 'Corkagh Park',
+  'The Square Tallaght': 'The Square, Tallaght', 'Tallaght University Hospital': 'Tallaght University Hospital', 'Tallaght Stadium': 'Tallaght Stadium',
+  'Sean Walsh Park': 'Tallaght', 'TU Dublin Tallaght': 'Technological University Dublin',
+};
+
+const wikiCache = {};
+function fetchWikiPhoto(title) {
+  if (!wikiCache[title]) {
+    wikiCache[title] = fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => (d && d.type !== 'disambiguation' ? (d.thumbnail?.source || d.originalimage?.source || null) : null))
+      .catch(() => null);
+  }
+  return wikiCache[title];
+}
+
 function PlaceImage({ place }) {
-  const [failed, setFailed] = useState(false);
-  if (!place.image || failed) return <div className="place-image place-image-fallback"><Icon name={place.cat} /></div>;
-  return <img className="place-image" src={place.image} alt={place.name} onError={() => setFailed(true)} />;
+  const [src, setSrc] = useState(place.image || null);
+  const [triedWiki, setTriedWiki] = useState(false);
+
+  const useWikipedia = () => {
+    if (triedWiki) { setSrc(null); return; }
+    setTriedWiki(true);
+    const titles = [WIKI_TITLES[place.name], place.name].filter(Boolean);
+    (async () => {
+      for (const t of titles) {
+        const photo = await fetchWikiPhoto(t);
+        if (photo) { setSrc(photo); return; }
+      }
+      setSrc(null);
+    })();
+  };
+
+  useEffect(() => { if (!place.image) useWikipedia(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!src) return <div className="place-image place-image-fallback"><Icon name={place.cat} /></div>;
+  return <img className="place-image" src={src} alt={place.name} loading="lazy" onError={useWikipedia} />;
 }
 
 function PlacesSection({ code, places, hoverPlace, onHoverPlace, onPlaceClick }) {
