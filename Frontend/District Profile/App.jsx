@@ -3,8 +3,9 @@ import DistrictMap, { ACTIVE_DISTRICTS, ALL_DISTRICTS, strongColor } from './Dis
 import DistrictProfile from './DistrictProfile';
 import { districtProfiles } from './districtProfiles';
 import './App.css';
+import profilesUrl from './data/district-profiles.json?url';
 
-const DATA_URL = '/data/district-profiles.json';
+const DATA_URL = profilesUrl;
 const DEFAULT_UNIVERSITY = 'TU Dublin - Grangegorman';
 const TOUR_MS = 4500;
 
