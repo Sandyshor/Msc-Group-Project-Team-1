@@ -231,6 +231,7 @@ function Home() {
           </p>
           <div className="fd-hero-actions">
             <Link className="fd-button fd-button-cream" to="/districts">Explore districts <span>↗</span></Link>
+            <a className="fd-hero-watch" href="/journey-planner/route.html"><span className="fd-play">⇄</span> Plan a journey</a>
             <a className="fd-hero-watch" href="#explore-dublin"><span className="fd-play">▶</span> Meet Dublin through film</a>
           </div>
         </div>
@@ -238,7 +239,7 @@ function Home() {
         <aside className="fd-hero-guide" aria-label="Quick links to explore Dublin">
           <div className="fd-guide-topline">
             <span><i /> YOUR CITY GUIDE</span>
-            <span>01 — 03</span>
+            <span>01 — 04</span>
           </div>
           <div className="fd-guide-route" aria-hidden="true">
             <span>DISTRICTS</span>
@@ -253,6 +254,8 @@ function Home() {
             <Link to="/districts"><span>01</span><strong>Neighbourhoods</strong><b>↗</b></Link>
             <a href="#universities"><span>02</span><strong>Campus life</strong><b>↗</b></a>
             <a href="#attractions"><span>03</span><strong>Places to explore</strong><b>↗</b></a>
+            {/* Separate page (not React) served from Frontend/public/journey-planner */}
+            <a href="/journey-planner/route.html"><span>04</span><strong>Journey planner</strong><b>↗</b></a>
           </nav>
         </aside>
 

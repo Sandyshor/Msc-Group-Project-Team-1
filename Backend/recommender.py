@@ -53,8 +53,8 @@ OTP_COMMUTE_FILE = "commute_otp.csv"
 NEIGHBOURHOOD_COMMUTE_FILE = "commute_otp_neighbourhoods.csv"
 
 AREA_CODES_ROOMS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14",
-                    "D15", "D16", "D17", "D18", "D20"]
-AREA_CODES_AMENITIES = AREA_CODES_ROOMS + ["D22", "D24"]
+                    "D15", "D16", "D17", "D18", "D20", "D22", "D24"]
+AREA_CODES_AMENITIES = AREA_CODES_ROOMS
 AREAS = AREA_CODES_AMENITIES
 
 # Room listings per file, and what "double" means in that file. The D1-D5 files were collected
@@ -64,9 +64,10 @@ ROOM_FILES = {
     "D1.xlsx": "shared", "D2.xlsx": "shared", "D3.xlsx": "shared",
     "D4_rent.xlsx": "shared", "D5_rent.xlsx": "shared",
     "D6.xlsx": "private", "D7.xlsx": "private", "D8.xlsx": "private", "D9.xlsx": "private", "D10.xlsx": "private",
-    # D11-D20: Daft listings like D6-D10 - a double costs more than a single in every district
+    # D11-D24: Daft listings like D6-D10 - a double costs more than a single in nearly every district
     "D11.xlsx": "private", "D12.xlsx": "private", "D13.xlsx": "private", "D14.xlsx": "private",
     "D15.xlsx": "private", "D16.xlsx": "private", "D17.xlsx": "private", "D18.xlsx": "private", "D20.xlsx": "private",
+    "D22.xlsx": "private", "D24.xlsx": "private",
 }
 PRIVATE_ROOM_LABELS = ["single", "single & twin", "single & double"]
 # A room rent needs at least this many listings; fewer is too unreliable to compare districts on
