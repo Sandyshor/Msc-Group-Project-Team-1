@@ -326,7 +326,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     async function initialiseMap() {
       try {
         proj4.defs('EPSG:2157', '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=0.99982 +x_0=600000 +y_0=750000 +ellps=GRS80 +units=m +no_defs');
-        const response = await fetch('/data/dublin_postcode_boundaries.geojson');
+               const response = await fetch(boundariesUrl);
         if (!response.ok) throw new Error(`Boundary file request failed (${response.status})`);
         const rawGeoJSON = await response.json();
         const geoJSON = {
@@ -395,7 +395,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
                 'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 11.5, 0.85, 13.5, 0],
               },
             });
-            map.addSource('dm-crime-areas', { type: 'geojson', data: '/data/crime-heatmap.geojson' });
+                        map.addSource('dm-crime-areas', { type: 'geojson', data: crimeAreasUrl });
             map.addLayer({
               id: 'dm-crime-areas', type: 'fill', source: 'dm-crime-areas', minzoom: 11.5, layout: { visibility: 'none' },
               paint: { 'fill-color': heatColour, 'fill-opacity': ['interpolate', ['linear'], ['zoom'], 11.5, 0, 13, 0.6, 16, 0.4] },
@@ -417,8 +417,8 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
             map.addLayer({ id: 'dm-spokes-line', type: 'line', source: 'dm-spokes', paint: { 'line-width': 1.6, 'line-dasharray': [2, 3], 'line-opacity': 0.85 } });
 
             
-            [['red', '#d71920', 'Luas Red Line'], ['green', '#008531', 'Luas Green Line']].forEach(([k, colour, ref]) => {
-              map.addSource(`luas-${k}-route`, { type: 'geojson', data: `/data/luas-${k}-line.geojson` });
+                        [['red', '#d71920', 'Luas Red Line', luasRedUrl], ['green', '#008531', 'Luas Green Line', luasGreenUrl]].forEach(([k, colour, ref, url]) => {
+              map.addSource(`luas-${k}-route`, { type: 'geojson', data: url });
               map.addLayer({
                 id: `luas-${k}-route-line`, type: 'line', source: `luas-${k}-route`,
                 filter: ['all', ['any', ['==', ['geometry-type'], 'LineString'], ['==', ['geometry-type'], 'MultiLineString']], ['==', ['get', 'ref'], ref]],
