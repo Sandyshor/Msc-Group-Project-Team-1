@@ -10,6 +10,10 @@ Re-run it whenever the TFI timetables (graph.obj) are rebuilt.
 
 Run from the Backend folder, with OTP running:
     OTP_URL=http://localhost:8080/otp/gtfs/v1 python tools/build_commute_matrix.py
+
+Add --neighbourhoods to do the same for the safety data's neighbourhoods (data/safety/neighbourhoods.csv)
+instead, saved to Data/commute_otp_neighbourhoods.csv. Until that file exists, the recommender gives each
+neighbourhood the times of the nearest landmark in its district.
 """
 import os
 import sys
@@ -25,6 +29,9 @@ import routing  # noqa: E402  (needs the Backend folder on the path)
 DATA_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "Data")
 POINTS_FILE = os.path.join(DATA_FOLDER, "Dublin_D1_D24_All_University_Commutes_clean_updated.csv")
 OUTPUT = os.path.join(DATA_FOLDER, "commute_otp.csv")
+NEIGHBOURHOODS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "safety",
+                                   "neighbourhoods.csv")
+NEIGHBOURHOODS_OUTPUT = os.path.join(DATA_FOLDER, "commute_otp_neighbourhoods.csv")
 
 ARRIVE_BY = "09:00"
 # recommender travel mode -> routing.py mode
@@ -59,11 +66,24 @@ def best_journey(job):
     }
 
 
+def neighbourhood_points(commutes):
+    """Every neighbourhood paired with every university, in the same columns as the landmark file."""
+    universities = commutes.drop_duplicates("University")[["University", "Destination_Latitude", "Destination_Longitude"]]
+    hoods = pd.read_csv(NEIGHBOURHOODS_FILE).rename(columns={
+        "Neighbourhood": "Landmark", "lat": "Origin_Latitude", "lon": "Origin_Longitude"})
+    hoods["Direction"] = "Neighbourhood"
+    return hoods[["District", "Direction", "Landmark", "Origin_Latitude", "Origin_Longitude"]].merge(universities, how="cross")
+
+
 def main():
+    for_neighbourhoods = "--neighbourhoods" in sys.argv
     points = pd.read_csv(POINTS_FILE)[[
         "District", "Direction", "Landmark", "Origin_Latitude", "Origin_Longitude",
         "University", "Destination_Latitude", "Destination_Longitude",
-    ]].drop_duplicates(["District", "Landmark", "University"])
+    ]]
+    if for_neighbourhoods:
+        points = neighbourhood_points(points)
+    points = points.drop_duplicates(["District", "Landmark", "University"])
     when = f"{next_weekday().isoformat()}T{ARRIVE_BY}"
     jobs = [(row, mode, when) for row in points.itertuples(index=False) for mode in MODES]
     print(f"Planning {len(jobs)} journeys ({len(points)} landmark-university pairs x {len(MODES)} modes), "
@@ -83,8 +103,12 @@ def main():
     matrix["Arrive_By"] = when
     matrix["Calculated_At"] = datetime.now(routing.DUBLIN_TZ).isoformat(timespec="seconds")
     matrix["Source"] = routing.SOURCE_LABEL
-    matrix.to_csv(OUTPUT, index=False)
-    print(f"Saved {len(matrix)} journeys to {OUTPUT} ({missing} had no route)")
+    output = OUTPUT
+    if for_neighbourhoods:
+        matrix = matrix.rename(columns={"Landmark": "Neighbourhood"}).drop(columns="Direction")
+        output = NEIGHBOURHOODS_OUTPUT
+    matrix.to_csv(output, index=False)
+    print(f"Saved {len(matrix)} journeys to {output} ({missing} had no route)")
     print(matrix.groupby("Mode")["Minutes"].describe()[["count", "mean", "min", "max"]].round(1).to_string())
 
 
