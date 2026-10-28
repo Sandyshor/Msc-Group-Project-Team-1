@@ -45,10 +45,13 @@ RESIDENCES_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"
 # Same commute file as "Recommendation system.py" (all universities). Until it's
 # uploaded to Data/, fall back to the TU Dublin Grangegorman-only file.
 COMMUTE_FILES = ["Dublin_D1_D24_All_University_Commutes_clean_updated.csv", "Commute_TUD_Grangegorman.csv"]
+# Commute times calculated with OpenTripPlanner by Backend/tools/build_commute_matrix.py. When the
+# file exists it replaces the Journey Planner export and the cycling estimate below.
+OTP_COMMUTE_FILE = "commute_otp.csv"
 
-AREA_CODES_ROOMS = ["D1", "D2", "D3", "D6", "D7", "D8", "D9", "D10"]
-AREA_CODES_AMENITIES = AREA_CODES_ROOMS + ["D4", "D5", "D11", "D12", "D13", "D14", "D15",
-                                           "D16", "D17", "D18", "D20", "D22", "D24"]
+AREA_CODES_ROOMS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14",
+                    "D15", "D16", "D17", "D18", "D20"]
+AREA_CODES_AMENITIES = AREA_CODES_ROOMS + ["D22", "D24"]
 AREAS = AREA_CODES_AMENITIES
 
 # Room listings per file, and what "double" means in that file. The D1-D5 files were collected
@@ -58,8 +61,13 @@ ROOM_FILES = {
     "D1.xlsx": "shared", "D2.xlsx": "shared", "D3.xlsx": "shared",
     "D4_rent.xlsx": "shared", "D5_rent.xlsx": "shared",
     "D6.xlsx": "private", "D7.xlsx": "private", "D8.xlsx": "private", "D9.xlsx": "private", "D10.xlsx": "private",
+    # D11-D20: Daft listings like D6-D10 - a double costs more than a single in every district
+    "D11.xlsx": "private", "D12.xlsx": "private", "D13.xlsx": "private", "D14.xlsx": "private",
+    "D15.xlsx": "private", "D16.xlsx": "private", "D17.xlsx": "private", "D18.xlsx": "private", "D20.xlsx": "private",
 }
-PRIVATE_ROOM_LABELS = ["single", "single & twin"]
+PRIVATE_ROOM_LABELS = ["single", "single & twin", "single & double"]
+# A room rent needs at least this many listings; fewer is too unreliable to compare districts on
+MIN_ROOM_LISTINGS = 3
 SHARED_ROOM_LABELS = ["twin", "shared", "double & twin", "twin & shared"]
 
 # "group" factors are scored as one category by default (the average of their
@@ -93,6 +101,22 @@ FACTOR_LOOKUP = {f["name"]: f for f in FACTORS + ITEM_FACTORS}
 # How a student can travel. Each key is a minutes column in data["commute_points"].
 TRAVEL_MODES = {"public_transport": "by public transport", "walk": "on foot", "cycle": "by bike"}
 CYCLING_KMH = 15  # typical city cycling speed, applied to the walking route distance
+# Route distance column in data["commute_points"] for each travel mode
+MODE_DISTANCE = {"public_transport": "Distance_km", "walk": "Walking km", "cycle": "Cycle km"}
+
+# Scoring scales. Every score is 0-1 and comes from the area's own value, not from its rank among the
+# areas being compared, so a score means the same in every search.
+AMENITY_RADIUS_KM = 1.0       # amenities counted within ~12 minutes' walk of each of a district's 5 points
+AMENITY_TARGET_PERCENTILE = 0.5  # having as many as a typical (median) Dublin district scores 1
+COMMUTE_BEST_MIN = 10         # 10 minutes or less scores 1 ...
+COMMUTE_WORST_MIN = 60        # ... falling to 0 at an hour (or at the student's own limit, if lower)
+RENT_COMFORT = 0.75           # rent at 75% of the budget or less scores 1 ...
+RENT_LIMIT = 1.5              # ... falling to 0 at 150% of the budget
+# A long commute is close to a dealbreaker, so (when commute matters to the student) the whole match score
+# shrinks from 45 minutes, down to half at 90 minutes - many amenities can't make up for it.
+LONG_COMMUTE_FROM_MIN = 45
+LONG_COMMUTE_TO_MIN = 90
+LONG_COMMUTE_KEEP = 0.5
 
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
 RATING_TO_WEIGHT = {1: 3, 2: 2, 3: 1, 4: 0}
@@ -263,7 +287,7 @@ def search_links(area, accommodation, budget):
 
 def load_data():
     # Refreshed weekly from OpenStreetMap by refresh_amenities.py
-    amenities = _clean_columns(pd.read_csv(_path("amenity_counts_osm.csv")))
+    places = _clean_columns(pd.read_csv(_path("amenities_osm.csv")))
     room_data = pd.concat(
         [_clean_columns(pd.read_excel(_path(file))).rename(columns={"Room Type": "Room type"}).assign(**{"Double Is": meaning})
          for file, meaning in ROOM_FILES.items()],
@@ -298,13 +322,35 @@ def load_data():
     commute_points["public_transport"] = commute_points["Travel_Time_Min"]
     commute_points["walk"] = commute_points["Walking Minutes"]
     commute_points["cycle"] = commute_points["Walking km"] / CYCLING_KMH * 60
+    commute_points["Cycle km"] = commute_points["Walking km"]
+    commute_source = "TFI Journey Planner export (public transport) and walking routes; cycling estimated"
+
+    if os.path.exists(_path(OTP_COMMUTE_FILE)):
+        otp = _clean_columns(pd.read_csv(_path(OTP_COMMUTE_FILE)))
+        keys = ["Area", "Direction", "Landmark", "University"]
+        minutes = otp.pivot_table(index=keys, columns="Mode", values="Minutes")
+        km = otp.pivot_table(index=keys, columns="Mode", values="Distance_km")
+        commute_points = commute_points.set_index(keys)
+        for mode, km_column in MODE_DISTANCE.items():
+            if mode in minutes:
+                # Where OTP found no route, keep the older figure
+                commute_points[mode] = minutes[mode].reindex(commute_points.index).fillna(commute_points[mode])
+                commute_points[km_column] = km[mode].reindex(commute_points.index).fillna(commute_points[km_column])
+        commute_points = commute_points.reset_index()
+        commute_source = (f"OpenTripPlanner (TFI timetables), public transport arriving by "
+                          f"{otp['Arrive_By'].iloc[0][-5:]} on a weekday; calculated {otp['Calculated_At'].iloc[0][:10]}")
+
+    # Amenities near where students would live: the average number within AMENITY_RADIUS_KM of each
+    # district's 5 points (the same points the commute is measured from)
+    landmarks = commute_points.drop_duplicates(["Area", "Landmark"])[["Area", "Origin_Latitude", "Origin_Longitude"]]
+    amenities = _amenities_nearby(landmarks, places)
 
     # Rent tables
     is_double = room_data["Room type"] == "double"
     is_private = room_data["Room type"].isin(PRIVATE_ROOM_LABELS) | (is_double & (room_data["Double Is"] == "private"))
     is_shared = room_data["Room type"].isin(SHARED_ROOM_LABELS) | (is_double & (room_data["Double Is"] == "shared"))
-    shared_room_rent = room_data[is_shared].groupby("Area")["Rent"].mean()
-    private_room_rent = room_data[is_private].groupby("Area")["Rent"].mean()
+    shared_room_rent, shared_listings = _room_rent(room_data[is_shared])
+    private_room_rent, private_listings = _room_rent(room_data[is_private])
 
     rtb["Area"] = "D" + rtb["Location"].astype(str).str.extract(
         r"Dublin\s*(\d+W?)", flags=re.IGNORECASE, expand=False
@@ -331,6 +377,11 @@ def load_data():
         "walking": walking,
         "commute_by_university": commute_by_university,
         "commute_points": commute_points,
+        "commute_source": commute_source,
+        # Dublin-wide "enough" level for each amenity, so amenity scores don't depend on the search
+        "amenity_targets": {item["column"]: max(float(amenities[item["column"]].quantile(AMENITY_TARGET_PERCENTILE)), 1.0)
+                            for item in ITEM_FACTORS + [f for f in FACTORS if f["kind"] == "count"]},
+        "rent_listings": {"shared_room": shared_listings, "private_room": private_listings},
         "universities": sorted(commute_by_university["University"].unique()),
         "safety": load_safety(),
         "safety_maps": load_safety_maps(),
@@ -344,14 +395,38 @@ def load_data():
     }
 
 
+def _room_rent(rooms):
+    """Average room rent per district and its number of listings; districts with too few listings get no rent."""
+    stats = rooms.groupby("Area")["Rent"].agg(["mean", "count"])
+    reliable = stats[stats["count"] >= MIN_ROOM_LISTINGS]
+    return reliable["mean"], reliable["count"].astype(int)
+
+
+def _amenities_nearby(landmarks, places, radius_km=AMENITY_RADIUS_KM):
+    """Average count of each amenity category within radius_km of a district's points."""
+    lat1 = np.radians(landmarks["Origin_Latitude"].to_numpy())[:, None]
+    lon1 = np.radians(landmarks["Origin_Longitude"].to_numpy())[:, None]
+    lat2 = np.radians(places["latitude"].to_numpy())[None, :]
+    lon2 = np.radians(places["longitude"].to_numpy())[None, :]
+    a = np.sin((lat2 - lat1) / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2) ** 2
+    near = 6371 * 2 * np.arcsin(np.sqrt(a)) <= radius_km  # landmark x place
+    columns = [item["column"] for item in ITEM_FACTORS] + [f["column"] for f in FACTORS if f["kind"] == "count"]
+    counts = pd.DataFrame({col: near[:, (places["category"] == col).to_numpy()].sum(axis=1) for col in columns},
+                          index=landmarks.index)
+    counts["Area"] = landmarks["Area"].to_numpy()
+    return counts.groupby("Area").mean().reset_index()
+
+
 # 2. SCORING HELPERS
 
-def _rank_score(series, ascending):
-    n = len(series)
-    if n <= 1:
-        return pd.Series(1.0, index=series.index)
-    ranks = series.rank(method="average", ascending=ascending)
-    return (n - ranks) / (n - 1)
+def _scale(series, worst, best):
+    """0 at `worst`, 1 at `best`, straight line in between (either direction)."""
+    return ((series - worst) / (best - worst)).clip(lower=0, upper=1)
+
+
+def _euros(amount):
+    """Whole euros, rounding halves up like the website does."""
+    return f"€{int(abs(amount) + 0.5):,}"
 
 
 def _factor_columns(factor):
@@ -443,7 +518,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     points = points[(points["University"] == university) & points[travel_mode].notna()].copy()
     points["Minutes"] = points[travel_mode]
     points["Within Limit"] = points["Minutes"] <= max_commute if max_commute else True
-    distance_column = "Distance_km" if travel_mode == "public_transport" else "Walking km"
+    distance_column = MODE_DISTANCE[travel_mode]
     commute = points.groupby("Area").agg(**{
         "Commute Minutes": ("Minutes", "mean"),
         "Parts": ("Minutes", "size"),
@@ -482,16 +557,21 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
                 "Try a longer commute or another way to travel.")
 
     # Scores
-    candidates["Rent Score"] = (1 - (candidates["Rent"] - budget).clip(lower=0) / (0.5 * budget)).clip(lower=0)
+    # Scores (0-1, from each area's own values - see the scales at the top of this file)
+    candidates["Rent Score"] = _scale(candidates["Rent"], worst=RENT_LIMIT * budget, best=RENT_COMFORT * budget)
     if "Commute" in active_factors:
-        candidates["Commute Score"] = _rank_score(candidates["Commute Minutes"], ascending=True)
+        worst = min(COMMUTE_WORST_MIN, max_commute) if max_commute else COMMUTE_WORST_MIN
+        worst = max(worst, COMMUTE_BEST_MIN + 5)
+        candidates["Commute Score"] = _scale(candidates["Commute Minutes"], worst=worst, best=COMMUTE_BEST_MIN)
+    targets = data["amenity_targets"]
     for factor in FACTORS:
         if factor["kind"] == "count":
-            candidates[f"{factor['column']} Score"] = _rank_score(candidates[factor["column"]] / candidates["Population"], ascending=False)
+            col = factor["column"]
+            candidates[f"{col} Score"] = _scale(candidates[col], worst=0, best=targets[col])
         elif factor["kind"] == "group":
             sub_cols = []
             for col in factor["columns"]:
-                candidates[f"{col} Score"] = _rank_score(candidates[col] / candidates["Population"], ascending=False)
+                candidates[f"{col} Score"] = _scale(candidates[col], worst=0, best=targets[col])
                 sub_cols.append(f"{col} Score")
             candidates[f"{factor['name']} Score"] = candidates[sub_cols].mean(axis=1)
 
@@ -499,6 +579,10 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     for name in active_factors:
         candidates[f"{name} Contribution"] = candidates[_score_column(name)] * weights[name] / total_weight * 100
     candidates["Match Score"] = candidates[[f"{n} Contribution" for n in active_factors]].sum(axis=1)
+    if "Commute" in active_factors:
+        long_commute = 1 - _scale(candidates["Commute Minutes"], worst=LONG_COMMUTE_TO_MIN, best=LONG_COMMUTE_FROM_MIN)
+        candidates["Commute Penalty"] = 1 - (1 - LONG_COMMUTE_KEEP) * long_commute
+        candidates["Match Score"] *= candidates["Commute Penalty"]
     ranked = candidates.sort_values("Match Score", ascending=False).reset_index(drop=True)
 
     averages = ranked[[f["column"] for f in FACTOR_LOOKUP.values() if f["column"] in ranked]].mean()
@@ -526,8 +610,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
                 return f"is the cheapest area for a {accommodation_name.lower()} (€{value:,.0f} a month)"
             return f"has lower rent than most areas (€{value:,.0f} a month)"
         if value == ranked[col].max():
-            return f"has the most {factor['noun']} ({value:.0f})"
-        return f"has more {factor['noun']} than most areas ({value:.0f})"
+            return f"has the most {factor['noun']} nearby ({value:.0f} within {AMENITY_RADIUS_KM:g} km)"
+        return f"has more {factor['noun']} nearby than most areas ({value:.0f} within {AMENITY_RADIUS_KM:g} km)"
 
     def bad_sentence(name, row):
         factor = FACTOR_LOOKUP[name]
@@ -538,8 +622,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         if factor["kind"] == "rent":
             return f"The rent is higher than in most areas (€{value:,.0f} a month)."
         if value == ranked[col].min():
-            return f"It has the fewest {factor['noun']} of all the areas ({value:.0f})."
-        return f"It has fewer {factor['noun']} than most areas ({value:.0f})."
+            return f"It has the fewest {factor['noun']} nearby of all the areas ({value:.0f} within {AMENITY_RADIUS_KM:g} km)."
+        return f"It has fewer {factor['noun']} nearby than most areas ({value:.0f} within {AMENITY_RADIUS_KM:g} km)."
 
     def short_name(name):
         factor = FACTOR_LOOKUP[name]
@@ -573,10 +657,13 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             lines.append(sentence + ".")
 
         diff = row["Budget Difference"]
-        if diff <= 0:
-            lines.append(f"The average rent is €{row['Rent']:,.0f} a month, which is €{abs(diff):,.0f} less than your budget.")
+        rent = f"The average rent is {_euros(row['Rent'])} a month"
+        if abs(diff) < 5:
+            lines.append(f"{rent}, about the same as your budget.")
+        elif diff < 0:
+            lines.append(f"{rent}, which is {_euros(diff)} less than your budget.")
         else:
-            lines.append(f"The average rent is €{row['Rent']:,.0f} a month, which is €{diff:,.0f} more than your budget.")
+            lines.append(f"{rent}, which is {_euros(diff)} more than your budget.")
 
         if n > 1:
             if position < n:
@@ -597,6 +684,10 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             opener = "One downside is that " if i == 0 else "Another downside is that "
             lines.append(opener + sentence[0].lower() + sentence[1:])
 
+        if row.get("Commute Penalty", 1) < 0.95:
+            lines.append(f"Its long commute (about {row['Commute Minutes']:.0f} minutes {mode_words}) "
+                         f"lowers its match score by {(1 - row['Commute Penalty']) * 100:.0f}%.")
+
         if not good and n > 1:
             lines.insert(0, "This area is about average on the things you care about.")
         return lines
@@ -608,7 +699,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             young_pct = row["Age_20_29"] / row["Population"] * 100
             dublin_students = census["Students"].sum() / census["Population"].sum() * 100
             dublin_young = census["Age_20_29"].sum() / census["Population"].sum() * 100
-            lines.append(f"About {row['Population']:,.0f} people live here.")
+            # Census figures are for the wider local electoral area (LEA), not just this district
+            lines.append(f"About {row['Population']:,.0f} people live in the wider {row['LEA']} area.")
             lines.append(f"{students_pct:.0f}% of people are students – "
                          f"{_compare_word(students_pct, dublin_students)} the Dublin average ({dublin_students:.0f}%).")
             lines.append(f"{young_pct:.0f}% of people are aged 20–29 – "
@@ -670,6 +762,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             "parts_within_limit": int(row["Parts Within Limit"]) if max_commute else None,
         }
 
+    listings = data["rent_listings"].get(accommodation, pd.Series(dtype=int))
     results = []
     for idx, row in top.iterrows():
         position = idx + 1
@@ -678,6 +771,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             "area": row["Area"],
             "lea": _none_if_nan(row.get("LEA")),
             "rent": round(float(row["Rent"]), 2),
+            # number of room listings behind the rent (None for apartments, which use RTB averages)
+            "rent_listings": int(listings[row["Area"]]) if row["Area"] in listings.index else None,
             "budget_status": row["Budget Status"],
             "budget_difference": round(float(row["Budget Difference"]), 2),
             "commute_minutes": None if pd.isna(row["Commute Minutes"]) else round(float(row["Commute Minutes"])),
@@ -698,6 +793,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         "budget": budget,
         "travel_mode": travel_mode,
         "max_commute": max_commute,
+        "commute_source": data["commute_source"],
         "areas_compared": len(ranked),
         "warning": warning,
         "recommendations": results,
