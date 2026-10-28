@@ -48,6 +48,9 @@ COMMUTE_FILES = ["Dublin_D1_D24_All_University_Commutes_clean_updated.csv", "Com
 # Commute times calculated with OpenTripPlanner by Backend/tools/build_commute_matrix.py. When the
 # file exists it replaces the Journey Planner export and the cycling estimate below.
 OTP_COMMUTE_FILE = "commute_otp.csv"
+# The same for the safety data's neighbourhoods (build_commute_matrix.py --neighbourhoods). Until it
+# exists, a neighbourhood uses the times of the nearest commute point in its district.
+NEIGHBOURHOOD_COMMUTE_FILE = "commute_otp_neighbourhoods.csv"
 
 AREA_CODES_ROOMS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14",
                     "D15", "D16", "D17", "D18", "D20"]
@@ -97,6 +100,7 @@ for _factor in FACTORS:
         _factor["columns"] = [item["column"] for item in _factor["items"]]
 ITEM_FACTORS = [dict(item, kind="count") for f in FACTORS if f["kind"] == "group" for item in f["items"]]
 FACTOR_LOOKUP = {f["name"]: f for f in FACTORS + ITEM_FACTORS}
+AMENITY_COLUMNS = [item["column"] for item in ITEM_FACTORS] + [f["column"] for f in FACTORS if f["kind"] == "count"]
 
 # How a student can travel. Each key is a minutes column in data["commute_points"].
 TRAVEL_MODES = {"public_transport": "by public transport", "walk": "on foot", "cycle": "by bike"}
@@ -106,15 +110,20 @@ MODE_DISTANCE = {"public_transport": "Distance_km", "walk": "Walking km", "cycle
 
 # Scoring scales. Every score is 0-1 and comes from the area's own value, not from its rank among the
 # areas being compared, so a score means the same in every search.
-AMENITY_RADIUS_KM = 1.0       # amenities counted within ~12 minutes' walk of each of a district's 5 points
+AMENITY_RADIUS_KM = 1.0       # everyday amenities counted within ~12 minutes' walk of a place
+# ... but hospitals and shopping centres are trips, not walks, so they count from further away
+AMENITY_RADIUS_OVERRIDES_KM = {"Hospitals": 3.0, "Shopping_Malls": 2.0}
 AMENITY_TARGET_PERCENTILE = 0.5  # having as many as a typical (median) Dublin district scores 1
 COMMUTE_BEST_MIN = 10         # 10 minutes or less scores 1 ...
 COMMUTE_WORST_MIN = 60        # ... falling to 0 at an hour (or at the student's own limit, if lower)
 RENT_COMFORT = 0.75           # rent at 75% of the budget or less scores 1 ...
 RENT_LIMIT = 1.5              # ... falling to 0 at 150% of the budget
-# A long commute is close to a dealbreaker, so (when commute matters to the student) the whole match score
-# shrinks from 45 minutes, down to half at 90 minutes - many amenities can't make up for it.
-LONG_COMMUTE_FROM_MIN = 45
+# A commute point this close to a named neighbourhood is the same place, so only the neighbourhood is kept
+SAME_PLACE_KM = 0.5
+# A long commute is close to a dealbreaker, so the whole match score shrinks from 30 minutes, down to half at
+# 90 minutes - many amenities can't make up for it. How strongly depends on how much commute matters to the
+# student: fully for "Very important", 2/3 for "Important", 1/3 for "Slightly important".
+LONG_COMMUTE_FROM_MIN = 30
 LONG_COMMUTE_TO_MIN = 90
 LONG_COMMUTE_KEEP = 0.5
 
@@ -343,7 +352,8 @@ def load_data():
     # Amenities near where students would live: the average number within AMENITY_RADIUS_KM of each
     # district's 5 points (the same points the commute is measured from)
     landmarks = commute_points.drop_duplicates(["Area", "Landmark"])[["Area", "Origin_Latitude", "Origin_Longitude"]]
-    amenities = _amenities_nearby(landmarks, places)
+    amenities = (_amenity_counts(landmarks, places).assign(Area=landmarks["Area"].to_numpy())
+                 .groupby("Area").mean().reset_index())
 
     # Rent tables
     is_double = room_data["Room type"] == "double"
@@ -379,8 +389,11 @@ def load_data():
         "commute_points": commute_points,
         "commute_source": commute_source,
         # Dublin-wide "enough" level for each amenity, so amenity scores don't depend on the search
-        "amenity_targets": {item["column"]: max(float(amenities[item["column"]].quantile(AMENITY_TARGET_PERCENTILE)), 1.0)
-                            for item in ITEM_FACTORS + [f for f in FACTORS if f["kind"] == "count"]},
+        "amenity_targets": {col: max(float(amenities[col].quantile(AMENITY_TARGET_PERCENTILE)), 1.0)
+                            for col in AMENITY_COLUMNS},
+        # Parts of each district (neighbourhoods and commute points) that are scored individually
+        "parts": _district_parts(commute_points, places),
+        "neighbourhood_commute": _load_neighbourhood_commute(),
         "rent_listings": {"shared_room": shared_listings, "private_room": private_listings},
         "universities": sorted(commute_by_university["University"].unique()),
         "safety": load_safety(),
@@ -402,19 +415,116 @@ def _room_rent(rooms):
     return reliable["mean"], reliable["count"].astype(int)
 
 
-def _amenities_nearby(landmarks, places, radius_km=AMENITY_RADIUS_KM):
-    """Average count of each amenity category within radius_km of a district's points."""
-    lat1 = np.radians(landmarks["Origin_Latitude"].to_numpy())[:, None]
-    lon1 = np.radians(landmarks["Origin_Longitude"].to_numpy())[:, None]
+def _km(lat, lon, lats, lons):
+    """Straight-line km from one point to each of several."""
+    lat, lon = np.radians(lat), np.radians(lon)
+    lats, lons = np.radians(np.asarray(lats, dtype=float)), np.radians(np.asarray(lons, dtype=float))
+    a = np.sin((lats - lat) / 2) ** 2 + np.cos(lat) * np.cos(lats) * np.sin((lons - lon) / 2) ** 2
+    return 6371 * 2 * np.arcsin(np.sqrt(a))
+
+
+def _amenity_counts(points, places, radius_km=AMENITY_RADIUS_KM):
+    """Count of each amenity category within radius_km of each point (same index as `points`)."""
+    lat1 = np.radians(points["Origin_Latitude"].to_numpy())[:, None]
+    lon1 = np.radians(points["Origin_Longitude"].to_numpy())[:, None]
     lat2 = np.radians(places["latitude"].to_numpy())[None, :]
     lon2 = np.radians(places["longitude"].to_numpy())[None, :]
     a = np.sin((lat2 - lat1) / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2) ** 2
-    near = 6371 * 2 * np.arcsin(np.sqrt(a)) <= radius_km  # landmark x place
-    columns = [item["column"] for item in ITEM_FACTORS] + [f["column"] for f in FACTORS if f["kind"] == "count"]
-    counts = pd.DataFrame({col: near[:, (places["category"] == col).to_numpy()].sum(axis=1) for col in columns},
-                          index=landmarks.index)
-    counts["Area"] = landmarks["Area"].to_numpy()
-    return counts.groupby("Area").mean().reset_index()
+    km = 6371 * 2 * np.arcsin(np.sqrt(a))  # point x place
+    return pd.DataFrame({col: (km[:, (places["category"] == col).to_numpy()] <= _radius(col, radius_km)).sum(axis=1)
+                         for col in AMENITY_COLUMNS}, index=points.index)
+
+
+def _radius(column, default=AMENITY_RADIUS_KM):
+    return AMENITY_RADIUS_OVERRIDES_KM.get(column, default)
+
+
+def _nearby(column, value):
+    """'12 within 1 km' for one amenity type; just '12 nearby' for a category that mixes distances."""
+    if column in AMENITY_COLUMNS:
+        return f"{value:.0f} within {_radius(column):g} km"
+    return f"{value:.0f} nearby"
+
+
+def _same_name(neighbourhood, point):
+    """'Phibsborough' is the commute point 'Phibsborough Village', but 'Cabra West' is not the point 'Cabra'."""
+    neighbourhood, point = neighbourhood.lower().strip(), point.lower().strip()
+    return point == neighbourhood or point.startswith(neighbourhood + " ")
+
+
+def _district_parts(commute_points, places):
+    """Named parts of each district a student could live in: the safety data's neighbourhoods plus the commute
+    points not within SAME_PLACE_KM of one. Each has the amenities around it, the commute point whose times it
+    uses (itself, or a neighbourhood's nearest) and its neighbourhood safety score (display only)."""
+    landmarks = (commute_points.drop_duplicates(["Area", "Landmark"])
+                 [["Area", "Landmark", "Origin_Latitude", "Origin_Longitude"]]
+                 .rename(columns={"Landmark": "Part"}).assign(Kind="landmark").reset_index(drop=True))
+    # Two commute points of a district that are one place ('Blanchardstown' and 'Blanchardstown Village', 1 km
+    # apart at most) count once
+    repeat = [any(_same_name(other["Part"], point["Part"]) and other["Part"] != point["Part"]
+                  and _km(point["Origin_Latitude"], point["Origin_Longitude"],
+                          [other["Origin_Latitude"]], [other["Origin_Longitude"]])[0] <= 1.0
+                  for _, other in landmarks[landmarks["Area"] == point["Area"]].iterrows())
+              for _, point in landmarks.iterrows()]
+    landmarks = landmarks[~np.array(repeat, dtype=bool)].reset_index(drop=True)
+    landmarks["Commute Point"] = landmarks["Part"]
+    landmarks["Safety Score"] = np.nan
+    columns = ["Area", "Part", "Origin_Latitude", "Origin_Longitude"]
+    if os.path.exists(NEIGHBOURHOOD_PLACES_CSV):
+        hoods = (pd.read_csv(NEIGHBOURHOOD_PLACES_CSV)
+                 .rename(columns={"District": "Area", "Neighbourhood": "Part",
+                                  "lat": "Origin_Latitude", "lon": "Origin_Longitude"})[columns]
+                 .drop_duplicates(["Area", "Part"]).assign(Kind="neighbourhood").reset_index(drop=True))
+    else:
+        hoods = pd.DataFrame(columns=columns + ["Kind"])
+    safety = pd.read_csv(SAFETY_NEIGHBOURHOODS_CSV) if os.path.exists(SAFETY_NEIGHBOURHOODS_CSV) else None
+    scores = {} if safety is None else dict(zip(zip(safety["District"], safety["Neighbourhood"]),
+                                                safety["safety_index_0_100"]))
+    hoods["Safety Score"] = [scores.get(key, np.nan) for key in zip(hoods["Area"], hoods["Part"])]
+    hoods["Commute Point"] = None
+
+    # A neighbourhood with the same name as a commute point is that point (which has exact commute times)
+    duplicate = [any(_same_name(hood["Part"], name) for name in landmarks.loc[landmarks["Area"] == hood["Area"], "Part"])
+                 for _, hood in hoods.iterrows()]
+    for (_, hood), dup in zip(hoods.iterrows(), duplicate):
+        if dup:
+            same = (landmarks["Area"] == hood["Area"]) & landmarks["Part"].map(lambda name: _same_name(hood["Part"], name))
+            landmarks.loc[same, "Safety Score"] = hood["Safety Score"]
+    hoods = hoods[~np.array(duplicate, dtype=bool)].reset_index(drop=True)
+
+    keep = []
+    for area, points in landmarks.groupby("Area"):
+        in_area = hoods[hoods["Area"] == area]
+        for i, point in points.iterrows():
+            if in_area.empty:
+                keep.append(i)
+                continue
+            km = _km(point["Origin_Latitude"], point["Origin_Longitude"],
+                     in_area["Origin_Latitude"], in_area["Origin_Longitude"])
+            if pd.isna(point["Safety Score"]):
+                landmarks.at[i, "Safety Score"] = in_area["Safety Score"].iloc[km.argmin()]
+            if km.min() >= SAME_PLACE_KM:
+                keep.append(i)
+        for j, hood in in_area.iterrows():
+            km = _km(hood["Origin_Latitude"], hood["Origin_Longitude"],
+                     points["Origin_Latitude"], points["Origin_Longitude"])
+            hoods.at[j, "Commute Point"] = points["Part"].iloc[km.argmin()]
+
+    parts = pd.concat([hoods.dropna(subset=["Commute Point"]), landmarks.loc[keep]], ignore_index=True)
+    parts = pd.concat([parts, _amenity_counts(parts, places)], axis=1)
+    for factor in FACTORS:
+        if factor["kind"] == "group":
+            parts[factor["column"]] = parts[factor["columns"]].sum(axis=1)
+    return parts
+
+
+def _load_neighbourhood_commute():
+    """OTP times for neighbourhoods, if build_commute_matrix.py --neighbourhoods has been run."""
+    columns = ["Area", "Part", "University", "Mode", "Minutes", "Distance_km"]
+    if not os.path.exists(_path(NEIGHBOURHOOD_COMMUTE_FILE)):
+        return pd.DataFrame(columns=columns)
+    return _clean_columns(pd.read_csv(_path(NEIGHBOURHOOD_COMMUTE_FILE))).rename(
+        columns={"Neighbourhood": "Part"})[columns]
 
 
 # 2. SCORING HELPERS
@@ -519,15 +629,28 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     points["Minutes"] = points[travel_mode]
     points["Within Limit"] = points["Minutes"] <= max_commute if max_commute else True
     distance_column = MODE_DISTANCE[travel_mode]
-    commute = points.groupby("Area").agg(**{
-        "Commute Minutes": ("Minutes", "mean"),
-        "Parts": ("Minutes", "size"),
-        "Parts Within Limit": ("Within Limit", "sum"),
-        "Distance_km": (distance_column, "mean"),
-    }).reset_index()
-    commute["Distance"] = commute["Distance_km"].map(lambda km: f"{km:.1f} km" if pd.notna(km) else None)
-    fastest = points.loc[points.groupby("Area")["Minutes"].idxmin()].set_index("Area")
-    area_data = data["area_data"].merge(commute, on="Area", how="left")
+    # Every part of every district gets its own commute: commute points use their own times; neighbourhoods
+    # use their own OTP times when they've been calculated, otherwise their nearest commute point's.
+    parts = data["parts"].merge(
+        points[["Area", "Landmark", "Minutes", distance_column]].rename(
+            columns={"Landmark": "Commute Point", distance_column: "Distance_km"}),
+        on=["Area", "Commute Point"], how="left")
+    parts["Commute Estimated"] = parts["Kind"] == "neighbourhood"
+    own = data["neighbourhood_commute"]
+    own = own[(own["University"] == university) & (own["Mode"] == travel_mode)].set_index(["Area", "Part"])
+    if not own.empty:
+        key = pd.MultiIndex.from_frame(parts[["Area", "Part"]])
+        minutes = own["Minutes"].reindex(key).to_numpy(dtype=float)
+        found = ~np.isnan(minutes) & (parts["Kind"] == "neighbourhood").to_numpy()
+        parts.loc[found, "Minutes"] = minutes[found]
+        parts.loc[found, "Distance_km"] = own["Distance_km"].reindex(key).to_numpy(dtype=float)[found]
+        parts.loc[found, "Commute Estimated"] = False
+    parts = parts.dropna(subset=["Minutes"]).rename(columns={"Minutes": "Commute Minutes"})
+    parts["Distance"] = parts["Distance_km"].map(lambda km: f"{km:.1f} km" if pd.notna(km) else None)
+    parts["Within Limit"] = parts["Commute Minutes"] <= max_commute if max_commute else True
+    # District figures (rent, census); amenities and commute come from the parts
+    area_data = data["area_data"].drop(columns=[c for c in data["parts"].columns
+                                                if c in data["area_data"] and c != "Area"])
     walking = walking[walking["University"] == university]
 
     # Rent + budget
@@ -544,13 +667,13 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     for name in active_factors:
         needed_columns.extend(_factor_columns(FACTOR_LOOKUP[name]))
     needed_columns = list(dict.fromkeys(needed_columns + ["Rent"]))
-    has_data = area_data[needed_columns].notna().all(axis=1)
-    candidates = area_data[has_data].copy()
+    candidates = parts.merge(area_data, on="Area")  # one row per part, with its district's figures
+    candidates = candidates[candidates[needed_columns].notna().all(axis=1)].copy()
     if candidates.empty:
         raise RecommendationError("No area has complete data for your accommodation type and chosen factors.")
     if max_commute:
-        # Keep an area if at least one part of it is within the student's limit
-        candidates = candidates[candidates["Parts Within Limit"] > 0]
+        # Keep only the parts of each district within the student's limit
+        candidates = candidates[candidates["Within Limit"]]
         if candidates.empty:
             raise RecommendationError(
                 f"No area is within {max_commute} minutes of {university} {mode_words}. "
@@ -581,9 +704,13 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     candidates["Match Score"] = candidates[[f"{n} Contribution" for n in active_factors]].sum(axis=1)
     if "Commute" in active_factors:
         long_commute = 1 - _scale(candidates["Commute Minutes"], worst=LONG_COMMUTE_TO_MIN, best=LONG_COMMUTE_FROM_MIN)
-        candidates["Commute Penalty"] = 1 - (1 - LONG_COMMUTE_KEEP) * long_commute
+        strength = weights["Commute"] / max(RATING_TO_WEIGHT.values())
+        candidates["Commute Penalty"] = 1 - (1 - LONG_COMMUTE_KEEP) * long_commute * strength
         candidates["Match Score"] *= candidates["Commute Penalty"]
-    ranked = candidates.sort_values("Match Score", ascending=False).reset_index(drop=True)
+    # Each district is represented by its best part, and districts are ranked by it
+    candidates = candidates.sort_values("Match Score", ascending=False)
+    ranked = candidates.drop_duplicates("Area").reset_index(drop=True)
+    ranked["Label"] = ranked["Part"] + " (" + ranked["Area"] + ")"
 
     averages = ranked[[f["column"] for f in FACTOR_LOOKUP.values() if f["column"] in ranked]].mean()
 
@@ -604,14 +731,16 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         if factor["kind"] == "commute":
             if value == ranked[col].min():
                 return f"is the closest to {university} (only {value:.0f} minutes {mode_words})"
-            return f"has a short commute to {university} (about {value:.0f} minutes {mode_words})"
+            if value <= LONG_COMMUTE_FROM_MIN:
+                return f"has a short commute to {university} (about {value:.0f} minutes {mode_words})"
+            return f"has a shorter commute to {university} than most areas (about {value:.0f} minutes {mode_words})"
         if factor["kind"] == "rent":
             if value == ranked[col].min():
                 return f"is the cheapest area for a {accommodation_name.lower()} (€{value:,.0f} a month)"
             return f"has lower rent than most areas (€{value:,.0f} a month)"
         if value == ranked[col].max():
-            return f"has the most {factor['noun']} nearby ({value:.0f} within {AMENITY_RADIUS_KM:g} km)"
-        return f"has more {factor['noun']} nearby than most areas ({value:.0f} within {AMENITY_RADIUS_KM:g} km)"
+            return f"has the most {factor['noun']} nearby ({_nearby(col, value)})"
+        return f"has more {factor['noun']} nearby than most areas ({_nearby(col, value)})"
 
     def bad_sentence(name, row):
         factor = FACTOR_LOOKUP[name]
@@ -622,8 +751,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         if factor["kind"] == "rent":
             return f"The rent is higher than in most areas (€{value:,.0f} a month)."
         if value == ranked[col].min():
-            return f"It has the fewest {factor['noun']} nearby of all the areas ({value:.0f} within {AMENITY_RADIUS_KM:g} km)."
-        return f"It has fewer {factor['noun']} nearby than most areas ({value:.0f} within {AMENITY_RADIUS_KM:g} km)."
+            return f"It has the fewest {factor['noun']} nearby of all the areas ({_nearby(col, value)})."
+        return f"It has fewer {factor['noun']} nearby than most areas ({_nearby(col, value)})."
 
     def short_name(name):
         factor = FACTOR_LOOKUP[name]
@@ -649,7 +778,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         good.sort(key=lambda name: ratings[name], reverse=True)
         good = good[:3]
         if good:
-            sentence = f"{row['Area']} " + _join_words([good_phrase(name, row) for name in good])
+            sentence = f"{row['Label']} " + _join_words([good_phrase(name, row) for name in good])
             important = [name for name in good if ratings[name] >= 3]
             if len(important) == len(good):
                 sentence += (", which are all things you said matter to you" if len(good) > 1
@@ -670,12 +799,12 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
                 below = ranked.iloc[position]
                 reasons = why_ahead(row, below)
                 if reasons:
-                    lines.append(f"It ranked higher than {below['Area']} because it has {_join_words(reasons)}.")
+                    lines.append(f"It ranked higher than {below['Label']} because it has {_join_words(reasons)}.")
             if position > 1:
                 above = ranked.iloc[position - 2]
                 reasons = why_ahead(above, row)
                 if reasons:
-                    lines.append(f"It ranked lower than {above['Area']} because {above['Area']} has {_join_words(reasons)}.")
+                    lines.append(f"It ranked lower than {above['Label']} because {above['Part']} has {_join_words(reasons)}.")
 
         bad = [name for name in active_factors if ratings[name] >= 3 and better_or_worse(name, row) == -1]
         bad.sort(key=lambda name: ratings[name], reverse=True)
@@ -741,25 +870,40 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         warning = f"None of the top {len(top)} areas fit your €{budget:,.0f} budget for a {accommodation_name.lower()}."
         if not affordable.empty:
             best = affordable.loc[affordable["Match Score"].idxmax()]
-            warning += (f" {best['Area']} does fit your budget (€{best['Rent']:,.0f}/month), but ranked lower "
+            warning += (f" {best['Label']} does fit your budget (€{best['Rent']:,.0f}/month), but ranked lower "
                         f"overall (match score {best['Match Score']:.1f}%) because of your other preferences.")
         else:
             cheapest = ranked.loc[ranked["Rent"].idxmin()]
-            warning += (f" The cheapest compared area is {cheapest['Area']} at €{cheapest['Rent']:,.0f}/month "
+            warning += (f" The cheapest compared area is {cheapest['Label']} at €{cheapest['Rent']:,.0f}/month "
                         f"(€{cheapest['Rent'] - budget:,.0f} over budget).")
 
-    def commute_info(area, row):
-        """Fastest part of the area (a pin for the map) and how much of it is within the limit."""
-        if area not in fastest.index:
-            return None
-        spot = fastest.loc[area]
+    def commute_info(area):
+        """Quickest part of the district (a pin for the map) and how many of its parts are within the limit."""
+        in_area = parts[parts["Area"] == area]
+        quickest = in_area.loc[in_area["Commute Minutes"].idxmin()]
         return {
-            "fastest_from": spot["Landmark"],
-            "fastest_minutes": round(float(spot["Minutes"])),
-            "lat": float(spot["Origin_Latitude"]),
-            "lon": float(spot["Origin_Longitude"]),
-            "parts": int(row["Parts"]),
-            "parts_within_limit": int(row["Parts Within Limit"]) if max_commute else None,
+            "fastest_from": quickest["Part"],
+            "fastest_minutes": round(float(quickest["Commute Minutes"])),
+            "lat": float(quickest["Origin_Latitude"]),
+            "lon": float(quickest["Origin_Longitude"]),
+            "parts": len(in_area),
+            "parts_within_limit": int(in_area["Within Limit"].sum()) if max_commute else None,
+        }
+
+    def neighbourhood_info(row):
+        """The recommended part of the district, and the district's other good parts."""
+        others = candidates[(candidates["Area"] == row["Area"]) & (candidates["Part"] != row["Part"])].head(4)
+        return {
+            "name": row["Part"],
+            "kind": row["Kind"],
+            "lat": float(row["Origin_Latitude"]),
+            "lon": float(row["Origin_Longitude"]),
+            "commute_minutes": round(float(row["Commute Minutes"])),
+            # until neighbourhood OTP times exist, a neighbourhood uses its nearest commute point's
+            "commute_estimated_from": row["Commute Point"] if row["Commute Estimated"] else None,
+            "safety_score": _round_or_none(row["Safety Score"], 1),
+            "others": [{"name": other["Part"], "commute_minutes": round(float(other["Commute Minutes"])),
+                        "match_score": round(float(other["Match Score"]), 1)} for _, other in others.iterrows()],
         }
 
     listings = data["rent_listings"].get(accommodation, pd.Series(dtype=int))
@@ -777,7 +921,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             "budget_difference": round(float(row["Budget Difference"]), 2),
             "commute_minutes": None if pd.isna(row["Commute Minutes"]) else round(float(row["Commute Minutes"])),
             "distance": _none_if_nan(row.get("Distance")),
-            "commute": commute_info(row["Area"], row),
+            "neighbourhood": neighbourhood_info(row),
+            "commute": commute_info(row["Area"]),
             "match_score": round(float(row["Match Score"]), 1),
             "walking": walking_info(row["Area"]),
             "safety": data.get("safety", {}).get(row["Area"]),
@@ -795,6 +940,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         "max_commute": max_commute,
         "commute_source": data["commute_source"],
         "areas_compared": len(ranked),
+        "parts_compared": len(candidates),
         "warning": warning,
         "recommendations": results,
     }

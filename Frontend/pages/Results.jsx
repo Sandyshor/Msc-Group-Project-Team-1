@@ -255,6 +255,23 @@ function CommuteDetails({ area, commute, maxCommute }) {
   )
 }
 
+// The recommended part of the district (a neighbourhood or commute point) and its other good parts
+function NeighbourhoodDetails({ area, neighbourhood }) {
+  if (!neighbourhood) return null
+  const others = neighbourhood.others ?? []
+
+  return (
+    <p className="result-muted">
+      Best part of {area} for you: <strong>{neighbourhood.name}</strong>
+      {neighbourhood.safety_score != null && ` (safety ${Math.round(neighbourhood.safety_score)}/100)`}
+      {neighbourhood.commute_estimated_from &&
+        ` (commute estimated from nearby ${neighbourhood.commute_estimated_from})`}
+      {others.length > 0 &&
+        ` · Also good in ${area}: ${others.map((o) => `${o.name} (${o.commute_minutes} min)`).join(', ')}`}
+    </p>
+  )
+}
+
 function ResultCard({ result, university, modeWords, maxCommute }) {
   const navigate = useNavigate()
   const hasProfile = districts.some((d) => d.id === result.area)
@@ -267,7 +284,9 @@ function ResultCard({ result, university, modeWords, maxCommute }) {
           <span className="result-rank">#{result.rank}</span>
           <h2>
             {result.area}
-            {result.lea && <span className="result-lea"> · {result.lea}</span>}
+            {result.neighbourhood
+              ? <span className="result-lea"> · {result.neighbourhood.name}</span>
+              : result.lea && <span className="result-lea"> · {result.lea}</span>}
           </h2>
         </div>
         <div className="result-score">
@@ -297,6 +316,8 @@ function ResultCard({ result, university, modeWords, maxCommute }) {
         </div>
       </dl>
 
+      <NeighbourhoodDetails area={result.area} neighbourhood={result.neighbourhood} />
+
       <CommuteDetails area={result.area} commute={result.commute} maxCommute={maxCommute} />
 
       <WalkingDistance area={result.area} walking={result.walking} university={university} />
@@ -305,7 +326,7 @@ function ResultCard({ result, university, modeWords, maxCommute }) {
 
       <PlacesToLive area={result.area} places={result.places_to_live} />
 
-      <h3>Why {result.area} is #{result.rank}</h3>
+      <h3>Why {result.neighbourhood ? `${result.neighbourhood.name}, ${result.area}` : result.area} is #{result.rank}</h3>
       <p>{result.why}</p>
 
       {result.profile && (
