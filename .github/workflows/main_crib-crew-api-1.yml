@@ -10,6 +10,11 @@ on:
       - 'main'
   workflow_dispatch:
 
+# One deploy at a time: a push while another is deploying waits for it instead of failing with 409 Conflict
+concurrency:
+  group: azure-deploy
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
