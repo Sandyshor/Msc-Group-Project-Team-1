@@ -178,6 +178,14 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Catherine has updated the district profile map till D10, now the map can be viewed district wise rather than entire map.
 -  Vignesh has implemented new feature called Journey Planner, where distance, commute time, transportation between any two points can be viewed.
 - Santhosh deployed the map feature, and highlighted all universities, famous places across Dublin on the map, and also automated the amenities count by setting up a code which connect to api and updates the count every week.
+
+**Meeting 5 (5:00 - 7:00)**
+- Attended by Santhosh, Vignesh, Sowmiya, Sheryas and Catherine
+- Santhosh worked on fixing calculation issue in the recommendation system and made the enabled the slider option for rating the factors instead of buttons
+- Vignesh has added the safety feature which show the safety rating of each area it recommends.
+- Sowmiya made the website more visualized way rather than text heavy
+- Catherine worked on the district map so that it shows only the area displayed by the recommendation model, rather than the entire map
+- Sheryas added the letting agencies option at the bottom of result page 
   
 
   
