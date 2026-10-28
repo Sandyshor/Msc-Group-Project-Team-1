@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import './HomePage.css'
 
 const cityImage =
-  'https://images.unsplash.com/photo-1692624459321-518f34276661?auto=format&fit=crop&fm=jpg&q=85&w=2200'
+  'https://www.fodors.com/wp-content/uploads/2025/09/0_HERO_Ireland_Dublin_Samuel-backett-bridge_river-liffey_Shutterstock_1956890866_muratart.jpg'
 
 // Photographs are from the institutions' sites or published campus-photo pages.
 // Each campus has its own official information link instead of sharing one generic URL.
@@ -221,22 +221,40 @@ function Home() {
         <div className="fd-hero-copy">
           <p className="fd-hero-kicker"><span /> A CITY GUIDE FOR INTERNATIONAL STUDENTS</p>
           <h1 id="fd-hero-title">
-            Coming to Dublin
-            <em>to study?</em>
+            New to
+            <em>Dublin?</em>
             <span>Let’s help you find your place.</span>
           </h1>
           <p className="fd-hero-description">
-            Welcome to Dublin. We’ll help you make sense of student life here —
-            from finding your campus to exploring districts that fit your budget,
-            commute and everyday needs.
+            From finding your campus to discovering a neighbourhood that feels
+            like yours, get to know Dublin at your own pace.
           </p>
           <div className="fd-hero-actions">
             <Link className="fd-button fd-button-cream" to="/districts">Explore districts <span>↗</span></Link>
-            {/* Separate page (not React) served from Frontend/public/journey-planner */}
-            <a className="fd-hero-watch" href="/journey-planner/route.html"><span className="fd-play">⇄</span> Plan a journey</a>
             <a className="fd-hero-watch" href="#explore-dublin"><span className="fd-play">▶</span> Meet Dublin through film</a>
           </div>
         </div>
+
+        <aside className="fd-hero-guide" aria-label="Quick links to explore Dublin">
+          <div className="fd-guide-topline">
+            <span><i /> YOUR CITY GUIDE</span>
+            <span>01 — 03</span>
+          </div>
+          <div className="fd-guide-route" aria-hidden="true">
+            <span>DISTRICTS</span>
+            <i />
+            <span>CAMPUSES</span>
+            <i />
+            <span>CITY LIFE</span>
+          </div>
+          <h2>Start with what matters to you.</h2>
+          <p>Explore your new city one step at a time.</p>
+          <nav className="fd-guide-links" aria-label="Explore the city guide">
+            <Link to="/districts"><span>01</span><strong>Neighbourhoods</strong><b>↗</b></Link>
+            <a href="#universities"><span>02</span><strong>Campus life</strong><b>↗</b></a>
+            <a href="#attractions"><span>03</span><strong>Places to explore</strong><b>↗</b></a>
+          </nav>
+        </aside>
 
         <div className="fd-hero-footer-left">BAILE ÁTHA CLIATH <span>—</span> DUBLIN, IRELAND</div>
       </section>
