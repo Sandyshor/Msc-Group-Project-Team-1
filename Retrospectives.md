@@ -185,7 +185,16 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Vignesh has added the safety feature which show the safety rating of each area it recommends.
 - Sowmiya made the website more visualized way rather than text heavy
 - Catherine worked on the district map so that it shows only the area displayed by the recommendation model, rather than the entire map
-- Sheryas added the letting agencies option at the bottom of result page 
+- Sheryas added the letting agencies option at the bottom of result page
+
+**Meeting 6 (9:00 - 9:30)**
+- Attended by Sheryash, Sowmiya, Catherine, Santhosh and Vignesh
+- Sheryash scrapped rent data from D22 - D24.
+- Catherine added D11 - D24 data in map and integrated the safety feature as well.
+- Sowmiya worked on adding amenities in the journey planner and made the website look less text heavy.
+- Santhosh integrated rest of the rent data to the system and, calculated the commute distance from each sub divided area to the university,
+  now the system suggests same area with different landmarks, based on certain criteria.
+- Vignesh added the property listing along with result cards.
   
 
   
