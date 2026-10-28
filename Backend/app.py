@@ -53,6 +53,14 @@ def options():
     }
 
 
+@app.get("/universities")
+def universities():
+    """University locations (the commute destinations), for the journey planner map."""
+    points = DATA["commute_points"].groupby("University")[["Destination_Latitude", "Destination_Longitude"]].first()
+    return [{"name": name, "lat": float(row.Destination_Latitude), "lon": float(row.Destination_Longitude)}
+            for name, row in points.iterrows()]
+
+
 @app.post("/recommend")
 def recommend(req: RecommendRequest):
     if any(r not in (1, 2, 3, 4) for r in req.ratings.values()):
