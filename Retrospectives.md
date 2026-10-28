@@ -192,7 +192,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Sheryash scrapped rent data from D22 - D24.
 - Catherine added D11 - D24 data in map and integrated the safety feature as well.
 - Sowmiya worked on adding amenities in the journey planner and made the website look less text heavy.
-- Santhosh integrated rest of the rent data to the system and, calculated the commute distance from each sub divided area to the university,
+- Santhosh integrated rest of the rent data to the system and, calculated the commute distance from each sub divided part of the area to the university,
   now the system suggests same area with different landmarks, based on certain criteria.
 - Vignesh added the property listing along with result cards.
   
