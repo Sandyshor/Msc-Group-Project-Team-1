@@ -833,27 +833,79 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             lines.insert(0, "This area is about average on the things you care about.")
         return lines
 
-    def area_profile(row):
-        lines = []
+    def profile_stats(row):
+        """Census figures for the area (for the result page's charts); None where the data is missing."""
+        stats = {"lea": _none_if_nan(row.get("LEA"))}
         if pd.notna(row.get("Population")) and row["Population"] > 0:
-            students_pct = row["Students"] / row["Population"] * 100
-            young_pct = row["Age_20_29"] / row["Population"] * 100
-            dublin_students = census["Students"].sum() / census["Population"].sum() * 100
-            dublin_young = census["Age_20_29"].sum() / census["Population"].sum() * 100
             # Census figures are for the wider local electoral area (LEA), not just this district
-            lines.append(f"About {row['Population']:,.0f} people live in the wider {row['LEA']} area.")
-            lines.append(f"{students_pct:.0f}% of people are students – "
-                         f"{_compare_word(students_pct, dublin_students)} the Dublin average ({dublin_students:.0f}%).")
-            lines.append(f"{young_pct:.0f}% of people are aged 20–29 – "
-                         f"{_compare_word(young_pct, dublin_young)} the Dublin average ({dublin_young:.0f}%).")
+            stats.update({
+                "population": int(row["Population"]),
+                "students_pct": round(float(row["Students"] / row["Population"] * 100), 1),
+                "dublin_students_pct": round(float(census["Students"].sum() / census["Population"].sum() * 100), 1),
+                "young_pct": round(float(row["Age_20_29"] / row["Population"] * 100), 1),
+                "dublin_young_pct": round(float(census["Age_20_29"].sum() / census["Population"].sum() * 100), 1),
+            })
         if pd.notna(row.get("Non_Irish_%")):
             groups = [c for c in ethnicity.columns if c != "Area" and pd.notna(row.get(c))]
             largest = sorted(groups, key=lambda c: row[c], reverse=True)[:2]
-            group_text = " and ".join(f"{c.replace(' (%)', '')} ({row[c]:.1f}%)" for c in largest)
-            lines.append(f"{row['Non_Irish_%']:.0f}% of people are not Irish. The biggest groups are {group_text}.")
+            stats["non_irish_pct"] = round(float(row["Non_Irish_%"]), 1)
+            stats["largest_groups"] = [{"name": c.replace(" (%)", ""), "pct": round(float(row[c]), 1)}
+                                       for c in largest]
         if pd.notna(row.get("Apartments_%")):
-            lines.append(f"{row['Apartments_%']:.0f}% of homes are apartments.")
+            stats["apartments_pct"] = round(float(row["Apartments_%"]), 1)
+        return stats
+
+    def area_profile(row):
+        stats = profile_stats(row)
+        lines = []
+        if "population" in stats:
+            lines.append(f"About {stats['population']:,.0f} people live in the wider {stats['lea']} area.")
+            lines.append(f"{stats['students_pct']:.0f}% of people are students – "
+                         f"{_compare_word(stats['students_pct'], stats['dublin_students_pct'])} "
+                         f"the Dublin average ({stats['dublin_students_pct']:.0f}%).")
+            lines.append(f"{stats['young_pct']:.0f}% of people are aged 20–29 – "
+                         f"{_compare_word(stats['young_pct'], stats['dublin_young_pct'])} "
+                         f"the Dublin average ({stats['dublin_young_pct']:.0f}%).")
+        if "non_irish_pct" in stats:
+            group_text = " and ".join(f"{g['name']} ({g['pct']:.1f}%)" for g in stats["largest_groups"])
+            lines.append(f"{stats['non_irish_pct']:.0f}% of people are not Irish. The biggest groups are {group_text}.")
+        if "apartments_pct" in stats:
+            lines.append(f"{stats['apartments_pct']:.0f}% of homes are apartments.")
         return lines
+
+    def breakdown(row):
+        """How the place does on each factor the student rated, most important first (for the result page)."""
+        items = []
+        for name in sorted(active_factors, key=lambda name: (ratings[name], -row[f"{name} Contribution"])):
+            factor = FACTOR_LOOKUP[name]
+            value = row[factor["column"]]
+            if factor["kind"] == "commute":
+                shown = f"{value:.0f} min {mode_words}"
+            elif factor["kind"] == "rent":
+                shown = f"{_euros(value)}/month"
+            else:
+                shown = _nearby(factor["column"], value)
+            items.append({
+                "factor": name,
+                "rating": ratings[name],
+                "score": round(float(row[_score_column(name)]) * 100),  # 0-100: how well it meets the need
+                "compared": better_or_worse(name, row),  # 1 better than most areas, 0 about average, -1 worse
+                "value": shown,
+            })
+        return items
+
+    def neighbours(position, row):
+        """The places ranked just above and below, and what separates them (for the result page)."""
+        result = {}
+        if position < len(ranked):
+            below = ranked.iloc[position]
+            result["ahead_of"] = {"name": below["Part"], "area": below["Area"], "rank": position + 1,
+                                  "reasons": why_ahead(row, below)}
+        if position > 1:
+            above = ranked.iloc[position - 2]
+            result["behind"] = {"name": above["Part"], "area": above["Area"], "rank": position - 1,
+                                "reasons": why_ahead(above, row)}
+        return result
 
     def walking_info(area):
         area_walks = walking[walking["Area"] == area]
@@ -944,6 +996,12 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
                                "search_links": search_links(row["Area"], accommodation, budget)},
             "why": " ".join(explain(position, row)),
             "profile": " ".join(area_profile(row)),
+            # the same explanation as numbers, for charts
+            "breakdown": breakdown(row),
+            "compared_with": neighbours(position, row),
+            "commute_penalty_pct": (round((1 - float(row["Commute Penalty"])) * 100)
+                                    if row.get("Commute Penalty", 1) < 0.95 else None),
+            "profile_stats": profile_stats(row),
         })
 
     return {

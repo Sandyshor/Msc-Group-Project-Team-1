@@ -193,20 +193,165 @@
   font-weight: 400;
 }
 
-.result-walking details {
-  margin-top: 4px;
+/* Why this place: one bar per factor the student rated */
+
+.result-why .why-list {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.result-walking summary {
-  color: #245b48;
-  cursor: pointer;
+.why-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(0, 1.3fr) minmax(170px, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #f4efe4;
+}
+
+.why-factor,
+.why-value {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.why-factor strong {
+  font-size: 14px;
+}
+
+.why-factor .result-muted {
+  font-size: 12px;
+}
+
+.why-value {
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 13px;
   font-weight: 600;
 }
 
-.result-walking ul {
-  margin: 8px 0 0;
-  padding-left: 20px;
+.why-bar,
+.share-bar {
+  position: relative;
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: #e2d9c6;
+}
+
+.why-bar > span,
+.share-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #245b48;
+}
+
+.why-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.why-tag.better { background: #dbe4d4; color: #245b48; }
+.why-tag.average { background: #ece6d8; color: #5f6f67; }
+.why-tag.worse { background: #f6e1d6; color: #8a3b2b; }
+
+.why-compare {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 4px;
+  padding: 0;
+  list-style: none;
   color: #4d5e53;
+}
+
+.why-compare li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.why-rank {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #173f32;
+  color: #fffdf7;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* About this area: census shares as small bar tiles */
+
+.about-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.about-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f4efe4;
+  line-height: 1.4;
+}
+
+.about-label {
+  color: #718075;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.about-tile strong {
+  font-family: Georgia, serif;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.about-tile .result-muted {
+  font-size: 12px;
+}
+
+/* the Dublin average, marked on the bar */
+.share-bar > i {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 16px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: #a8753f;
+}
+
+@media (max-width: 760px) {
+  .why-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px 14px;
+  }
+
+  .why-bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .about-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* Safety section */

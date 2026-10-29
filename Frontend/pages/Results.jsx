@@ -27,34 +27,6 @@ function euro(value) {
   return `€${Math.round(value).toLocaleString('en-IE')}`
 }
 
-function WalkingDistance({ area, walking, university }) {
-  if (!walking) {
-    return <p className="result-muted">No walking data from {area} to {university}.</p>
-  }
-
-  return (
-    <div className="result-walking">
-      <p>
-        <strong>Walking:</strong> average {walking.average_km.toFixed(2)} km
-        (about {walking.average_minutes} min) from {area} to {university}
-      </p>
-      <details>
-        <summary>Show walking distance to each place in {area}</summary>
-        <ul>
-          {walking.places.map((place) => (
-            <li key={place.landmark}>
-              {place.landmark} ({place.direction}):{' '}
-              {place.km != null
-                ? `${place.km.toFixed(2)} km, about ${place.minutes} min walk`
-                : 'not available'}
-            </li>
-          ))}
-        </ul>
-      </details>
-    </div>
-  )
-}
-
 // One safety score per postal district, straight from safety_indicators.csv (via the API).
 // The wording comes from the district's rank among the 22 districts; no colours for areas.
 // Street safety scores: 50 = the Dublin average; twice the average crime rate = 25, half = 75.
@@ -255,24 +227,152 @@ function CommuteDetails({ area, commute, maxCommute }) {
   )
 }
 
-// The recommended place (a neighbourhood or commute point in the district) and the district's other options
-function NeighbourhoodDetails({ area, neighbourhood }) {
-  if (!neighbourhood) return null
-  const others = neighbourhood.others ?? []
+const IMPORTANCE = { 1: 'Very important', 2: 'Important', 3: 'Slightly important' }
+
+// compared: 1 = better than most areas, 0 = about average, -1 = worse (icon + words, never colour alone)
+const COMPARED = {
+  1: ['better', '▲ Better than most'],
+  0: ['average', '● About average'],
+  [-1]: ['worse', '▼ Worse than most'],
+}
+
+function joinWords(items) {
+  return items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`
+}
+
+// Why the place ranked here: one bar per factor the student rated, most important first
+function WhyThisPlace({ result, place }) {
+  const items = result.breakdown
+  const title = `Why ${place} is #${result.rank}`
+  if (!items?.length) {
+    return (
+      <>
+        <h3>{title}</h3>
+        <p>{result.why}</p>
+      </>
+    )
+  }
+  const { ahead_of: ahead, behind } = result.compared_with ?? {}
 
   return (
-    <p className="result-muted">
-      Recommended place: <strong>{neighbourhood.name}, {area}</strong>
-      {neighbourhood.safety_score != null && ` (safety ${Math.round(neighbourhood.safety_score)}/100)`}
-      {neighbourhood.commute_estimated_from &&
-        ` (commute estimated from nearby ${neighbourhood.commute_estimated_from})`}
-      {others.length > 0 &&
-        ` · Other options in ${area}: ${others.map((o) => `${o.name} (${o.commute_minutes} min)`).join(', ')}`}
-    </p>
+    <section className="result-why" aria-label={title}>
+      <h3>{title}</h3>
+      <p className="result-muted">
+        Each thing you rated, most important first. The bar shows how well this place meets your need (full = all
+        you need); the tag compares it with the other areas.
+      </p>
+      <ul className="why-list">
+        {items.map((item) => {
+          const [tone, words] = COMPARED[item.compared] ?? COMPARED[0]
+          return (
+            <li key={item.factor} className="why-row">
+              <div className="why-factor">
+                <strong>{item.factor}</strong>
+                <span className="result-muted">{IMPORTANCE[item.rating]}</span>
+              </div>
+              <span className="why-bar" role="img" aria-label={`${item.factor}: ${item.score} out of 100`}>
+                <span style={{ width: `${Math.max(3, item.score)}%` }} />
+              </span>
+              <div className="why-value">
+                <span>{item.value}</span>
+                <span className={`why-tag ${tone}`}>{words}</span>
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+      {(behind?.reasons?.length > 0 || ahead?.reasons?.length > 0) && (
+        <ul className="why-compare">
+          {behind?.reasons?.length > 0 && (
+            <li>
+              <span className="why-rank">#{behind.rank}</span>
+              <span><strong>{behind.name}, {behind.area}</strong> ranked higher with {joinWords(behind.reasons)}</span>
+            </li>
+          )}
+          {ahead?.reasons?.length > 0 && (
+            <li>
+              <span className="why-rank">#{ahead.rank}</span>
+              <span>Ahead of <strong>{ahead.name}, {ahead.area}</strong> for {joinWords(ahead.reasons)}</span>
+            </li>
+          )}
+        </ul>
+      )}
+      {result.commute_penalty_pct != null && (
+        <p className="result-muted">The long commute lowers the match score by {result.commute_penalty_pct}%.</p>
+      )}
+    </section>
   )
 }
 
-function ResultCard({ result, university, modeWords, maxCommute }) {
+// A share of the population, with the Dublin average marked on the same bar when there is one
+function ShareTile({ label, value, dublin, note }) {
+  const diff = dublin == null ? null : value - dublin
+  return (
+    <div className="about-tile">
+      <span className="about-label">{label}</span>
+      <strong>{Math.round(value)}%</strong>
+      <span
+        className="share-bar"
+        role="img"
+        aria-label={`${label}: ${Math.round(value)}%${dublin != null ? `, Dublin average ${Math.round(dublin)}%` : ''}`}
+      >
+        <span style={{ width: `${Math.min(100, value)}%` }} />
+        {dublin != null && <i style={{ left: `${Math.min(100, dublin)}%` }} />}
+      </span>
+      {dublin != null && (
+        <span className="result-muted">
+          {Math.abs(diff) < 1 ? 'About the same as' : diff > 0 ? 'Higher than' : 'Lower than'} the Dublin
+          average ({Math.round(dublin)}%)
+        </span>
+      )}
+      {note && <span className="result-muted">{note}</span>}
+    </div>
+  )
+}
+
+function AboutArea({ result }) {
+  const stats = result.profile_stats
+  const hasStats = stats && (stats.population != null || stats.non_irish_pct != null || stats.apartments_pct != null)
+  if (!hasStats) {
+    return result.profile ? (
+      <>
+        <h3>About this area</h3>
+        <p>{result.profile}</p>
+      </>
+    ) : null
+  }
+  const groups = stats.largest_groups ?? []
+
+  return (
+    <section className="result-about" aria-label="About this area">
+      <h3>About this area</h3>
+      {stats.population != null && (
+        <p className="result-muted">
+          Census figures for the wider {stats.lea} area, home to {stats.population.toLocaleString('en-IE')} people
+          · the line on each bar is the Dublin average
+        </p>
+      )}
+      <div className="about-tiles">
+        {stats.students_pct != null && (
+          <ShareTile label="Students" value={stats.students_pct} dublin={stats.dublin_students_pct} />
+        )}
+        {stats.young_pct != null && (
+          <ShareTile label="Aged 20–29" value={stats.young_pct} dublin={stats.dublin_young_pct} />
+        )}
+        {stats.non_irish_pct != null && (
+          <ShareTile
+            label="Not Irish"
+            value={stats.non_irish_pct}
+            note={groups.length > 0 && `Biggest groups: ${groups.map((g) => `${g.name} ${g.pct}%`).join(' · ')}`}
+          />
+        )}
+        {stats.apartments_pct != null && <ShareTile label="Homes that are apartments" value={stats.apartments_pct} />}
+      </div>
+    </section>
+  )
+}
+
+function ResultCard({ result, modeWords, maxCommute }) {
   const navigate = useNavigate()
   const hasProfile = districts.some((d) => d.id === result.area)
   const withinBudget = result.budget_status === 'Within budget'
@@ -316,25 +416,18 @@ function ResultCard({ result, university, modeWords, maxCommute }) {
         </div>
       </dl>
 
-      <NeighbourhoodDetails area={result.area} neighbourhood={result.neighbourhood} />
-
       <CommuteDetails area={result.area} commute={result.commute} maxCommute={maxCommute} />
 
-      <WalkingDistance area={result.area} walking={result.walking} university={university} />
+      <WhyThisPlace
+        result={result}
+        place={result.neighbourhood ? `${result.neighbourhood.name}, ${result.area}` : result.area}
+      />
+
+      <AboutArea result={result} />
 
       <SafetyScores area={result.area} safety={result.safety} residences={result.places_to_live?.residences} />
 
       <PlacesToLive area={result.area} places={result.places_to_live} />
-
-      <h3>Why {result.neighbourhood ? `${result.neighbourhood.name}, ${result.area}` : result.area} is #{result.rank}</h3>
-      <p>{result.why}</p>
-
-      {result.profile && (
-        <>
-          <h3>About this area</h3>
-          <p>{result.profile}</p>
-        </>
-      )}
 
       {hasProfile && (
         <button
@@ -489,7 +582,6 @@ function Results() {
                 <ResultCard
                   key={`${result.area}-${result.neighbourhood?.name ?? result.rank}`}
                   result={result}
-                  university={data.university}
                   modeWords={modeWords}
                   maxCommute={maxCommute}
                 />
