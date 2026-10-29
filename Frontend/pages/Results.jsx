@@ -522,6 +522,84 @@ function LettingAgents() {
   )
 }
 
+const COMPARE_ROWS = [
+  { label: 'Match score', get: (r) => r.match_score, show: (v) => `${v.toFixed(1)}%`, better: 'high' },
+  { label: 'Monthly rent', get: (r) => r.rent, show: (v) => euro(v), better: 'low' },
+  { label: 'Commute', get: (r) => r.commute_minutes, show: (v) => `${v} min`, better: 'low' },
+  { label: 'Walk to campus', get: (r) => r.walking?.average_minutes, show: (v) => `${v} min`, better: 'low' },
+  { label: 'Safety score', get: (r) => r.safety?.index, show: (v) => `${Math.round(v)} / 100`, better: 'high' },
+]
+
+function CompareAreas({ results, budget }) {
+  const [open, setOpen] = useState(false)
+  if (!results || results.length < 2) return null
+
+  // only show rows where at least two areas have a value
+  const rows = COMPARE_ROWS.filter((row) => results.filter((r) => row.get(r) != null).length >= 2)
+
+  return (
+    <div className="compare-wrap">
+      <button type="button" className="questionnaire-next" onClick={() => setOpen(!open)} aria-expanded={open}>
+        {open ? 'Hide comparison' : `Compare these ${results.length} areas`} <span>{open ? '↑' : '↓'}</span>
+      </button>
+
+      {open && (
+        <section className="compare" aria-label="Compare your top areas">
+          <h2 className="compare-title">Your top {results.length} side by side</h2>
+          <p className="compare-subtitle">The best area for each row is highlighted.</p>
+
+          <div className="compare-table" style={{ '--areas': results.length }}>
+            <div className="compare-corner" />
+            {results.map((r) => (
+              <div className="compare-head" key={r.rank}>
+                <span className="compare-rank">#{r.rank}</span>
+                <strong>{r.area}</strong>
+                {r.neighbourhood && <span className="compare-sub">{r.neighbourhood.name}</span>}
+              </div>
+            ))}
+
+            {rows.map((row) => {
+              const values = results.map((r) => row.get(r))
+              const known = values.filter((v) => v != null)
+              const best = row.better === 'low' ? Math.min(...known) : Math.max(...known)
+              const max = Math.max(...known)
+              return [
+                <div className="compare-label" key={row.label}>{row.label}</div>,
+                ...results.map((r, i) => {
+                  const v = values[i]
+                  const isBest = v != null && v === best
+                  return (
+                    <div className={isBest ? 'compare-cell best' : 'compare-cell'} key={row.label + r.rank}>
+                      {v == null ? (
+                        <span className="compare-na">Not available</span>
+                      ) : (
+                        <>
+                          <span className="compare-value">
+                            {row.show(v)}
+                            {isBest && <span className="compare-badge">Best</span>}
+                          </span>
+                          <span className="compare-bar">
+                            <span style={{ width: `${max ? Math.max((v / max) * 100, 4) : 0}%` }} />
+                          </span>
+                          {row.label === 'Monthly rent' && budget && (
+                            <span className={v <= budget ? 'compare-note ok' : 'compare-note over'}>
+                              {v <= budget ? 'Within budget' : `${euro(v - budget)} over`}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )
+                }),
+              ]
+            })}
+          </div>
+        </section>
+      )}
+    </div>
+  )
+}
+
 function Results() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -667,6 +745,7 @@ function Results() {
                 />
               ))}
             </div>
+            <CompareAreas results={data.recommendations} budget={data.budget} />
             <LettingAgents />
           </>
         )}
