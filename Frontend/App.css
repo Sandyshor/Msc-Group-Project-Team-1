@@ -2216,13 +2216,7 @@ html {
   }
 
   .questionnaire-page:has(.results-container) {
-    background-color: #f7f2e8;
-    background-image:
-      linear-gradient(28deg, transparent 48%, rgba(114, 139, 112, .08) 49%, rgba(114, 139, 112, .08) 50%, transparent 51%),
-      linear-gradient(112deg, transparent 44%, rgba(114, 139, 112, .06) 45%, rgba(114, 139, 112, .06) 46%, transparent 47%),
-      linear-gradient(76deg, transparent 62%, rgba(169, 148, 105, .07) 63%, rgba(169, 148, 105, .07) 64%, transparent 65%),
-      repeating-linear-gradient(0deg, transparent 0 118px, rgba(114, 139, 112, .045) 119px 120px, transparent 121px 220px),
-      repeating-linear-gradient(90deg, transparent 0 146px, rgba(114, 139, 112, .04) 147px 148px, transparent 149px 270px);
+    background: url('/images/questionnaire-background.png') center / cover no-repeat fixed;
   }
 
   .questionnaire-page:has(.results-container) .results-container > h1 {
@@ -2244,6 +2238,19 @@ html {
     border-radius: 0 0 14px 14px;
     background: rgba(255, 253, 247, .94);
     box-shadow: 0 14px 36px rgba(18, 61, 49, .08);
+  }
+
+  .questionnaire-page:has(.results-container) .results-container {
+    display: block;
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .questionnaire-page:has(.results-container) .results-container > h1,
+  .questionnaire-page:has(.results-container) .results-container > h1 + .questionnaire-description {
+    box-sizing: border-box;
+    width: 100%;
   }
 
   .questionnaire-container {
