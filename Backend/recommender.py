@@ -130,6 +130,11 @@ SAME_PLACE_KM = 0.5
 LONG_COMMUTE_FROM_MIN = 30
 LONG_COMMUTE_TO_MIN = 90
 LONG_COMMUTE_KEEP = 0.5
+# Rent above the budget is the same: the student said that's what they can spend, so the whole match score
+# shrinks from the budget down to 40% at 50% over it (fully for "Very important" rent, 2/3 "Important",
+# 1/3 otherwise - the budget is still a limit even when cheap rent isn't a priority).
+OVER_BUDGET_LIMIT = 1.5
+OVER_BUDGET_KEEP = 0.4
 
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
 RATING_TO_WEIGHT = {1: 3, 2: 2, 3: 1, 4: 0}
@@ -737,10 +742,15 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         strength = weights["Commute"] / max(RATING_TO_WEIGHT.values())
         candidates["Commute Penalty"] = 1 - (1 - LONG_COMMUTE_KEEP) * long_commute * strength
         candidates["Match Score"] *= candidates["Commute Penalty"]
-    # Places are ranked directly, so the top picks can be several parts of the same district (Blanchardstown,
-    # Castleknock and Clonsilla in D15) when they suit the student better than other districts
+    over_budget = 1 - _scale(candidates["Rent"], worst=OVER_BUDGET_LIMIT * budget, best=budget)
+    strength = max(weights.get("Rent", 0), 1) / max(RATING_TO_WEIGHT.values())
+    candidates["Budget Penalty"] = 1 - (1 - OVER_BUDGET_KEEP) * over_budget * strength
+    candidates["Match Score"] *= candidates["Budget Penalty"]
+    # One result per district, shown as its best place for this search: changing the commute limit or the
+    # travel mode moves the pick within the district (Blanchardstown -> Clonsilla in D15) rather than
+    # filling the top 3 with parts of one district
     candidates = candidates.sort_values("Match Score", ascending=False)
-    ranked = candidates.reset_index(drop=True)
+    ranked = candidates.drop_duplicates("Area").reset_index(drop=True)
     ranked["Label"] = ranked["Part"] + " (" + ranked["Area"] + ")"
 
     averages = ranked[[f["column"] for f in FACTOR_LOOKUP.values() if f["column"] in ranked]].mean()
@@ -847,6 +857,9 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         if row.get("Commute Penalty", 1) < 0.95:
             lines.append(f"Its long commute (about {row['Commute Minutes']:.0f} minutes {mode_words}) "
                          f"lowers its match score by {(1 - row['Commute Penalty']) * 100:.0f}%.")
+
+        if row["Budget Penalty"] < 0.95:
+            lines.append(f"Being over your budget lowers its match score by {(1 - row['Budget Penalty']) * 100:.0f}%.")
 
         if not good and n > 1:
             lines.insert(0, "This area is about average on the things you care about.")
@@ -1022,6 +1035,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             "compared_with": neighbours(position, row),
             "commute_penalty_pct": (round((1 - float(row["Commute Penalty"])) * 100)
                                     if row.get("Commute Penalty", 1) < 0.95 else None),
+            "budget_penalty_pct": (round((1 - float(row["Budget Penalty"])) * 100)
+                                   if row["Budget Penalty"] < 0.95 else None),
             "profile_stats": profile_stats(row),
         })
 
