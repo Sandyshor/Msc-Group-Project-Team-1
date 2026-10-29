@@ -3,7 +3,8 @@ import { defineConfig } from 'vite'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const amenitiesCsvPath = resolve(process.cwd(), 'Data', 'amenities_osm.csv')
+// Data/ sits next to Frontend/, so resolve from this file's folder (the build runs inside Frontend/)
+const amenitiesCsvPath = resolve(import.meta.dirname, '..', 'Data', 'amenities_osm.csv')
 
 function amenitiesCsvPlugin() {
   return {
@@ -37,4 +38,9 @@ function amenitiesCsvPlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), amenitiesCsvPlugin()],
+  // Frontend/public: images, videos, icons and the map boundaries
+  // (/data/dublin_postcode_boundaries.geojson) used by the District Profile.
+  publicDir: 'public',
+  // District Profile has its own package.json; make sure only one copy of React is bundled.
+  resolve: { dedupe: ['react', 'react-dom'] },
 })
