@@ -32,7 +32,7 @@
 .mini-map .stop-heading { margin: 4px 0 0; color: #91a18c; font-size: 11px; font-weight: 700; }
 .mm-legend-home { display: inline-block; width: 10px; height: 10px; border: 2px solid #fffefa; border-radius: 50%; background: #d94351; box-shadow: 0 0 0 1px #d94351; }
 
-
+/* District picker above the mini map */
 .mini-map-explore { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
 .mini-map-explore label { display: inline-flex; align-items: center; gap: 8px; color: #687968; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
 .mini-map-explore select { padding: 6px 10px; border: 1px solid #dce6d7; border-radius: 9px; background: #fffefa; color: #214b39; font-size: 0.8rem; font-weight: 700; text-transform: none; letter-spacing: 0; }
