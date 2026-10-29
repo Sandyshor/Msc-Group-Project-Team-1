@@ -300,6 +300,9 @@ function WhyThisPlace({ result, place }) {
       {result.commute_penalty_pct != null && (
         <p className="result-muted">The long commute lowers the match score by {result.commute_penalty_pct}%.</p>
       )}
+      {result.budget_penalty_pct != null && (
+        <p className="result-muted">Being over your budget lowers the match score by {result.budget_penalty_pct}%.</p>
+      )}
     </section>
   )
 }
