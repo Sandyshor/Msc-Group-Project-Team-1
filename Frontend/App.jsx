@@ -6,8 +6,6 @@ import Questionnaire from './pages/Questionnaire'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Districts from './pages/Districts'
-import Results from './pages/Results'
-import LanguageSwitcher from './LanguageSwitcher'
 
 function App() {
   const location = useLocation()
@@ -35,7 +33,6 @@ function App() {
 
         
 <div className="nav-actions">
-  <LanguageSwitcher />
   <Link className="nav-cta" to="/questionnaire">
     Find my match <span>↗</span>
   </Link>
@@ -51,7 +48,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/districts" element={<Districts />} />
-          <Route path="/results" element={<Results />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/login" element={<Login />} />
@@ -65,7 +61,7 @@ function App() {
 
       <footer className="footer">
         <Link className="brand footer-brand" to="/">
-          <span className="brand-mark">⌂</span>
+          <img className="footer-logo" src="/images/find-your-dublin-logo.png" alt="" />
           <span>Find Your Dublin</span>
         </Link>
         <p>Helping you find your place in Dublin.</p>
