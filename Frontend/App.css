@@ -2204,6 +2204,12 @@ html {
     background: url('/images/questionnaire-background.png') center / cover no-repeat;
   }
 
+  .questionnaire-page:has(.results-container) {
+    background-size: 100% auto;
+    background-position: center top;
+    background-attachment: fixed;
+  }
+
   .questionnaire-container {
     display: grid;
     grid-template-columns: minmax(280px, .86fr) minmax(0, 1.14fr);
