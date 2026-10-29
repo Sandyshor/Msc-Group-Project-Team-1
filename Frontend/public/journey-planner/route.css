@@ -19,6 +19,9 @@
 .map-hint .spinner { border-color: rgba(255,255,255,.35); border-top-color: var(--lime); }
 @keyframes hint-in { from { opacity: 0; transform: translate(-50%, -8px) scale(.96); } }
 
+.amenity-status { position: absolute; z-index: 600; top: 62px; left: 14px; max-width: min(330px, calc(100% - 28px)); padding: 9px 12px; border: 1px solid rgba(255,255,255,.72); border-radius: 11px; color: #43524a; background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 8px 22px rgba(16,47,42,.12); font-size: 10px; font-weight: 600; line-height: 1.5; }
+.amenity-status.is-error { color: #8c302b; background: rgba(255,248,245,.95); }
+
 .map-legend { position: absolute; z-index: 600; left: 14px; bottom: 26px; display: flex; flex-wrap: wrap; gap: 6px 12px; max-width: calc(100% - 90px); padding: 9px 12px; border-radius: 12px; color: #43524a; background: rgba(255,255,255,.88); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 8px 22px rgba(16,47,42,.12); font-size: 10.5px; font-weight: 600; animation: rise-in .4s ease both; }
 .map-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .map-legend i { width: 18px; height: 5px; border-radius: 3px; background: var(--c); }
@@ -169,7 +172,26 @@
 .landmark { display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid var(--forest-deep); border-radius: 50%; background: #fff; box-shadow: 0 4px 12px rgba(16,47,42,.28); font-size: 15px; line-height: 1; cursor: pointer; transition: transform .15s; }
 .landmark:hover { transform: scale(1.15); }
 .landmark-place { border-color: #b8862f; background: #fffaf0; }
+.landmark-landmark { border-color: #a65c3b; background: #fff4e8; }
 .landmark-airport { width: 38px; height: 38px; margin: -4px 0 0 -4px; border-width: 3px; font-size: 19px; }
 .landmark-tooltip { padding: 6px 9px; border: 0; border-radius: 8px; color: var(--forest-deep); box-shadow: 0 6px 16px rgba(16,47,42,.18); font: 700 12px/1.4 "DM Sans", sans-serif; }
 .landmark-category { color: #7a877f; font-weight: 500; }
-.route-map .leaflet-control-layers { border: 0; border-radius: 10px; box-shadow: 0 8px 22px rgba(16,47,42,.12); font: 600 12px "DM Sans", sans-serif; color: #43524a; }
+.amenity-marker-icon { border: 0; background: transparent; }
+.amenity-marker { display: grid; place-items: center; width: 32px; height: 32px; border: 2px solid #fff; border-radius: 50%; color: #fff; background: var(--amenity-color); box-shadow: 0 3px 10px rgba(16,47,42,.3); font-size: 16px; line-height: 1; transition: transform .16s ease; }
+.amenity-marker:hover { transform: scale(1.13); }
+.amenity-supermarkets { --amenity-color: #2f7b50; }
+.amenity-groceries { --amenity-color: #58835a; }
+.amenity-pharmacies { --amenity-color: #7054a0; }
+.amenity-hospitals { --amenity-color: #bd4138; }
+.amenity-shopping { --amenity-color: #bd7627; }
+.amenity-parks { --amenity-color: #4b8550; }
+.amenity-landmarks { --amenity-color: #a65c3b; }
+.amenity-tooltip small { display: block; margin-top: 2px; color: #a9beb0; font-size: 9px; font-weight: 600; }
+.route-map .leaflet-control-layers { max-width: min(270px, calc(100vw - 30px)); border: 0; border-radius: 10px; box-shadow: 0 8px 22px rgba(16,47,42,.12); font: 600 12px "DM Sans", sans-serif; color: #43524a; }
+.route-map .leaflet-control-layers-list { max-height: min(52vh, 360px); overflow-y: auto; }
+.route-map .leaflet-control-layers label { padding: 3px 1px; }
+.route-map .leaflet-control-layers-separator { margin: 7px 0; }
+
+@media (max-width: 650px) {
+  .amenity-status { top: 12px; left: 12px; max-width: min(250px, calc(100% - 72px)); }
+}

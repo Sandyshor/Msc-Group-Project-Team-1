@@ -1,0 +1,17 @@
+[
+  { "name": "Technological University Dublin — Aungier Street Campus", "lat": 53.3385, "lon": -6.2663 },
+  { "name": "Technological University Dublin — Bolton Street Campus", "lat": 53.3533, "lon": -6.2697 },
+  { "name": "Technological University Dublin — Grangegorman Campus", "lat": 53.3547, "lon": -6.2789 },
+  { "name": "Technological University Dublin — Blanchardstown Campus", "lat": 53.4065, "lon": -6.3759 },
+  { "name": "Technological University Dublin — Tallaght Campus", "lat": 53.2892, "lon": -6.3738 },
+  { "name": "Trinity College Dublin", "lat": 53.3437061, "lon": -6.2544278 },
+  { "name": "University College Dublin — Belfield", "lat": 53.3068499, "lon": -6.2246268 },
+  { "name": "Dublin City University — Glasnevin Campus", "lat": 53.3852, "lon": -6.2578 },
+  { "name": "Dublin City University — St Patrick's Campus", "lat": 53.3708, "lon": -6.2519 },
+  { "name": "Royal College of Surgeons in Ireland", "lat": 53.3384, "lon": -6.2632 },
+  { "name": "National College of Art and Design", "lat": 53.3428, "lon": -6.2793 },
+  { "name": "Griffith College Dublin", "lat": 53.3368, "lon": -6.2781 },
+  { "name": "National College of Ireland — IFSC", "lat": 53.3482, "lon": -6.2438 },
+  { "name": "Dublin Business School", "lat": 53.3387, "lon": -6.2663 },
+  { "name": "IADT — Dún Laoghaire", "lat": 53.2878, "lon": -6.1358 }
+]

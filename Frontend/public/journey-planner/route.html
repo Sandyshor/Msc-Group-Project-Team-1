@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="styles.css?v=4" />
-  <link rel="stylesheet" href="route.css?v=6" />
+  <link rel="stylesheet" href="route.css?v=9" />
 </head>
 <body>
   <div class="app-shell route-shell">
@@ -20,6 +20,7 @@
           <div id="routeMap" class="route-map" aria-label="Map: click to set start and end points"></div>
           <div class="map-vignette" aria-hidden="true"></div>
           <div id="mapHint" class="map-hint" aria-live="polite">Click the map to set your <strong>start</strong> point</div>
+          <div id="amenityStatus" class="amenity-status" role="status" aria-live="polite" hidden></div>
           <div id="mapLegend" class="map-legend" hidden>
             <span><i class="legend-walk"></i>Walk</span>
             <span><i style="--c:#1d63a8"></i>Bus</span>
@@ -67,13 +68,13 @@
               <g class="empty-pin empty-pin-b" transform="translate(210 30)"><path d="M0 0 C -9 -12 -11 -16 -11 -21 a11 11 0 0 1 22 0 c0 5 -2 9 -11 21z"/><text y="-17">B</text></g>
             </svg>
             <strong>Where are you going?</strong>
-            <p>Click once on the map for your start, again for your destination, or click a 🎓 university or famous place, such as ✈️ Dublin Airport. Drag either pin to adjust the route.</p>
+            <p>Click the map to set your start and destination, or choose a university, famous place or amenity from the map layers. Drag either pin to adjust the route.</p>
           </div>
         </aside>
       </section>
     </main>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="route.js?v=6"></script>
+  <script src="route.js?v=10"></script>
 </body>
 </html>
