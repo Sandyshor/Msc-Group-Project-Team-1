@@ -1314,6 +1314,14 @@ h1 em { color: #8a9d79; font-weight: 500; }
   margin-bottom: 8px;
 }
 
+.question-group > .question-label {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 21px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
 .field-hint {
   color: #718075;
   font-size: 13px;
@@ -1406,6 +1414,107 @@ h1 em { color: #8a9d79; font-weight: 500; }
   padding: 14px;
 }
 
+.questionnaire-step-2 .importance-group {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 0;
+}
+
+.importance-group legend {
+  float: none;
+  width: 100%;
+  padding: 0;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.importance-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.importance-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #e0d8c9;
+  border-radius: 7px;
+  background: #fffdf7;
+  color: #52685b;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.importance-option.selected {
+  border-color: #173f32;
+  background: #edf0e6;
+  color: #173f32;
+}
+
+.importance-option input,
+.recreation-options input {
+  accent-color: #173f32;
+}
+
+.recreation-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #e7dfd0;
+  border-radius: 8px;
+}
+
+.recreation-options legend {
+  width: auto;
+  padding: 0 5px;
+  color: #617067;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.recreation-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #52685b;
+  font-size: 13px;
+}
+
+.questionnaire-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.questionnaire-actions .questionnaire-next {
+  flex: 1;
+}
+
+.questionnaire-previous {
+  flex: 0 0 auto;
+  padding: 16px 20px;
+  border: 1px solid #d8d1c4;
+  border-radius: 7px;
+  background: #fffdf7;
+  color: #173f32;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.questionnaire-previous:hover {
+  background: #edf0e6;
+}
+
 .questionnaire-next {
   display: flex;
   align-items: center;
@@ -1426,6 +1535,18 @@ h1 em { color: #8a9d79; font-weight: 500; }
   background: #245542;
 }
 
+.questionnaire-next:disabled {
+  cursor: default;
+  opacity: .8;
+}
+
+.questionnaire-submit-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #245542;
+  font-size: 14px;
+}
+
 @media (max-width: 520px) {
   .questionnaire-page {
     padding: 32px 16px 55px;
@@ -1443,6 +1564,10 @@ h1 em { color: #8a9d79; font-weight: 500; }
     min-height: auto;
     flex-direction: row;
     align-items: center;
+  }
+
+  .importance-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -2076,9 +2201,7 @@ html {
     align-items: center;
     min-height: calc(100vh - 76px);
     padding: 48px clamp(36px, 6vw, 100px) 72px;
-    background:
-      linear-gradient(90deg, rgba(247, 242, 232, .25) 0%, rgba(247, 242, 232, .48) 37%, #f7f2e8 63%),
-      url('/images/hero-dublin.jpg') left center / cover no-repeat;
+    background: url('/images/questionnaire-background.png') center / cover no-repeat;
   }
 
   .questionnaire-container {
@@ -2092,7 +2215,6 @@ html {
 
   .questionnaire-container > .back-link {
     grid-column: 1 / -1;
-    justify-self: start;
     margin-bottom: 30px;
   }
 
@@ -2137,8 +2259,12 @@ html {
     padding: 20px;
   }
 
-  .questionnaire-container .question-group:last-of-type,
+  .questionnaire-container .questionnaire-step-1 > .question-group:last-of-type,
   .questionnaire-container .questionnaire-next {
+    grid-column: 1 / -1;
+  }
+
+  .questionnaire-container .questionnaire-actions {
     grid-column: 1 / -1;
   }
 
