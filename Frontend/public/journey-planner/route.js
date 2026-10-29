@@ -305,6 +305,22 @@ const AMENITY_CATEGORIES = {
     color: "#2f7b50",
     csvCategory: "Supermarkets",
   },
+  tesco: { label: "Tesco stores", brand: "Tesco", brandNames: ["tesco"], csvCategory: "Supermarkets", icon: "TESCO" },
+  spar: { label: "Spar stores", brand: "Spar", brandNames: ["spar"], csvCategory: "Groceries", icon: "SPAR" },
+  dunnes: { label: "Dunnes Stores", brand: "Dunnes", brandNames: ["dunnes"], csvCategory: "Supermarkets", icon: "DUNNES" },
+  aldi: { label: "Aldi stores", brand: "Aldi", brandNames: ["aldi"], csvCategory: "Supermarkets", icon: "ALDI" },
+  centra: { label: "Centra stores", brand: "Centra", brandNames: ["centra"], csvCategory: "Groceries", icon: "CENTRA" },
+  lidl: { label: "Lidl stores", brand: "Lidl", brandNames: ["lidl"], csvCategory: "Supermarkets", icon: "LIDL" },
+  supervalu: { label: "SuperValu stores", brand: "SuperValu", brandNames: ["supervalu"], csvCategory: "Groceries", icon: "SUPERVALU" },
+  circlek: { label: "Circle K stores", brand: "Circle K", brandNames: ["circle k"], csvCategory: "Groceries", icon: "CIRCLE K" },
+  mace: { label: "Mace stores", brand: "Mace", brandNames: ["mace"], csvCategory: "Groceries", icon: "MACE" },
+  daybreak: { label: "Daybreak stores", brand: "Daybreak", brandNames: ["daybreak"], csvCategory: "Groceries", icon: "DAYBREAK" },
+  londis: { label: "Londis stores", brand: "Londis", brandNames: ["londis"], csvCategory: "Groceries", icon: "LONDIS" },
+  eurospar: { label: "Eurospar stores", brand: "Eurospar", brandNames: ["eurospar"], csvCategory: "Groceries", icon: "EUROSPAR" },
+  polonez: { label: "Polonez stores", brand: "Polonez", brandNames: ["polonez"], csvCategory: "Groceries", icon: "POLONEZ" },
+  gala: { label: "Gala stores", brand: "Gala", brandNames: ["gala"], csvCategory: "Groceries", icon: "GALA" },
+  costcutter: { label: "Costcutter stores", brand: "Costcutter", brandNames: ["costcutter"], csvCategory: "Groceries", icon: "COSTCUTTER" },
+  daytoday: { label: "Day-Today stores", brand: "Day-Today", brandNames: ["day-today"], csvCategory: "Groceries", icon: "DAY-TODAY" },
   groceries: {
     label: "Groceries & convenience",
     icon: "🧺",
@@ -346,7 +362,12 @@ const amenityLayers = Object.fromEntries(
 );
 amenityLayers.landmarks = cityLandmarkLayer;
 const amenityOverlayNames = Object.fromEntries(
-  Object.entries(AMENITY_CATEGORIES).map(([key, category]) => [`${category.icon} ${category.label}`, amenityLayers[key]]),
+  Object.entries(AMENITY_CATEGORIES).map(([key, category]) => [
+    category.brand
+      ? `<span class="layer-subcategory"><span class="brand-logo brand-logo-${key}">${category.icon}</span><span>${category.label}</span></span>`
+      : `${category.icon} ${category.label}`,
+    amenityLayers[key],
+  ]),
 );
 const overlays = {
   "🎓 Universities": universityLayer,
@@ -369,6 +390,25 @@ function setAmenityStatus(message = "") {
   amenityStatus.textContent = message;
   amenityStatus.hidden = !message;
   amenityStatus.classList.toggle("is-error", message.startsWith("Could not load"));
+}
+
+function recordMatchesAmenityLayer(record, key) {
+  const category = AMENITY_CATEGORIES[key];
+  if (!category.csvCategory) return false;
+  if (category.brandNames) {
+    if (!["Supermarkets", "Groceries"].includes(record.category)) return false;
+    const name = record.name.trim().toLocaleLowerCase();
+    return category.brandNames.some(brand => name === brand || name.startsWith(`${brand} `));
+  }
+  if (record.category !== category.csvCategory) return false;
+  const isBranded = Object.values(AMENITY_CATEGORIES).some(candidate =>
+    candidate.brandNames?.some(brand => {
+      const name = record.name.trim().toLocaleLowerCase();
+      return name === brand || name.startsWith(`${brand} `);
+    }),
+  );
+  if (key === "supermarkets" || key === "groceries") return !isBranded;
+  return true;
 }
 
 function parseCsv(text) {
@@ -454,15 +494,11 @@ function loadAmenityRecords() {
 function renderAmenities(keys) {
   keys.forEach(key => amenityLayers[key].clearLayers());
   const bounds = map.getBounds();
-  const enabledCsvCategories = new Map(
-    keys.filter(key => AMENITY_CATEGORIES[key].csvCategory)
-      .map(key => [AMENITY_CATEGORIES[key].csvCategory, key]),
-  );
   const seenPlaces = new Set();
   let count = 0;
 
   amenityRecords.forEach(record => {
-    const key = enabledCsvCategories.get(record.category);
+    const key = keys.find(candidate => recordMatchesAmenityLayer(record, candidate));
     if (
       !key ||
       !DUBLIN_BOUNDS.contains([record.latitude, record.longitude]) ||
@@ -474,11 +510,15 @@ function renderAmenities(keys) {
     if (seenPlaces.has(placeKey)) return;
     seenPlaces.add(placeKey);
 
+    const markerContent = category.brand
+      ? `<span class="brand-logo brand-logo-${key}" aria-hidden="true">${category.icon}</span>`
+      : category.icon;
+    const markerSize = category.brand ? 40 : 32;
     const icon = L.divIcon({
       className: "amenity-marker-icon",
-      html: `<span class="amenity-marker amenity-${key}" aria-hidden="true">${category.icon}</span>`,
-      iconSize: [32, 32],
-      iconAnchor: [16, 16],
+      html: `<span class="amenity-marker amenity-${key}" aria-hidden="true">${markerContent}</span>`,
+      iconSize: [markerSize, markerSize],
+      iconAnchor: [markerSize / 2, markerSize / 2],
     });
     const latlng = L.latLng(record.latitude, record.longitude);
     const marker = L.marker(latlng, {
@@ -521,8 +561,9 @@ async function updateAmenities() {
     if (!amenityRecords) await loadAmenityRecords();
     const currentKeys = activeAmenityKeys();
     const count = renderAmenities(currentKeys);
-    const csvCategories = currentKeys.map(key => AMENITY_CATEGORIES[key].csvCategory).filter(Boolean);
-    const csvCount = amenityRecords.filter(record => csvCategories.includes(record.category)).length;
+    const csvCount = amenityRecords.filter(record =>
+      currentKeys.some(key => recordMatchesAmenityLayer(record, key)),
+    ).length;
     setAmenityStatus(`Showing ${count} places in this map view (${csvCount} matching CSV records). Source: amenities_osm.csv, based on OpenStreetMap data.`);
   } catch (error) {
     console.error("Could not load nearby places from amenities_osm.csv.", error);
