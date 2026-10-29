@@ -3,6 +3,7 @@
 // Only the Vite dev server (npm run dev, port 5173) needs to point at the backend on port 8000.
 const API_BASE = location.port === "5173" ? "http://127.0.0.1:8000" : "";
 const DUBLIN_CENTRE = [53.3498, -6.2603];
+const DUBLIN_BOUNDS = L.latLngBounds([53.24, -6.48], [53.46, -6.0]);
 // First view: the city centre and Dublin Airport together
 const START_VIEW = [[53.330, -6.300], [53.430, -6.215]];
 const START_PADDING = { paddingTopLeft: [30, 90], paddingBottomRight: [30, 70] };  // clear of the hint and legend
@@ -13,6 +14,7 @@ const TRAVEL_MS = 6500;        // one lap of the travelling dot
 
 const mapHint = document.getElementById("mapHint");
 const mapLegend = document.getElementById("mapLegend");
+const amenityStatus = document.getElementById("amenityStatus");
 const resetBtn = document.getElementById("routeResetBtn");
 const timeType = document.getElementById("timeType");
 const timeInput = document.getElementById("timeInput");
@@ -228,14 +230,12 @@ function choosePoint(latlng) {
 map.on("click", event => choosePoint(event.latlng));
 
 // ---------------------------------------------------------------- universities and famous places
-// 🎓 universities come from the backend's /universities; famous places (airport, stations, sights)
-// from places.json next to this page, so the team can add places without touching the code.
+// Curated, local coordinate lists keep the planner independent of backend commute-data centroids.
 // Clicking a marker uses it as the start or destination, or moves the destination there once both
 // pins are set. Points within 60 m of each other share a marker.
 const universityLayer = L.layerGroup().addTo(map);
 const placeLayer = L.layerGroup().addTo(map);
-L.control.layers(null, { "🎓 Universities": universityLayer, "📍 Famous places": placeLayer },
-  { position: "topright", collapsed: false }).addTo(map);
+const cityLandmarkLayer = L.layerGroup();
 
 function useLandmark(latlng) {
   if (startMarker && endMarker) {
@@ -250,6 +250,7 @@ function useLandmark(latlng) {
 function addLandmarks(list, layer, kind) {
   const groups = [];
   list.forEach(item => {
+    if (!Number.isFinite(item.lat) || !Number.isFinite(item.lon)) return;
     const latlng = L.latLng(item.lat, item.lon);
     const group = groups.find(g => map.distance(g.latlng, latlng) < 60);
     if (group) group.items.push(item);
@@ -274,13 +275,265 @@ function addLandmarks(list, layer, kind) {
 
 function loadLandmarks(url, layer, kind) {
   fetch(url, { headers: { Accept: "application/json" } })
-    .then(response => (response.ok ? response.json() : []))
-    .then(list => addLandmarks(list, layer, kind))
-    .catch(() => {});  // the planner still works without the markers
+    .then(response => {
+      if (!response.ok) throw new Error(`Could not load map places (${response.status})`);
+      return response.json();
+    })
+    .then(list => {
+      if (!Array.isArray(list)) throw new Error("Map places response must be a list");
+      addLandmarks(list, layer, kind);
+      if (kind === "place") {
+        addLandmarks(
+          list.filter(item => !["Airport", "Rail station"].includes(item.category)),
+          cityLandmarkLayer,
+          "landmark",
+        );
+        if (map.hasLayer(cityLandmarkLayer)) updateAmenities();
+      }
+    })
+    .catch(error => console.error(`Could not load ${kind} locations from ${url}.`, error));
 }
 
-loadLandmarks(`${API_BASE}/universities`, universityLayer, "uni");
+loadLandmarks("universities.json", universityLayer, "uni");
 loadLandmarks("places.json", placeLayer, "place");
+
+// The supplied OSM CSV is the source of truth for mapped local amenities.
+const AMENITY_CATEGORIES = {
+  supermarkets: {
+    label: "Supermarkets",
+    icon: "🛒",
+    color: "#2f7b50",
+    csvCategory: "Supermarkets",
+  },
+  groceries: {
+    label: "Groceries & convenience",
+    icon: "🧺",
+    color: "#58835a",
+    csvCategory: "Groceries",
+  },
+  pharmacies: {
+    label: "Pharmacies",
+    icon: "💊",
+    color: "#7054a0",
+    csvCategory: "Pharmacies",
+  },
+  hospitals: {
+    label: "Hospitals",
+    icon: "🏥",
+    color: "#bd4138",
+    csvCategory: "Hospitals",
+  },
+  shopping: {
+    label: "Shopping centres",
+    icon: "🛍️",
+    color: "#bd7627",
+    csvCategory: "Shopping_Malls",
+  },
+  parks: {
+    label: "Parks",
+    icon: "🌳",
+    color: "#4b8550",
+    csvCategory: "Parks",
+  },
+  landmarks: {
+    label: "City landmarks",
+    icon: "🏛️",
+    color: "#a65c3b",
+  },
+};
+const amenityLayers = Object.fromEntries(
+  Object.entries(AMENITY_CATEGORIES).map(([key]) => [key, L.layerGroup()]),
+);
+amenityLayers.landmarks = cityLandmarkLayer;
+const amenityOverlayNames = Object.fromEntries(
+  Object.entries(AMENITY_CATEGORIES).map(([key, category]) => [`${category.icon} ${category.label}`, amenityLayers[key]]),
+);
+const overlays = {
+  "🎓 Universities": universityLayer,
+  "📍 Famous places": placeLayer,
+  ...amenityOverlayNames,
+};
+L.control.layers(null, overlays, {
+  position: "topright",
+  collapsed: window.matchMedia("(max-width: 650px)").matches,
+}).addTo(map);
+
+let amenityRecords = null;
+let amenityLoad = null;
+
+function activeAmenityKeys() {
+  return Object.keys(AMENITY_CATEGORIES).filter(key => map.hasLayer(amenityLayers[key]));
+}
+
+function setAmenityStatus(message = "") {
+  amenityStatus.textContent = message;
+  amenityStatus.hidden = !message;
+  amenityStatus.classList.toggle("is-error", message.startsWith("Could not load"));
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let quoted = false;
+
+  for (let index = 0; index < text.length; index++) {
+    const character = text[index];
+    if (quoted) {
+      if (character === '"' && text[index + 1] === '"') {
+        field += '"';
+        index++;
+      } else if (character === '"') {
+        quoted = false;
+      } else {
+        field += character;
+      }
+    } else if (character === '"' && field.length === 0) {
+      quoted = true;
+    } else if (character === ",") {
+      row.push(field);
+      field = "";
+    } else if (character === "\n" || character === "\r") {
+      row.push(field);
+      if (row.some(value => value.length)) rows.push(row);
+      row = [];
+      field = "";
+      if (character === "\r" && text[index + 1] === "\n") index++;
+    } else {
+      field += character;
+    }
+  }
+  if (field.length || row.length) {
+    row.push(field);
+    if (row.some(value => value.length)) rows.push(row);
+  }
+  if (rows.length < 2) throw new Error("Amenities CSV contains no place records");
+
+  const headers = rows[0].map(header => header.trim().replace(/^\uFEFF/, ""));
+  const indexes = Object.fromEntries(headers.map((header, index) => [header, index]));
+  for (const required of ["Area", "name", "category", "latitude", "longitude"]) {
+    if (indexes[required] === undefined) throw new Error(`Amenities CSV is missing the ${required} column`);
+  }
+
+  return rows.slice(1).map(values => {
+    const latitude = Number(values[indexes.latitude]);
+    const longitude = Number(values[indexes.longitude]);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      throw new Error("Amenities CSV contains an invalid latitude or longitude");
+    }
+    return {
+      area: values[indexes.Area],
+      name: values[indexes.name],
+      category: values[indexes.category],
+      latitude,
+      longitude,
+    };
+  });
+}
+
+function loadAmenityRecords() {
+  if (!amenityLoad) {
+    amenityLoad = fetch("amenities_osm.csv", { headers: { Accept: "text/csv" } })
+      .then(response => {
+        if (!response.ok) throw new Error(`Amenities CSV request failed (${response.status})`);
+        return response.text();
+      })
+      .then(parseCsv)
+      .then(records => {
+        amenityRecords = records;
+        return records;
+      })
+      .catch(error => {
+        amenityLoad = null;
+        throw error;
+      });
+  }
+  return amenityLoad;
+}
+
+function renderAmenities(keys) {
+  keys.forEach(key => amenityLayers[key].clearLayers());
+  const bounds = map.getBounds();
+  const enabledCsvCategories = new Map(
+    keys.filter(key => AMENITY_CATEGORIES[key].csvCategory)
+      .map(key => [AMENITY_CATEGORIES[key].csvCategory, key]),
+  );
+  const seenPlaces = new Set();
+  let count = 0;
+
+  amenityRecords.forEach(record => {
+    const key = enabledCsvCategories.get(record.category);
+    if (
+      !key ||
+      !DUBLIN_BOUNDS.contains([record.latitude, record.longitude]) ||
+      !bounds.contains([record.latitude, record.longitude])
+    ) return;
+    const category = AMENITY_CATEGORIES[key];
+    const name = record.name.trim() || `Unnamed ${category.label.toLowerCase()}`;
+    const placeKey = `${key}|${name.toLocaleLowerCase()}|${record.latitude.toFixed(5)}|${record.longitude.toFixed(5)}`;
+    if (seenPlaces.has(placeKey)) return;
+    seenPlaces.add(placeKey);
+
+    const icon = L.divIcon({
+      className: "amenity-marker-icon",
+      html: `<span class="amenity-marker amenity-${key}" aria-hidden="true">${category.icon}</span>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+    const latlng = L.latLng(record.latitude, record.longitude);
+    const marker = L.marker(latlng, {
+      icon,
+      title: `${name} · ${category.label} · ${record.area}`,
+      keyboard: true,
+    })
+      .bindTooltip(`${escapeHtml(name)}<small>${escapeHtml(category.label)} · ${escapeHtml(record.area)}</small>`, {
+        direction: "top",
+        offset: [0, -14],
+        className: "landmark-tooltip amenity-tooltip",
+      })
+      .on("click", () => useLandmark(latlng));
+
+    marker.addTo(amenityLayers[key]);
+    count++;
+  });
+  return count;
+}
+
+async function updateAmenities() {
+  const keys = activeAmenityKeys();
+  if (!keys.length) {
+    Object.values(amenityLayers).forEach(layer => layer.clearLayers());
+    setAmenityStatus();
+    return;
+  }
+  if (keys.every(key => !AMENITY_CATEGORIES[key].csvCategory)) {
+    setAmenityStatus(`Showing ${cityLandmarkLayer.getLayers().length} curated city landmarks.`);
+    return;
+  }
+  if (map.getZoom() < 12) {
+    keys.filter(key => AMENITY_CATEGORIES[key].csvCategory)
+      .forEach(key => amenityLayers[key].clearLayers());
+    setAmenityStatus("Zoom in to level 12 to see local amenities.");
+    return;
+  }
+  if (!amenityRecords) setAmenityStatus("Loading local amenities from amenities_osm.csv…");
+  try {
+    if (!amenityRecords) await loadAmenityRecords();
+    const currentKeys = activeAmenityKeys();
+    const count = renderAmenities(currentKeys);
+    const csvCategories = currentKeys.map(key => AMENITY_CATEGORIES[key].csvCategory).filter(Boolean);
+    const csvCount = amenityRecords.filter(record => csvCategories.includes(record.category)).length;
+    setAmenityStatus(`Showing ${count} places in this map view (${csvCount} matching CSV records). Source: amenities_osm.csv, based on OpenStreetMap data.`);
+  } catch (error) {
+    console.error("Could not load nearby places from amenities_osm.csv.", error);
+    setAmenityStatus("Could not load amenities_osm.csv. Check the planner data file and reload.");
+  }
+}
+
+map.on("overlayadd overlayremove", event => {
+  if (Object.values(amenityLayers).includes(event.layer)) updateAmenities();
+});
+map.on("moveend", updateAmenities);
 
 // ---------------------------------------------------------------- panel states
 function showLoading() {
