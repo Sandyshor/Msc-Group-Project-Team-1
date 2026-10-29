@@ -397,13 +397,18 @@ function ResultCard({ result, modeWords, maxCommute }) {
 
       <dl className="result-stats">
         <div>
-          <dt>Average rent</dt>
+          <dt>Average rent in {result.area}</dt>
           <dd>
             {euro(result.rent)}/month
             <span className={withinBudget ? 'budget-tag within' : 'budget-tag above'}>
               {withinBudget
                 ? `${euro(-result.budget_difference)} under budget`
                 : `${euro(result.budget_difference)} over budget`}
+            </span>
+            {/* Rent data is per postal district, so every place in a district shows the same average */}
+            <span className="rent-note">
+              For all of {result.area}
+              {result.rent_listings != null ? ` · from ${result.rent_listings} listings` : ' · registered rents (RTB)'}
             </span>
           </dd>
         </div>
