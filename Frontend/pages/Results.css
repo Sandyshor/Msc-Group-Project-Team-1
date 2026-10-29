@@ -7,6 +7,20 @@
   max-width: 820px;
 }
 
+/* The questionnaire's two-column wide-screen layout (App.css) is not used for results:
+   keep them in one centred column */
+@media (min-width: 1001px) {
+  .questionnaire-container.results-container {
+    display: block;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .results-container form {
+    display: block;
+  }
+}
+
 .results-status {
   display: flex;
   flex-direction: column;
