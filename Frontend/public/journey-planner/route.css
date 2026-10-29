@@ -179,7 +179,63 @@
 .amenity-marker-icon { border: 0; background: transparent; }
 .amenity-marker { display: grid; place-items: center; width: 32px; height: 32px; border: 2px solid #fff; border-radius: 50%; color: #fff; background: var(--amenity-color); box-shadow: 0 3px 10px rgba(16,47,42,.3); font-size: 16px; line-height: 1; transition: transform .16s ease; }
 .amenity-marker:hover { transform: scale(1.13); }
+.amenity-marker.amenity-tesco,
+.amenity-marker.amenity-spar,
+.amenity-marker.amenity-dunnes,
+.amenity-marker.amenity-aldi,
+.amenity-marker.amenity-centra,
+.amenity-marker.amenity-lidl,
+.amenity-marker.amenity-supervalu,
+.amenity-marker.amenity-circlek,
+.amenity-marker.amenity-mace,
+.amenity-marker.amenity-daybreak,
+.amenity-marker.amenity-londis,
+.amenity-marker.amenity-eurospar,
+.amenity-marker.amenity-polonez,
+.amenity-marker.amenity-gala,
+.amenity-marker.amenity-costcutter,
+.amenity-marker.amenity-daytoday { width: 46px; height: 46px; border: 0; color: inherit; background: #fff; }
+.brand-logo { position: relative; display: inline-grid; place-items: center; width: 34px; height: 24px; overflow: hidden; border: 2px solid currentColor; border-radius: 5px; color: #244b80; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.12); font: 900 7px/1 "Manrope", sans-serif; letter-spacing: -.35px; text-align: center; }
+.amenity-marker .brand-logo { width: 37px; height: 27px; font-size: 8px; }
+.brand-logo-tesco { border-color: #e31b34; color: #e31b34; background: linear-gradient(180deg,#fff 0 72%,#fce5e8 72%); font-size: 9px; font-style: italic; }
+.brand-logo-spar { border-color: #168441; color: #168441; background: linear-gradient(135deg,#fff 0 65%,#e7f4e9 65%); font-size: 9px; }
+.brand-logo-spar::before { position: absolute; top: 2px; left: 3px; width: 5px; height: 5px; border-radius: 50% 50% 50% 0; background: #e3322c; content: ""; transform: rotate(-45deg); }
+.brand-logo-dunnes { border-color: #244b80; color: #244b80; background: linear-gradient(180deg,#fff 0 70%,#e8eef6 70%); font-size: 7px; letter-spacing: -.5px; }
+.brand-logo-aldi { border-color: #064e9b; color: #064e9b; background: linear-gradient(135deg,#fff 0 42%,#e6f0fb 42%); font-size: 9px; font-style: italic; }
+.brand-logo-aldi::before { position: absolute; top: 2px; left: 3px; width: 4px; height: 3px; border-top: 2px solid #e53235; border-bottom: 1px solid #e53235; content: ""; }
+.brand-logo-centra { border-color: #d5232f; color: #fff; background: linear-gradient(180deg,#e82b38 0 68%,#ffcf24 68%); font-size: 8px; }
+.brand-logo-lidl { border: 3px solid #134f9b; border-radius: 50%; color: #064e9b; background: #ffdf00; font-size: 9px; font-style: italic; }
+.brand-logo-lidl::after { position: absolute; top: 3px; right: 5px; width: 5px; height: 5px; border-radius: 50%; background: #e5322b; content: ""; }
+.brand-logo-supervalu { border: 0; color: #bd1934; background: linear-gradient(135deg,#fff 0 55%,#e8f4eb 55%); font-size: 7px; font-style: italic; }
+.brand-logo-supervalu::after { position: absolute; right: 3px; bottom: 3px; width: 7px; height: 4px; border-radius: 7px 0; background: #318b4c; content: ""; transform: rotate(-25deg); }
+.brand-logo-circlek { border: 2px solid #e5222a; border-radius: 50%; color: #e5222a; background: #fff; font-size: 10px; }
+.brand-logo-mace { border-color: #d3272f; color: #fff; background: linear-gradient(135deg,#d3272f 0 48%,#fff 48%); font-size: 9px; text-shadow: 0 1px 1px #8f1720; }
+.brand-logo-daybreak { border-color: #e17a20; color: #99500e; background: linear-gradient(180deg,#fff 0 55%,#ffd777 55%); font-size: 6px; }
+.brand-logo-daybreak::before { position: absolute; top: 2px; width: 7px; height: 7px; border-radius: 50%; background: #f3a322; content: ""; }
+.brand-logo-londis { border-color: #14539a; color: #14539a; background: linear-gradient(135deg,#fff 0 70%,#5ca45e 70%); font-size: 8px; font-style: italic; }
+.brand-logo-eurospar { border-color: #16783e; color: #16783e; background: linear-gradient(135deg,#fff 0 73%,#e53235 73%); font-size: 7px; }
+.brand-logo-polonez { border-color: #315d9c; color: #315d9c; background: linear-gradient(90deg,#fff 0 50%,#f6e8e8 50%); font-size: 7px; }
+.brand-logo-gala { border-color: #c52535; color: #c52535; background: linear-gradient(180deg,#fff 0 70%,#ffd444 70%); font-size: 9px; font-style: italic; }
+.brand-logo-costcutter { border-color: #258545; color: #258545; background: linear-gradient(135deg,#fff 0 55%,#f4d84c 55%); font-size: 6px; }
+.brand-logo-daytoday { border-color: #d5252d; color: #fff; background: linear-gradient(135deg,#d5252d 0 50%,#245a9a 50%); font-size: 6px; }
+.layer-subcategory { display: inline-flex; align-items: center; gap: 7px; margin-left: 18px; }
 .amenity-supermarkets { --amenity-color: #2f7b50; }
+.amenity-tesco { --amenity-color: #e31b34; }
+.amenity-spar { --amenity-color: #168441; }
+.amenity-dunnes { --amenity-color: #244b80; }
+.amenity-aldi { --amenity-color: #064e9b; }
+.amenity-centra { --amenity-color: #d5232f; }
+.amenity-lidl { --amenity-color: #064e9b; }
+.amenity-supervalu { --amenity-color: #d21e38; }
+.amenity-circlek { --amenity-color: #e5222a; }
+.amenity-mace { --amenity-color: #d3272f; }
+.amenity-daybreak { --amenity-color: #e17a20; }
+.amenity-londis { --amenity-color: #14539a; }
+.amenity-eurospar { --amenity-color: #16783e; }
+.amenity-polonez { --amenity-color: #315d9c; }
+.amenity-gala { --amenity-color: #c52535; }
+.amenity-costcutter { --amenity-color: #258545; }
+.amenity-daytoday { --amenity-color: #d5252d; }
 .amenity-groceries { --amenity-color: #58835a; }
 .amenity-pharmacies { --amenity-color: #7054a0; }
 .amenity-hospitals { --amenity-color: #bd4138; }
