@@ -1414,6 +1414,13 @@ h1 em { color: #8a9d79; font-weight: 500; }
   padding: 14px;
 }
 
+.room-option-wide {
+  grid-column: span 2;
+  flex-direction: row;
+  align-items: center;
+  min-height: 76px;
+}
+
 .questionnaire-step-2 .importance-group {
   grid-column: 1 / -1;
   min-width: 0;
@@ -1564,6 +1571,10 @@ h1 em { color: #8a9d79; font-weight: 500; }
     min-height: auto;
     flex-direction: row;
     align-items: center;
+  }
+
+  .room-option-wide {
+    grid-column: auto;
   }
 
   .importance-options {
@@ -2212,6 +2223,27 @@ html {
       linear-gradient(76deg, transparent 62%, rgba(169, 148, 105, .07) 63%, rgba(169, 148, 105, .07) 64%, transparent 65%),
       repeating-linear-gradient(0deg, transparent 0 118px, rgba(114, 139, 112, .045) 119px 120px, transparent 121px 220px),
       repeating-linear-gradient(90deg, transparent 0 146px, rgba(114, 139, 112, .04) 147px 148px, transparent 149px 270px);
+  }
+
+  .questionnaire-page:has(.results-container) .results-container > h1 {
+    margin: 0;
+    padding: 24px 26px 8px;
+    border: 1px solid rgba(231, 223, 208, .9);
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+    background: rgba(255, 253, 247, .94);
+    box-shadow: 0 14px 36px rgba(18, 61, 49, .08);
+  }
+
+  .questionnaire-page:has(.results-container) .results-container > h1 + .questionnaire-description {
+    max-width: none;
+    margin: 0 0 28px;
+    padding: 4px 26px 22px;
+    border: 1px solid rgba(231, 223, 208, .9);
+    border-top: 0;
+    border-radius: 0 0 14px 14px;
+    background: rgba(255, 253, 247, .94);
+    box-shadow: 0 14px 36px rgba(18, 61, 49, .08);
   }
 
   .questionnaire-container {
