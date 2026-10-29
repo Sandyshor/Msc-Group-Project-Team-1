@@ -188,6 +188,14 @@
   color: #8a3b2b;
 }
 
+.rent-note {
+  display: block;
+  margin-top: 2px;
+  color: #718075;
+  font-size: 12px;
+  font-weight: 400;
+}
+
 .result-muted {
   color: #718075;
   font-weight: 400;
