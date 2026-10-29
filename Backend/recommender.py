@@ -136,6 +136,7 @@ LONG_COMMUTE_KEEP = 0.5
 OVER_BUDGET_LIMIT = 1.5
 OVER_BUDGET_KEEP = 0.4
 
+
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
 RATING_TO_WEIGHT = {1: 3, 2: 2, 3: 1, 4: 0}
 
@@ -390,8 +391,16 @@ def load_data():
             area_data[factor["column"]] = area_data[factor["columns"]].sum(axis=1, skipna=False)
 
     neighbourhood_commute = _load_neighbourhood_commute()
+    agencies_file = _path("letting_agencies.csv")
+    if os.path.exists(agencies_file):
+        agencies = _clean_columns(pd.read_csv(agencies_file, dtype=str)).fillna("")
+        agencies = agencies.apply(lambda col: col.str.strip())
+        agencies["PSRA_Licence"] = agencies["PSRA_Licence"].apply(lambda x: x.zfill(6) if x else "")
+    else:
+        agencies = pd.DataFrame(columns=["Name", "Areas", "Address", "Website", "PSRA_Licence"])
     return {
         "area_data": area_data,
+        "agencies": agencies,
         "census": census,
         "ethnicity": ethnicity,
         "walking": walking,
