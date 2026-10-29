@@ -579,6 +579,31 @@ def _compare_word(value, average):
 
 # 3. MAIN ENTRY POINT
 
+def _part_commutes(data, university, mode):
+    """Minutes and km from every part of every district to the university by one travel mode.
+    Commute points use their own times; neighbourhoods use their own OTP times when they've been
+    calculated, otherwise their nearest commute point's (Commute Estimated)."""
+    points = data["commute_points"]
+    points = points[(points["University"] == university) & points[mode].notna()].copy()
+    points["Minutes"] = points[mode]
+    distance_column = MODE_DISTANCE[mode]
+    parts = data["parts"].merge(
+        points[["Area", "Landmark", "Minutes", distance_column]].rename(
+            columns={"Landmark": "Commute Point", distance_column: "Distance_km"}),
+        on=["Area", "Commute Point"], how="left")
+    parts["Commute Estimated"] = parts["Kind"] == "neighbourhood"
+    own = data["neighbourhood_commute"]
+    own = own[(own["University"] == university) & (own["Mode"] == mode)].set_index(["Area", "Part"])
+    if not own.empty:
+        key = pd.MultiIndex.from_frame(parts[["Area", "Part"]])
+        minutes = own["Minutes"].reindex(key).to_numpy(dtype=float)
+        found = ~np.isnan(minutes) & (parts["Kind"] == "neighbourhood").to_numpy()
+        parts.loc[found, "Minutes"] = minutes[found]
+        parts.loc[found, "Distance_km"] = own["Distance_km"].reindex(key).to_numpy(dtype=float)[found]
+        parts.loc[found, "Commute Estimated"] = False
+    return parts
+
+
 def recommend(data, university, budget, accommodation, ratings, top_n=3,
               travel_mode="public_transport", max_commute=None):
     """
@@ -634,28 +659,22 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     census, ethnicity, walking = data["census"], data["ethnicity"], data["walking"]
     mode_words = TRAVEL_MODES[travel_mode]
 
-    # Commute for this search: the chosen travel mode, from each of the 5 parts of every area
-    points = data["commute_points"]
-    points = points[(points["University"] == university) & points[travel_mode].notna()].copy()
-    points["Minutes"] = points[travel_mode]
-    points["Within Limit"] = points["Minutes"] <= max_commute if max_commute else True
-    distance_column = MODE_DISTANCE[travel_mode]
-    # Every part of every district gets its own commute: commute points use their own times; neighbourhoods
-    # use their own OTP times when they've been calculated, otherwise their nearest commute point's.
-    parts = data["parts"].merge(
-        points[["Area", "Landmark", "Minutes", distance_column]].rename(
-            columns={"Landmark": "Commute Point", distance_column: "Distance_km"}),
-        on=["Area", "Commute Point"], how="left")
-    parts["Commute Estimated"] = parts["Kind"] == "neighbourhood"
-    own = data["neighbourhood_commute"]
-    own = own[(own["University"] == university) & (own["Mode"] == travel_mode)].set_index(["Area", "Part"])
-    if not own.empty:
+    # Commute for this search: the chosen travel mode, from every part of every area
+    parts = _part_commutes(data, university, travel_mode)
+    parts["Walk Faster"] = False
+    if travel_mode == "public_transport":
+        # Nobody waits for a bus to go somewhere they could walk to sooner, so when walking is quicker
+        # (often for places near a city-centre campus) the walk is the public transport answer
+        walk = _part_commutes(data, university, "walk").set_index(["Area", "Part"])
         key = pd.MultiIndex.from_frame(parts[["Area", "Part"]])
-        minutes = own["Minutes"].reindex(key).to_numpy(dtype=float)
-        found = ~np.isnan(minutes) & (parts["Kind"] == "neighbourhood").to_numpy()
-        parts.loc[found, "Minutes"] = minutes[found]
-        parts.loc[found, "Distance_km"] = own["Distance_km"].reindex(key).to_numpy(dtype=float)[found]
-        parts.loc[found, "Commute Estimated"] = False
+        walk_minutes = walk["Minutes"].reindex(key).to_numpy(dtype=float)
+        transit_minutes = parts["Minutes"].to_numpy(dtype=float)
+        # also where there's no public transport time (OTP finds no bus or train for very short trips)
+        faster = (walk_minutes <= transit_minutes) | (np.isnan(transit_minutes) & ~np.isnan(walk_minutes))
+        parts.loc[faster, "Minutes"] = walk_minutes[faster]
+        parts.loc[faster, "Distance_km"] = walk["Distance_km"].reindex(key).to_numpy(dtype=float)[faster]
+        parts.loc[faster, "Commute Estimated"] = walk["Commute Estimated"].reindex(key).to_numpy(dtype=bool)[faster]
+        parts.loc[faster, "Walk Faster"] = True
     parts = parts.dropna(subset=["Minutes"]).rename(columns={"Minutes": "Commute Minutes"})
     parts["Distance"] = parts["Distance_km"].map(lambda km: f"{km:.1f} km" if pd.notna(km) else None)
     parts["Within Limit"] = parts["Commute Minutes"] <= max_commute if max_commute else True
@@ -880,7 +899,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             factor = FACTOR_LOOKUP[name]
             value = row[factor["column"]]
             if factor["kind"] == "commute":
-                shown = f"{value:.0f} min {mode_words}"
+                shown = f"{value:.0f} min {TRAVEL_MODES['walk'] if row['Walk Faster'] else mode_words}"
             elif factor["kind"] == "rent":
                 shown = f"{_euros(value)}/month"
             else:
@@ -986,6 +1005,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
             "budget_status": row["Budget Status"],
             "budget_difference": round(float(row["Budget Difference"]), 2),
             "commute_minutes": None if pd.isna(row["Commute Minutes"]) else round(float(row["Commute Minutes"])),
+            # public transport search, but walking is quicker from here (the time and distance are the walk's)
+            "walk_faster": bool(row["Walk Faster"]),
             "distance": _none_if_nan(row.get("Distance")),
             "neighbourhood": neighbourhood_info(row),
             "commute": commute_info(row["Area"]),

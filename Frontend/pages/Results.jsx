@@ -415,8 +415,12 @@ function ResultCard({ result, modeWords, maxCommute }) {
         <div>
           <dt>Commute</dt>
           <dd>
-            {result.commute_minutes != null ? `${result.commute_minutes} min ${modeWords}` : 'Not available'}
+            {result.commute_minutes != null
+              ? `${result.commute_minutes} min ${result.walk_faster ? 'on foot' : modeWords}`
+              : 'Not available'}
             {result.distance && <span className="result-muted"> · {result.distance}</span>}
+            {/* public transport search, but walking from here is quicker than any bus, train or Luas */}
+            {result.walk_faster && <span className="rent-note">Walking is quicker than public transport from here</span>}
           </dd>
         </div>
       </dl>
