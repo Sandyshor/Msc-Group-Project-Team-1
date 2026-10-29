@@ -240,7 +240,7 @@ function Questionnaire() {
                     <button
                       key={type}
                       type="button"
-                      className={roomType === type ? 'room-option selected' : 'room-option'}
+                      className={`room-option${roomType === type ? ' selected' : ''}${type === 'Student accommodation' ? ' room-option-wide' : ''}`}
                       onClick={() => setRoomType(type)}
                     >
                       <span>{icon}</span>
