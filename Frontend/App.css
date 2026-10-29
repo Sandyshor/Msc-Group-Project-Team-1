@@ -2205,9 +2205,13 @@ html {
   }
 
   .questionnaire-page:has(.results-container) {
-    background-size: 100% auto;
-    background-position: center top;
-    background-attachment: fixed;
+    background-color: #f7f2e8;
+    background-image:
+      linear-gradient(28deg, transparent 48%, rgba(114, 139, 112, .08) 49%, rgba(114, 139, 112, .08) 50%, transparent 51%),
+      linear-gradient(112deg, transparent 44%, rgba(114, 139, 112, .06) 45%, rgba(114, 139, 112, .06) 46%, transparent 47%),
+      linear-gradient(76deg, transparent 62%, rgba(169, 148, 105, .07) 63%, rgba(169, 148, 105, .07) 64%, transparent 65%),
+      repeating-linear-gradient(0deg, transparent 0 118px, rgba(114, 139, 112, .045) 119px 120px, transparent 121px 220px),
+      repeating-linear-gradient(90deg, transparent 0 146px, rgba(114, 139, 112, .04) 147px 148px, transparent 149px 270px);
   }
 
   .questionnaire-container {
