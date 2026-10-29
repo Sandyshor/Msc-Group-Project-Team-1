@@ -2092,6 +2092,7 @@ html {
 
   .questionnaire-container > .back-link {
     grid-column: 1 / -1;
+    justify-self: start;
     margin-bottom: 30px;
   }
 
