@@ -6,26 +6,24 @@ import profilesUrl from './district-profiles.json?url';
 import crimeAreasUrl from './crime-heatmap.geojson?url';
 import { ALL_DISTRICTS, HEAT_STOPS, ICONS, iconFor, safetyLabel, strongColor } from './DistrictMap';
 import './DistrictMiniMap.css';
-
-// Small map for one recommendation: only the chosen district, zoomed in, with
-// neighbourhood names, safety areas, Luas, famous places and the commute line.
-// The user can switch to any other district from the dropdown.
-// It also reads the card it sits in ("#3 D3 · ..."), so each card shows its own district.
-//
-// Usage:
-// <DistrictMiniMap
-//   districtId="D1"
-//   university="TU Dublin - Grangegorman"
-//   place={{ name: "O'Connell Street Upper", lat: 53.3505, lng: -6.2605 }}
-//   minutes={15} km={1.8}
-// />
+if (typeof window !== 'undefined' && !window.__districtExploreClicks) {
+  window.__districtExploreClicks = true;
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest?.('a, button');
+    if (!target) return;
+    const text = target.textContent || '';
+    const m = text.match(/(?:^|[^A-Za-z0-9])D(\d{1,2})(W?)(?![0-9A-Za-z])/i);
+    if (!m || !/district|profile|explore/i.test(text)) return;
+    try { sessionStorage.setItem('explore-district', `D${Number(m[1])}${m[2].toUpperCase()}`); } catch { /* ignore */ }
+  }, true);
+}
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 const EXPLORER_URL = '/districts'; // full district explorer page
 const BOUNDARIES_URL = '/data/dublin_postcode_boundaries.geojson';
 const LUAS_URLS = { red: '/data/luas-red-line.geojson', green: '/data/luas-green-line.geojson' };
 
-// Approximate main entrance of each campus [lng, lat]
+
 const UNIVERSITIES = {
   "DCU - St Patrick's Campus": [-6.2557, 53.3708],
   'Dublin Business School': [-6.2654, 53.3384],
@@ -44,7 +42,7 @@ const UNIVERSITIES = {
   'University College Dublin - Belfield': [-6.2210, 53.3065],
 };
 
-// Load shared files once, however many mini maps are on the page
+
 const cache = {};
 const loadJson = (url) => {
   if (!cache[url]) cache[url] = fetch(url).then((r) => { if (!r.ok) throw new Error(`${url} (${r.status})`); return r.json(); });
@@ -220,11 +218,11 @@ export default function DistrictMiniMap({ districtId: districtProp, university =
           });
           map.on('mouseleave', 'mm-crime', () => hover.remove());
 
-          // District outline
+          
           map.addSource('mm-district', { type: 'geojson', data: feature });
           map.addLayer({ id: 'mm-district', type: 'line', source: 'mm-district', paint: { 'line-color': colour, 'line-width': 3 } });
 
-          // Luas lines (only the part inside the district shows) and the stops in it
+          
           [['red', '#d71920', 'Luas Red Line'], ['green', '#008531', 'Luas Green Line']].forEach(([k, c, ref]) => {
             map.addSource(`mm-luas-${k}`, { type: 'geojson', data: LUAS_URLS[k] });
             map.addLayer({ id: `mm-luas-${k}`, type: 'line', source: `mm-luas-${k}`, filter: ['==', ['get', 'ref'], ref], layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': c, 'line-width': 4 } });
@@ -251,7 +249,7 @@ export default function DistrictMiniMap({ districtId: districtProp, university =
           // Neighbourhood names
           (profile.areas || []).forEach(([name, lat, lng]) => new maplibregl.Marker({ element: el('div', 'dm-area mm-area', name) }).setLngLat([lng, lat]).addTo(map));
 
-          // Famous places
+          
           markersRef.current.places = (profile.places || []).map(([name, cat, desc, lat, lng]) => {
             const node = el('button', 'dm-place small');
             node.type = 'button';
@@ -265,7 +263,7 @@ export default function DistrictMiniMap({ districtId: districtProp, university =
             return new maplibregl.Marker({ element: node }).setLngLat([lng, lat]).setPopup(new maplibregl.Popup({ offset: 16 }).setDOMContent(pop)).addTo(map);
           });
 
-          // Commute: recommended place → university
+         
           if (fromLngLat) {
             const timeText = `${mins != null ? `${Math.round(mins)} min` : ''}${dist != null ? `${mins != null ? ' · ' : ''}${Number(dist).toFixed(1)} km` : ''}`;
             const home = el('div', 'mm-pin mm-home');
@@ -302,7 +300,7 @@ export default function DistrictMiniMap({ districtId: districtProp, university =
     return () => { cancelled = true; map?.remove(); mapRef.current = null; };
   }, [ready, shownId, districtId, university, place?.lat, place?.lng, place?.name, minutes, km]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Show or hide layers when the buttons are clicked (also re-applied after a new district loads)
+  
   const layersRef = useRef(layers);
   layersRef.current = layers;
   const applyLayers = () => {
