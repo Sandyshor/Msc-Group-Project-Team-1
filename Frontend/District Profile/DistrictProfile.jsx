@@ -111,7 +111,6 @@ function PlacesSection({ code, places, hoverPlace, onHoverPlace, onPlaceClick })
           </button>
         ))}
       </div>
-      {places.some((p) => p.sample) && <p className="section-description top-gap">These places are sample content. Add the team's list to districtProfiles.js.</p>}
     </section>
   );
 }
