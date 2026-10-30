@@ -10,7 +10,7 @@ const DATA_URL = profilesUrl;
 const DEFAULT_UNIVERSITY = 'TU Dublin - Grangegorman';
 const TOUR_MS = 4500;
 
-
+// Coordinates for team famous places that are not in the profile data. Format: [lng, lat]
 const LANDMARK_LOCATIONS = {
   'Herbert Park': [-6.2352, 53.3261],
   'Aviva Stadium': [-6.2285, 53.3352],
@@ -41,8 +41,7 @@ const storage = {
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
 };
 
-// Which district to open: from the address (?district=D17, /districts/D17, #D17, Dublin 17)
-// or from the "Explore D17 district profile" button clicked on the results page.
+
 function districtFromUrl() {
   const { pathname, search, hash } = window.location;
   const params = new URLSearchParams(search);
@@ -60,7 +59,28 @@ function districtFromUrl() {
   return 'D1';
 }
 
+// Remember which district an "Explore D7 district profile" button was for, so the
+// district explorer opens on it: on a new page, in a new tab, or on the same page.
+if (typeof window !== 'undefined' && !window.__districtExploreClicks) {
+  window.__districtExploreClicks = true;
+  const CODE_RE = /(?:^|[^A-Za-z0-9])D(\d{1,2})(W?)(?![0-9A-Za-z])/i;
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest?.('a, button');
+    if (!target || target.closest('.mini-map, .district-page')) return;
+    if (!/district|profile|explore/i.test(target.textContent || '')) return;
+    // District code on the button itself, or else on the card around it
+    let m = (target.textContent || '').match(CODE_RE);
+    for (let node = target.parentElement, level = 0; !m && node && level < 8; node = node.parentElement, level += 1) {
+      m = (node.innerText || node.textContent || '').match(CODE_RE);
+    }
+    if (!m) return;
+    const id = `D${Number(m[1])}${m[2].toUpperCase()}`;
+    try { localStorage.setItem('explore-district', JSON.stringify({ id, t: Date.now() })); } catch { /* ignore */ }
+    window.dispatchEvent(new CustomEvent('explore-district', { detail: id }));
+  }, true);
+}
 
+// Team famous places (from districtProfiles.js) win; the sample places fill the gaps.
 function buildPlaces(profileData) {
   const byDistrict = {};
   ACTIVE_DISTRICTS.forEach((code) => {
@@ -82,6 +102,7 @@ function buildPlaces(profileData) {
   return byDistrict;
 }
 
+/* ---------------- page ---------------- */
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -106,10 +127,22 @@ export default function App() {
       .catch((e) => setError(e.message));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
- 
+  // The saved "Explore" choice is used once
   useEffect(() => { try { localStorage.removeItem('explore-district'); } catch { /* ignore */ } }, []);
 
-  
+  // An "Explore D7 district profile" button clicked while this page is already open
+  useEffect(() => {
+    const onExplore = (e) => {
+      if (!ACTIVE_DISTRICTS.includes(e.detail)) return;
+      setTouring(false);
+      setSelectedId(e.detail);
+      try { localStorage.removeItem('explore-district'); } catch { /* ignore */ }
+    };
+    window.addEventListener('explore-district', onExplore);
+    return () => window.removeEventListener('explore-district', onExplore);
+  }, []);
+
+  // If the address changes while this page is open, show that district
   useEffect(() => {
     let last = window.location.href;
     const id = setInterval(() => {
@@ -160,7 +193,7 @@ export default function App() {
   if (!data) return <div className="district-page"><p className="empty-note">Loading district map…</p></div>;
 
   const teamName = districtProfiles?.[selectedId]?.name;
-  
+  // Use the team's name unless it is just "Dublin N"
   const team = teamName && !/^Dublin\s/i.test(teamName) ? { name: teamName } : null;
   const places = placesByDistrict[selectedId] || [];
 
