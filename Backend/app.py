@@ -22,10 +22,15 @@ class RecommendRequest(BaseModel):
     budget: float = Field(..., gt=0, examples=[900])
     accommodation: str = Field(..., examples=["private_room"],
                                description="shared_room | private_room | one_bed | two_bed")
-    ratings: Dict[str, int] = Field(
-        ..., description="1 = Very important, 2 = Important, 3 = Slightly important, 4 = Not important. "
-                         "A category (e.g. Healthcare) can instead be rated by its items "
-                         "(e.g. Hospitals, Pharmacies) - see factor_items in /options.",
+    importance: Optional[Dict[str, float]] = Field(
+        None, description="0 = Not important ... 10 = Very important (the website's sliders). "
+                          "A category (e.g. Healthcare) can instead be rated by its items "
+                          "(e.g. Hospitals, Pharmacies) - see factor_items in /options.",
+        examples=[{"Rent": 10, "Commute": 7, "Shopping & Groceries": 7, "Restaurants": 3,
+                   "Healthcare": 0, "Recreation & Wellness": 3}])
+    ratings: Optional[Dict[str, int]] = Field(
+        None, description="Older alternative to importance: 1 = Very important, 2 = Important, "
+                          "3 = Slightly important, 4 = Not important.",
         examples=[{"Rent": 1, "Commute": 2, "Shopping & Groceries": 2, "Restaurants": 3,
                    "Healthcare": 4, "Recreation & Wellness": 3}])
     travel_mode: str = Field("public_transport", examples=["public_transport"],
@@ -63,11 +68,16 @@ def universities():
 
 @app.post("/recommend")
 def recommend(req: RecommendRequest):
-    if any(r not in (1, 2, 3, 4) for r in req.ratings.values()):
+    if req.importance is None and req.ratings is None:
+        raise HTTPException(422, "Send importance (0-10) or ratings (1-4) for every factor")
+    if req.importance is not None and any(not 0 <= v <= 10 for v in req.importance.values()):
+        raise HTTPException(422, "Each importance must be between 0 and 10")
+    if req.importance is None and any(r not in (1, 2, 3, 4) for r in req.ratings.values()):
         raise HTTPException(422, "Each rating must be 1, 2, 3 or 4")
     try:
         result = recommender.recommend(DATA, req.university, req.budget, req.accommodation, req.ratings,
-                                       travel_mode=req.travel_mode, max_commute=req.max_commute)
+                                       travel_mode=req.travel_mode, max_commute=req.max_commute,
+                                       importance=req.importance)
     except recommender.RecommendationError as e:
         raise HTTPException(422, str(e))
 

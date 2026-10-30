@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Results.css'
 import { districts } from '../District Profile/districtData.js'
 import CommuteFields, { TRAVEL_MODES } from './CommuteFields'
+import PrioritySlider from './PrioritySlider'
 
 const SafetyHeatMap = lazy(() => import('./SafetyHeatMap'))
 
@@ -227,8 +228,6 @@ function CommuteDetails({ area, commute, maxCommute }) {
   )
 }
 
-const IMPORTANCE = { 1: 'Very important', 2: 'Important', 3: 'Slightly important' }
-
 // compared: 1 = better than most areas, 0 = about average, -1 = worse (icon + words, never colour alone)
 const COMPARED = {
   1: ['better', '▲ Better than most'],
@@ -268,7 +267,7 @@ function WhyThisPlace({ result, place }) {
             <li key={item.factor} className="why-row">
               <div className="why-factor">
                 <strong>{item.factor}</strong>
-                <span className="result-muted">{IMPORTANCE[item.rating]}</span>
+                <span className="result-muted">{item.importance_label}</span>
               </div>
               <span className="why-bar" role="img" aria-label={`${item.factor}: ${item.score} out of 100`}>
                 <span style={{ width: `${Math.max(3, item.score)}%` }} />
@@ -613,9 +612,9 @@ function Results() {
   const maxCommute = answers?.maxCommute ?? null
   const modeWords = TRAVEL_MODES.find(([value]) => value === travelMode)[2]
 
-  // Changing the commute on this page searches again straight away.
-  function updateCommute(commute) {
-    const updated = loadAnswers({ ...answers, ...commute })
+  // Changing the commute or a priority on this page searches again straight away.
+  function updateAnswers(changes) {
+    const updated = loadAnswers({ ...answers, ...changes })
     setAnswers(updated)
     navigate('/results', { replace: true, state: updated }) // so a refresh keeps the new choice
   }
@@ -634,7 +633,8 @@ function Results() {
         university: answers.university,
         budget: answers.budget,
         accommodation: answers.accommodation,
-        ratings: answers.ratings,
+        importance: answers.importance,
+        ratings: answers.importance ? undefined : answers.ratings, // answers saved before the sliders
         language: answers.language ?? 'en',
         travel_mode: travelMode,
         max_commute: maxCommute,
@@ -710,8 +710,26 @@ function Results() {
         </p>
 
         <div className="commute-controls">
-          <CommuteFields travelMode={travelMode} maxCommute={maxCommute} onChange={updateCommute} />
+          <CommuteFields travelMode={travelMode} maxCommute={maxCommute} onChange={updateAnswers} />
         </div>
+
+        {answers.importance && (
+          <details className="priority-controls">
+            <summary>Adjust your priorities</summary>
+            <p className="result-muted">Move a slider and your matches update straight away.</p>
+            <div className="priority-grid">
+              {Object.entries(answers.importance).map(([name, value]) => (
+                <PrioritySlider
+                  key={name}
+                  name={name}
+                  value={value}
+                  showName
+                  onChange={(changed) => updateAnswers({ importance: { ...answers.importance, [name]: changed } })}
+                />
+              ))}
+            </div>
+          </details>
+        )}
 
         {!data && !error && (
           <div className="results-status" role="status">
