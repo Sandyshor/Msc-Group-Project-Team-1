@@ -119,6 +119,20 @@ fieldset.question-group {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* A category rated by its items: on wide screens the card spans both columns, with its sliders side by side,
+   so the card next to it isn't stretched to the same height */
+@media (min-width: 1001px) {
+  .questionnaire-container .question-group-wide {
+    grid-column: 1 / -1;
+  }
+
+  .question-group-wide .item-ratings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px 28px;
+  }
+}
+
 /* Importance sliders (0-10), in the questionnaire and on the results page */
 
 .priority-value {

@@ -243,7 +243,11 @@ function Questionnaire() {
           <>
             <form onSubmit={handleSubmit}>
               {FACTORS.map(([name, hint, items]) => (
-                <fieldset className="question-group" key={name}>
+                <fieldset
+                  // a category rated by its items needs the whole row for its sliders
+                  className={items && separately[name] ? 'question-group question-group-wide' : 'question-group'}
+                  key={name}
+                >
                   <legend className="factor-name">{name}</legend>
                   <p className="field-hint">{hint}</p>
 
