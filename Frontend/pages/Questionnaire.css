@@ -119,9 +119,59 @@ fieldset.question-group {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* Wide screens put two question cards side by side, so four ratings in a row get cut off */
-@media (min-width: 1001px) {
-  .questionnaire-container .rating-options:not(.mode-options) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+/* Importance sliders (0-10), in the questionnaire and on the results page */
+
+.priority-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: #617067;
+  font-size: 14px;
+}
+
+.priority-value strong {
+  color: #173f32;
+  font-family: Georgia, serif;
+  font-size: 20px;
+}
+
+.priority-value .priority-name {
+  display: block;
+  color: #173f32;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.priority-slider input[type="range"] {
+  width: 100%;
+  accent-color: #173f32;
+  cursor: pointer;
+}
+
+.priority-controls {
+  margin: 0 0 24px;
+  padding: 16px 20px;
+  border: 1px solid #e0d8c9;
+  border-radius: 12px;
+  background: #fffdf7;
+}
+
+.priority-controls summary {
+  color: #245b48;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.priority-controls > .result-muted {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.priority-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px 28px;
+  margin-top: 16px;
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './Questionnaire.css'
 import CommuteFields from './CommuteFields'
+import PrioritySlider, { DEFAULT_IMPORTANCE } from './PrioritySlider'
 
 // Values match the university names in the backend's commute data.
 const UNIVERSITIES = [
@@ -46,31 +47,6 @@ function joinWords(items) {
   return items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`
 }
 
-function RatingButtons({ name, value, onChange }) {
-  return (
-    <div className="rating-options" role="group" aria-label={name}>
-      {RATINGS.map(([rating, label]) => (
-        <button
-          key={rating}
-          type="button"
-          aria-pressed={value === rating}
-          className={value === rating ? 'rating-option selected' : 'rating-option'}
-          onClick={() => onChange(rating)}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  )
-}
-
-const RATINGS = [
-  [1, 'Very important'],
-  [2, 'Important'],
-  [3, 'Slightly important'],
-  [4, 'Not important'],
-]
-
 
 function Questionnaire() {
   const [step, setStep] = useState(1)
@@ -78,9 +54,9 @@ function Questionnaire() {
   const [destination, setDestination] = useState('')
   const [roomType, setRoomType] = useState('Private room')
   const [commute, setCommute] = useState({ travelMode: 'public_transport', maxCommute: null })
-  const [ratings, setRatings] = useState(
+  const [importance, setImportance] = useState(
     Object.fromEntries(
-      FACTORS.flatMap(([name, , items = []]) => [name, ...items]).map((name) => [name, 2])
+      FACTORS.flatMap(([name, , items = []]) => [name, ...items]).map((name) => [name, DEFAULT_IMPORTANCE])
     )
   )
   const [separately, setSeparately] = useState({})
@@ -88,15 +64,15 @@ function Questionnaire() {
 
   const accommodation = ROOM_TYPES.find(([label]) => label === roomType)[2]
   // A category rated "separately" is replaced by its items, as in the backend.
-  const activeRatings = Object.fromEntries(
+  const activeImportance = Object.fromEntries(
     FACTORS.flatMap(([name, , items]) =>
-      items && separately[name] ? items.map((item) => [item, ratings[item]]) : [[name, ratings[name]]]
+      items && separately[name] ? items.map((item) => [item, importance[item]]) : [[name, importance[name]]]
     )
   )
-  const allNotImportant = Object.values(activeRatings).every((r) => r === 4)
+  const allNotImportant = Object.values(activeImportance).every((value) => value === 0)
 
-  function setRating(name, value) {
-    setRatings({ ...ratings, [name]: value })
+  function setFactorImportance(name, value) {
+    setImportance({ ...importance, [name]: value })
   }
 
   function handleContinue(event) {
@@ -113,7 +89,7 @@ function Questionnaire() {
         budget,
         accommodation,
         accommodationLabel: roomType,
-        ratings: activeRatings,
+        importance: activeImportance,
         travelMode: commute.travelMode,
         maxCommute: commute.maxCommute,
       },
@@ -272,10 +248,10 @@ function Questionnaire() {
                   <p className="field-hint">{hint}</p>
 
                   {!(items && separately[name]) && (
-                    <RatingButtons
+                    <PrioritySlider
                       name={name}
-                      value={ratings[name]}
-                      onChange={(value) => setRating(name, value)}
+                      value={importance[name]}
+                      onChange={(value) => setFactorImportance(name, value)}
                     />
                   )}
 
@@ -297,10 +273,10 @@ function Questionnaire() {
                       {items.map((item) => (
                         <div className="item-rating" key={item}>
                           <p className="item-name">{item}</p>
-                          <RatingButtons
+                          <PrioritySlider
                             name={item}
-                            value={ratings[item]}
-                            onChange={(value) => setRating(item, value)}
+                            value={importance[item]}
+                            onChange={(value) => setFactorImportance(item, value)}
                           />
                         </div>
                       ))}
@@ -311,7 +287,7 @@ function Questionnaire() {
 
               {allNotImportant && (
                 <p className="field-note">
-                  Mark at least one thing as important so we have something to rank on.
+                  Move at least one slider above 0 so we have something to rank on.
                 </p>
               )}
 

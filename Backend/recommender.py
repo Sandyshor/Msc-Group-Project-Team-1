@@ -139,6 +139,23 @@ OVER_BUDGET_KEEP = 0.4
 
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
 RATING_TO_WEIGHT = {1: 3, 2: 2, 3: 1, 4: 0}
+# The website asks for importance on a 0-10 slider (0 = not important, 10 = very important); the older
+# 4-step ratings map onto the same scale (Very important = 10, Important = 6.7, Slightly = 3.3, Not = 0)
+MAX_IMPORTANCE = 10
+RATING_TO_IMPORTANCE = {rating: weight * MAX_IMPORTANCE / max(RATING_TO_WEIGHT.values())
+                        for rating, weight in RATING_TO_WEIGHT.items()}
+IMPORTANT_FROM = 4  # 4 and up counts as something the student said matters to them
+
+
+def importance_label(value):
+    """The words for a 0-10 importance (shown next to each factor on the results page)."""
+    if value <= 0:
+        return "Not important"
+    if value < IMPORTANT_FROM:
+        return "Slightly important"
+    if value < 8:
+        return "Important"
+    return "Very important"
 
 
 class RecommendationError(Exception):
@@ -618,12 +635,13 @@ def _part_commutes(data, university, mode):
     return parts
 
 
-def recommend(data, university, budget, accommodation, ratings, top_n=3,
-              travel_mode="public_transport", max_commute=None):
+def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
+              travel_mode="public_transport", max_commute=None, importance=None):
     """
     university:    one of data["universities"], e.g. "TU Dublin - Grangegorman"
     budget:        max monthly budget in euro
     accommodation: shared_room | private_room | one_bed | two_bed
+    importance:    {factor name: 0-10} for every factor (the website's sliders), or instead
     ratings:       {factor name: 1-4} for every factor, as in "Recommendation system.py"
     travel_mode:   public_transport | walk | cycle
     max_commute:   longest commute in minutes the student accepts (None = no limit)
@@ -637,7 +655,12 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     if travel_mode not in TRAVEL_MODES:
         raise RecommendationError(
             f"Unknown travel mode '{travel_mode}'. Use one of: {', '.join(TRAVEL_MODES)}")
-    unknown = [name for name in ratings if name not in FACTOR_LOOKUP]
+    if importance is None:
+        if ratings is None:
+            raise RecommendationError("Please say how important each factor is.")
+        importance = {name: RATING_TO_IMPORTANCE[int(rating)] for name, rating in ratings.items()}
+    importance = {name: float(value) for name, value in importance.items()}
+    unknown = [name for name in importance if name not in FACTOR_LOOKUP]
     if unknown:
         raise RecommendationError(
             f"Unknown factor(s): {', '.join(unknown)}. Use: {', '.join(FACTOR_LOOKUP)}")
@@ -646,26 +669,25 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     missing = []
     for factor in FACTORS:
         if factor["kind"] != "group":
-            if factor["name"] not in ratings:
+            if factor["name"] not in importance:
                 missing.append(factor["name"])
             continue
         item_names = [item["name"] for item in factor["items"]]
-        rated_items = [name for name in item_names if name in ratings]
-        if factor["name"] in ratings and rated_items:
+        rated_items = [name for name in item_names if name in importance]
+        if factor["name"] in importance and rated_items:
             raise RecommendationError(
                 f"Rate {factor['name']} either as a whole or by {', '.join(item_names)} - not both.")
-        if factor["name"] in ratings:
+        if factor["name"] in importance:
             continue
         if rated_items:
-            missing.extend(name for name in item_names if name not in ratings)
+            missing.extend(name for name in item_names if name not in importance)
         else:
             missing.append(factor["name"])
     if missing:
         raise RecommendationError(f"Please rate every factor. Missing: {', '.join(missing)}")
 
     accommodation_name, selected_rent = data["rent_tables"][accommodation]
-    ratings = {name: int(rating) for name, rating in ratings.items()}
-    weights = {name: RATING_TO_WEIGHT[r] for name, r in ratings.items()}
+    weights = importance
     active_factors = [name for name, w in weights.items() if w > 0]
     if not active_factors:
         raise RecommendationError("You rated every factor as 'Not important', so there is nothing to rank on.")
@@ -748,11 +770,11 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     candidates["Match Score"] = candidates[[f"{n} Contribution" for n in active_factors]].sum(axis=1)
     if "Commute" in active_factors:
         long_commute = 1 - _scale(candidates["Commute Minutes"], worst=LONG_COMMUTE_TO_MIN, best=LONG_COMMUTE_FROM_MIN)
-        strength = weights["Commute"] / max(RATING_TO_WEIGHT.values())
+        strength = weights["Commute"] / MAX_IMPORTANCE
         candidates["Commute Penalty"] = 1 - (1 - LONG_COMMUTE_KEEP) * long_commute * strength
         candidates["Match Score"] *= candidates["Commute Penalty"]
     over_budget = 1 - _scale(candidates["Rent"], worst=OVER_BUDGET_LIMIT * budget, best=budget)
-    strength = max(weights.get("Rent", 0), 1) / max(RATING_TO_WEIGHT.values())
+    strength = max(weights.get("Rent", 0), MAX_IMPORTANCE / 3) / MAX_IMPORTANCE
     candidates["Budget Penalty"] = 1 - (1 - OVER_BUDGET_KEEP) * over_budget * strength
     candidates["Match Score"] *= candidates["Budget Penalty"]
     # One result per district, shown as its best place for this search: changing the commute limit or the
@@ -825,11 +847,11 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
         lines = []
         n = len(ranked)
         good = [name for name in active_factors if better_or_worse(name, row) == 1]
-        good.sort(key=lambda name: ratings[name], reverse=True)
+        good.sort(key=lambda name: importance[name], reverse=True)
         good = good[:3]
         if good:
             sentence = f"{row['Label']} " + _join_words([good_phrase(name, row) for name in good])
-            important = [name for name in good if ratings[name] >= 3]
+            important = [name for name in good if importance[name] >= IMPORTANT_FROM]
             if len(important) == len(good):
                 sentence += (", which are all things you said matter to you" if len(good) > 1
                              else ", which you said matters to you")
@@ -856,8 +878,9 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
                 if reasons:
                     lines.append(f"It ranked lower than {above['Label']} because {above['Part']} has {_join_words(reasons)}.")
 
-        bad = [name for name in active_factors if ratings[name] >= 3 and better_or_worse(name, row) == -1]
-        bad.sort(key=lambda name: ratings[name], reverse=True)
+        bad = [name for name in active_factors
+               if importance[name] >= IMPORTANT_FROM and better_or_worse(name, row) == -1]
+        bad.sort(key=lambda name: importance[name], reverse=True)
         for i, name in enumerate(bad[:2]):
             sentence = bad_sentence(name, row)
             opener = "One downside is that " if i == 0 else "Another downside is that "
@@ -917,7 +940,7 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
     def breakdown(row):
         """How the place does on each factor the student rated, most important first (for the result page)."""
         items = []
-        for name in sorted(active_factors, key=lambda name: (ratings[name], -row[f"{name} Contribution"])):
+        for name in sorted(active_factors, key=lambda name: (-importance[name], -row[f"{name} Contribution"])):
             factor = FACTOR_LOOKUP[name]
             value = row[factor["column"]]
             if factor["kind"] == "commute":
@@ -928,7 +951,8 @@ def recommend(data, university, budget, accommodation, ratings, top_n=3,
                 shown = _nearby(factor["column"], value)
             items.append({
                 "factor": name,
-                "rating": ratings[name],
+                "importance": importance[name],
+                "importance_label": importance_label(importance[name]),
                 "score": round(float(row[_score_column(name)]) * 100),  # 0-100: how well it meets the need
                 "compared": better_or_worse(name, row),  # 1 better than most areas, 0 about average, -1 worse
                 "value": shown,
