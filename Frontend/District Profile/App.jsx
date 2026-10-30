@@ -41,6 +41,25 @@ const storage = {
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
 };
 
+// Which district to open: from the address (?district=D17, /districts/D17, #D17, Dublin 17)
+// or from the "Explore D17 district profile" button clicked on the results page.
+function districtFromUrl() {
+  const { pathname, search, hash } = window.location;
+  const params = new URLSearchParams(search);
+  const raw = [params.get('district'), params.get('d'), params.get('code'), params.get('search'), pathname, hash].filter(Boolean).join(' ');
+  const m = decodeURIComponent(raw).match(/(?:^|[^A-Za-z0-9])(?:D|Dublin[\s_-]*)0?(\d{1,2})(W?)(?![0-9])/i);
+  if (m) {
+    const id = `D${Number(m[1])}${m[2].toUpperCase()}`;
+    if (ACTIVE_DISTRICTS.includes(id)) return id;
+  }
+  try {
+    const saved = sessionStorage.getItem('explore-district');
+    sessionStorage.removeItem('explore-district');
+    if (saved && ACTIVE_DISTRICTS.includes(saved)) return saved;
+  } catch { /* ignore */ }
+  return 'D1';
+}
+
 // Team famous places (from districtProfiles.js) win; the sample places fill the gaps.
 function buildPlaces(profileData) {
   const byDistrict = {};
@@ -68,7 +87,7 @@ function buildPlaces(profileData) {
 export default function App() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
-  const [selectedId, setSelectedId] = useState('D1');
+  const [selectedId, setSelectedId] = useState(districtFromUrl);
   const [filter, setFilter] = useState('all');
   const [showLuas, setShowLuas] = useState(true);
   const [showHeat, setShowHeat] = useState(false);
@@ -87,6 +106,18 @@ export default function App() {
       .then((d) => { setData(d); if (!d.unis.includes(uni)) setUniState(d.unis[0]); })
       .catch((e) => setError(e.message));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // If the address changes while this page is open, show that district
+  useEffect(() => {
+    let last = window.location.href;
+    const id = setInterval(() => {
+      if (window.location.href === last) return;
+      last = window.location.href;
+      setTouring(false);
+      setSelectedId(districtFromUrl());
+    }, 400);
+    return () => clearInterval(id);
+  }, []);
 
   const placesByDistrict = useMemo(() => (data ? buildPlaces(data) : {}), [data]);
   const isVisible = useCallback((c) => filter === 'all' || data?.profiles[c]?.side === filter, [filter, data]);
