@@ -6,15 +6,21 @@ import profilesUrl from './district-profiles.json?url';
 import crimeAreasUrl from './crime-heatmap.geojson?url';
 import { ALL_DISTRICTS, HEAT_STOPS, ICONS, iconFor, safetyLabel, strongColor } from './DistrictMap';
 import './DistrictMiniMap.css';
+
+const CODE_RE = /(?:^|[^A-Za-z0-9])D(\d{1,2})(W?)(?![0-9A-Za-z])/i;
 if (typeof window !== 'undefined' && !window.__districtExploreClicks) {
   window.__districtExploreClicks = true;
   document.addEventListener('click', (e) => {
     const target = e.target.closest?.('a, button');
-    if (!target) return;
-    const text = target.textContent || '';
-    const m = text.match(/(?:^|[^A-Za-z0-9])D(\d{1,2})(W?)(?![0-9A-Za-z])/i);
-    if (!m || !/district|profile|explore/i.test(text)) return;
-    try { sessionStorage.setItem('explore-district', `D${Number(m[1])}${m[2].toUpperCase()}`); } catch { /* ignore */ }
+    if (!target || target.closest('.mini-map')) return;
+    if (!/district|profile|explore/i.test(target.textContent || '')) return;
+    // District code on the button itself, or else on the card around it
+    let m = (target.textContent || '').match(CODE_RE);
+    for (let node = target.parentElement, level = 0; !m && node && level < 8; node = node.parentElement, level += 1) {
+      m = (node.innerText || node.textContent || '').match(CODE_RE);
+    }
+    if (!m) return;
+    try { localStorage.setItem('explore-district', JSON.stringify({ id: `D${Number(m[1])}${m[2].toUpperCase()}`, t: Date.now() })); } catch { /* ignore */ }
   }, true);
 }
 
