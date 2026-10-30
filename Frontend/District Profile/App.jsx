@@ -10,7 +10,7 @@ const DATA_URL = profilesUrl;
 const DEFAULT_UNIVERSITY = 'TU Dublin - Grangegorman';
 const TOUR_MS = 4500;
 
-// Coordinates for team famous places that are not in the profile data. Format: [lng, lat]
+
 const LANDMARK_LOCATIONS = {
   'Herbert Park': [-6.2352, 53.3261],
   'Aviva Stadium': [-6.2285, 53.3352],
@@ -28,7 +28,7 @@ const LANDMARK_LOCATIONS = {
   'Cherry Orchard': [-6.3780, 53.3440],
 };
 
-// Icons for the team's places (any place not listed gets the landmark icon)
+
 const PLACE_ICONS = {
   'Herbert Park': 'park', 'Aviva Stadium': 'stadium', "St Anne's Park": 'park', 'North Bull Island': 'nature',
   'Rathmines Town Hall': 'tower', Ranelagh: 'village', 'Phoenix Park': 'park', 'National Museum at Collins Barracks': 'museum',
@@ -53,14 +53,14 @@ function districtFromUrl() {
     if (ACTIVE_DISTRICTS.includes(id)) return id;
   }
   try {
-    const saved = sessionStorage.getItem('explore-district');
-    sessionStorage.removeItem('explore-district');
-    if (saved && ACTIVE_DISTRICTS.includes(saved)) return saved;
+    // Set when an "Explore district profile" button is clicked on the results page
+    const saved = JSON.parse(localStorage.getItem('explore-district') || 'null');
+    if (saved && Date.now() - saved.t < 120000 && ACTIVE_DISTRICTS.includes(saved.id)) return saved.id;
   } catch { /* ignore */ }
   return 'D1';
 }
 
-// Team famous places (from districtProfiles.js) win; the sample places fill the gaps.
+
 function buildPlaces(profileData) {
   const byDistrict = {};
   ACTIVE_DISTRICTS.forEach((code) => {
@@ -82,7 +82,6 @@ function buildPlaces(profileData) {
   return byDistrict;
 }
 
-/* ---------------- page ---------------- */
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -107,7 +106,10 @@ export default function App() {
       .catch((e) => setError(e.message));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // If the address changes while this page is open, show that district
+ 
+  useEffect(() => { try { localStorage.removeItem('explore-district'); } catch { /* ignore */ } }, []);
+
+  
   useEffect(() => {
     let last = window.location.href;
     const id = setInterval(() => {
@@ -158,7 +160,7 @@ export default function App() {
   if (!data) return <div className="district-page"><p className="empty-note">Loading district map…</p></div>;
 
   const teamName = districtProfiles?.[selectedId]?.name;
-  // Use the team's name unless it is just "Dublin N"
+  
   const team = teamName && !/^Dublin\s/i.test(teamName) ? { name: teamName } : null;
   const places = placesByDistrict[selectedId] || [];
 
