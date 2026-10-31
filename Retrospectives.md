@@ -195,6 +195,29 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Santhosh integrated rest of the rent data to the system and, calculated the commute distance from each sub divided part of the area to the university,
   now the system suggests same area with different landmarks, based on certain criteria.
 - Vignesh added the property listing along with result cards.
+
+**Week 7 Lead: Sowmiya**
+**Meeting 1 Friday (9:00 - 10:00)**
+- attendees: Sowmiya, Catherine, Shreyas, Santhosh, Vignesh
+- discussed on the feedback we received
+- everyone shared there opinions on the website layout
+- tasks were assigned by sowmiya, santhosh agreed to work on changing the layout
+- shreyas agreed on collected rent data for all areas in each district.
+- vignesh agreed to work on correct crime data collection
+- catherine agreed to work on map integration and angle consistency
+- sowmiya agreed to work on usee flow and quich tour on the website for users
+- we discussed the possible ways to collect accurate crime data and decided to mail andrea regarding it
+- all agreed to update their ideas on user evaluation as well
+
+**Meeting 2 Saturday (9:00 - 9:30)**
+- attendees: Sowmiya, Catherine, Santhosh, Vignesh
+- today's work was discussed, we brainstormed few steps to follow for user evaluation for our website
+- shreyas was not available to join the meeting
+- santhosh started improving the website layout, he showed the progress to us
+- catehrine is working on integrating all the maps to one map as per feedback
+- sowmiya started with user flow of our website
+
+
   
 
   
