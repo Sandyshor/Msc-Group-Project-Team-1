@@ -216,7 +216,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - santhosh started improving the website layout, he showed the progress to us
 - catehrine is working on integrating all the maps to one map as per feedback
 - sowmiya started with user flow of our website
-
+- shreyas informed us on chat that he went through previous year evaluation reports
 
   
 
