@@ -218,6 +218,15 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - sowmiya started with user flow of our website
 - shreyas informed us on chat that he went through previous year evaluation reports
 
+**Meeting 3 Monday (8:45 - 9:15)**
+- attendees: Sowmiya, Shreyas, Santhosh, Vignesh
+- Vignesh updated on crime data collection to the group. he described and filled on the details.
+- Shreyas agreed to ask his irish friend for the home page video's voiceover and as a last option we are considering to buy voice from someone in our group
+- We also discussed on different ways for conducting user evaluation. all of us agreed to work on it from wednesday. we made few journey plans on the go.
+- different possible website layout ideas were placed on the table and evaluated
+- all agreed to update their workflow tomorrow
+- catherine was not available for the meeting
+
   
 
   
