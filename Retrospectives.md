@@ -145,7 +145,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Viknesh, Sowmiya, Santhosh discussed on what to include in the website furthermore in future.
 
   **Week 6: Lead: Santhosh**
-  **Meeting 1 (1:00 - 2:00)**
+  **Meeting 1 Friday (1:00 - 2:00)**
   - Attendees: Catherine, Santhosh, Sowmiya, Vignesh and Sheryas
   - Met after the lecture hour at TU Dublin campus, and discussed about feedback given by Brenden, Andrea and Damian
   - Feedback were organized in an Excel file, and started splitting tasks among the team.
@@ -154,7 +154,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
   - Steps to be taken for Evaluating.
   - How we gonna make recommendation more dynamic
 
-  **Meeting 2 (7:30 - 8:30)**
+  **Meeting 2 Saturday (7:30 - 8:30)**
   - Attendees: Santhosh, Sowmiya, Catherine, Vignesh and Sheryas.
   - Connected on google meet and discussed deeply about the feedback.
   - Task has been assigned to all team members via JIRA
@@ -164,7 +164,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
   - Vignesh agreed to work on security and safety of the area, permission access to the data.
   - Sheryas agreed to evaluate the system, providing details for letting agencies
 
-  **Meeting 3 (9:00 - 9:30)**
+  **Meeting 3 Sunday (9:00 - 9:30)**
   - Attended by Sheryas, Catherine, Santhosh, Vignesh and Sowmiya
   - connected on a conference call discussed about the work progress.
   - Sowmiya started collecting landmark data by Dublin Postal districts
@@ -172,14 +172,14 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
   - Santhosh integrated commute time slider and type of transportation option in the questionnaire part of the website
   - Vignesh started collecting crime and safety data of Dublin
 
-**Meeting 4 (9:00 - 9:30)**
+**Meeting 4 Monday (9:00 - 9:30)**
 - Attended by Santhosh, Vignesh, Catherine and Sowmiya. Sheryas couldn't join the meeting
 - Sowmiya has replaced the video with British Accent, and working on map visualization
 - Catherine has updated the district profile map till D10, now the map can be viewed district wise rather than entire map.
 -  Vignesh has implemented new feature called Journey Planner, where distance, commute time, transportation between any two points can be viewed.
 - Santhosh deployed the map feature, and highlighted all universities, famous places across Dublin on the map, and also automated the amenities count by setting up a code which connect to api and updates the count every week.
 
-**Meeting 5 (5:00 - 7:00)**
+**Meeting 5 Tuesday (5:00 - 7:00)**
 - Attended by Santhosh, Vignesh, Sowmiya, Sheryas and Catherine
 - Santhosh worked on fixing calculation issue in the recommendation system and made the enabled the slider option for rating the factors instead of buttons
 - Vignesh has added the safety feature which show the safety rating of each area it recommends.
@@ -187,7 +187,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Catherine worked on the district map so that it shows only the area displayed by the recommendation model, rather than the entire map
 - Sheryas added the letting agencies option at the bottom of result page
 
-**Meeting 6 (9:00 - 9:30)**
+**Meeting 6 Wednesday (9:00 - 9:30)**
 - Attended by Sheryash, Sowmiya, Catherine, Santhosh and Vignesh
 - Sheryash scrapped rent data from D22 - D24.
 - Catherine added D11 - D24 data in map and integrated the safety feature as well.
