@@ -572,6 +572,30 @@ function AttractionCard({ place }) {
   )
 }
 
+function HeroRail({ title, label, children }) {
+  const rowRef = useRef(null)
+
+  function scroll(direction) {
+    const row = rowRef.current
+    row?.scrollBy({ left: direction * row.clientWidth * 0.8, behavior: 'smooth' })
+  }
+
+  return (
+    <div className="fd-hero-rail">
+      <div className="fd-hero-rail-top">
+        <p className="fd-hero-rail-title">{title}</p>
+        <div className="fd-hero-rail-arrows">
+          <button type="button" onClick={() => scroll(-1)} aria-label={`Scroll ${title} left`}>←</button>
+          <button type="button" onClick={() => scroll(1)} aria-label={`Scroll ${title} right`}>→</button>
+        </div>
+      </div>
+      <div className="fd-hero-rail-row" ref={rowRef} role="region" aria-label={label} tabIndex={0}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 function DublinMap({ title, locations, variant }) {
   const isCampusMap = variant === 'campuses'
   const mapContainerRef = useRef(null)
@@ -752,28 +776,14 @@ function Home() {
           </nav>
         </div>
 
-        {/* Campuses and places, side by side, moving up and down (hover to pause) */}
+        {/* Campuses and places: two rows the student scrolls sideways (swipe, trackpad or the arrows) */}
         <div className="fd-hero-rails">
-          <div className="fd-hero-rail">
-            <p className="fd-hero-rail-title">Find my campus</p>
-            <div className="fd-vertical-window" aria-label="Universities and campuses, moving list">
-              <div className="fd-vertical-track fd-vertical-up">
-                {[...universities, ...universities].map((school, index) => (
-                  <UniversityCard school={school} key={`${school.id}-${index}`} />
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="fd-hero-rail">
-            <p className="fd-hero-rail-title">Know your city</p>
-            <div className="fd-vertical-window" aria-label="Dublin attractions, moving list">
-              <div className="fd-vertical-track fd-vertical-down">
-                {[...attractions, ...attractions].map((place, index) => (
-                  <AttractionCard place={place} key={`${place.id}-${index}`} />
-                ))}
-              </div>
-            </div>
-          </div>
+          <HeroRail title="Find my campus" label="Universities and campuses">
+            {universities.map((school) => <UniversityCard school={school} key={school.id} />)}
+          </HeroRail>
+          <HeroRail title="Know your city" label="Places to explore in Dublin">
+            {attractions.map((place) => <AttractionCard place={place} key={place.id} />)}
+          </HeroRail>
         </div>
 
         <div className="fd-hero-footer-left">BAILE ÁTHA CLIATH <span>—</span> DUBLIN, IRELAND</div>

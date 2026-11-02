@@ -678,7 +678,7 @@
 
 .fd-hero-links strong {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: clamp(30px, 3.6vw, 50px);
+  font-size: clamp(28px, 3.1vw, 50px);
   font-weight: 500;
   letter-spacing: -1px;
   line-height: 1.05;
@@ -698,23 +698,30 @@
 .fd-hero-rails {
   position: absolute;
   z-index: 1;
-  top: 96px;
+  top: 104px;
   right: 7%;
-  bottom: 40px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  width: min(560px, 42vw);
+  bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  width: min(560px, 40vw);
 }
 
 .fd-hero-rail {
+  min-width: 0;
+}
+
+.fd-hero-rail-top {
   display: flex;
-  flex-direction: column;
-  min-height: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .fd-hero-rail-title {
-  margin: 0 0 12px;
+  margin: 0;
   color: #f4dfb9;
   font-size: 11px;
   font-weight: 800;
@@ -722,44 +729,64 @@
   text-transform: uppercase;
 }
 
-.fd-vertical-window {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(transparent, #000 8%, #000 92%, transparent);
-}
-
-.fd-vertical-track {
+.fd-hero-rail-arrows {
   display: flex;
-  flex-direction: column;
+  gap: 8px;
+}
+
+.fd-hero-rail-arrows button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 250, 240, 0.65);
+  border-radius: 50%;
+  background: rgba(8, 35, 26, 0.35);
+  color: #fffaf0;
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.fd-hero-rail-arrows button:hover,
+.fd-hero-rail-arrows button:focus-visible {
+  background: var(--fd-cream);
+  color: var(--fd-green);
+}
+
+/* the row scrolls sideways only when the student scrolls it - nothing moves on its own */
+.fd-hero-rail-row {
+  display: flex;
   gap: 14px;
-  animation: fd-rail-up 60s linear infinite;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 250, 240, 0.55) transparent;
 }
 
-/* the two lists move in opposite directions */
-.fd-vertical-down {
-  animation-name: fd-rail-down;
+.fd-hero-rail-row:focus-visible {
+  outline: 2px solid #f0c49b;
+  outline-offset: 4px;
 }
 
-.fd-vertical-window:hover .fd-vertical-track,
-.fd-vertical-window:focus-within .fd-vertical-track {
-  animation-play-state: paused;
+.fd-hero-rail-row > article {
+  scroll-snap-align: start;
 }
-
-@keyframes fd-rail-up { from { transform: translateY(0); } to { transform: translateY(-50%); } }
-@keyframes fd-rail-down { from { transform: translateY(-50%); } to { transform: translateY(0); } }
 
 /* compact cards in the hero */
 .fd-hero-rails .fd-university-card,
 .fd-hero-rails .fd-attraction-card {
-  width: 100%;
+  width: 230px;
   min-height: 0;
   flex: 0 0 auto;
 }
 
 .fd-hero-rails .fd-university-photo {
-  min-height: 150px;
+  min-height: 132px;
 }
 
 .fd-hero-rails .fd-university-name {
@@ -772,7 +799,7 @@
 }
 
 .fd-hero-rails .fd-attraction-image-wrap {
-  height: 120px;
+  height: 104px;
 }
 
 .fd-hero-rails .fd-attraction-info {
@@ -789,7 +816,7 @@
 
 @media (min-width: 1001px) {
   .fd-hero-copy {
-    max-width: calc(100% - min(560px, 42vw) - 40px);
+    max-width: calc(100% - min(560px, 40vw) - 40px);
   }
 }
 
@@ -804,7 +831,6 @@
   .fd-hero-rails {
     position: static;
     width: 100%;
-    height: 440px;
   }
 
   .fd-hero-links strong {
