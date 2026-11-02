@@ -528,6 +528,50 @@ function PhotoCredit({ credit, className }) {
   )
 }
 
+function UniversityCard({ school }) {
+  return (
+    <article className="fd-university-card">
+      <a className="fd-university-card-link" href={school.url} target="_blank" rel="noreferrer">
+        <div className="fd-university-photo" style={{ backgroundImage: `url("${school.image}")` }}>
+          <div className="fd-university-photo-shade" />
+          <div className="fd-university-logo-wrap">
+            {school.logo && (
+              <img className="fd-university-logo" src={school.logo} alt={`${school.name} logo`} loading="lazy" onError={(event) => { event.currentTarget.style.display = 'none' }} />
+            )}
+          </div>
+          <span className="fd-card-category">{school.type || 'UNIVERSITY / CAMPUS'}</span>
+          <strong className="fd-university-name">{school.name}</strong>
+        </div>
+        <div className="fd-university-details">
+          <span className="fd-card-location">{school.location}</span>
+          <span className="fd-card-link">Official website <b>↗</b></span>
+        </div>
+      </a>
+      <PhotoCredit credit={school.imageCredit} className="fd-university-photo-credit" />
+    </article>
+  )
+}
+
+function AttractionCard({ place }) {
+  return (
+    <article className="fd-attraction-card">
+      <a className="fd-attraction-card-link" href={place.url} target="_blank" rel="noreferrer">
+        <div className="fd-attraction-image-wrap">
+          <img src={place.image} alt={place.name} loading="lazy" />
+          <span className="fd-attraction-icon"><MapIcon name={place.icon} /></span>
+        </div>
+        <div className="fd-attraction-info">
+          <span className="fd-card-category">{place.category}</span>
+          <strong>{place.name}</strong>
+          <p>{place.detail}</p>
+          <span className="fd-card-link">Explore more <b>↗</b></span>
+        </div>
+      </a>
+      <PhotoCredit credit={place.imageCredit} className="fd-attraction-photo-credit" />
+    </article>
+  )
+}
+
 function DublinMap({ title, locations, variant }) {
   const isCampusMap = variant === 'campuses'
   const mapContainerRef = useRef(null)
@@ -698,45 +742,39 @@ function Home() {
         <div className="fd-hero-shade" />
 
         <div className="fd-hero-copy">
-          <p className="fd-hero-kicker"><span /> A CITY GUIDE FOR INTERNATIONAL STUDENTS</p>
-          <h1 id="fd-hero-title">
-            New to
-            <em>Dublin?</em>
-            <span>Let’s help you find your place.</span>
-          </h1>
-          <p className="fd-hero-description">
-            From finding your campus to discovering a neighbourhood that feels
-            like yours, get to know Dublin at your own pace.
-          </p>
-          <div className="fd-hero-actions">
-            <Link className="fd-button fd-button-cream" to="/districts">Explore districts <span>↗</span></Link>
-            <a className="fd-hero-watch" href="/journey-planner/route.html"><span className="fd-play">⇄</span> Plan a journey</a>
-            <a className="fd-hero-watch" href="#explore-dublin"><span className="fd-play">▶</span> Meet Dublin through film</a>
-          </div>
-        </div>
-
-        <aside className="fd-hero-guide" aria-label="Quick links to explore Dublin">
-          <div className="fd-guide-topline">
-            <span><i /> YOUR CITY GUIDE</span>
-            <span>01 — 04</span>
-          </div>
-          <div className="fd-guide-route" aria-hidden="true">
-            <span>DISTRICTS</span>
-            <i />
-            <span>CAMPUSES</span>
-            <i />
-            <span>CITY LIFE</span>
-          </div>
-          <h2>Start with what matters to you.</h2>
-          <p>Explore your new city one step at a time.</p>
-          <nav className="fd-guide-links" aria-label="Explore the city guide">
+          <h1 id="fd-hero-title" className="fd-visually-hidden">Find Your Dublin</h1>
+          <nav className="fd-hero-links" aria-label="Explore the city guide">
             <Link to="/districts"><span>01</span><strong>Neighbourhoods</strong><b>↗</b></Link>
             <a href="#universities"><span>02</span><strong>Campus life</strong><b>↗</b></a>
             <a href="#attractions"><span>03</span><strong>Places to explore</strong><b>↗</b></a>
             {/* Separate page (not React) served from Frontend/public/journey-planner */}
             <a href="/journey-planner/route.html"><span>04</span><strong>Journey planner</strong><b>↗</b></a>
           </nav>
-        </aside>
+        </div>
+
+        {/* Campuses and places, side by side, moving up and down (hover to pause) */}
+        <div className="fd-hero-rails">
+          <div className="fd-hero-rail">
+            <p className="fd-hero-rail-title">Find my campus</p>
+            <div className="fd-vertical-window" aria-label="Universities and campuses, moving list">
+              <div className="fd-vertical-track fd-vertical-up">
+                {[...universities, ...universities].map((school, index) => (
+                  <UniversityCard school={school} key={`${school.id}-${index}`} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="fd-hero-rail">
+            <p className="fd-hero-rail-title">Know your city</p>
+            <div className="fd-vertical-window" aria-label="Dublin attractions, moving list">
+              <div className="fd-vertical-track fd-vertical-down">
+                {[...attractions, ...attractions].map((place, index) => (
+                  <AttractionCard place={place} key={`${place.id}-${index}`} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="fd-hero-footer-left">BAILE ÁTHA CLIATH <span>—</span> DUBLIN, IRELAND</div>
       </section>
@@ -789,32 +827,6 @@ function Home() {
           <p>Explore universities and colleges across the city and nearby coast. Check your course location before deciding how you’ll travel each day.</p>
         </div>
 
-        <div className="fd-moving-window" aria-label="Universities and campuses, moving list">
-          <div className="fd-moving-track fd-university-track">
-            {[...universities, ...universities].map((school, index) => (
-              <article className="fd-university-card" key={`${school.id}-${index}`}>
-                <a className="fd-university-card-link" href={school.url} target="_blank" rel="noreferrer">
-                  <div className="fd-university-photo" style={{ backgroundImage: `url("${school.image}")` }}>
-                    <div className="fd-university-photo-shade" />
-                    <div className="fd-university-logo-wrap">
-                      {school.logo && (
-                        <img className="fd-university-logo" src={school.logo} alt={`${school.name} logo`} loading="lazy" onError={(event) => { event.currentTarget.style.display = 'none' }} />
-                      )}
-                    </div>
-                    <span className="fd-card-category">{school.type || 'UNIVERSITY / CAMPUS'}</span>
-                    <strong className="fd-university-name">{school.name}</strong>
-                  </div>
-                  <div className="fd-university-details">
-                    <span className="fd-card-location">{school.location}</span>
-                    <span className="fd-card-link">Official website <b>↗</b></span>
-                  </div>
-                </a>
-                <PhotoCredit credit={school.imageCredit} className="fd-university-photo-credit" />
-              </article>
-            ))}
-          </div>
-        </div>
-        <p className="fd-moving-hint">THE LIST MOVES AUTOMATICALLY · HOVER TO PAUSE</p>
         <DublinMap title="Find the campuses across Dublin." locations={universities} variant="campuses" />
       </section>
 
@@ -827,28 +839,6 @@ function Home() {
           <p>Landmarks, history and green spaces for the days when you close your laptop and go exploring.</p>
         </div>
 
-        <div className="fd-moving-window" aria-label="Dublin attractions, moving list">
-          <div className="fd-moving-track fd-attraction-track">
-            {[...attractions, ...attractions].map((place, index) => (
-              <article className="fd-attraction-card" key={`${place.id}-${index}`}>
-                <a className="fd-attraction-card-link" href={place.url} target="_blank" rel="noreferrer">
-                  <div className="fd-attraction-image-wrap">
-                    <img src={place.image} alt={place.name} loading="lazy" />
-                    <span className="fd-attraction-icon"><MapIcon name={place.icon} /></span>
-                  </div>
-                  <div className="fd-attraction-info">
-                    <span className="fd-card-category">{place.category}</span>
-                    <strong>{place.name}</strong>
-                    <p>{place.detail}</p>
-                    <span className="fd-card-link">Explore more <b>↗</b></span>
-                  </div>
-                </a>
-                <PhotoCredit credit={place.imageCredit} className="fd-attraction-photo-credit" />
-              </article>
-            ))}
-          </div>
-        </div>
-        <p className="fd-moving-hint">A FEW PLACES TO BEGIN · HOVER TO PAUSE</p>
         <DublinMap title="Landmarks, all around the city." locations={attractions} variant="attractions" />
       </section>
 
