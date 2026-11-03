@@ -57,19 +57,11 @@ AREA_CODES_ROOMS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10",
 AREA_CODES_AMENITIES = AREA_CODES_ROOMS
 AREAS = AREA_CODES_AMENITIES
 
-# Room listings per file, and what "double" means in that file. The D1-D5 files were collected
-# separately from the D6-D10 Daft listings: in D1-D5 a double is cheaper than a single in every
-# area, so it is a room shared by two people; in the Daft files it is a private room with a double bed.
-ROOM_FILES = {
-    "D1.xlsx": "shared", "D2.xlsx": "shared", "D3.xlsx": "shared",
-    "D4_rent.xlsx": "shared", "D5_rent.xlsx": "shared",
-    "D6.xlsx": "private", "D7.xlsx": "private", "D8.xlsx": "private", "D9.xlsx": "private", "D10.xlsx": "private",
-    # D11-D24: Daft listings like D6-D10 - a double costs more than a single in nearly every district
-    "D11.xlsx": "private", "D12.xlsx": "private", "D13.xlsx": "private", "D14.xlsx": "private",
-    "D15.xlsx": "private", "D16.xlsx": "private", "D17.xlsx": "private", "D18.xlsx": "private", "D20.xlsx": "private",
-    "D22.xlsx": "private", "D24.xlsx": "private",
-}
-PRIVATE_ROOM_LABELS = ["single", "single & twin", "single & double"]
+# Room listings: one Daft file per district (Area, Neighbourhood, Address, Room type, Listing Type, Rent).
+# In every file a double is a private room with a double bed (it costs more than a single), so only the
+# twin/shared labels below are shared rooms. A district whose file is missing just has no room rent.
+ROOM_FILES = [f"{area}.xlsx" for area in AREA_CODES_ROOMS]
+PRIVATE_ROOM_LABELS = ["single", "double", "single & twin", "single & double"]
 # A room rent needs at least this many listings; fewer is too unreliable to compare districts on
 MIN_ROOM_LISTINGS = 3
 SHARED_ROOM_LABELS = ["twin", "shared", "double & twin", "twin & shared"]
@@ -324,9 +316,13 @@ def search_links(area, accommodation, budget):
 def load_data():
     # Refreshed weekly from OpenStreetMap by refresh_amenities.py
     places = _clean_columns(pd.read_csv(_path("amenities_osm.csv")))
+    room_files = [file for file in ROOM_FILES if os.path.exists(_path(file))]
+    missing = sorted(set(ROOM_FILES) - set(room_files))
+    if missing:
+        # a renamed or deleted upload shouldn't take the whole website down - those districts have no room rent
+        print(f"WARNING: rent files not found in Data/, skipping: {', '.join(missing)}")
     room_data = pd.concat(
-        [_clean_columns(pd.read_excel(_path(file))).rename(columns={"Room Type": "Room type"}).assign(**{"Double Is": meaning})
-         for file, meaning in ROOM_FILES.items()],
+        [_clean_columns(pd.read_excel(_path(file))).rename(columns={"Room Type": "Room type"}) for file in room_files],
         ignore_index=True,
     )
     room_data["Room type"] = room_data["Room type"].astype(str).str.strip().str.lower()
@@ -383,9 +379,8 @@ def load_data():
                  .groupby("Area").mean().reset_index())
 
     # Rent tables
-    is_double = room_data["Room type"] == "double"
-    is_private = room_data["Room type"].isin(PRIVATE_ROOM_LABELS) | (is_double & (room_data["Double Is"] == "private"))
-    is_shared = room_data["Room type"].isin(SHARED_ROOM_LABELS) | (is_double & (room_data["Double Is"] == "shared"))
+    is_private = room_data["Room type"].isin(PRIVATE_ROOM_LABELS)
+    is_shared = room_data["Room type"].isin(SHARED_ROOM_LABELS)
     shared_room_rent, shared_listings = _room_rent(room_data[is_shared])
     private_room_rent, private_listings = _room_rent(room_data[is_private])
 
