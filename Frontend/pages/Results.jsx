@@ -30,14 +30,27 @@ function euro(value) {
 }
 
 // One safety score per postal district, straight from safety_indicators.csv (via the API).
-// The wording comes from the district's rank among the 22 districts; no colours for areas.
-// Street safety scores: 50 = the Dublin average; twice the average crime rate = 25, half = 75.
-function safetyLevel(raw) {
-  const score = Math.round(raw)   // label the number people see (39.8 shows as 40)
-  if (score >= 60) return ['good', 'Safer than Dublin average']
-  if (score >= 40) return ['mid', 'Around Dublin average']
-  return ['low', 'Below Dublin average']
+// Relative crime scores: 0-100 against the recorded-crime rate of Irish towns and cities (50 = that rate), in four bands.
+const SAFETY_TIERS = [[57, 'Lower recorded crime'], [50, 'Below-benchmark crime'], [40, 'Above-benchmark crime'], [0, 'Higher recorded crime']]
+const TIER_TONE = { 'Lower recorded crime': 'good', 'Below-benchmark crime': 'good', 'Above-benchmark crime': 'mid', 'Higher recorded crime': 'low' }
+
+// Bands from the unrounded score (the card shows one decimal, so the number and its band always agree).
+function safetyTier(score) {
+  return SAFETY_TIERS.find(([cut]) => score >= cut)[1]
 }
+
+function safetyLevel(raw) {
+  const tier = safetyTier(raw)
+  return [TIER_TONE[tier], tier]
+}
+
+const CRIME_GROUPS = [
+  ['violent', 'Violent crime and assault (35%)'],
+  ['robbery', 'Robbery (25%)'],
+  ['burglary_theft', 'Burglary and theft (20%)'],
+  ['public_order', 'Public order (15%)'],
+  ['damage', 'Criminal damage (5%)'],
+]
 
 function SafetyScore({ label, score }) {
   if (score == null) return null
@@ -46,9 +59,9 @@ function SafetyScore({ label, score }) {
     <div>
       <dt>{label}</dt>
       <dd>
-        {Math.round(score)}<span className="result-muted">/100</span>
+        {score.toFixed(1)}<span className="result-muted">/100</span>
         <span className={`safety-tag ${tone}`}>{words}</span>
-        <span className="safety-meter" role="img" aria-label={`${label}: ${Math.round(score)} out of 100`}>
+        <span className="safety-meter" role="img" aria-label={`${label}: ${score.toFixed(1)} out of 100`}>
           <span className={tone} style={{ width: `${Math.max(4, Math.min(100, score))}%` }} />
         </span>
       </dd>
@@ -62,30 +75,63 @@ function SafetyScores({ area, safety }) {
   return (
     <section className="result-safety" aria-label={`Safety in ${area}`}>
       <h3>Safety</h3>
-      <p className="result-muted">50 = Dublin average · higher is safer</p>
+      <p className="result-muted">
+        50 = the recorded-crime rate of Irish towns and cities · above 50 = less recorded crime, below 50 = more. A
+        comparative index, not the chance of becoming a victim: 70 is not twice as safe as 35.
+      </p>
       <dl className="result-stats safety-stats">
-        <SafetyScore label="Street safety score" score={safety.index} />
+        <SafetyScore label="Relative crime score (estimate)" score={safety.index} />
       </dl>
+      {safety.areas_to_check?.length > 0 && (
+        <div className="safety-check" role="note">
+          <strong>Check the specific street before choosing:</strong> {safety.areas_to_check.join(', ')}
+          {safety.check_street_pct ? ` (${safety.check_street_pct}% of this district's residents)` : ''}.
+          <span className="result-muted">
+            {' '}These parts are classed as disadvantaged in the official Pobal Deprivation Index 2022, and Garda crime
+            figures cover whole station areas, so the score above may not reflect a particular street. Visit the
+            street, ask locals and look at the surroundings before signing a lease.
+          </span>
+        </div>
+      )}
       <details>
         <summary>What&apos;s behind this score</summary>
-        <h4>Used in the score</h4>
-        <ul>
-          {safety.robbery_per_100k != null && (
-            <li>
-              Robberies: {safety.robbery_per_100k.toLocaleString('en-IE')} per 100,000 people a year
-              {safety.dublin_robbery_per_100k != null && ` (Dublin average ${safety.dublin_robbery_per_100k.toLocaleString('en-IE')})`}
-            </li>
-          )}
-          {safety.public_order_per_100k != null && (
-            <li>
-              Public order offences: {safety.public_order_per_100k.toLocaleString('en-IE')} per 100,000 people a year
-              {safety.dublin_public_order_per_100k != null && ` (Dublin average ${safety.dublin_public_order_per_100k.toLocaleString('en-IE')})`}
-            </li>
-          )}
-          {safety.garda_nearest_km != null && (
-            <li>Nearest Garda station: {safety.garda_nearest_km.toFixed(1)} km on average</li>
-          )}
-        </ul>
+        <h4>How the score is made</h4>
+        <p className="result-muted">
+          Recorded crime per 1,000 people in each Garda station area, compared with the rate across Irish towns and
+          cities. It measures recorded crime only, not every aspect of safety. Garda areas don&apos;t follow postal
+          districts, so this district&apos;s score is the average of the station areas its residents live in:
+        </p>
+        {safety.station_areas?.length > 0 && (
+          <ul>
+            {safety.station_areas.map((part) => (
+              <li key={part.station}>
+                {part.station} station area: {part.score} ({part.share_pct}% of residents)
+              </li>
+            ))}
+          </ul>
+        )}
+        {safety.crime_per_1k && (
+          <>
+            <h4>Recorded crime{safety.crime_period ? ` (${safety.crime_period})` : ''}</h4>
+            <ul>
+              {CRIME_GROUPS.filter(([key]) => safety.crime_per_1k[key] != null).map(([key, name]) => (
+                <li key={key}>
+                  {name}: {safety.crime_per_1k[key].toLocaleString('en-IE')} per 1,000 people a year
+                  {safety.ireland_crime_per_1k?.[key] != null
+                    && ` (Irish towns and cities ${safety.ireland_crime_per_1k[key].toLocaleString('en-IE')})`}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        <p className="result-muted">
+          Recorded crime statistics reflect incidents known to and recorded by An Garda Síochána. They do not capture
+          all criminal activity, unreported incidents, or residents&apos; perceptions of safety. Consider this score
+          alongside the other indicators here, such as lighting and transport.
+        </p>
+        {safety.garda_nearest_km != null && (
+          <p className="result-muted">Nearest Garda station: {safety.garda_nearest_km.toFixed(1)} km on average (not part of the score)</p>
+        )}
         {(safety.lit_streets_pct != null || safety.night_transit_pct != null) && (
           <>
             <h4>Other safety factors</h4>
@@ -518,7 +564,7 @@ const COMPARE_ROWS = [
   { label: 'Monthly rent', get: (r) => r.rent, show: (v) => euro(v), better: 'low' },
   { label: 'Commute', get: (r) => r.commute_minutes, show: (v) => `${v} min`, better: 'low' },
   { label: 'Walk to campus', get: (r) => r.walking?.average_minutes, show: (v) => `${v} min`, better: 'low' },
-  { label: 'Safety score', get: (r) => r.safety?.index, show: (v) => `${Math.round(v)} / 100`, better: 'high' },
+  { label: 'Relative crime score', get: (r) => r.safety?.index, show: (v) => `${v.toFixed(1)} / 100`, better: 'high' },
 ]
 
 function CompareAreas({ results, budget }) {

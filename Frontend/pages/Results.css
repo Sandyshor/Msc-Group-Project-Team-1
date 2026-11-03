@@ -383,6 +383,16 @@
 .safety-tag.mid { background: #f3e6c8; color: #7a5a12; }
 .safety-tag.low { background: #f6e1d6; color: #8a3b2b; }
 
+.safety-check {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fbf0e3;
+  color: #6b4513;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 .safety-meter {
   display: block;
   height: 5px;

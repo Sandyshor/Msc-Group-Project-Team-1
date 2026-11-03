@@ -1,0 +1,565 @@
+code,label,station,division,sub_district,residents,daytime
+11101,"11101 Bailieboro, Cavan/Monaghan Division",bailieboro,Cavan/Monaghan Division,Bailieboro,6343.0,5328.0
+11102,"11102 Ballyjamesduff, Cavan/Monaghan Division",ballyjamesduff,Cavan/Monaghan Division,Ballyjamesduff,7103.0,5443.0
+11103,"11103 Cootehill, Cavan/Monaghan Division",cootehill,Cavan/Monaghan Division,Cootehill,5177.0,5500.0
+11104,"11104 Kingscourt, Cavan/Monaghan Division",kingscourt,Cavan/Monaghan Division,Kingscourt,4601.0,3639.0
+11105,"11105 Mullagh, Cavan/Monaghan Division",mullagh,Cavan/Monaghan Division,Mullagh,2535.0,2504.0
+11106,"11106 Shercock, Cavan/Monaghan Division",shercock,Cavan/Monaghan Division,Shercock,2872.0,2011.0
+11108,"11108 Virginia, Cavan/Monaghan Division",virginia,Cavan/Monaghan Division,Virginia,8196.0,5472.0
+11201,"11201 Ballyconnell, Cavan/Monaghan Division",ballyconnell,Cavan/Monaghan Division,Ballyconnell,4121.0,3213.0
+11203,"11203 Belturbet, Cavan/Monaghan Division",belturbet,Cavan/Monaghan Division,Belturbet,4071.0,2341.0
+11204,"11204 Blacklion, Cavan/Monaghan Division",blacklion,Cavan/Monaghan Division,Blacklion,668.0,840.0
+11205,"11205 Dowra, Cavan/Monaghan Division",dowra,Cavan/Monaghan Division,Dowra,616.0,527.0
+11206,"11206 Killeshandra, Cavan/Monaghan Division",killeshandra,Cavan/Monaghan Division,Killeshandra,1578.0,2429.0
+11207,"11207 Swanlinbar, Cavan/Monaghan Division",swanlinbar,Cavan/Monaghan Division,Swanlinbar,960.0,658.0
+11301,"11301 Ballybay, Cavan/Monaghan Division",ballybay,Cavan/Monaghan Division,Ballybay,4299.0,3727.0
+11302,"11302 Carrickmacross, Cavan/Monaghan Division",carrickmacross,Cavan/Monaghan Division,Carrickmacross,15143.0,12379.0
+11303,"11303 Castleblayney, Cavan/Monaghan Division",castleblayney,Cavan/Monaghan Division,Castleblaney,11564.0,9905.0
+11305,"11305 Rockcorry, Cavan/Monaghan Division",rockcorry,Cavan/Monaghan Division,Rockcorry [SS],2105.0,1774.0
+11401,"11401 Arva, Cavan/Monaghan Division",arva,Cavan/Monaghan Division,Arvagh,2294.0,1450.0
+11402,"11402 Ballinagh, Cavan/Monaghan Division",ballinagh,Cavan/Monaghan Division,Ballinagh,4341.0,3126.0
+11403,"11403 Cavan, Cavan/Monaghan Division",cavan,Cavan/Monaghan Division,Cavan,20852.0,23076.0
+11404,"11404 Kilnaleck, Cavan/Monaghan Division",kilnaleck,Cavan/Monaghan Division,Kilnaleck,5376.0,3613.0
+11501,"11501 Clones, Cavan/Monaghan Division",clones,Cavan/Monaghan Division,Clones,6295.0,5201.0
+11503,"11503 Emyvale, Cavan/Monaghan Division",emyvale,Cavan/Monaghan Division,Emyvale,4814.0,3509.0
+11504,"11504 Monaghan, Cavan/Monaghan Division",monaghan,Cavan/Monaghan Division,Monaghan,17038.0,18391.0
+11506,"11506 Scotstown, Cavan/Monaghan Division",scotstown,Cavan/Monaghan Division,Scotstown,4030.0,2751.0
+12101,"12101 Ballintra, Donegal Division",ballintra,Donegal Division,Ballintra,2790.0,1681.0
+12102,"12102 Ballyshannon, Donegal Division",ballyshannon,Donegal Division,Ballyshannon,4090.0,4704.0
+12103,"12103 Bundoran, Donegal Division",bundoran,Donegal Division,Bundoran,3303.0,2952.0
+12104,"12104 Donegal Town, Donegal Division",donegal town,Donegal Division,Donegal,6699.0,7131.0
+12106,"12106 Mountcharles, Donegal Division",mountcharles,Donegal Division,Mountcharles,2848.0,1817.0
+12107,"12107 Na Cealla Beaga, Donegal Division",na cealla beaga,Donegal Division,Killybegs,4852.0,4774.0
+12108,"12108 Pettigo, Donegal Division",pettigo,Donegal Division,Pettigo,557.0,518.0
+12201,"12201 Buncrana, Donegal Division",buncrana,Donegal Division,Buncrana,9904.0,9599.0
+12202,"12202 Burnfoot, Donegal Division",burnfoot,Donegal Division,Burnfoot,4687.0,3551.0
+12203,"12203 Carndonagh, Donegal Division",carndonagh,Donegal Division,Carndonagh,8796.0,8493.0
+12204,"12204 Clonmany, Donegal Division",clonmany,Donegal Division,Clonmany,3532.0,2659.0
+12207,"12207 Moville, Donegal Division",moville,Donegal Division,Moville,5408.0,4276.0
+12208,"12208 Muff, Donegal Division",muff,Donegal Division,Muff,3852.0,2985.0
+12301,"12301 Ballybofey, Donegal Division",ballybofey,Donegal Division,Ballybofey,11696.0,10435.0
+12302,"12302 Carrigans, Donegal Division",carrigans,Donegal Division,Carrigans,3198.0,1993.0
+12303,"12303 Castlefin, Donegal Division",castlefin,Donegal Division,Castlefinn,2513.0,1599.0
+12304,"12304 Convoy, Donegal Division",convoy,Donegal Division,Convoy,3705.0,2840.0
+12305,"12305 Letterkenny, Donegal Division",letterkenny,Donegal Division,Letterkenny,25207.0,29948.0
+12306,"12306 Lifford, Donegal Division",lifford,Donegal Division,Lifford,3585.0,3276.0
+12308,"12308 Newtowncunningham, Donegal Division",newtowncunningham,Donegal Division,Newtown Cunningham,3687.0,2989.0
+12309,"12309 Raphoe, Donegal Division",raphoe,Donegal Division,Raphoe,5004.0,4949.0
+12401,"12401 An Craoslach, Donegal Division",an craoslach,Donegal Division,Creeslough [SS],1375.0,748.0
+12402,"12402 An Fail Carrach, Donegal Division",an fail carrach,Donegal Division,Falcarragh,4453.0,5200.0
+12403,"12403 Carraig Airt, Donegal Division",carraig airt,Donegal Division,Carrigart,2693.0,2326.0
+12404,"12404 Dun Fionnachaid, Donegal Division",dun fionnachaid,Donegal Division,Dunfanaghy,1820.0,1225.0
+12405,"12405 Kerrykeel, Donegal Division",kerrykeel,Donegal Division,Carrowkeel,2728.0,1921.0
+12406,"12406 Kilmacrennan, Donegal Division",kilmacrennan,Donegal Division,Kilmacrennan,7005.0,3838.0
+12408,"12408 Milford, Co Donegal, Donegal Division",milford,Donegal Division,Milford,1964.0,2648.0
+12409,"12409 Ramelton, Donegal Division",ramelton,Donegal Division,Ramelton,3759.0,2092.0
+12410,"12410 Rathmullen, Donegal Division",rathmullen,Donegal Division,Rathmullen [SS],1085.0,1167.0
+12501,"12501 Ailt an Chorraiin, Donegal Division",ailt an chorraiin,Donegal Division,Burtonport,1974.0,1117.0
+12502,"12502 An Bun Beag, Donegal Division",an bun beag,Donegal Division,Bunbeg,6523.0,4956.0
+12503,"12503 An Charraig, Donegal Division",an charraig,Donegal Division,Carrick,2785.0,2808.0
+12504,"12504 An Clochain Liath, Donegal Division",an clochain liath,Donegal Division,Dungloe,3647.0,4284.0
+12507,"12507 Ard an Raitha, Donegal Division",ard an raitha,Donegal Division,Ardara,2296.0,1566.0
+12508,"12508 Clogher, Donegal Division",clogher,Donegal Division,Clogher [SS],989.0,604.0
+12510,"12510 Na Gleannta, Donegal Division",na gleannta,Donegal Division,Glenties,2075.0,2594.0
+13103,"13103 Ballymote, Sligo/Leitrim Division",ballymote,Sligo/Leitrim Division,Ballymote,4817.0,3790.0
+13106,"13106 Enniscrone, Sligo/Leitrim Division",enniscrone,Sligo/Leitrim Division,Enniscrone,5808.0,4115.0
+13107,"13107 Gurteen, Sligo/Leitrim Division",gurteen,Sligo/Leitrim Division,Gurteen,2013.0,1709.0
+13108,"13108 Riverstown, Sligo/Leitrim Division",riverstown,Sligo/Leitrim Division,Riverstown,4352.0,4291.0
+13109,"13109 Tubbercurry, Sligo/Leitrim Division",tubbercurry,Sligo/Leitrim Division,Tobercurry,6832.0,4824.0
+13201,"13201 Ballinamore, Sligo/Leitrim Division",ballinamore,Sligo/Leitrim Division,Ballinamore,3324.0,2070.0
+13202,"13202 Carrick-On-Shannon, Sligo/Leitrim Division",carrick-on-shannon,Sligo/Leitrim Division,Carrick-on-Shannon,7534.0,8709.0
+13203,"13203 Carrigallen, Sligo/Leitrim Division",carrigallen,Sligo/Leitrim Division,Carrigallen,1595.0,2020.0
+13206,"13206 Drumshambo, Sligo/Leitrim Division",drumshambo,Sligo/Leitrim Division,Drumshanbo,4963.0,3316.0
+13208,"13208 Kinlough, Sligo/Leitrim Division",kinlough,Sligo/Leitrim Division,Kinlough,3510.0,2468.0
+13209,"13209 Manorhamilton, Sligo/Leitrim Division",manorhamilton,Sligo/Leitrim Division,Manorhamilton,7081.0,5469.0
+13211,"13211 Mohill, Sligo/Leitrim Division",mohill,Sligo/Leitrim Division,Mohill,7192.0,5548.0
+13302,"13302 Collooney, Sligo/Leitrim Division",collooney,Sligo/Leitrim Division,Collooney,5939.0,4415.0
+13303,"13303 Coolaney, Sligo/Leitrim Division",coolaney,Sligo/Leitrim Division,Coolaney,2416.0,1573.0
+13304,"13304 Grange, Sligo/Leitrim Division",grange,Sligo/Leitrim Division,Grange,5775.0,3803.0
+13305,"13305 Rosses Point, Sligo/Leitrim Division",rosses point,Sligo/Leitrim Division,Rosses Point,2849.0,2488.0
+13306,"13306 Skreen, Sligo/Leitrim Division",skreen,Sligo/Leitrim Division,Skreen,1665.0,1334.0
+13307,"13307 Sligo, Sligo/Leitrim Division",sligo,Sligo/Leitrim Division,Sligo,27732.0,34469.0
+14101,"14101 Ardee, Louth Division",ardee,Louth Division,Ardee,10267.0,8613.0
+14102,"14102 Castlebellingham, Louth Division",castlebellingham,Louth Division,Castlebellinham,7218.0,4419.0
+14103,"14103 Collon, Louth Division",collon,Louth Division,Collon,1860.0,2467.0
+14104,"14104 Louth, Louth Division",louth,Louth Division,Louth,4292.0,2976.0
+14201,"14201 Clogherhead, Louth Division",clogherhead,Louth Division,Clogherhead,4480.0,3294.0
+14202,"14202 Drogheda, Louth Division",drogheda,Louth Division,Drogheda,44936.0,43571.0
+14203,"14203 Dunleer, Louth Division",dunleer,Louth Division,Dunleer,5819.0,4016.0
+14301,"14301 Blackrock, Co Louth, Louth Division",blackrock,Louth Division,Blackrock,23764.0,13678.0
+14302,"14302 Carlingford, Louth Division",carlingford,Louth Division,Carlingford,4954.0,3562.0
+14303,"14303 Drumad, Louth Division",drumad,Louth Division,Drumad,4653.0,2381.0
+14304,"14304 Dundalk, Louth Division",dundalk,Louth Division,Dundalk,19816.0,32820.0
+14305,"14305 Hackballscross, Louth Division",hackballscross,Louth Division,Hackballscross,6139.0,2376.0
+14306,"14306 Omeath, Louth Division",omeath,Louth Division,Omeath,1505.0,1733.0
+21101,"21101 Crusheen, Clare Division",crusheen,Clare Division,Crusheen,2356.0,1340.0
+21102,"21102 Ennis, Clare Division",ennis,Clare Division,Ennis,36651.0,32098.0
+21104,"21104 Killaloe, Clare Division",killaloe,Clare Division,Killaloe,6180.0,7242.0
+21106,"21106 Newmarket on Fergus, Clare Division",newmarket on fergus,Clare Division,Newmarket-on-Fergus,3847.0,3108.0
+21108,"21108 Scariff, Clare Division",scariff,Clare Division,Scarriff,4902.0,3382.0
+21109,"21109 Shannon, Clare Division",shannon,Clare Division,Shannon,13242.0,19158.0
+21110,"21110 Sixmilebridge, Clare Division",sixmilebridge,Clare Division,Sixmilebridge,6294.0,4142.0
+21111,"21111 Tulla, Clare Division",tulla,Clare Division,Tulla,4070.0,3150.0
+21201,"21201 Ballyvaughan, Clare Division",ballyvaughan,Clare Division,Ballyvaughan,1552.0,524.0
+21203,"21203 Corofin Co. Clare, Clare Division",corofin co. clare,Clare Division,Corofin,2416.0,2475.0
+21205,"21205 Ennistymon, Clare Division",ennistymon,Clare Division,Ennistymon,9186.0,7134.0
+21206,"21206 Kildysart, Clare Division",kildysart,Clare Division,Killadysert,3049.0,2128.0
+21207,"21207 Kilkee, Clare Division",kilkee,Clare Division,Kilkee,5381.0,3551.0
+21208,"21208 Kilmihil , Clare Division",kilmihil,Clare Division,,,
+21209,"21209 Kilrush, Clare Division",kilrush,Clare Division,Kilrush,5243.0,5727.0
+21211,"21211 Lisdoonvarna, Clare Division",lisdoonvarna,Clare Division,Lisdoonvarna,3512.0,2608.0
+21212,"21212 Miltown Malbay, Clare Division",miltown malbay,Clare Division,Miltown Malbay,4530.0,3498.0
+22102,"22102 Ballycroy, Mayo Division",ballycroy,Mayo Division,Ballycroy [SS],332.0,792.0
+22103,"22103 Bangor Erris, Mayo Division",bangor erris,Mayo Division,Bangor Erris,1978.0,2594.0
+22104,"22104 Béal an Mhuirthead, Mayo Division",beal an mhuirthead,Mayo Division,Belmullet,4760.0,5001.0
+22106,"22106 Gleann na Muaidhe, Mayo Division",gleann na muaidhe,Mayo Division,Glenamoy,1789.0,672.0
+22201,"22201 Ballina, Mayo Division",ballina,Mayo Division,Ballina,14807.0,15326.0
+22203,"22203 Bonniconlon, Mayo Division",bonniconlon,Mayo Division,Bonniconlon,1744.0,1424.0
+22204,"22204 Crossmolina, Mayo Division",crossmolina,Mayo Division,Crossmolina,4998.0,3291.0
+22205,"22205 Killala, Mayo Division",killala,Mayo Division,Killala,3895.0,3601.0
+22301,"22301 Balla, Mayo Division",balla,Mayo Division,Balla,2719.0,1423.0
+22304,"22304 Castlebar, Mayo Division",castlebar,Mayo Division,Castlebar,23989.0,24208.0
+22306,"22306 Partry, Mayo Division",partry,Mayo Division,Partry,4705.0,4900.0
+22401,"22401 Ballindine, Mayo Division",ballindine,Mayo Division,Ballindine,2657.0,1417.0
+22402,"22402 Ballinrobe, Mayo Division",ballinrobe,Mayo Division,Ballinrobe,4997.0,5832.0
+22403,"22403 Claremorris, Mayo Division",claremorris,Mayo Division,Claremorris,7623.0,6551.0
+22404,"22404 Cong, Mayo Division",cong,Mayo Division,Cong,1653.0,1074.0
+22406,"22406 Kilmaine, Mayo Division",kilmaine,Mayo Division,Kilmaine,1690.0,710.0
+22407,"22407 Knock, Mayo Division",knock,Mayo Division,Knock,2654.0,1917.0
+22408,"22408 Shrule, Mayo Division",shrule,Mayo Division,Shrule,2380.0,2060.0
+22501,"22501 Ballyhaunis, Mayo Division",ballyhaunis,Mayo Division,Ballyhaunis,6079.0,5586.0
+22502,"22502 Charlestown, Mayo Division",charlestown,Mayo Division,Charlestown,3127.0,2945.0
+22503,"22503 Foxford, Mayo Division",foxford,Mayo Division,Foxford,4918.0,4324.0
+22504,"22504 Kilkelly, Mayo Division",kilkelly,Mayo Division,Kilkelly,2784.0,2239.0
+22505,"22505 Kiltimagh, Mayo Division",kiltimagh,Mayo Division,Kiltamagh,3444.0,3091.0
+22506,"22506 Swinford, Mayo Division",swinford,Mayo Division,Swinford,4532.0,4325.0
+22601,"22601 Gob an Choire, Mayo Division",gob an choire,Mayo Division,Achill Sound,2102.0,798.0
+22602,"22602 Keel, Mayo Division",keel,Mayo Division,Keel,968.0,1361.0
+22603,"22603 Louisburgh, Mayo Division",louisburgh,Mayo Division,Louisburgh,3027.0,2462.0
+22605,"22605 Newport, Co Mayo, Mayo Division",newport,Mayo Division,Newport,3731.0,2960.0
+22606,"22606 Westport, Mayo Division",westport,Mayo Division,Westport,13888.0,13649.0
+23101,"23101 Ahascragh, Galway Division",ahascragh,Galway Division,Ahascragh,2715.0,1459.0
+23102,"23102 Ballinasloe, Galway Division",ballinasloe,Galway Division,Ballinasloe,8510.0,8292.0
+23103,"23103 Ballygar, Galway Division",ballygar,Galway Division,Ballygar,1654.0,1514.0
+23104,"23104 Creggs, Galway Division",creggs,Galway Division,Creggs,983.0,871.0
+23105,"23105 Kilconnell, Galway Division",kilconnell,Galway Division,Kilconnell,1933.0,1614.0
+23106,"23106 Kiltormer, Galway Division",kiltormer,Galway Division,Kiltormer,2116.0,1918.0
+23108,"23108 Mountbellew, Galway Division",mountbellew,Galway Division,Mountbellew,4014.0,4896.0
+23109,"23109 Moylough, Galway Division",moylough,Galway Division,Moylough,3647.0,1098.0
+23201,"23201 An Maim, Galway Division",an maim,Galway Division,Maum,2572.0,1353.0
+23202,"23202 Carna, Galway Division",carna,Galway Division,Carna,1780.0,2093.0
+23203,"23203 Clifden, Galway Division",clifden,Galway Division,Clifden,3393.0,4145.0
+23204,"23204 Cloch na Ron, Galway Division",cloch na ron,Galway Division,Roundstone,851.0,0.0
+23206,"23206 Letterfrack, Galway Division",letterfrack,Galway Division,Letterfrack,2257.0,2791.0
+23207,"23207 Sraith Salach, Galway Division",sraith salach,Galway Division,Recess [SS],439.0,0.0
+23301,"23301 Aran More, Galway Division",aran more,Galway Division,Oranmore,24736.0,13796.0
+23302,"23302 Athenry, Galway Division",athenry,Galway Division,Athenry,11584.0,10910.0
+23304,"23304 Gaillimh, Galway Division",gaillimh,Galway Division,Galway,48053.0,80955.0
+23306,"23306 Leach Seoirse, Galway Division",leach seoirse,Galway Division,Loughgeorge,15957.0,15037.0
+23307,"23307 Monivea, Galway Division",monivea,Galway Division,Monivea,3134.0,1813.0
+23401,"23401 Ardrahan, Galway Division",ardrahan,Galway Division,Ardrahan,3364.0,2763.0
+23402,"23402 Craughwell, Galway Division",craughwell,Galway Division,Craughwell,8482.0,3705.0
+23403,"23403 Gort, Galway Division",gort,Galway Division,Gort,6447.0,5530.0
+23406,"23406 Kinvara, Galway Division",kinvara,Galway Division,Kinvara,2932.0,2872.0
+23501,"23501 Eyrecourt, Galway Division",eyrecourt,Galway Division,Eyrecourt,1995.0,1504.0
+23502,"23502 Killimor, Galway Division",killimor,Galway Division,Killimor,3722.0,1175.0
+23503,"23503 Kilrickle, Galway Division",kilrickle,Galway Division,Kilrickle,3935.0,2065.0
+23504,"23504 Loughrea, Galway Division",loughrea,Galway Division,Loughrea,8766.0,8222.0
+23506,"23506 Portumna, Galway Division",portumna,Galway Division,Portumna,3362.0,4188.0
+23508,"23508 Woodford, Galway Division",woodford,Galway Division,Woodford,1584.0,1496.0
+23601,"23601 An Cheathru Rua, Galway Division",an cheathru rua,Galway Division,Carraroe,2665.0,2034.0
+23602,"23602 An Spideal, Galway Division",an spideal,Galway Division,Spiddle,4584.0,3474.0
+23603,"23603 Bothar Na Tra, Galway Division",bothar na tra,Galway Division,Salthill,30484.0,20829.0
+23604,"23604 Cill Ronain, Galway Division",cill ronain,Galway Division,Kilronan,1347.0,1163.0
+23605,"23605 Indreabhain, Galway Division",indreabhain,Galway Division,Inverin,3076.0,3342.0
+23606,"23606 Leitir Mor, Galway Division",leitir mor,Galway Division,Leitir Mor,2207.0,1973.0
+23607,"23607 Maigh Cuilinn, Galway Division",maigh cuilinn,Galway Division,Moycullen [SS],3100.0,2644.0
+23608,"23608 Oughterard, Galway Division",oughterard,Galway Division,Oughterard,5704.0,2865.0
+23609,"23609 Ros Muc, Galway Division",ros muc,Galway Division,Ros Muc,887.0,819.0
+23802,"23802 Barnaderg, Galway Division",barnaderg,Galway Division,Barnaderg,3760.0,2667.0
+23803,"23803 Corofin Co. Galway, Galway Division",corofin co. galway,Galway Division,Corofin,5161.0,2823.0
+23804,"23804 Dunmore, Galway Division",dunmore,Galway Division,Dunmore,2299.0,2324.0
+23805,"23805 Glenamaddy, Galway Division",glenamaddy,Galway Division,Glenamaddy,1906.0,2029.0
+23806,"23806 Headford, Galway Division",headford,Galway Division,Headford,6512.0,4711.0
+23808,"23808 Milltown, Galway Division",milltown,Galway Division,Milltown,1917.0,1401.0
+23809,"23809 Tuam, Galway Division",tuam,Galway Division,Tuam,15099.0,14620.0
+23810,"23810 Williamstown, Galway Division",williamstown,Galway Division,Williamstown,2320.0,1469.0
+24101,"24101 Boyle, Roscommon/Longford Division",boyle,Roscommon/Longford Division,Boyle,6307.0,6504.0
+24103,"24103 Elphin, Roscommon/Longford Division",elphin,Roscommon/Longford Division,Elphin,3342.0,1451.0
+24104,"24104 Keadue, Roscommon/Longford Division",keadue,Roscommon/Longford Division,Keadue,1814.0,1068.0
+24105,"24105 Roosky, Roscommon/Longford Division",roosky,Roscommon/Longford Division,Rooskey,4079.0,2919.0
+24106,"24106 Strokestown, Roscommon/Longford Division",strokestown,Roscommon/Longford Division,Strokestown,2238.0,2525.0
+24201,"24201 Ballaghderreen, Roscommon/Longford Division",ballaghderreen,Roscommon/Longford Division,Ballaghaderreen,6504.0,5681.0
+24202,"24202 Ballinlough, Roscommon/Longford Division",ballinlough,Roscommon/Longford Division,Ballinlough,3178.0,2050.0
+24204,"24204 Castlerea, Roscommon/Longford Division",castlerea,Roscommon/Longford Division,Castlerea,5810.0,5841.0
+24205,"24205 Frenchpark, Roscommon/Longford Division",frenchpark,Roscommon/Longford Division,Frenchpark,2172.0,1448.0
+24207,"24207 Tulsk, Roscommon/Longford Division",tulsk,Roscommon/Longford Division,Tulsk,1588.0,636.0
+24303,"24303 Drumlish, Roscommon/Longford Division",drumlish,Roscommon/Longford Division,Drumlish,3411.0,2157.0
+24304,"24304 Edgeworthstown, Roscommon/Longford Division",edgeworthstown,Roscommon/Longford Division,Edgeworthstown,5642.0,3463.0
+24305,"24305 Granard, Roscommon/Longford Division",granard,Roscommon/Longford Division,Granard,6145.0,5929.0
+24306,"24306 Smear, Roscommon/Longford Division",smear,Roscommon/Longford Division,Smear,2954.0,1939.0
+24401,"24401 Kenagh, Roscommon/Longford Division",kenagh,Roscommon/Longford Division,Keenagh,2657.0,2577.0
+24402,"24402 Lanesboro, Roscommon/Longford Division",lanesboro,Roscommon/Longford Division,Lanesboro,3076.0,2333.0
+24403,"24403 Longford, Roscommon/Longford Division",longford,Roscommon/Longford Division,Longford,15241.0,17449.0
+24407,"24407 Ballymahon, Roscommon/Longford Division",ballymahon,Roscommon/Longford Division,Ballymahon,7625.0,4477.0
+24501,"24501 Athleague, Roscommon/Longford Division",athleague,Roscommon/Longford Division,Athleague,3203.0,1690.0
+24503,"24503 Clonark, Roscommon/Longford Division",clonark,Roscommon/Longford Division,Clonark,6999.0,5227.0
+24505,"24505 Roscommon, Roscommon/Longford Division",roscommon,Roscommon/Longford Division,Roscommon,16258.0,13410.0
+24506,"24506 Taughmaconnell, Roscommon/Longford Division",taughmaconnell,Roscommon/Longford Division,Taghmaconnel [SS],1277.0,1675.0
+31101,"31101 Anglesea Street, Cork City Division",anglesea street,Cork City Division,Anglesea Street,11325.0,23305.0
+31104,"31104 Blackrock, Co Cork, Cork City Division",blackrock,Cork City Division,Blackrock,17161.0,19309.0
+31105,"31105 Bridewell Cork, Cork City Division",bridewell cork,Cork City Division,Bridewell,15451.0,28654.0
+31201,"31201 Ballincollig, Cork City Division",ballincollig,Cork City Division,Ballincollig,27160.0,22678.0
+31202,"31202 Blarney, Cork City Division",blarney,Cork City Division,Blarney,17252.0,13177.0
+31203,"31203 Gurranabraher, Cork City Division",gurranabraher,Cork City Division,Gurranabraher,19811.0,18076.0
+31304,"31304 Watercourse Road, Cork City Division",watercourse,Cork City Division,Watercourse Road,24180.0,26706.0
+31401,"31401 Bishopstown, Cork City Division",bishopstown,Cork City Division,Bishopstown,23808.0,33062.0
+31402,"31402 Carrigaline, Cork City Division",carrigaline,Cork City Division,Carrigaline,19092.0,19099.0
+31403,"31403 Crosshaven, Cork City Division",crosshaven,Cork City Division,Crosshaven,8242.0,3418.0
+31404,"31404 Douglas, Cork City Division",douglas,Cork City Division,Douglas,36680.0,24116.0
+31405,"31405 Passage West, Cork City Division",passage west,Cork City Division,Passage West,6663.0,4848.0
+31406,"31406 Togher, Cork City Division",togher,Cork City Division,Togher,12847.0,20549.0
+31407,"31407 Mayfield, Cork City Division",mayfield,Cork City Division,Mayfield,13363.0,15174.0
+32102,"32102 Carrigtwohill, Cork North Division",carrigtwohill,Cork North Division,Carrigtwohill,8181.0,10709.0
+32103,"32103 Cobh, Cork North Division",cobh,Cork North Division,Cobh,16029.0,11324.0
+32104,"32104 Glanmire, Cork City Division",glanmire,Cork City Division,Glanmire,21109.0,19694.0
+32106,"32106 Watergrasshill, Cork North Division",watergrasshill,Cork North Division,Watergrasshill,7827.0,5131.0
+32201,"32201 Ballynoe, Cork North Division",ballynoe,Cork North Division,Ballynoe,3073.0,2692.0
+32202,"32202 Castletownroche, Cork North Division",castletownroche,Cork North Division,Castletownroche,3714.0,3122.0
+32203,"32203 Fermoy, Cork North Division",fermoy,Cork North Division,Fermoy,10044.0,9143.0
+32204,"32204 Kildorrery, Cork North Division",kildorrery,Cork North Division,Kildorrery,3988.0,1697.0
+32205,"32205 Kilworth, Cork North Division",kilworth,Cork North Division,Kilworth,3197.0,3270.0
+32206,"32206 Mitchelstown, Cork North Division",mitchelstown,Cork North Division,Mitchelstown,7498.0,7022.0
+32207,"32207 Rathcormac, Co Cork, Cork North Division",rathcormac,Cork North Division,Rathcormack,5749.0,4279.0
+32301,"32301 Buttevant, Cork North Division",buttevant,Cork North Division,Buttervant,4680.0,3691.0
+32302,"32302 Charleville, Cork North Division",charleville,Cork North Division,Charleville,6033.0,7420.0
+32303,"32303 Doneraile, Cork North Division",doneraile,Cork North Division,Doneraile,2479.0,2552.0
+32304,"32304 Glantaine, Cork North Division",glantaine,Cork North Division,Glantane,4201.0,2577.0
+32305,"32305 Liscarroll, Cork North Division",liscarroll,Cork North Division,Liscarroll,2124.0,2946.0
+32306,"32306 Mallow, Cork North Division",mallow,Cork North Division,Mallow,18462.0,16936.0
+32307,"32307 Milford, Co Cork, Cork North Division",milford,Cork North Division,Milford,2715.0,929.0
+32401,"32401 Ballycotton, Cork North Division",ballycotton,Cork North Division,Ballycotton,3309.0,1576.0
+32402,"32402 Cloyne, Cork North Division",cloyne,Cork North Division,Cloyne,4730.0,4106.0
+32403,"32403 Killeagh, Cork North Division",killeagh,Cork North Division,Killeagh,8731.0,4098.0
+32404,"32404 Midleton, Cork North Division",midleton,Cork North Division,Midleton,17680.0,15007.0
+32405,"32405 Whitegate, Cork North Division",whitegate,Cork North Division,Whitegate,4813.0,2640.0
+32406,"32406 Youghal, Cork North Division",youghal,Cork North Division,Youghal,10529.0,8927.0
+33101,"33101 Ballineen, Cork West Division",ballineen,Cork West Division,Ballineen,5415.0,3508.0
+33102,"33102 Ballinhassig, Cork West Division",ballinhassig,Cork West Division,Ballinhassig,7902.0,3634.0
+33105,"33105 Bandon, Cork West Division",bandon,Cork West Division,Bandon,11703.0,12033.0
+33106,"33106 Innishannon, Cork West Division",innishannon,Cork West Division,Innishannon,2094.0,2143.0
+33107,"33107 Kilbrittain, Cork West Division",kilbrittain,Cork West Division,Kilbrittain,2222.0,1408.0
+33108,"33108 Kinsale, Cork West Division",kinsale,Cork West Division,Kinsale,14283.0,11603.0
+33109,"33109 Timoleague, Cork West Division",timoleague,Cork West Division,Timoleague,3186.0,2121.0
+33202,"33202 Ballydehob, Cork West Division",ballydehob,Cork West Division,Ballydehob,1876.0,1262.0
+33203,"33203 Bantry, Cork West Division",bantry,Cork West Division,Bantry,5256.0,6121.0
+33204,"33204 Castletownbere, Cork West Division",castletownbere,Cork West Division,Castletownbere,4497.0,4069.0
+33205,"33205 Drimoleague, Cork West Division",drimoleague,Cork West Division,Drimoleague,3217.0,2386.0
+33206,"33206 Durrus, Cork West Division",durrus,Cork West Division,Durrus,1743.0,1205.0
+33207,"33207 Glengarriff, Cork West Division",glengarriff,Cork West Division,Glengarriff,2076.0,772.0
+33209,"33209 Kealkil, Cork West Division",kealkil,Cork West Division,Kealkil [SS],852.0,824.0
+33210,"33210 Schull, Cork West Division",schull,Cork West Division,Skull,2447.0,2669.0
+33302,"33302 Baltimore, Cork West Division",baltimore,Cork West Division,Baltimore [SS],1141.0,690.0
+33304,"33304 Clonakilty, Cork West Division",clonakilty,Cork West Division,Clonakilty,10017.0,10190.0
+33305,"33305 Drinagh, Cork West Division",drinagh,Cork West Division,Drinagh,1943.0,1371.0
+33306,"33306 Dunmanway, Cork West Division",dunmanway,Cork West Division,Dunmanway,5467.0,4902.0
+33307,"33307 Rosscarbery, Cork West Division",rosscarbery,Cork West Division,Rosscarberry,4243.0,3400.0
+33308,"33308 Skibbereen, Cork West Division",skibbereen,Cork West Division,Skibbereen,8776.0,8285.0
+33401,"33401 Ballydesmond, Cork West Division",ballydesmond,Cork West Division,Ballydesmond,1305.0,615.0
+33402,"33402 Boherbue, Cork West Division",boherbue,Cork West Division,Boherbue,2179.0,1748.0
+33403,"33403 Kanturk, Cork North Division",kanturk,Cork North Division,Kanturk,7964.0,5565.0
+33406,"33406 Millstreet, Co. Cork, Cork West Division",millstreet,Cork West Division,Millstreet,5019.0,4783.0
+33407,"33407 Newmarket, Cork North Division",newmarket,Cork North Division,Newmarket,4163.0,2940.0
+33408,"33408 Rathmore, Co Kerry, Cork West Division",rathmore,Cork West Division,Rathmore,5797.0,4687.0
+33501,"33501 Béal atha an Ghaorthaidh, Cork West Division",beal atha an ghaorthaidh,Cork West Division,Ballingeary,2089.0,1587.0
+33502,"33502 Baile Bhuirne, Cork West Division",baile bhuirne,Cork West Division,Ballyvourney,2671.0,2757.0
+33503,"33503 Coachford, Cork West Division",coachford,Cork West Division,Coachford,4614.0,3341.0
+33504,"33504 Crookstown, Cork West Division",crookstown,Cork West Division,Crookstown,5297.0,2066.0
+33506,"33506 Macroom, Cork West Division",macroom,Cork West Division,Macroom,8848.0,6547.0
+33507,"33507 Stuake, Cork West Division",stuake,Cork West Division,Stuake,3675.0,2137.0
+33508,"33508 Tarelton, Cork West Division",tarelton,Cork West Division,Tarelton,2284.0,1737.0
+34101,"34101 An Coirean, Kerry Division",an coirean,Kerry Division,Waterville,2396.0,1886.0
+34102,"34102 Barraduff, Kerry Division",barraduff,Kerry Division,Barraduff,2710.0,1927.0
+34104,"34104 Caherciveen, Kerry Division",caherciveen,Kerry Division,Caherciveen,3557.0,3336.0
+34105,"34105 Glenbeigh, Kerry Division",glenbeigh,Kerry Division,Glenbeigh,2554.0,1370.0
+34106,"34106 Kenmare, Kerry Division",kenmare,Kerry Division,Kenmare,7221.0,6078.0
+34108,"34108 Killarney, Kerry Division",killarney,Kerry Division,Killarney,26469.0,26308.0
+34109,"34109 Killorglin, Kerry Division",killorglin,Kerry Division,Killorglin,10224.0,10382.0
+34111,"34111 Portmagee, Kerry Division",portmagee,Kerry Division,Portmagee,1495.0,1156.0
+34112,"34112 Sneem, Kerry Division",sneem,Kerry Division,Sneem,1425.0,1445.0
+34201,"34201 Ballybunion, Kerry Division",ballybunion,Kerry Division,Ballybunnion,4156.0,3562.0
+34202,"34202 Ballyduff, Co. Kerry, Kerry Division",ballyduff,Kerry Division,Ballyduff,2790.0,2972.0
+34203,"34203 Ballyheigue, Kerry Division",ballyheigue,Kerry Division,Ballyheigue,3110.0,3631.0
+34206,"34206 Knocknagoshel, Kerry Division",knocknagoshel,Kerry Division,knockgoshel,2250.0,1492.0
+34207,"34207 Listowel, Kerry Division",listowel,Kerry Division,Listowel,10573.0,8833.0
+34208,"34208 Lixnaw, Kerry Division",lixnaw,Kerry Division,Lixnaw,3566.0,2458.0
+34210,"34210 Tarbert, Kerry Division",tarbert,Kerry Division,Tarbert,2726.0,2514.0
+34303,"34303 Annascaul, Kerry Division",annascaul,Kerry Division,Anascaul [SS],1761.0,1155.0
+34304,"34304 Ardfert, Kerry Division",ardfert,Kerry Division,Ardfert,5127.0,2913.0
+34305,"34305 Baile an Fheirtéaraigh, Kerry Division",baile an fheirtearaigh,Kerry Division,Ballyferriter [SS],1368.0,1089.0
+34307,"34307 Castlegregory, Kerry Division",castlegregory,Kerry Division,Castlegregory,3264.0,2259.0
+34308,"34308 Castleisland, Kerry Division",castleisland,Kerry Division,Castleisland,7560.0,7632.0
+34309,"34309 Castlemaine, Kerry Division",castlemaine,Kerry Division,Castlemaine,1756.0,1445.0
+34310,"34310 Dingle, Kerry Division",dingle,Kerry Division,Dingle,4743.0,4915.0
+34311,"34311 Farranfore, Kerry Division",farranfore,Kerry Division,Farranfore,3912.0,2114.0
+34313,"34313 Tralee, Kerry Division",tralee,Kerry Division,Tralee,35001.0,37350.0
+35101,"35101 Ballylanders, Limerick Division",ballylanders,Limerick Division,Ballylanders,3068.0,2300.0
+35102,"35102 Bruff, Limerick Division",bruff,Limerick Division,Bruff,3532.0,2586.0
+35103,"35103 Bruree, Limerick Division",bruree,Limerick Division,Bruree,2743.0,2049.0
+35104,"35104 Cappamore, Limerick Division",cappamore,Limerick Division,Cappamore,3459.0,3523.0
+35107,"35107 Hospital Co Limerick, Limerick Division",hospital co limerick,Limerick Division,Hospital,3759.0,3263.0
+35109,"35109 Kilmallock, Limerick Division",kilmallock,Limerick Division,Kilmallock,7392.0,6727.0
+35110,"35110 Murroe, Limerick Division",murroe,Limerick Division,Murroe [SS],3662.0,1819.0
+35111,"35111 Oola, Limerick Division",oola,Limerick Division,Oola,1707.0,1243.0
+35112,"35112 Pallasgreen, Limerick Division",pallasgreen,Limerick Division,Pallas Green,3070.0,894.0
+35201,"35201 Ardnacrusha, Limerick Division",ardnacrusha,Limerick Division,Ardnacrusha,11962.0,6055.0
+35202,"35202 Castleconnell, Limerick Division",castleconnell,Limerick Division,Castleconnell,8120.0,9776.0
+35203,"35203 Henry Street, Limerick Division",henry street,Limerick Division,Henry Street,20404.0,45378.0
+35205,"35205 Mayorstone Park, Limerick Division",mayorstone park,Limerick Division,Mayorstone,27527.0,28421.0
+35301,"35301 Abbeyfeale, Limerick Division",abbeyfeale,Limerick Division,Abbeyfeale,6970.0,6891.0
+35302,"35302 Adare, Limerick Division",adare,Limerick Division,Adare,3675.0,2678.0
+35303,"35303 Askeaton, Limerick Division",askeaton,Limerick Division,Askeaton,2208.0,1594.0
+35304,"35304 Athea, Limerick Division",athea,Limerick Division,Athea,1875.0,1432.0
+35305,"35305 Ballingarry, Limerick Division",ballingarry,Limerick Division,Ballingarry,2621.0,1373.0
+35307,"35307 Croom, Limerick Division",croom,Limerick Division,Croom,5338.0,3778.0
+35308,"35308 Drumcollogher, Limerick Division",drumcollogher,Limerick Division,Dromcollogher,5410.0,4429.0
+35309,"35309 Foynes, Limerick Division",foynes,Limerick Division,Foynes,3836.0,3184.0
+35310,"35310 Glin, Limerick Division",glin,Limerick Division,Glin,1879.0,1603.0
+35312,"35312 Newcastle West, Limerick Division",newcastle west,Limerick Division,Newcastle West,11774.0,11062.0
+35313,"35313 Pallaskenry, Limerick Division",pallaskenry,Limerick Division,Pallaskenry,4038.0,3366.0
+35314,"35314 Rathkeale, Limerick Division",rathkeale,Limerick Division,Rathkeale,4987.0,5168.0
+35401,"35401 Ballyneety, Limerick Division",ballyneety,Limerick Division,Ballyneety,19812.0,3632.0
+35402,"35402 Caherconlish, Limerick Division",caherconlish,Limerick Division,Caherconlish,3282.0,3016.0
+35403,"35403 Patrickswell, Limerick Division",patrickswell,Limerick Division,Patrickswell,23996.0,5708.0
+35404,"35404 Roxboro Road, Limerick Division",roxboro,Limerick Division,Roxboro Road,18566.0,43943.0
+41101,"41101 Banagher, Laois/Offaly Division",banagher,Laois/Offaly Division,Banagher,3026.0,2160.0
+41102,"41102 Birr, Laois/Offaly Division",birr,Laois/Offaly Division,Birr,7214.0,8067.0
+41103,"41103 Cloghan, Co. Offaly, Laois/Offaly Division",cloghan,Laois/Offaly Division,Cloghan,2153.0,2499.0
+41104,"41104 Ferbane, Laois/Offaly Division",ferbane,Laois/Offaly Division,Ferbane,5103.0,3134.0
+41105,"41105 Kilcormac, Laois/Offaly Division",kilcormac,Laois/Offaly Division,Kilcormac,2671.0,1691.0
+41106,"41106 Kinnitty, Laois/Offaly Division",kinnitty,Laois/Offaly Division,Kinnity,1744.0,893.0
+41108,"41108 Shinrone, Laois/Offaly Division",shinrone,Laois/Offaly Division,Shinrone,2606.0,1995.0
+41201,"41201 Abbeyleix, Laois/Offaly Division",abbeyleix,Laois/Offaly Division,Abbeyleix,8549.0,7615.0
+41202,"41202 Arles, Laois/Offaly Division",arles,Laois/Offaly Division,Arles,9509.0,3639.0
+41205,"41205 Ballylinan, Laois/Offaly Division",ballylinan,Laois/Offaly Division,Ballylynan,4345.0,2425.0
+41206,"41206 Borris-In-Ossory, Laois/Offaly Division",borris-in-ossory,Laois/Offaly Division,Borris-In-Ossery,2452.0,1397.0
+41207,"41207 Clonaslee, Laois/Offaly Division",clonaslee,Laois/Offaly Division,Clonaslee,2279.0,1910.0
+41208,"41208 Durrow, Laois/Offaly Division",durrow,Laois/Offaly Division,Durrow,2406.0,2011.0
+41209,"41209 Mountmellick, Laois/Offaly Division",mountmellick,Laois/Offaly Division,Mountmellick,7630.0,5949.0
+41210,"41210 Mountrath, Laois/Offaly Division",mountrath,Laois/Offaly Division,Mountrath,6666.0,5475.0
+41211,"41211 Portarlington, Laois/Offaly Division",portarlington,Laois/Offaly Division,Portarlington,16163.0,12337.0
+41212,"41212 Portlaoise, Laois/Offaly Division",portlaoise,Laois/Offaly Division,Portlaoise,28552.0,26457.0
+41213,"41213 Rathdowney, Laois/Offaly Division",rathdowney,Laois/Offaly Division,Rathdowney,2919.0,1882.0
+41214,"41214 Stradbally Co Laois, Laois/Offaly Division",stradbally co laois,Laois/Offaly Division,Stradbally,4722.0,4465.0
+41301,"41301 Clara, Laois/Offaly Division",clara,Laois/Offaly Division,Clara,6542.0,5598.0
+41302,"41302 Clonbologue, Laois/Offaly Division",clonbologue,Laois/Offaly Division,Clonbologue,2394.0,1269.0
+41303,"41303 Daingean, Laois/Offaly Division",daingean,Laois/Offaly Division,Daingean,4615.0,2186.0
+41304,"41304 Edenderry, Laois/Offaly Division",edenderry,Laois/Offaly Division,Edenderry,10541.0,8046.0
+41306,"41306 Rhode, Laois/Offaly Division",rhode,Laois/Offaly Division,Rhode,2664.0,3302.0
+41307,"41307 Tullamore, Laois/Offaly Division",tullamore,Laois/Offaly Division,Tullamore,25346.0,25836.0
+42101,"42101 Ashbourne, Meath Division",ashbourne,Meath Division,Ashbourne,30175.0,21405.0
+42102,"42102 Duleek, Meath Division",duleek,Meath Division,Duleek,9475.0,6707.0
+42103,"42103 Dunboyne, Meath Division",dunboyne,Meath Division,Dunboyne,14470.0,11777.0
+42104,"42104 Dunshaughlin, Meath Division",dunshaughlin,Meath Division,Dunshaughlin,12756.0,7063.0
+42105,"42105 Laytown, Meath Division",laytown,Meath Division,Laytown,33375.0,18883.0
+42201,"42201 Baile Atha Bui, Meath Division",baile atha bui,Meath Division,Athboy,6676.0,4957.0
+42203,"42203 Kells Ceanannus Mor, Meath Division",kells ceanannus mor,Meath Division,Kells,16130.0,13702.0
+42204,"42204 Oldcastle, Meath Division",oldcastle,Meath Division,Oldcastle,4320.0,4196.0
+42301,"42301 Navan, Meath Division",navan,Meath Division,Navan,44987.0,36666.0
+42302,"42302 Nobber, Meath Division",nobber,Meath Division,Nobber,7129.0,5815.0
+42303,"42303 Slane, Meath Division",slane,Meath Division,Slane,5914.0,3728.0
+42401,"42401 Ballivor, Meath Division",ballivor,Meath Division,Ballivor,4212.0,3467.0
+42402,"42402 Enfield, Meath Division",enfield,Meath Division,Enfield,5375.0,4213.0
+42404,"42404 Longwood, Meath Division",longwood,Meath Division,Longwood [SS],5309.0,3300.0
+42405,"42405 Summerhill, Meath Division",summerhill,Meath Division,Summerhill,4178.0,2054.0
+42406,"42406 Trim, Meath Division",trim,Meath Division,Trim,16345.0,15041.0
+42407,"42407 Glasson, Westmeath Division",glasson,Westmeath Division,Glassan,3532.0,2938.0
+43101,"43101 Baltinglass, Wicklow Division",baltinglass,Wicklow Division,Baltinglass,7326.0,5676.0
+43102,"43102 Blessington, Wicklow Division",blessington,Wicklow Division,Blessington,10180.0,7337.0
+43103,"43103 Carnew, Wicklow Division",carnew,Wicklow Division,Carnew,2901.0,2462.0
+43105,"43105 Dunlavin, Wicklow Division",dunlavin,Wicklow Division,Dunlavin,2838.0,2882.0
+43107,"43107 Shillelagh, Wicklow Division",shillelagh,Wicklow Division,Shilleagh,2183.0,2492.0
+43108,"43108 Tinahely, Wicklow Division",tinahely,Wicklow Division,Tinahely,2537.0,1965.0
+43201,"43201 Bray, Wicklow Division",bray,Wicklow Division,Bray,32810.0,29502.0
+43202,"43202 Enniskerry, Wicklow Division",enniskerry,Wicklow Division,Enniskerry,4062.0,3087.0
+43203,"43203 Greystones, Wicklow Division",greystones,Wicklow Division,Greystones,28007.0,18565.0
+43204,"43204 Newtownmountkennedy, Wicklow Division",newtownmountkennedy,Wicklow Division,Newtownmountkennedy,7650.0,4783.0
+43301,"43301 Arklow, Wicklow Division",arklow,Wicklow Division,Arklow,17152.0,15882.0
+43302,"43302 Ashford, Wicklow Division",ashford,Wicklow Division,Ashford,4837.0,4751.0
+43303,"43303 Aughrim, Wicklow Division",aughrim,Wicklow Division,Aughrim,3275.0,2655.0
+43304,"43304 Avoca, Wicklow Division",avoca,Wicklow Division,Avoca,3101.0,1531.0
+43305,"43305 Rathdrum, Wicklow Division",rathdrum,Wicklow Division,Rathdrum,5522.0,4288.0
+43306,"43306 Roundwood, Wicklow Division",roundwood,Wicklow Division,Roundwood,3196.0,1871.0
+43307,"43307 Wicklow, Wicklow Division",wicklow,Wicklow Division,Wicklow,18274.0,13396.0
+44101,"44101 Athlone, Westmeath Division",athlone,Westmeath Division,Athlone,24671.0,32061.0
+44103,"44103 Ballymore, Westmeath Division",ballymore,Westmeath Division,Ballymore,2274.0,1662.0
+44105,"44105 Kilbeggan, Westmeath Division",kilbeggan,Westmeath Division,Kilbeggan,5311.0,4193.0
+44106,"44106 Moate, Westmeath Division",moate,Westmeath Division,Moate,8070.0,5484.0
+44201,"44201 Ballynacargy, Westmeath Division",ballynacargy,Westmeath Division,Ballynacargy,2867.0,1828.0
+44202,"44202 Castlepollard, Westmeath Division",castlepollard,Westmeath Division,Castlepollard,5373.0,5684.0
+44204,"44204 Delvin, Westmeath Division",delvin,Westmeath Division,Delvin,4904.0,3817.0
+44206,"44206 Killucan, Westmeath Division",killucan,Westmeath Division,Killucan,5311.0,3363.0
+44207,"44207 Kinnegad, Westmeath Division",kinnegad,Westmeath Division,Kinnegad,3850.0,2602.0
+44208,"44208 Mullingar, Westmeath Division",mullingar,Westmeath Division,Mullingar,28326.0,28088.0
+44209,"44209 Multyfarnham, Westmeath Division",multyfarnham,Westmeath Division,Multyfarnham,2268.0,709.0
+44211,"44211 Rochfortbridge, Westmeath Division",rochfortbridge,Westmeath Division,Rochfortbridge,4746.0,3416.0
+45101,"45101 Athy, Kildare Division",athy,Kildare Division,Athy,18285.0,15086.0
+45103,"45103 Castledermot, Kildare Division",castledermot,Kildare Division,Castledermot,4944.0,3196.0
+45104,"45104 Kildare, Kildare Division",kildare,Kildare Division,Kildare,15218.0,11356.0
+45105,"45105 Monasterevin, Kildare Division",monasterevin,Kildare Division,Monasterevin,8831.0,7180.0
+45106,"45106 Newbridge, Kildare Division",newbridge,Kildare Division,Newbridge,30941.0,30366.0
+45107,"45107 Rathangan, Kildare Division",rathangan,Kildare Division,Rathangan,5188.0,3491.0
+45201,"45201 Carbury, Kildare Division",carbury,Kildare Division,Carbury,7968.0,4595.0
+45202,"45202 Celbridge, Kildare Division",celbridge,Kildare Division,Celbridge,22718.0,17757.0
+45203,"45203 Kilcock, Kildare Division",kilcock,Kildare Division,Kilcock,13907.0,8807.0
+45204,"45204 Leixlip, Kildare Division",leixlip,Kildare Division,Leixlip,16755.0,15249.0
+45205,"45205 Maynooth, Kildare Division",maynooth,Kildare Division,Maynooth,21242.0,23004.0
+45302,"45302 Clane, Kildare Division",clane,Kildare Division,Clane,18826.0,12416.0
+45303,"45303 Kilcullen, Kildare Division",kilcullen,Kildare Division,Killcullen,11753.0,7839.0
+45305,"45305 Naas, Kildare Division",naas,Kildare Division,Naas,41156.0,40405.0
+45306,"45306 Robertstown, Kildare Division",robertstown,Kildare Division,Robertstown,10042.0,5690.0
+51101,"51101 Ardfinnan, Tipperary Division",ardfinnan,Tipperary Division,Ardfinnan,4229.0,2936.0
+51102,"51102 Ballyporeen, Tipperary Division",ballyporeen,Tipperary Division,Ballyporeen,2631.0,1885.0
+51103,"51103 Cahir, Tipperary Division",cahir,Tipperary Division,Caher,7490.0,5591.0
+51104,"51104 Cashel, Tipperary Division",cashel,Tipperary Division,Cashel,9684.0,8391.0
+51105,"51105 Clogheen, Co. Tipperary, Tipperary Division",clogheen,Tipperary Division,Clogheen,1308.0,1387.0
+51201,"51201 Carrick-On-Suir, Tipperary Division",carrick-on-suir,Tipperary Division,Carrick-on-Suir,7341.0,7388.0
+512015,"512015 Carrig na Bhfear, Cork City Division",carrig na bhfear,Cork City Division,,,
+51202,"51202 Clonmel, Tipperary Division",clonmel,Tipperary Division,Clonmel,20089.0,23385.0
+51203,"51203 Fethard, Tipperary Division",fethard,Tipperary Division,Fethard,4384.0,3271.0
+51205,"51205 Kilsheelan, Tipperary Division",kilsheelan,Tipperary Division,Kilsheelan,2248.0,1453.0
+51206,"51206 Mullinahone, Tipperary Division",mullinahone,Tipperary Division,Mullinahone,3994.0,2234.0
+51302,"51302 Ballingarry North, Tipperary Division",ballingarry north,Tipperary Division,Ballingarry North [SS],1014.0,477.0
+51303,"51303 Borrisokane, Tipperary Division",borrisokane,Tipperary Division,Borrisokane,3420.0,2878.0
+51304,"51304 Cloughjordan, Tipperary Division",cloughjordan,Tipperary Division,Cloughjordon,1754.0,719.0
+51305,"51305 Dolla, Tipperary Division",dolla,Tipperary Division,Dolla,2625.0,2030.0
+51306,"51306 Lorrha, Tipperary Division",lorrha,Tipperary Division,Lorrha,1971.0,1138.0
+51307,"51307 Nenagh, Tipperary Division",nenagh,Tipperary Division,Nenagh,14613.0,14904.0
+51308,"51308 Newport, Co Tipperary, Tipperary Division",newport,Tipperary Division,Newport,10077.0,5490.0
+51309,"51309 Portroe, Tipperary Division",portroe,Tipperary Division,Portroe,2988.0,1819.0
+51312,"51312 Toomevara, Tipperary Division",toomevara,Tipperary Division,Toomevara,2285.0,1885.0
+51401,"51401 Borrisoleigh, Tipperary Division",borrisoleigh,Tipperary Division,Borrisoleigh,2143.0,1525.0
+51402,"51402 Moneygall, Tipperary Division",moneygall,Tipperary Division,Moneygall,1687.0,1150.0
+51403,"51403 Moyne, Tipperary Division",moyne,Tipperary Division,Moyne,1639.0,1066.0
+51404,"51404 Roscrea, Tipperary Division",roscrea,Tipperary Division,Roscrea,8255.0,8560.0
+51405,"51405 Shevry, Tipperary Division",shevry,Tipperary Division,Shevry,1391.0,1170.0
+51406,"51406 Templederry, Tipperary Division",templederry,Tipperary Division,Templederry [SS],686.0,497.0
+51407,"51407 Templemore, Tipperary Division",templemore,Tipperary Division,Templemore,4971.0,4794.0
+51408,"51408 Templetuohy, Tipperary Division",templetuohy,Tipperary Division,Templetuohy,1303.0,977.0
+51501,"51501 Ballingarry South, Tipperary Division",ballingarry south,Tipperary Division,Ballingarry South,2326.0,1793.0
+51503,"51503 Holycross, Tipperary Division",holycross,Tipperary Division,Holycross,3383.0,2315.0
+51504,"51504 Killenaule, Tipperary Division",killenaule,Tipperary Division,Killenaule,4939.0,5981.0
+51505,"51505 Littleton, Tipperary Division",littleton,Tipperary Division,Littleton,2667.0,2032.0
+51506,"51506 Thurles, Tipperary Division",thurles,Tipperary Division,Thurles,10467.0,12509.0
+51601,"51601 Bansha, Tipperary Division",bansha,Tipperary Division,Bansha,1329.0,1107.0
+51602,"51602 Cappawhite, Tipperary Division",cappawhite,Tipperary Division,Cappawhite,5394.0,3763.0
+51604,"51604 Emly, Tipperary Division",emly,Tipperary Division,Emly [SS],1632.0,1260.0
+51605,"51605 Golden, Tipperary Division",golden,Tipperary Division,Golden,1650.0,1533.0
+51606,"51606 Tipperary, Tipperary Division",tipperary,Tipperary Division,Tipperary,10567.0,9728.0
+52101,"52101 Blackwater, Wexford Division",blackwater,Wexford Division,Blackwater,4428.0,3246.0
+52102,"52102 Clonroche, Wexford Division",clonroche,Wexford Division,Clonroche,5683.0,3549.0
+52103,"52103 Enniscorthy, Wexford Division",enniscorthy,Wexford Division,Enniscorthy,17598.0,17562.0
+52104,"52104 Ferns, Wexford Division",ferns,Wexford Division,Ferns,5789.0,3202.0
+52106,"52106 Oulart, Wexford Division",oulart,Wexford Division,Oulart,3748.0,2547.0
+52107,"52107 Oylegate, Wexford Division",oylegate,Wexford Division,Oylegate,4852.0,3212.0
+52201,"52201 Bunclody, Wexford Division",bunclody,Wexford Division,Bunclody,6135.0,6058.0
+52202,"52202 Courtown Harbour, Wexford Division",courtown harbour,Wexford Division,Courtown Harbour,10718.0,7084.0
+52203,"52203 Gorey, Wexford Division",gorey,Wexford Division,Gorey,21908.0,18754.0
+52301,"52301 Ballycullane, Wexford Division",ballycullane,Wexford Division,Ballycullane,3311.0,1341.0
+52303,"52303 Campile, Wexford Division",campile,Wexford Division,Campile,2656.0,3174.0
+52304,"52304 Carrickbyrne, Wexford Division",carrickbyrne,Wexford Division,Carrickbyrne,5204.0,4414.0
+52305,"52305 Carrick-on-Bannow, Wexford Division",carrick-on-bannow,Wexford Division,Carrick-on-Bannow,3068.0,1980.0
+52306,"52306 Duncannon, Wexford Division",duncannon,Wexford Division,Duncannon,4097.0,2497.0
+52307,"52307 New Ross, Wexford Division",new ross,Wexford Division,New Ross,12305.0,13295.0
+52402,"52402 Castlebridge, Wexford Division",castlebridge,Wexford Division,Castlebridge [SS],4800.0,3664.0
+52403,"52403 Glynn, Wexford Division",glynn,Wexford Division,Glynn,3471.0,2739.0
+52404,"52404 Kilmore Quay, Wexford Division",kilmore quay,Wexford Division,Kilmore Quay,6152.0,4169.0
+52405,"52405 Rosslare Harbour, Wexford Division",rosslare harbour,Wexford Division,Rosslare Harbour,4924.0,4031.0
+52406,"52406 Rosslare Strand, Wexford Division",rosslare strand,Wexford Division,Rosslare Strand,4275.0,2217.0
+52407,"52407 Taghmon, Wexford Division",taghmon,Wexford Division,Taghmon,3583.0,3009.0
+52408,"52408 Wexford, Wexford Division",wexford,Wexford Division,Wexford,25214.0,29924.0
+53101,"53101 Ballon, Kilkenny/Carlow Division",ballon,Kilkenny/Carlow Division,Ballon,4559.0,3274.0
+53102,"53102 Borris, Kilkenny/Carlow Division",borris,Kilkenny/Carlow Division,Borris,3416.0,3449.0
+53103,"53103 Carlow, Kilkenny/Carlow Division",carlow,Kilkenny/Carlow Division,Carlow,28181.0,34211.0
+53104,"53104 Hacketstown, Kilkenny/Carlow Division",hacketstown,Kilkenny/Carlow Division,Hacketstown,2088.0,1443.0
+53106,"53106 Muine Bheag, Kilkenny/Carlow Division",muine bheag,Kilkenny/Carlow Division,Muine Bheag,9431.0,8584.0
+53107,"53107 Myshall, Kilkenny/Carlow Division",myshall,Kilkenny/Carlow Division,Myshall [SS],3037.0,2019.0
+53108,"53108 Rathvilly, Kilkenny/Carlow Division",rathvilly,Kilkenny/Carlow Division,Rathvilly,2769.0,2254.0
+53109,"53109 Tullow, Kilkenny/Carlow Division",tullow,Kilkenny/Carlow Division,Tullow,7438.0,5516.0
+53202,"53202 Callan, Kilkenny/Carlow Division",callan,Kilkenny/Carlow Division,Callan,6482.0,5569.0
+53203,"53203 Castlecomer, Kilkenny/Carlow Division",castlecomer,Kilkenny/Carlow Division,Castlecomer,9372.0,7411.0
+53204,"53204 Freshford, Kilkenny/Carlow Division",freshford,Kilkenny/Carlow Division,Freshford,3369.0,2137.0
+53206,"53206 Kilkenny, Kilkenny/Carlow Division",kilkenny,Kilkenny/Carlow Division,Kilkenny,33752.0,40127.0
+53207,"53207 Urlingford, Kilkenny/Carlow Division",urlingford,Kilkenny/Carlow Division,Urlingford,3758.0,3408.0
+53301,"53301 Ballyhale, Kilkenny/Carlow Division",ballyhale,Kilkenny/Carlow Division,Ballyhale,2651.0,1420.0
+53302,"53302 Bennettsbridge, Kilkenny/Carlow Division",bennettsbridge,Kilkenny/Carlow Division,Bennetsbridge,3516.0,2275.0
+53303,"53303 Glenmore, Kilkenny/Carlow Division",glenmore,Kilkenny/Carlow Division,Glenmore,3695.0,2010.0
+53304,"53304 Goresbridge, Kilkenny/Carlow Division",goresbridge,Kilkenny/Carlow Division,Goresbridge,5423.0,3779.0
+53305,"53305 Graiguenamanagh, Kilkenny/Carlow Division",graiguenamanagh,Kilkenny/Carlow Division,Graiguenmanagh,6187.0,2461.0
+53307,"53307 Kilmacow, Kilkenny/Carlow Division",kilmacow,Kilkenny/Carlow Division,Kilmacow,3034.0,2411.0
+53308,"53308 Kilmoganny, Kilkenny/Carlow Division",kilmoganny,Kilkenny/Carlow Division,Kilmoganny,1349.0,717.0
+53309,"53309 Mooncoin, Kilkenny/Carlow Division",mooncoin,Kilkenny/Carlow Division,Mooncoin,2638.0,2367.0
+53310,"53310 Mullinavat, Kilkenny/Carlow Division",mullinavat,Kilkenny/Carlow Division,Mullinavat,2975.0,3160.0
+53311,"53311 Piltown, Kilkenny/Carlow Division",piltown,Kilkenny/Carlow Division,Pilltown,4167.0,2686.0
+53312,"53312 Stoneyford, Kilkenny/Carlow Division",stoneyford,Kilkenny/Carlow Division,Stoneyford [SS],2167.0,1193.0
+53313,"53313 Thomastown, Kilkenny/Carlow Division",thomastown,Kilkenny/Carlow Division,Thomastown,3787.0,3816.0
+54101,"54101 Aglish, Waterford Division",aglish,Waterford Division,Aglish,2108.0,849.0
+54102,"54102 An Rinn, Waterford Division",an rinn,Waterford Division,Ring,2198.0,1636.0
+54103,"54103 Ardmore, Waterford Division",ardmore,Waterford Division,Ardmore,2854.0,2483.0
+54105,"54105 Ballymacarberry, Waterford Division",ballymacarberry,Waterford Division,Ballymacarberry,3228.0,3315.0
+54106,"54106 Cappoquin, Waterford Division",cappoquin,Waterford Division,Cappoquin,2590.0,1705.0
+54107,"54107 Dungarvan, Waterford Division",dungarvan,Waterford Division,Dungarvan,15890.0,15525.0
+54108,"54108 Lismore, Waterford Division",lismore,Waterford Division,Lismore,4231.0,4139.0
+54109,"54109 Tallow, Waterford Division",tallow,Waterford Division,Tallow,1933.0,1171.0
+54201,"54201 Kill, Co Waterford, Waterford Division",kill,Waterford Division,Kill,2518.0,1444.0
+54202,"54202 Kilmacthomas, Waterford Division",kilmacthomas,Waterford Division,Kilmacthomas,3005.0,2656.0
+54203,"54203 Kilmeaden, Waterford Division",kilmeaden,Waterford Division,Kilmeaden,2637.0,2645.0
+54204,"54204 Leamybrien, Waterford Division",leamybrien,Waterford Division,Leamybrien,3026.0,2146.0
+54205,"54205 Portlaw, Waterford Division",portlaw,Waterford Division,Portlaw,3154.0,1860.0
+54206,"54206 Rathgormack, Co Waterford, Waterford Division",rathgormack,Waterford Division,Rathgormack,1852.0,1184.0
+54208,"54208 Tramore, Waterford Division",tramore,Waterford Division,Tramore,13843.0,10083.0
+54301,"54301 Dunmore East, Waterford Division",dunmore east,Waterford Division,Dunmore East,3286.0,2020.0
+54302,"54302 Ferrybank, Waterford Division",ferrybank,Waterford Division,Ferrybank,6887.0,5330.0
+54303,"54303 Passage East, Waterford Division",passage east,Waterford Division,Passage East,2750.0,2319.0
+54304,"54304 Waterford, Waterford Division",waterford,Waterford Division,Waterford,55332.0,63176.0
+61101,"61101 Donnybrook, D.M.R. South Central Division",donnybrook,D.M.R. South Central Division,Donnybrook,36084.0,59537.0
+61102,"61102 Irishtown, D.M.R. South Central Division",irishtown,D.M.R. South Central Division,Irishtown,18192.0,33406.0
+61202,"61202 Pearse Street, D.M.R. South Central Division",pearse street,D.M.R. South Central Division,Pearse Street,26647.0,124430.0
+61301,"61301 Kevin Street, D.M.R. South Central Division",kevin street,D.M.R. South Central Division,Kevin Street,27141.0,41813.0
+61302,"61302 Kilmainham, D.M.R. South Central Division",kilmainham,D.M.R. South Central Division,Kilmainham,29775.0,27427.0
+62101,"62101 Bridewell Dublin, D.M.R. North Central Division",bridewell,D.M.R. North Central Division,Bridewell,28786.0,26424.0
+62202,"62202 Fitzgibbon Street, D.M.R. North Central Division",fitzgibbon street,D.M.R. North Central Division,Fitzgibbon Street,22548.0,23627.0
+62203,"62203 Mountjoy, D.M.R. North Central Division",mountjoy,D.M.R. North Central Division,Mountjoy,27525.0,23407.0
+62301,"62301 Store Street, D.M.R. North Central Division",store street,D.M.R. North Central Division,Store Street,32213.0,68499.0
+63101,"63101 Balbriggan, D.M.R. Northern Division",balbriggan,D.M.R. Northern Division,Balbriggan,29668.0,22492.0
+63102,"63102 Garristown, D.M.R. Northern Division",garristown,D.M.R. Northern Division,Garristown,4363.0,2334.0
+63103,"63103 Lusk, D.M.R. Northern Division",lusk,D.M.R. Northern Division,Lusk,21890.0,15160.0
+63105,"63105 Skerries, D.M.R. Northern Division",skerries,D.M.R. Northern Division,Skerries,13027.0,8202.0
+63201,"63201 Ballymun, D.M.R. Northern Division",ballymun,D.M.R. Northern Division,Ballymun,23608.0,19484.0
+63202,"63202 Dublin Airport, D.M.R. Northern Division",dublin airport,D.M.R. Northern Division,,,
+63203,"63203 Santry, D.M.R. Northern Division",santry,D.M.R. Northern Division,Santry,34311.0,53724.0
+63301,"63301 Coolock, D.M.R. Northern Division",coolock,D.M.R. Northern Division,Coolock,62831.0,43748.0
+63302,"63302 Malahide, D.M.R. Northern Division",malahide,D.M.R. Northern Division,Malahide,34667.0,23314.0
+63303,"63303 Swords, D.M.R. Northern Division",swords,D.M.R. Northern Division,Swords,60105.0,50591.0
+63401,"63401 Clontarf, D.M.R. Northern Division",clontarf,D.M.R. Northern Division,Clontarf,42509.0,29524.0
+63402,"63402 Howth, D.M.R. Northern Division",howth,D.M.R. Northern Division,Howth,22284.0,19303.0
+63403,"63403 Raheny, D.M.R. Northern Division",raheny,D.M.R. Northern Division,Raheny,27134.0,19960.0
+64101,"64101 Crumlin, D.M.R. Southern Division",crumlin,D.M.R. Southern Division,Crumlin,26780.0,25704.0
+64102,"64102 Sundrive Road, D.M.R. Southern Division",sundrive,D.M.R. Southern Division,Sundrive Road,26558.0,21615.0
+64201,"64201 Rathfarnham, D.M.R. Southern Division",rathfarnham,D.M.R. Southern Division,Rathfarnham,64439.0,41896.0
+64202,"64202 Tallaght, D.M.R. Southern Division",tallaght,D.M.R. Southern Division,Tallaght,92181.0,76761.0
+64301,"64301 Rathmines, D.M.R. Southern Division",rathmines,D.M.R. Southern Division,Rathmines,28207.0,20914.0
+64302,"64302 Terenure, D.M.R. Southern Division",terenure,D.M.R. Southern Division,Terenure,28358.0,22959.0
+65101,"65101 Blackrock, Co Dublin, D.M.R. Eastern Division",blackrock,D.M.R. Eastern Division,Blackrock,34803.0,35413.0
+65102,"65102 Dundrum, D.M.R. Eastern Division",dundrum,D.M.R. Eastern Division,Dundrum,80581.0,69851.0
+65201,"65201 Cabinteely, D.M.R. Eastern Division",cabinteely,D.M.R. Eastern Division,Cabinteely,35789.0,31142.0
+65203,"65203 Dun Laoghaire, D.M.R. Eastern Division",dun laoghaire,D.M.R. Eastern Division,Dun Laoghaire,42936.0,38761.0
+65205,"65205 Shankill, D.M.R. Eastern Division",shankill,D.M.R. Eastern Division,Shankill,24283.0,15777.0
+66101,"66101 Blanchardstown, D.M.R. Western Division",blanchardstown,D.M.R. Western Division,Blanchardstown,107091.0,96370.0
+66102,"66102 Cabra, D.M.R. Western Division",cabra,D.M.R. Western Division,Cabra,23372.0,20067.0
+66103,"66103 Finglas, D.M.R. Western Division",finglas,D.M.R. Western Division,Finglas,54917.0,39231.0
+66201,"66201 Ballyfermot, D.M.R. Western Division",ballyfermot,D.M.R. Western Division,Ballyfermot,26346.0,33311.0
+66202,"66202 Clondalkin, D.M.R. Western Division",clondalkin,D.M.R. Western Division,Clondalkin,35998.0,40178.0
+66203,"66203 Rathcoole, D.M.R. Western Division",rathcoole,D.M.R. Western Division,Rathcoole,12142.0,25573.0
+66301,"66301 Lucan, D.M.R. Western Division",lucan,D.M.R. Western Division,Lucan,23701.0,30080.0
+66302,"66302 Ronanstown, D.M.R. Western Division",ronanstown,D.M.R. Western Division,Ronanstown,58212.0,27957.0

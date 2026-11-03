@@ -101,7 +101,7 @@ def recommend(req: RecommendRequest):
 @app.get("/safety-map/{area}")
 def safety_map(area: str):
     """Safety heat map for one district: its Census ED areas with their street safety scores (GeoJSON) and its
-    named neighbourhoods. Same scale as the district score: 50 = Dublin average, higher is safer."""
+    named neighbourhoods. Same scale as the district score: 0-100, 50 = a typical Irish town or city, higher is safer."""
     found = DATA.get("safety_maps", {}).get(area.upper())
     if not found:
         raise HTTPException(404, f"No safety map for {area}")

@@ -1,12 +1,31 @@
 #!/usr/bin/env python3
-"""Find Your Dublin - automated safety indicator pipeline (lean version).
+"""Find Your Dublin - automated relative crime score pipeline.
 
-Indicators (street safety): robbery and public order offences per person in the area (CSO CJA07, Garda-station
-level, average of the latest 3 calendar years; residents + daytime population) and distance to the nearest Garda
-station (OSM). Scores compare each area with the Dublin average (50 = average). Each source is cached separately; if a refresh fails or looks
-implausible, the last validated copy is kept and the problem is logged in safety_metadata.json.
+Method (recorded crime only, normalised against an Irish reference rate):
+  1. Every Garda station in Ireland (CSO CJA11, recorded crime incidents by Garda station, average of the latest
+     3 calendar years) gets a rate per 1,000 people in five groups: violent (35%), robbery (25%), burglary and
+     theft (20%), public order (15%) and criminal damage (5%). The rate's denominator is the average number of
+     people present over a day: residents (Census 2022) for 16 hours and the daytime population (Census 2016
+     Workplace Zones, scaled to 2022 by the national rise in people at work) for 8 hours.
+  2. The Irish reference rate for each group = all incidents / all people over Ireland's town and city stations.
+     Each group scores 100 x reference / (reference + rate): 50 at the reference rate, 67 at half of it, 33 at
+     double. It never reaches 0 or 100. The station score is the weighted average of its group scores.
+  3. A postal district's score is an estimate: the resident-weighted average of the scores of the Garda station
+     areas its residents live in (district_station_shares.csv lists each share, so every district score can be
+     reproduced by hand). Named neighbourhoods show the score of the station area they lie in.
+Areas classed Disadvantaged or worse in the Pobal HP Deprivation Index 2022 are flagged "check the street": station
+figures can hide local problems there, so the site asks users to look at the specific street. The flag does not
+change the score. Scores listed in data/safety/manual_overrides.csv replace the calculated ones (see CRIME_SCORE.md).
+Bands compare with the Irish reference, from the unrounded score: Lower recorded crime (57 or higher, under 3/4
+of the reference rate), Below-benchmark crime (50 to below 57), Above-benchmark crime (40 to below 50, up to 1.5x),
+Higher recorded crime (below 40, more than 1.5x). The score is a comparative index, not a probability of becoming
+a victim: 70 is not twice as safe as 35 (it means a rate of 0.43x the reference; 35 means 1.86x). Distance to the
+nearest Garda station is shown alongside but is not part of the score.
 
-Run:  python safety_pipeline.py [--force] [--cso-csv CJA07_FILE] [--stations FILE]
+Each source is cached separately; if a refresh fails or looks implausible, the last validated copy is kept and
+the problem is logged in safety_metadata.json.
+
+Run:  python safety_pipeline.py [--force] [--cso-csv CJA11_FILE] [--stations FILE]
 """
 import argparse, hashlib, io, json, logging, os, re, sys, time, unicodedata
 from datetime import datetime, timezone
@@ -22,26 +41,53 @@ log = logging.getLogger("safety")
 CFG = {
     # Every Dublin ED: residents, Garda station area, postal district, centre (build_station_map.py)
     "ed_points_csv": "data/safety/ed_points.csv",
-    # Daytime population per station area (build_station_map.py, Census 2016 Workplace Zones); optional.
-    # Rates are per (residents + daytime population) / 2, so busy areas where few people live aren't
-    # judged on residents alone.
-    "station_daytime_csv": "data/safety/station_daytime.csv",
+    # Residents and daytime population of every Garda station area in Ireland (build_national_stations.py)
+    "national_stations_csv": "data/safety/national_stations.csv",
     # Official Garda station areas: CSO Census 2011 boundary files, "Garda Sub Districts" (Nov 2013), one polygon
-    # per station - the same 41 Dublin stations CJA07 reports crime for. Only the one-off builders read it
-    # (build_station_map.py, build_neighbourhoods.py); without it they fall back to the nearest-station rule.
+    # per station, all of Ireland. Only the one-off builders read it (build_station_map.py,
+    # build_neighbourhoods.py, build_national_stations.py).
     # https://www.cso.ie/en/media/csoie/census/census2011boundaryfiles/Garda_Sub_Districts.zip
     "sub_districts_shp": "data/raw/garda_sub_districts/Garda Sub Districts/Census2011_Garda_Subdistricts_Nov2013.shp",
     # Named neighbourhoods with their Garda station area (build_neighbourhoods.py); optional
     "neighbourhoods_csv": "data/safety/neighbourhoods.csv",
+    # Pobal deprivation category per ED and neighbourhood (build_area_deprivation.py); optional. Areas in these
+    # categories are flagged "check the street" on the site; the score is unchanged.
+    "area_deprivation_csv": "data/safety/area_deprivation.csv",
+    "check_street_categories": ["Disadvantaged", "Very Disadvantaged", "Extremely Disadvantaged"],
+    # Project-team overrides of calculated scores (kind district/ed/neighbourhood, id, score); recorded in
+    # CRIME_SCORE.md, Appendix A9. Optional.
+    "manual_overrides_csv": "data/safety/manual_overrides.csv",
     "out_dir": "data/safety",
-    "cso_cja07_csv": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/CJA07/CSV/1.0/en",
+    # CJA11: recorded crime incidents by Garda station and offence group, per calendar year (New Garda Operating
+    # Model divisions; the station figures are the same as the older CJA07 table).
+    "cso_crime_csv": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/CJA11/CSV/1.0/en",
     "overpass": ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"],
-    # Street safety: offence groups that mostly happen in public. Assault (03) is left out because it mixes
-    # street, domestic and prison incidents (Mountjoy, Cloverhill and Wheatfield prisons inflate their stations).
-    "offence_groups": {"robbery_per_100k": ["06"], "public_order_per_100k": ["13"]},
+    # Crime groups (CSO ICCS offence groups) and weights. Theft from the person is inside theft (08) and can't be
+    # separated at station level. Left out: drugs (10) and weapons (11), which mostly reflect where Gardai
+    # search; fraud (09), traffic (14), offences against justice (15, recorded at the courts) and other (16).
+    "categories": {
+        "violent": ["03", "04", "05"],          # assault and harassment, dangerous acts, kidnapping
+        "robbery": ["06"],
+        "burglary_theft": ["07", "08"],
+        "public_order": ["13"],
+        "damage": ["12"],                        # criminal damage to property
+    },
+    "category_weights": {"violent": 0.35, "robbery": 0.25, "burglary_theft": 0.20, "public_order": 0.15, "damage": 0.05},
     "crime_years": 3,          # average the latest 3 calendar years so small station counts aren't one-year noise
-    "weights": {"robbery_per_100k": 0.55, "public_order_per_100k": 0.30, "garda_nearest_km": 0.15},
-    "higher_is_safer": {"robbery_per_100k": False, "public_order_per_100k": False, "garda_nearest_km": False},
+    # Denominator: people present on an average day = (home_hours x residents + day_hours x daytime population) / 24.
+    # Daytime population is Census 2016 (the latest Workplace Zones); it is scaled to 2022 by the national change in
+    # persons at work, Census 2016 2,006,641 -> Census 2022 2,320,297.
+    "home_hours": 16, "day_hours": 8,
+    "daytime_scale": 2320297 / 2006641,
+    # The Irish reference: stations with at least this many residents - Ireland's towns and cities (105 stations).
+    "min_reference_residents": 15000,
+    # Prisons inside a station area add offences that didn't happen on its streets: those stations' violent rate
+    # is capped at the highest other station's in the same division.
+    "custody_stations": {"mountjoy": "Mountjoy Prison and the Dochas Centre",
+                         "ronanstown": "Cloverhill and Wheatfield prisons"},
+    "custody_categories": ["violent"],
+    # Bands by the unrounded score. 57 = 3/4 of the reference rate, 50 = the reference, 40 = 1.5x.
+    "tiers": [(57, "Lower recorded crime"), (50, "Below-benchmark crime"), (40, "Above-benchmark crime"), (0, "Higher recorded crime")],
     "refresh_days": {"crime": 30, "garda": 30},
     "max_change_ratio": 2.0,
 }
@@ -69,7 +115,6 @@ CRIME_EXCLUDED = {
     "o'connell street": "no separate CSO figures (recorded under a neighbouring station)",
     "stepaside": "no separate CSO figures (recorded under a neighbouring station)",
 }
-
 
 # ---------------------------------------------------------------- helpers
 def norm_district(label):
@@ -133,9 +178,16 @@ def station_key(name):
 
 
 def cso_station_key(label):
-    """CJA07 label -> station key, e.g. '62101 Bridewell Dublin, D.M.R. North Central Division' -> 'bridewell'."""
+    """CSO station label -> station key: '62101 Bridewell Dublin, D.M.R. North Central Division' (CJA07) or
+    'Bridewell Dublin, D.M.R. North Central Division (62101)' (CJA11) -> 'bridewell'."""
     name = re.sub(r"^\d+\s+", "", str(label).split(",")[0])
     return re.sub(r"\s+dublin$", "", station_key(name))
+
+
+def cso_station_code(label):
+    """CSO station code from a CJA07 ('62101 Bridewell ...') or CJA11 ('Bridewell ... (62101)') label."""
+    m = re.match(r"^(\d+)\s", str(label)) or re.search(r"\((\d+)\)\s*$", str(label))
+    return m.group(1) if m else None
 
 
 def clean_stations(g):
@@ -232,6 +284,7 @@ def nearest_station_same_side(pts, st):
     return idx, dist.min(axis=1) / 1000, ps, pd_
 
 
+
 # ---------------------------------------------------------------- crime
 def offence_code(label):
     """ICCS group code of a CJA07 offence label, e.g. 'Robbery, extortion and hijacking offences (06)' -> '06'."""
@@ -239,107 +292,122 @@ def offence_code(label):
     return m.group(1) if m else None
 
 
-def crime_from_stations(df, points, groups, n_years=3, daytime=None):
-    """District crime rates from station-level CSO data (CJA07, calendar years).
+def reference_score(rate, reference):
+    """0-100 against the Irish reference rate: 100 x reference / (reference + rate). 50 at the reference, 67 at
+    half of it, 33 at double; never 0 or 100."""
+    return 100 * reference / (reference + np.asarray(rate, dtype=float))
 
-    groups: {output column: [ICCS group codes added together]}, e.g. {"robbery_per_100k": ["06"]}.
-    points: every Dublin ED with Population, Station (whose area it is in) and District (None outside D1-D24).
-    daytime: optional {station: daytime population}. People in an area = (residents + daytime) / 2, else residents.
-    A station's rate = its yearly incidents (averaged over the latest n_years) / people in its area; a district's
-    rate = the resident-weighted average over its EDs. The Dublin average (all incidents / all people) is
-    returned in dublin_<column>. Returns (district rates, per-station table).
+
+def tier(score):
+    """Band for a 0-100 score, from the unrounded score (49.96 is below 50)."""
+    if pd.isna(score):
+        return None
+    return next(name for cut, name in CFG["tiers"] if float(score) >= cut)
+
+
+def station_scores(df, national, points, n_years=3):
+    """Crime rates and scores for every Garda station in Ireland (CSO CJA11 or CJA07, calendar years).
+
+    national: residents and daytime population per station code (build_national_stations.py). Dublin stations use
+    the residents of the EDs our map gives them (points), so station and area figures agree.
+    Returns (all stations, Irish reference rates per 1,000 people, period).
     """
+    cats, weights = CFG["categories"], CFG["category_weights"]
     year_col, st_col, off_col = find_col(df, "year"), find_col(df, "garda station"), find_col(df, "offence")
     val_col = next((c for c in df.columns if c.upper() == "VALUE"), None) or find_col(df, "value")
-    df = df[df[st_col].astype(str).str.contains("D.M.R.", regex=False)].copy()
+    df = df.copy()
     df[val_col] = pd.to_numeric(df[val_col], errors="coerce")
     df["code"] = df[off_col].map(offence_code)
-    codes = sorted({c for cs in groups.values() for c in cs})
+    codes = sorted({c for cs in cats.values() for c in cs})
     missing_groups = sorted(set(codes) - set(df["code"].dropna()))
     if missing_groups:
         raise RuntimeError(f"Offence groups {missing_groups} not in the CSO file")
     years = sorted(df.loc[df[val_col].notna(), year_col].unique())
     if len(years) < n_years:
-        raise RuntimeError(f"Need {n_years} years of Dublin station figures, found {years}")
+        raise RuntimeError(f"Need {n_years} years of station figures, found {years}")
     used = years[-n_years:]
-    log.info("Offence groups used: %s; years %s", sorted(set(df.loc[df["code"].isin(codes), off_col])), used)
+    sub = df[df[year_col].isin(used) & df["code"].isin(codes)]
+    incidents = sub.pivot_table(index=st_col, columns="code", values=val_col, aggfunc="sum") / len(used)
+    incidents = incidents.reindex(columns=codes, fill_value=0).fillna(0)
 
-    sub = df[df[year_col].isin(used) & df["code"].isin(codes)].copy()
-    sub["Station"] = sub[st_col].map(cso_station_key)
-    incidents = sub.pivot_table(index="Station", columns="code", values=val_col, aggfunc="sum") / len(used)
-    residents = points.groupby("Station")["Population"].sum()
-    missing = sorted(set(residents.index) - set(incidents.index))
-    if missing:
-        raise RuntimeError(f"No CSO figures for station areas {missing} in {used}")
-    unused = sorted(set(incidents.index) - set(residents.index))
-    if unused:
-        log.info("CSO stations without an area (excluded or no map location): %s", unused)
+    nat = national.assign(code=national["code"].astype(str)).set_index("code")
+    t = pd.DataFrame({"label": incidents.index})
+    t["station"] = t["label"].map(cso_station_key)
+    t["code"] = t["label"].map(cso_station_code)
+    t["division"] = t["code"].map(nat["division"])
+    t["residents"] = t["code"].map(nat["residents"])
+    t["daytime"] = t["code"].map(nat["daytime"])
+    dublin = t["label"].str.contains("D.M.R.", regex=False)
+    t.loc[dublin, "residents"] = t.loc[dublin, "station"].map(points.groupby("Station")["Population"].sum())
+    unmapped = sorted(set(points["Station"]) - set(t.loc[dublin, "station"]))
+    if unmapped:
+        raise RuntimeError(f"No CSO figures for station areas {unmapped} in {used}")
+    t = t.dropna(subset=["residents"]).reset_index(drop=True)
+    dublin = t["label"].str.contains("D.M.R.", regex=False)
+    daytime = t["daytime"].fillna(t["residents"] / CFG["daytime_scale"]) * CFG["daytime_scale"]
+    t["people"] = ((CFG["home_hours"] * t["residents"] + CFG["day_hours"] * daytime) / 24).round(0)
+    for cat, cs in cats.items():
+        t[f"{cat}_per_year"] = incidents[cs].sum(axis=1).reindex(t["label"]).values
+        t[f"{cat}_per_1k"] = t[f"{cat}_per_year"] / t["people"] * 1000
 
-    if daytime is None:
-        people = residents
-    else:
-        day = pd.Series(daytime).reindex(residents.index)
-        if day.isna().any():
-            raise RuntimeError(f"No daytime population for station areas {sorted(day[day.isna()].index)}")
-        people = (residents + day) / 2
-    stations = pd.DataFrame({"residents_in_area": residents, "daytime_population": None if daytime is None else day,
-                             "people_in_area": people.round(0)}).rename_axis("station")
-    d = points.dropna(subset=["District"]).copy()
-    out, averages = None, {}
-    for col, group_codes in groups.items():
-        per_year = incidents[group_codes].sum(axis=1).reindex(residents.index)
-        rate = per_year / people * 1e5
-        averages[col] = per_year.sum() / people.sum() * 1e5
-        stations[col.replace("_per_100k", "_per_year")] = per_year.round(1)
-        stations[col] = rate.round(1)
-        d["weighted"] = d["Station"].map(rate) * d["Population"]
-        g = d.groupby("District")[["weighted", "Population"]].sum()
-        part = (g["weighted"] / g["Population"]).rename(col).reset_index()
-        out = part if out is None else out.merge(part, on="District")
-    if set(out["District"]) != EXPECTED:
-        raise RuntimeError(f"Crime rates must cover exactly {sorted(EXPECTED)}")
-    for col, avg in averages.items():
-        out[f"dublin_{col}"] = round(avg, 1)
+    # Prisons: cap their stations at the highest other station in the same division.
+    for key, why in CFG["custody_stations"].items():
+        row = t.index[dublin & (t["station"] == key)]
+        if not len(row):
+            continue
+        same_div = (t["division"] == t.loc[row[0], "division"]) & (t["station"] != key)
+        for cat in CFG["custody_categories"]:
+            cap = t.loc[same_div, f"{cat}_per_1k"].max()
+            if t.loc[row[0], f"{cat}_per_1k"] > cap:
+                log.info("%s %s rate %.1f capped at %.1f per 1,000 (%s)", key, cat, t.loc[row[0], f"{cat}_per_1k"], cap, why)
+                t.loc[row[0], f"{cat}_per_1k"] = cap
+                t.loc[row[0], f"{cat}_per_year"] = cap * t.loc[row[0], "people"] / 1000
+
+    ref = t[t["residents"] >= CFG["min_reference_residents"]]
+    reference = {cat: ref[f"{cat}_per_year"].sum() / ref["people"].sum() * 1000 for cat in cats}
+    t["score"] = sum(w * reference_score(t[f"{cat}_per_1k"], reference[cat]) for cat, w in weights.items())
     period = f"{int(used[0])} (calendar year)" if len(used) == 1 else f"{int(used[0])}-{int(used[-1])} average"
-    out["crime_reference_period"] = period
-    stations = stations.reset_index()
-    stations["years"] = period
-    return out, stations
+    log.info("Irish reference: %d town and city stations; per 1,000 people %s; %s", len(ref),
+             {c: round(v, 2) for c, v in reference.items()}, period)
+    return t, reference, period
 
 
-# ---------------------------------------------------------------- scoring
-def dublin_scale(values, average, higher_is_safer=False):
-    """0-100 against the Dublin average: 50 = average, each doubling of a crime rate costs 25 points and each
-    halving adds 25 (so 2x the average = 25, half = 75), clipped to 0-100."""
-    with np.errstate(divide="ignore"):
-        step = 25 * np.log2(values / average)
-    return (50 + step if higher_is_safer else 50 - step).clip(0, 100)
+def area_scores(areas, stations):
+    """Each area takes its Garda station area's score and crime rates (crime isn't published below station level)."""
+    s = stations.set_index("station")
+    a = areas.copy()
+    a["safety_index_0_100"] = a["Station"].map(s["score"])
+    a["tier"] = a["safety_index_0_100"].map(tier)
+    for cat in CFG["categories"]:
+        a[f"{cat}_per_1k"] = a["Station"].map(s[f"{cat}_per_1k"])
+    return a
 
 
-def weighted_score(df, averages):
-    """Weighted 0-100 street safety score against the Dublin averages, plus confidence and indicators used.
-
-    An indicator missing for an area is left out of that area's score (confidence drops).
-    """
-    w, up = CFG["weights"], CFG["higher_is_safer"]
-    parts = {col: dublin_scale(df[col], averages[col], up[col]) for col, wt in w.items()
-             if col in df and col in averages and wt > 0}
-    total_w = sum(w[c] for c in parts)
-    num = sum(parts[c].fillna(0) * w[c] for c in parts)
-    avail = sum(parts[c].notna().astype(float) * w[c] for c in parts)
-    used = [",".join(c for c in parts if pd.notna(parts[c].iloc[i])) for i in range(len(df))]
-    return (num / avail.replace(0, np.nan)).round(1), (avail / total_w).round(2), used
-
-
-def dublin_averages(base):
-    """Dublin averages from a composed district table: crime from the dublin_* columns, Garda distance = mean."""
-    averages = {col: base[f"dublin_{col}"].iloc[0] for col in CFG["offence_groups"]}
-    averages["garda_nearest_km"] = base["garda_nearest_km"].mean()
-    return averages
+def add_street_check(areas, kind, id_col):
+    """Pobal index and category (a separate indicator, not part of the score) and the 'check the street' flag for
+    each area; none of them if the file isn't there."""
+    p = Path(CFG["area_deprivation_csv"])
+    if not p.exists():
+        return areas.assign(pobal_index=None, pobal_category=None, check_street=False)
+    dep = pd.read_csv(p)
+    dep = dep[dep["kind"] == kind].set_index("id")
+    out = areas.assign(pobal_index=areas[id_col].map(dep["pobal_index"]),
+                       pobal_category=areas[id_col].map(dep["pobal_category"]))
+    out["check_street"] = out["pobal_category"].isin(CFG["check_street_categories"])
+    return out
 
 
-def score(df, averages):
-    df["safety_index_0_100"], df["confidence"], df["indicators_used"] = weighted_score(df, averages)
+def apply_overrides(df, kind, ids):
+    """Replace calculated scores with those in manual_overrides.csv for this kind (district, ed, neighbourhood)."""
+    p = Path(CFG["manual_overrides_csv"])
+    if not p.exists():
+        return df
+    o = pd.read_csv(p)
+    o = o[o["kind"] == kind].set_index("id")["score"]
+    new = ids.map(o)
+    df = df.copy()
+    df["safety_index_0_100"] = new.fillna(df["safety_index_0_100"])
+    df["tier"] = df["safety_index_0_100"].map(tier)
     return df
 
 
@@ -388,20 +456,6 @@ class Store:
         self.meta_path.write_text(json.dumps(self.meta, indent=2))
 
 
-def run_crime(store, local=None):
-    raw = Path(local).read_bytes() if local else fetch(CFG["cso_cja07_csv"])
-    df = pd.read_csv(io.BytesIO(raw), low_memory=False)
-    daytime = None
-    if Path(CFG["station_daytime_csv"]).exists():
-        daytime = pd.read_csv(CFG["station_daytime_csv"]).set_index("Station")["daytime_population"]
-    else:
-        log.warning("No %s - crime rates are per resident only", CFG["station_daytime_csv"])
-    out, stations = crime_from_stations(df, load_ed_points(), CFG["offence_groups"], CFG["crime_years"], daytime)
-    if store.accept("crime", "crime", out, list(CFG["offence_groups"]), note=out["crime_reference_period"].iloc[0]):
-        stations.to_csv(store.dir / "crime_by_station.csv", index=False)
-        store.meta["crime"]["sha256"] = hashlib.sha256(raw).hexdigest()[:16]
-
-
 def run_garda(store, local=None):
     st = read_stations_file(local) if local else read_stations_overpass()
     if len(st) < 20:
@@ -426,19 +480,76 @@ def run_garda(store, local=None):
         nb[["District", "Neighbourhood"]].assign(garda_nearest_km=km).to_csv(store.path("garda_neighbourhoods"), index=False)
 
 
+
+
+CRIME_PER_YEAR = [f"{c}_per_year" for c in CFG["categories"]]
+CRIME_PER_1K = [f"{c}_per_1k" for c in CFG["categories"]]
+
+
+def run_crime(store, local=None):
+    raw = Path(local).read_bytes() if local else fetch(CFG["cso_crime_csv"])
+    df = pd.read_csv(io.BytesIO(raw), low_memory=False)
+    national = pd.read_csv(CFG["national_stations_csv"], dtype={"code": str})
+    stations, reference, period = station_scores(df, national, load_ed_points(), CFG["crime_years"])
+    dublin = stations[stations["label"].str.contains("D.M.R.", regex=False)].assign(years=period)
+    for cat, v in reference.items():
+        dublin[f"ireland_{cat}_per_1k"] = v
+    cols = ["station", "division", "residents", "daytime", "people", *CRIME_PER_YEAR, *CRIME_PER_1K,
+            *[f"ireland_{c}" for c in CRIME_PER_1K], "score", "years"]
+    out = dublin[cols].round({**{c: 1 for c in CRIME_PER_YEAR}, **{c: 2 for c in CRIME_PER_1K},
+                              **{f"ireland_{c}": 2 for c in CRIME_PER_1K}, "score": 1})
+    if store.accept("crime", "crime", out, CRIME_PER_YEAR, note=period):
+        out.to_csv(store.dir / "crime_by_station.csv", index=False)
+        nat_cols = ["label", "residents", "daytime", "people", *CRIME_PER_1K, "score"]
+        stations[nat_cols].round(2).to_csv(store.path("national_station_scores"), index=False)
+        store.meta["crime"]["sha256"] = hashlib.sha256(raw).hexdigest()[:16]
+
+
 def compose(store):
-    base = pd.DataFrame({"District": sorted(EXPECTED, key=lambda d: (int(re.sub(r"\D", "", d)), d))})
-    for name in ("crime", "garda"):
-        p = store.path(name)
-        if p.exists():
-            base = base.merge(pd.read_csv(p), on="District", how="left")
-    crime_cols = list(CFG["offence_groups"])
-    if any(c not in base or base[c].isna().any() for c in crime_cols):
-        raise RuntimeError(f"Crime indicators {crime_cols} missing for some districts - not publishing")
-    averages = dublin_averages(base)
-    base = score(base, averages)
-    for c in base.select_dtypes("number").columns:
-        base[c] = base[c].round(3)
+    path = store.dir / "crime_by_station.csv"
+    stations = pd.read_csv(path) if path.exists() else None
+    if stations is None or "people" not in stations:
+        raise RuntimeError(f"{path} missing or from an older method - run the crime step (--force)")
+
+    eds = add_street_check(area_scores(load_ed_points(), stations), "ed", "ED_GUID")
+    # Overrides are set per ED, so districts and their station-area parts are always averages of what is shown.
+    eds = apply_overrides(eds, "ed", eds["ED_GUID"])
+    if eds["safety_index_0_100"].isna().any():
+        raise RuntimeError(f"No station score for {sorted(eds.loc[eds['safety_index_0_100'].isna(), 'Station'].unique())}")
+
+    # Districts (an estimate): resident-weighted average of their EDs' station-area figures.
+    d = eds.dropna(subset=["District"])
+    cols = ["safety_index_0_100", *CRIME_PER_1K]
+    w = d[cols].mul(d["Population"], axis=0).groupby(d["District"]).sum()
+    base = w.div(d.groupby("District")["Population"].sum(), axis=0).reset_index()
+    if set(base["District"]) != EXPECTED:
+        raise RuntimeError(f"Scores must cover exactly {sorted(EXPECTED)}")
+    base["District"] = pd.Categorical(base["District"], sorted(EXPECTED, key=lambda x: (int(re.sub(r"\D", "", x)), x)))
+    base = base.sort_values("District")
+    base["District"] = base["District"].astype(str)
+    base["tier"] = base["safety_index_0_100"].map(tier)
+    # Which station areas make up each district, and how much: the district score is exactly
+    # sum(share x station score), published in district_station_shares.csv so it can be checked by hand.
+    share = d.groupby(["District", "Station"])["Population"].sum()
+    comp = share.rename("residents").reset_index()
+    comp["share"] = comp["residents"] / comp.groupby("District")["residents"].transform("sum")
+    # Each part's score = resident-weighted average of its EDs (the station score, unless an ED is overridden)
+    part = (d["safety_index_0_100"] * d["Population"]).groupby([d["District"], d["Station"]]).sum() / share
+    comp["station_score"] = [round(part[(r.District, r.Station)], 1) for r in comp.itertuples()]
+    comp = comp.sort_values(["District", "share"], ascending=[True, False],
+                            key=lambda c: c.map(lambda x: (int(re.sub(r"\D", "", x)), x)) if c.name == "District" else c)
+    comp.round({"share": 4}).to_csv(store.dir / "district_station_shares.csv", index=False)
+    base["main_station"] = base["District"].map(share.groupby(level=0).idxmax().map(lambda k: k[1]))
+    base["main_station_share"] = base["District"].map((share.groupby(level=0).max() / share.groupby(level=0).sum()).round(2))
+    # Share of the district's residents in areas to check street by street
+    base["check_street_share"] = base["District"].map(
+        d[d["check_street"]].groupby("District")["Population"].sum() / d.groupby("District")["Population"].sum()).fillna(0).round(3)
+    for c in CRIME_PER_1K:
+        base[f"ireland_{c}"] = stations[f"ireland_{c}"].iloc[0]
+    base["crime_reference_period"] = stations["years"].iloc[0]
+    if store.path("garda").exists():
+        base = base.merge(pd.read_csv(store.path("garda")), on="District", how="left")
+    base = base.round({"safety_index_0_100": 1, **{c: 2 for c in CRIME_PER_1K}, "garda_nearest_km": 3})
     base["generated_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     out = store.dir / "safety_indicators.csv"
     tmp = out.with_suffix(".tmp")
@@ -446,53 +557,47 @@ def compose(store):
     os.replace(tmp, out)
     base.to_csv(store.dir / "archive" / f"safety_indicators_{datetime.now(timezone.utc):%Y%m%d}.csv", index=False)
     log.info("Published %s (%d districts)", out, len(base))
-    for name, step in (("Neighbourhood", compose_neighbourhoods), ("ED (heat map)", compose_eds)):
+    for name, step in (("Neighbourhood", lambda: compose_neighbourhoods(store, stations)),
+                       ("ED (heat map)", lambda: compose_eds(store, eds))):
         try:
-            step(store, averages)
+            step()
         except Exception as e:  # noqa: BLE001 - district scores are already published; don't fail the run
             log.error("%s scores not updated: %s", name, e)
 
 
-def compose_neighbourhoods(store, averages):
-    """safety_neighbourhoods.csv: each neighbourhood scored like a district (its station area's crime rates,
-    its own Garda distance) against the same Dublin averages."""
-    sources = [Path(CFG["neighbourhoods_csv"]), store.dir / "crime_by_station.csv", store.path("garda_neighbourhoods")]
-    if not all(p.exists() for p in sources):
-        log.warning("Neighbourhood scores skipped: missing %s", [str(p) for p in sources if not p.exists()])
+def compose_neighbourhoods(store, stations):
+    """safety_neighbourhoods.csv: each named neighbourhood with the score and crime rates of the Garda station area
+    it lies in. A place listed in two districts (it straddles the boundary, e.g. Glasnevin in D7 and D9) is each
+    district's own part of it, placed by its own point, and is labelled 'Glasnevin (D7 part)'."""
+    if not Path(CFG["neighbourhoods_csv"]).exists():
+        log.warning("Neighbourhood scores skipped: no %s", CFG["neighbourhoods_csv"])
         return
-    nb = pd.read_csv(sources[0])
-    station_rates = pd.read_csv(sources[1]).set_index("station")
-    crime_cols = list(CFG["offence_groups"])
-    for col in crime_cols:
-        nb[col] = nb["Station"].map(station_rates[col])
-    nb = nb.merge(pd.read_csv(sources[2]), on=["District", "Neighbourhood"], how="left")
-    if nb[crime_cols].isna().any().any():
-        raise RuntimeError(f"No crime rates for station areas {sorted(nb.loc[nb[crime_cols].isna().any(axis=1), 'Station'].unique())}")
-    nb["safety_index_0_100"], nb["confidence"], _ = weighted_score(nb, averages)
-    cols = ["District", "Neighbourhood", "Station", *crime_cols, "garda_nearest_km", "safety_index_0_100", "confidence"]
-    nb = nb[cols].round({**{c: 1 for c in crime_cols}, "garda_nearest_km": 3})
+    nb = area_scores(pd.read_csv(CFG["neighbourhoods_csv"]), stations)
+    nb = add_street_check(nb.assign(id=nb["District"] + "|" + nb["Neighbourhood"]), "neighbourhood", "id")
+    shared = nb["Neighbourhood"].map(nb["Neighbourhood"].value_counts()) > 1
+    nb["Label"] = nb["Neighbourhood"].where(~shared, nb["Neighbourhood"] + " (" + nb["District"] + " part)")
+    if nb["safety_index_0_100"].isna().any():
+        raise RuntimeError(f"No station score for {sorted(nb.loc[nb['safety_index_0_100'].isna(), 'Station'].unique())}")
+    nb = apply_overrides(nb, "neighbourhood", nb["id"])
+    if store.path("garda_neighbourhoods").exists():
+        nb = nb.merge(pd.read_csv(store.path("garda_neighbourhoods")), on=["District", "Neighbourhood"], how="left")
+    cols = ["District", "Neighbourhood", "Label", "Station", "safety_index_0_100", "tier", "check_street", "pobal_category",
+            *CRIME_PER_1K, "garda_nearest_km"]
+    nb = nb.reindex(columns=cols).round({"safety_index_0_100": 1, **{c: 2 for c in CRIME_PER_1K}, "garda_nearest_km": 3})
     nb.to_csv(store.dir / "safety_neighbourhoods.csv", index=False)
     log.info("Published neighbourhood scores (%d neighbourhoods)", len(nb))
 
 
-def compose_eds(store, averages):
-    """safety_eds.csv: every ED scored the same way (its station area's crime rates, its own Garda distance), for
-    the heat map. The shapes are in safety_map_areas.geojson (build_safety_map.py)."""
-    sources = [store.dir / "crime_by_station.csv", store.path("garda_eds")]
-    if not all(p.exists() for p in sources):
-        log.warning("ED scores skipped: missing %s", [str(p) for p in sources if not p.exists()])
-        return
-    eds = load_ed_points()[["ED_GUID", "ED_ENGLISH", "Station"]].rename(columns={"ED_ENGLISH": "ED"})
-    station_rates = pd.read_csv(sources[0]).set_index("station")
-    crime_cols = list(CFG["offence_groups"])
-    for col in crime_cols:
-        eds[col] = eds["Station"].map(station_rates[col])
-    eds = eds.merge(pd.read_csv(sources[1]), on="ED_GUID", how="left")
-    if eds[crime_cols].isna().any().any():
-        raise RuntimeError(f"No crime rates for station areas {sorted(eds.loc[eds[crime_cols].isna().any(axis=1), 'Station'].unique())}")
-    eds["safety_index_0_100"], _, _ = weighted_score(eds, averages)
-    cols = ["ED_GUID", "ED", "Station", *crime_cols, "garda_nearest_km", "safety_index_0_100"]
-    eds[cols].round({**{c: 1 for c in crime_cols}, "garda_nearest_km": 3}).to_csv(store.dir / "safety_eds.csv", index=False)
+def compose_eds(store, eds):
+    """safety_eds.csv: every ED's score, for the heat map. The shapes are in safety_map_areas.geojson
+    (build_safety_map.py)."""
+    eds = eds.rename(columns={"ED_ENGLISH": "ED"})
+    if store.path("garda_eds").exists():
+        eds = eds.merge(pd.read_csv(store.path("garda_eds")), on="ED_GUID", how="left")
+    cols = ["ED_GUID", "ED", "Station", "safety_index_0_100", "tier", "check_street", "pobal_category", *CRIME_PER_1K,
+            "garda_nearest_km"]
+    eds = eds.reindex(columns=cols).round({"safety_index_0_100": 1, **{c: 2 for c in CRIME_PER_1K}, "garda_nearest_km": 3})
+    eds.to_csv(store.dir / "safety_eds.csv", index=False)
     log.info("Published ED scores (%d EDs)", len(eds))
 
 
@@ -500,7 +605,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--only", default="crime,garda")
-    ap.add_argument("--cso-csv", help="use a downloaded CJA07 CSV instead of fetching")
+    ap.add_argument("--cso-csv", help="use a downloaded CJA11 (or CJA07) CSV instead of fetching")
     ap.add_argument("--stations", help="use a downloaded OSM police GeoJSON instead of Overpass")
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")

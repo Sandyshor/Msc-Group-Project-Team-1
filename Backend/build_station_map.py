@@ -14,8 +14,8 @@ safety_pipeline.py turns this into crime rates per station area and per district
 centres for the population-weighted distance to the nearest Garda station.
 
 With the optional Census 2016 Workplace Zones shapefile, it also writes station_daytime.csv next to
-OUT_CSV: each station area's daytime population (people working or studying there), so busy areas
-where few people live aren't judged on residents alone.
+OUT_CSV: each station area's daytime population (people working or studying there), kept for reference. The score
+reads daytime population for every station in Ireland from national_stations.csv (build_national_stations.py).
 
 Usage
   python build_station_map.py ED_BOUNDARIES SAPS_CSV STATIONS_GEOJSON DISTRICT_BOUNDARIES_GEOJSON OUT_CSV [WORKPLACE_ZONES_SHP]

@@ -1,129 +1,176 @@
-District,Neighbourhood,Station,robbery_per_100k,public_order_per_100k,garda_nearest_km,safety_index_0_100,confidence
-D1,Ballybough,fitzgibbon street,184.8,1170.9,0.724,35.7,1.0
-D1,Hardwicke Street Flats,fitzgibbon street,184.8,1170.9,0.5,37.7,1.0
-D1,North Strand,fitzgibbon street,184.8,1170.9,0.912,34.5,1.0
-D1,East Wall,store street,284.6,4406.6,1.304,13.3,1.0
-D1,International Financial Services Centre,store street,284.6,4406.6,0.442,19.1,1.0
-D1,North Wall,store street,284.6,4406.6,0.857,15.5,1.0
-D2,Temple Bar,pearse street,278.4,2229.8,0.458,23.1,1.0
-D3,Clontarf,clontarf,50.9,404.4,1.582,68.6,1.0
-D3,Fairview,clontarf,50.9,404.4,1.099,70.6,1.0
-D3,Marino,clontarf,50.9,404.4,1.018,71.0,1.0
-D4,Ballsbridge,donnybrook,39.7,433.7,0.901,75.8,1.0
-D4,Irishtown,irishtown,64.6,754.6,0.057,65.2,1.0
-D4,Merrion,irishtown,64.6,754.6,1.847,56.3,1.0
-D4,Ringsend,irishtown,64.6,754.6,0.465,63.7,1.0
-D4,Sandymount,irishtown,64.6,754.6,0.883,60.3,1.0
-D5,Artane,coolock,92.6,511.7,0.868,57.4,1.0
-D5,Coolock,coolock,92.6,511.7,0.124,62.3,1.0
-D5,Coolock Village,coolock,92.6,511.7,0.26,62.3,1.0
-D5,Edenmore,coolock,92.6,511.7,1.039,56.5,1.0
-D5,Killester,raheny,46.7,314.3,1.263,74.2,1.0
-D5,Raheny,raheny,46.7,314.3,0.229,81.2,1.0
-D6,Donnybrook,donnybrook,39.7,433.7,0.05,80.9,1.0
-D6,Milltown,donnybrook,39.7,433.7,1.188,74.3,1.0
-D6,Ranelagh,donnybrook,39.7,433.7,0.907,75.8,1.0
-D6,Dartry,rathmines,62.4,884.9,1.279,57.2,1.0
-D6,Harold's Cross,rathmines,62.4,884.9,0.932,58.9,1.0
-D6,Rathgar,rathmines,62.4,884.9,0.931,58.9,1.0
-D6,Rathmines,rathmines,62.4,884.9,0.605,61.3,1.0
-D6,Terenure,terenure,54.6,366.4,0.315,76.4,1.0
-D6W,Kimmage,crumlin,62.2,565.3,1.02,63.4,1.0
-D6W,Templeogue,terenure,54.6,366.4,1.082,70.3,1.0
-D7,Grangegorman,bridewell,192.1,2103.3,0.919,27.3,1.0
-D7,Oxmantown,bridewell,192.1,2103.3,1.035,26.7,1.0
-D7,Smithfield,bridewell,192.1,2103.3,0.319,32.5,1.0
-D7,Stoneybatter,bridewell,192.1,2103.3,0.776,28.3,1.0
-D7,Ashtown,cabra,80.7,364.6,2.092,59.1,1.0
-D7,Cabra,cabra,80.7,364.6,0.944,63.4,1.0
-D7,Cabra West,cabra,80.7,364.6,0.782,64.4,1.0
-D7,Cabra East,mountjoy,138.7,1137.5,1.289,38.6,1.0
-D7,Glasnevin,mountjoy,138.7,1137.5,0.443,44.4,1.0
-D7,Phibsborough,mountjoy,138.7,1137.5,0.306,45.6,1.0
-D8,Dolphin's Barn,kevin street,286.2,1646.5,0.606,24.3,1.0
-D8,Portobello,kevin street,286.2,1646.5,0.844,22.5,1.0
-D8,The Liberties,kevin street,286.2,1646.5,0.544,24.9,1.0
-D8,Inchicore,kilmainham,149.2,1152.6,1.115,37.8,1.0
-D8,Kilmainham,kilmainham,149.2,1152.6,0.201,44.0,1.0
-D8,Rialto,kilmainham,149.2,1152.6,0.627,40.9,1.0
-D9,Ballymun,ballymun,133.0,654.4,0.116,52.5,1.0
-D9,Poppintree,ballymun,133.0,654.4,1.449,44.8,1.0
-D9,Wadelai,ballymun,133.0,654.4,0.999,46.8,1.0
-D9,Donnycarney,clontarf,50.9,404.4,1.244,69.9,1.0
-D9,Finglas,finglas,102.0,479.4,0.64,57.9,1.0
-D9,Finglas East,finglas,102.0,479.4,1.268,54.2,1.0
-D9,Drumcondra,mountjoy,138.7,1137.5,1.133,39.3,1.0
-D9,Beaumont,santry,58.3,427.9,1.265,66.5,1.0
-D9,Glasnevin,santry,58.3,427.9,1.653,65.1,1.0
-D9,Santry,santry,58.3,427.9,0.879,68.5,1.0
-D9,Whitehall,santry,58.3,427.9,0.95,68.1,1.0
-D10,Cherry Orchard,ballyfermot,67.0,597.9,1.275,60.1,1.0
-D11,Finglas West,finglas,102.0,479.4,0.382,60.7,1.0
-D12,Crumlin,crumlin,62.2,565.3,0.111,69.1,1.0
-D12,Greenhills,crumlin,62.2,565.3,1.577,61.0,1.0
-D12,Walkinstown,crumlin,62.2,565.3,1.04,63.3,1.0
-D12,Bluebell,kilmainham,149.2,1152.6,1.959,34.8,1.0
-D12,Drimnagh,sundrive,80.3,867.7,1.289,52.4,1.0
-D12,Perrystown,terenure,54.6,366.4,1.398,68.9,1.0
-D13,Clongriffin,coolock,92.6,511.7,3.183,50.4,1.0
-D13,Baldoyle,howth,43.3,264.5,3.783,71.7,1.0
-D13,Bayside,howth,43.3,264.5,2.73,73.4,1.0
-D13,Howth,howth,43.3,264.5,0.3,84.5,1.0
-D13,Sutton,howth,43.3,264.5,2.73,73.4,1.0
-D13,Kilbarrack,raheny,46.7,314.3,1.675,72.7,1.0
-D14,Clonskeagh,dundrum,54.1,290.9,1.787,70.3,1.0
-D14,Dundrum,dundrum,54.1,290.9,0.068,79.1,1.0
-D14,Windy Arbour,dundrum,54.1,290.9,1.519,71.2,1.0
-D14,Ballyroan,rathfarnham,38.8,286.2,1.091,79.7,1.0
-D14,Churchtown,rathfarnham,38.8,286.2,1.335,78.6,1.0
-D14,Nutgrove,rathfarnham,38.8,286.2,1.284,78.9,1.0
-D14,Rathfarnham,rathfarnham,38.8,286.2,0.232,85.8,1.0
-D14,Willbrook,rathfarnham,38.8,286.2,0.386,85.3,1.0
-D15,Blanchardstown,blanchardstown,75.4,315.2,0.622,68.5,1.0
-D15,Carpenterstown,blanchardstown,75.4,315.2,1.435,64.0,1.0
-D15,Castleknock,blanchardstown,75.4,315.2,2.247,61.6,1.0
-D15,Clonsilla,blanchardstown,75.4,315.2,2.493,61.0,1.0
-D15,Hartstown,blanchardstown,75.4,315.2,2.589,60.8,1.0
-D15,Huntstown,blanchardstown,75.4,315.2,2.258,61.6,1.0
-D15,Mulhuddart,blanchardstown,75.4,315.2,1.841,62.7,1.0
-D15,Ongar,blanchardstown,75.4,315.2,3.902,58.6,1.0
-D16,Ballinteer,dundrum,54.1,290.9,1.607,70.9,1.0
-D16,Ballyboden,rathfarnham,38.8,286.2,1.584,77.7,1.0
-D16,Knocklyon,rathfarnham,38.8,286.2,2.509,75.2,1.0
-D16,Rockbrook,rathfarnham,38.8,286.2,4.026,72.7,1.0
-D16,Scholarstown,rathfarnham,38.8,286.2,2.731,74.8,1.0
-D16,Whitechurch,rathfarnham,38.8,286.2,2.168,76.0,1.0
-D16,Woodstown,rathfarnham,38.8,286.2,3.116,74.1,1.0
-D17,Belmayne,coolock,92.6,511.7,2.485,51.7,1.0
-D17,Donaghmede,coolock,92.6,511.7,2.007,52.9,1.0
-D17,Coyne Woods,santry,58.3,427.9,0.838,68.7,1.0
-D18,Carrickmines,cabinteely,42.8,243.0,1.634,77.4,1.0
-D18,Cherrywood,cabinteely,42.8,243.0,1.693,77.2,1.0
-D18,Ballyogan,dundrum,54.1,290.9,1.283,72.1,1.0
-D18,Glencullen,dundrum,54.1,290.9,3.494,66.7,1.0
-D18,Kilternan,dundrum,54.1,290.9,2.449,68.6,1.0
-D18,Sandyford,dundrum,54.1,290.9,1.938,69.9,1.0
-D18,Stepaside,dundrum,54.1,290.9,0.043,79.1,1.0
-D18,Old Connaught,shankill,84.9,357.8,2.84,56.6,1.0
-D18,Rathmichael,shankill,84.9,357.8,1.101,61.7,1.0
-D18,Shankill,shankill,84.9,357.8,0.425,66.9,1.0
-D20,Ballyfermot,ballyfermot,67.0,597.9,0.663,63.6,1.0
-D20,Chapelizod,ballyfermot,67.0,597.9,0.923,61.8,1.0
-D20,Palmerstown,ballyfermot,67.0,597.9,1.504,59.2,1.0
-D22,Clondalkin,clondalkin,90.1,564.5,0.138,61.8,1.0
-D22,Adamstown,lucan,55.5,311.2,2.089,68.2,1.0
-D22,Lucan,lucan,55.5,311.2,0.091,77.8,1.0
-D22,Newcastle,rathcoole,25.3,258.0,3.196,83.5,1.0
-D24,Rathcoole,rathcoole,25.3,258.0,0.232,95.4,1.0
-D24,Saggart,rathcoole,25.3,258.0,1.346,88.2,1.0
-D24,Ballycullen,rathfarnham,38.8,286.2,3.18,73.9,1.0
-D24,Firhouse,rathfarnham,38.8,286.2,1.954,76.6,1.0
-D24,Brittas,tallaght,75.3,662.9,5.122,49.1,1.0
-D24,Deerpark,tallaght,75.3,662.9,1.883,54.5,1.0
-D24,Fettercairn,tallaght,75.3,662.9,2.066,54.0,1.0
-D24,Fortunestown,tallaght,75.3,662.9,2.905,52.2,1.0
-D24,Jobstown,tallaght,75.3,662.9,2.377,53.3,1.0
-D24,Kiltipper,tallaght,75.3,662.9,1.733,55.0,1.0
-D24,Old Bawn,tallaght,75.3,662.9,0.895,58.6,1.0
-D24,Springfield,tallaght,75.3,662.9,1.138,57.3,1.0
-D24,Tallaght,tallaght,75.3,662.9,0.375,63.3,1.0
+District,Neighbourhood,Label,Station,safety_index_0_100,tier,check_street,pobal_category,violent_per_1k,robbery_per_1k,burglary_theft_per_1k,public_order_per_1k,damage_per_1k,garda_nearest_km
+D1,Ballybough,Ballybough (D1 part),fitzgibbon street,39.2,Higher recorded crime,False,Marginally Below Average,12.03,1.77,27.48,11.19,11.57,0.724
+D1,Hardwicke Street Flats,Hardwicke Street Flats,fitzgibbon street,39.2,Higher recorded crime,False,Marginally Above Average,12.03,1.77,27.48,11.19,11.57,0.5
+D1,Mountjoy Square,Mountjoy Square,fitzgibbon street,39.2,Higher recorded crime,False,Marginally Above Average,12.03,1.77,27.48,11.19,11.57,0.16
+D1,North Strand,North Strand,fitzgibbon street,39.2,Higher recorded crime,False,Marginally Below Average,12.03,1.77,27.48,11.19,11.57,0.912
+D1,Parnell Square,Parnell Square,fitzgibbon street,39.2,Higher recorded crime,False,Marginally Above Average,12.03,1.77,27.48,11.19,11.57,0.4
+D1,Summerhill,Summerhill,fitzgibbon street,39.2,Higher recorded crime,False,Marginally Above Average,12.03,1.77,27.48,11.19,11.57,0.41
+D1,Abbey Street,Abbey Street,store street,20.6,Higher recorded crime,False,Marginally Above Average,28.64,2.99,111.19,46.35,12.44,0.283
+D1,Capel Street,Capel Street,store street,20.6,Higher recorded crime,False,Marginally Above Average,28.64,2.99,111.19,46.35,12.44,0.373
+D1,East Wall,East Wall,store street,20.6,Higher recorded crime,False,Marginally Above Average,28.64,2.99,111.19,46.35,12.44,1.304
+D1,Henry Street,Henry Street,store street,20.6,Higher recorded crime,False,Marginally Above Average,28.64,2.99,111.19,46.35,12.44,0.209
+D1,International Financial Services Centre,International Financial Services Centre,store street,20.6,Higher recorded crime,False,Marginally Above Average,28.64,2.99,111.19,46.35,12.44,0.442
+D1,North Wall,North Wall,store street,20.6,Higher recorded crime,False,Marginally Above Average,28.64,2.99,111.19,46.35,12.44,0.857
+D1,O'Connell Street,O'Connell Street,store street,20.6,Higher recorded crime,False,Marginally Above Average,28.64,2.99,111.19,46.35,12.44,0.092
+D1,Spencer Dock,Spencer Dock,store street,20.6,Higher recorded crime,False,Marginally Above Average,28.64,2.99,111.19,46.35,12.44,0.897
+D2,Baggot Street,Baggot Street,pearse street,29.1,Higher recorded crime,False,Affluent,13.48,3.21,83.37,25.63,6.95,1.019
+D2,College Green,College Green,pearse street,29.1,Higher recorded crime,False,Marginally Above Average,13.48,3.21,83.37,25.63,6.95,0.342
+D2,Dame Street,Dame Street,pearse street,29.1,Higher recorded crime,False,Marginally Above Average,13.48,3.21,83.37,25.63,6.95,0.596
+D2,Fitzwilliam Square,Fitzwilliam Square,pearse street,29.1,Higher recorded crime,False,Affluent,13.48,3.21,83.37,25.63,6.95,1.181
+D2,Grafton Street,Grafton Street,pearse street,29.1,Higher recorded crime,False,Marginally Below Average,13.48,3.21,83.37,25.63,6.95,0.53
+D2,Merrion Square,Merrion Square,pearse street,29.1,Higher recorded crime,False,Affluent,13.48,3.21,83.37,25.63,6.95,0.82
+D2,Pearse Street,Pearse Street,pearse street,29.1,Higher recorded crime,False,Marginally Below Average,13.48,3.21,83.37,25.63,6.95,0.319
+D2,Sir John Rogerson's Quay,Sir John Rogerson's Quay,pearse street,29.1,Higher recorded crime,False,Marginally Below Average,13.48,3.21,83.37,25.63,6.95,0.667
+D2,St Stephen's Green,St Stephen's Green,pearse street,29.1,Higher recorded crime,False,Affluent,13.48,3.21,83.37,25.63,6.95,0.736
+D2,Temple Bar,Temple Bar,pearse street,29.1,Higher recorded crime,False,Marginally Above Average,13.48,3.21,83.37,25.63,6.95,0.458
+D2,Trinity College,Trinity College,pearse street,29.1,Higher recorded crime,False,Marginally Below Average,13.48,3.21,83.37,25.63,6.95,0.246
+D3,Ballybough,Ballybough (D3 part),clontarf,61.5,Lower recorded crime,False,Marginally Above Average,4.84,0.47,19.63,3.67,4.1,1.226
+D3,Clontarf,Clontarf,clontarf,61.5,Lower recorded crime,False,Marginally Above Average,4.84,0.47,19.63,3.67,4.1,1.582
+D3,Fairview,Fairview,clontarf,61.5,Lower recorded crime,False,Affluent,4.84,0.47,19.63,3.67,4.1,1.099
+D3,Marino,Marino,clontarf,61.5,Lower recorded crime,False,Affluent,4.84,0.47,19.63,3.67,4.1,1.018
+D3,Drumcondra,Drumcondra (D3 part),santry,49.8,Above-benchmark crime,False,Affluent,11.96,0.58,29.55,4.32,5.12,1.682
+D4,Ballsbridge,Ballsbridge,donnybrook,64.4,Lower recorded crime,False,Affluent,3.83,0.4,18.06,4.41,2.73,0.901
+D4,Grand Canal Dock,Grand Canal Dock,irishtown,53.3,Below-benchmark crime,False,Affluent,6.03,0.67,27.62,7.77,3.93,1.068
+D4,Haddington Road,Haddington Road,irishtown,53.3,Below-benchmark crime,False,Affluent,6.03,0.67,27.62,7.77,3.93,1.237
+D4,Irishtown,Irishtown,irishtown,53.3,Below-benchmark crime,False,Marginally Above Average,6.03,0.67,27.62,7.77,3.93,0.057
+D4,Merrion,Merrion,irishtown,53.3,Below-benchmark crime,False,Marginally Above Average,6.03,0.67,27.62,7.77,3.93,1.847
+D4,Ringsend,Ringsend,irishtown,53.3,Below-benchmark crime,False,Marginally Above Average,6.03,0.67,27.62,7.77,3.93,0.465
+D4,Sandymount,Sandymount,irishtown,53.3,Below-benchmark crime,False,Affluent,6.03,0.67,27.62,7.77,3.93,0.883
+D5,Artane,Artane,coolock,51.9,Below-benchmark crime,False,Marginally Above Average,7.99,0.84,21.95,4.64,6.5,0.868
+D5,Coolock,Coolock,coolock,51.9,Below-benchmark crime,True,Disadvantaged,7.99,0.84,21.95,4.64,6.5,0.124
+D5,Coolock Village,Coolock Village,coolock,51.9,Below-benchmark crime,True,Disadvantaged,7.99,0.84,21.95,4.64,6.5,0.26
+D5,Edenmore,Edenmore,coolock,51.9,Below-benchmark crime,True,Disadvantaged,7.99,0.84,21.95,4.64,6.5,1.039
+D5,Kilmore,Kilmore,coolock,51.9,Below-benchmark crime,False,Marginally Above Average,7.99,0.84,21.95,4.64,6.5,1.174
+D5,Harmonstown,Harmonstown,raheny,63.5,Lower recorded crime,False,Marginally Below Average,6.06,0.43,12.35,2.88,3.63,1.206
+D5,Killester,Killester,raheny,63.5,Lower recorded crime,False,Affluent,6.06,0.43,12.35,2.88,3.63,1.263
+D5,Raheny,Raheny,raheny,63.5,Lower recorded crime,False,Marginally Above Average,6.06,0.43,12.35,2.88,3.63,0.229
+D6,Donnybrook,Donnybrook,donnybrook,64.4,Lower recorded crime,False,Affluent,3.83,0.4,18.06,4.41,2.73,0.05
+D6,Milltown,Milltown,donnybrook,64.4,Lower recorded crime,False,Affluent,3.83,0.4,18.06,4.41,2.73,1.188
+D6,Ranelagh,Ranelagh,donnybrook,64.4,Lower recorded crime,False,Affluent,3.83,0.4,18.06,4.41,2.73,0.907
+D6,Dartry,Dartry,rathmines,54.1,Below-benchmark crime,False,Affluent,5.27,0.57,33.1,8.09,4.52,1.279
+D6,Harold's Cross,Harold's Cross,rathmines,54.1,Below-benchmark crime,False,Affluent,5.27,0.57,33.1,8.09,4.52,0.932
+D6,Portobello,Portobello (D6 part),rathmines,54.1,Below-benchmark crime,False,Affluent,5.27,0.57,33.1,8.09,4.52,0.869
+D6,Rathgar,Rathgar,rathmines,54.1,Below-benchmark crime,False,Affluent,5.27,0.57,33.1,8.09,4.52,0.931
+D6,Rathmines,Rathmines,rathmines,54.1,Below-benchmark crime,False,Affluent,5.27,0.57,33.1,8.09,4.52,0.605
+D6,Terenure,Terenure,terenure,62.9,Lower recorded crime,False,Affluent,4.73,0.5,16.49,3.39,2.76,0.315
+D6W,Kimmage,Kimmage,crumlin,55.9,Below-benchmark crime,False,Marginally Above Average,6.56,0.58,20.2,5.34,6.03,1.02
+D6W,Templeogue,Templeogue,terenure,62.9,Lower recorded crime,False,Affluent,4.73,0.5,16.49,3.39,2.76,1.082
+D7,Arbour Hill,Arbour Hill,bridewell,34.2,Higher recorded crime,False,Marginally Above Average,13.76,1.83,41.02,20.01,10.33,0.88
+D7,Broadstone,Broadstone,bridewell,34.2,Higher recorded crime,False,Marginally Above Average,13.76,1.83,41.02,20.01,10.33,0.788
+D7,Grangegorman,Grangegorman,bridewell,34.2,Higher recorded crime,False,Marginally Above Average,13.76,1.83,41.02,20.01,10.33,0.919
+D7,Oxmantown,Oxmantown,bridewell,34.2,Higher recorded crime,False,Marginally Above Average,13.76,1.83,41.02,20.01,10.33,1.035
+D7,Smithfield,Smithfield,bridewell,34.2,Higher recorded crime,False,Marginally Above Average,13.76,1.83,41.02,20.01,10.33,0.319
+D7,Stoneybatter,Stoneybatter,bridewell,34.2,Higher recorded crime,False,Marginally Above Average,13.76,1.83,41.02,20.01,10.33,0.776
+D7,Ashtown,Ashtown (D7 part),cabra,58.6,Lower recorded crime,False,Marginally Above Average,5.16,0.74,18.67,3.36,4.67,2.092
+D7,Cabra,Cabra,cabra,58.6,Lower recorded crime,True,Disadvantaged,5.16,0.74,18.67,3.36,4.67,0.944
+D7,Cabra West,Cabra West,cabra,58.6,Lower recorded crime,True,Disadvantaged,5.16,0.74,18.67,3.36,4.67,0.782
+D7,Navan Road,Navan Road,cabra,58.6,Lower recorded crime,False,Marginally Above Average,5.16,0.74,18.67,3.36,4.67,0.744
+D7,Cabra East,Cabra East,mountjoy,36.9,Higher recorded crime,False,Marginally Below Average,18.95,1.29,30.3,10.56,9.41,1.289
+D7,Glasnevin,Glasnevin (D7 part),mountjoy,36.9,Higher recorded crime,False,Affluent,18.95,1.29,30.3,10.56,9.41,0.443
+D7,Phibsborough,Phibsborough,mountjoy,36.9,Higher recorded crime,False,Marginally Above Average,18.95,1.29,30.3,10.56,9.41,0.306
+D8,Christchurch,Christchurch,kevin street,31.8,Higher recorded crime,False,Marginally Below Average,14.61,2.88,45.27,16.59,11.83,0.455
+D8,Dolphin's Barn,Dolphin's Barn,kevin street,31.8,Higher recorded crime,False,Marginally Below Average,14.61,2.88,45.27,16.59,11.83,0.606
+D8,Portobello,Portobello (D8 part),kevin street,31.8,Higher recorded crime,False,Marginally Above Average,14.61,2.88,45.27,16.59,11.83,0.844
+D8,South Circular Road,South Circular Road,kevin street,31.8,Higher recorded crime,False,Marginally Above Average,14.61,2.88,45.27,16.59,11.83,0.967
+D8,The Liberties,The Liberties,kevin street,31.8,Higher recorded crime,False,Marginally Above Average,14.61,2.88,45.27,16.59,11.83,0.544
+D8,Thomas Street,Thomas Street,kevin street,31.8,Higher recorded crime,False,Marginally Above Average,14.61,2.88,45.27,16.59,11.83,0.633
+D8,Heuston,Heuston,kilmainham,38.8,Higher recorded crime,False,Affluent,15.32,1.4,26.31,10.85,9.85,1.001
+D8,Inchicore,Inchicore,kilmainham,38.8,Higher recorded crime,False,Marginally Above Average,15.32,1.4,26.31,10.85,9.85,1.115
+D8,Islandbridge,Islandbridge,kilmainham,38.8,Higher recorded crime,False,Affluent,15.32,1.4,26.31,10.85,9.85,0.607
+D8,Kilmainham,Kilmainham,kilmainham,38.8,Higher recorded crime,False,Affluent,15.32,1.4,26.31,10.85,9.85,0.201
+D8,Rialto,Rialto,kilmainham,38.8,Higher recorded crime,False,Marginally Below Average,15.32,1.4,26.31,10.85,9.85,0.627
+D9,Ballymun,Ballymun,ballymun,44.2,Above-benchmark crime,True,Very Disadvantaged,11.97,1.23,23.92,6.06,10.55,0.116
+D9,Poppintree,Poppintree,ballymun,44.2,Above-benchmark crime,True,Very Disadvantaged,11.97,1.23,23.92,6.06,10.55,1.449
+D9,Wadelai,Wadelai,ballymun,44.2,Above-benchmark crime,False,Marginally Above Average,11.97,1.23,23.92,6.06,10.55,0.999
+D9,Donnycarney,Donnycarney,clontarf,61.5,Lower recorded crime,False,Marginally Above Average,4.84,0.47,19.63,3.67,4.1,1.244
+D9,Finglas,Finglas (D9 part),finglas,50.5,Below-benchmark crime,False,Marginally Below Average,9.68,0.93,18.92,4.36,7.45,0.64
+D9,Finglas East,Finglas East,finglas,50.5,Below-benchmark crime,False,Marginally Below Average,9.68,0.93,18.92,4.36,7.45,1.268
+D9,Drumcondra,Drumcondra (D9 part),mountjoy,36.9,Higher recorded crime,False,Affluent,18.95,1.29,30.3,10.56,9.41,1.133
+D9,Beaumont,Beaumont,santry,49.8,Above-benchmark crime,False,Marginally Above Average,11.96,0.58,29.55,4.32,5.12,1.265
+D9,Glasnevin,Glasnevin (D9 part),santry,49.8,Above-benchmark crime,False,Marginally Above Average,11.96,0.58,29.55,4.32,5.12,1.653
+D9,Griffith Avenue,Griffith Avenue,santry,49.8,Above-benchmark crime,False,Marginally Above Average,11.96,0.58,29.55,4.32,5.12,1.48
+D9,Santry,Santry,santry,49.8,Above-benchmark crime,False,Marginally Above Average,11.96,0.58,29.55,4.32,5.12,0.879
+D9,Whitehall,Whitehall,santry,49.8,Above-benchmark crime,False,Marginally Above Average,11.96,0.58,29.55,4.32,5.12,0.95
+D10,Ballyfermot,Ballyfermot (D10 part),ballyfermot,19.4,Higher recorded crime,True,Disadvantaged,9.4,0.66,19.7,5.88,7.93,0.237
+D10,Cherry Orchard,Cherry Orchard,ballyfermot,22.2,Higher recorded crime,True,Disadvantaged,9.4,0.66,19.7,5.88,7.93,1.275
+D10,Le Fanu,Le Fanu,ballyfermot,22.5,Higher recorded crime,True,Disadvantaged,9.4,0.66,19.7,5.88,7.93,0.399
+D11,Finglas,Finglas (D11 part),finglas,50.5,Below-benchmark crime,True,Disadvantaged,9.68,0.93,18.92,4.36,7.45,0.328
+D11,Finglas West,Finglas West,finglas,50.5,Below-benchmark crime,True,Disadvantaged,9.68,0.93,18.92,4.36,7.45,0.382
+D12,Crumlin,Crumlin,crumlin,55.9,Below-benchmark crime,False,Marginally Above Average,6.56,0.58,20.2,5.34,6.03,0.111
+D12,Greenhills,Greenhills,crumlin,55.9,Below-benchmark crime,False,Marginally Below Average,6.56,0.58,20.2,5.34,6.03,1.577
+D12,Walkinstown,Walkinstown,crumlin,55.9,Below-benchmark crime,False,Marginally Above Average,6.56,0.58,20.2,5.34,6.03,1.04
+D12,Bluebell,Bluebell,kilmainham,38.8,Higher recorded crime,True,Disadvantaged,15.32,1.4,26.31,10.85,9.85,1.959
+D12,Drimnagh,Drimnagh,sundrive,49.8,Above-benchmark crime,False,Marginally Above Average,8.68,0.74,21.69,8.03,8.0,1.289
+D12,Perrystown,Perrystown,terenure,62.9,Lower recorded crime,False,Marginally Above Average,4.73,0.5,16.49,3.39,2.76,1.398
+D13,Clongriffin,Clongriffin,coolock,51.9,Below-benchmark crime,False,Marginally Above Average,7.99,0.84,21.95,4.64,6.5,3.183
+D13,Baldoyle,Baldoyle,howth,66.9,Lower recorded crime,False,Marginally Above Average,4.13,0.4,13.43,2.47,3.6,3.783
+D13,Bayside,Bayside,howth,66.9,Lower recorded crime,False,Marginally Above Average,4.13,0.4,13.43,2.47,3.6,2.73
+D13,Howth,Howth,howth,66.9,Lower recorded crime,False,Marginally Above Average,4.13,0.4,13.43,2.47,3.6,0.3
+D13,Sutton,Sutton,howth,66.9,Lower recorded crime,False,Marginally Above Average,4.13,0.4,13.43,2.47,3.6,2.73
+D13,Kilbarrack,Kilbarrack,raheny,63.5,Lower recorded crime,False,Marginally Below Average,6.06,0.43,12.35,2.88,3.63,1.675
+D14,Clonskeagh,Clonskeagh,dundrum,62.5,Lower recorded crime,False,Affluent,5.26,0.51,17.48,2.71,2.66,1.787
+D14,Dundrum,Dundrum,dundrum,62.5,Lower recorded crime,False,Affluent,5.26,0.51,17.48,2.71,2.66,0.068
+D14,Windy Arbour,Windy Arbour,dundrum,62.5,Lower recorded crime,False,Marginally Above Average,5.26,0.51,17.48,2.71,2.66,1.519
+D14,Ballyroan,Ballyroan,rathfarnham,67.1,Lower recorded crime,False,Marginally Above Average,4.87,0.35,12.13,2.57,3.18,1.091
+D14,Churchtown,Churchtown,rathfarnham,67.1,Lower recorded crime,False,Affluent,4.87,0.35,12.13,2.57,3.18,1.335
+D14,Nutgrove,Nutgrove,rathfarnham,67.1,Lower recorded crime,False,Marginally Below Average,4.87,0.35,12.13,2.57,3.18,1.284
+D14,Rathfarnham,Rathfarnham,rathfarnham,67.1,Lower recorded crime,False,Affluent,4.87,0.35,12.13,2.57,3.18,0.232
+D14,Willbrook,Willbrook,rathfarnham,67.1,Lower recorded crime,False,Marginally Above Average,4.87,0.35,12.13,2.57,3.18,0.386
+D15,Ashtown,Ashtown (D15 part),blanchardstown,54.1,Below-benchmark crime,False,Affluent,8.94,0.71,20.36,2.95,5.59,2.541
+D15,Blanchardstown,Blanchardstown,blanchardstown,54.1,Below-benchmark crime,False,Marginally Above Average,8.94,0.71,20.36,2.95,5.59,0.622
+D15,Carpenterstown,Carpenterstown,blanchardstown,54.1,Below-benchmark crime,False,Affluent,8.94,0.71,20.36,2.95,5.59,1.435
+D15,Castleknock,Castleknock,blanchardstown,54.1,Below-benchmark crime,False,Affluent,8.94,0.71,20.36,2.95,5.59,2.247
+D15,Clonsilla,Clonsilla,blanchardstown,54.1,Below-benchmark crime,False,Marginally Above Average,8.94,0.71,20.36,2.95,5.59,2.493
+D15,Coolmine,Coolmine,blanchardstown,54.1,Below-benchmark crime,False,Marginally Below Average,8.94,0.71,20.36,2.95,5.59,0.986
+D15,Hartstown,Hartstown,blanchardstown,54.1,Below-benchmark crime,False,Marginally Above Average,8.94,0.71,20.36,2.95,5.59,2.589
+D15,Huntstown,Huntstown,blanchardstown,54.1,Below-benchmark crime,False,Marginally Above Average,8.94,0.71,20.36,2.95,5.59,2.258
+D15,Mulhuddart,Mulhuddart,blanchardstown,54.1,Below-benchmark crime,False,Marginally Above Average,8.94,0.71,20.36,2.95,5.59,1.841
+D15,Ongar,Ongar,blanchardstown,54.1,Below-benchmark crime,False,Marginally Above Average,8.94,0.71,20.36,2.95,5.59,3.902
+D16,Ballinteer,Ballinteer,dundrum,62.5,Lower recorded crime,False,Marginally Above Average,5.26,0.51,17.48,2.71,2.66,1.607
+D16,Ballyboden,Ballyboden,rathfarnham,67.1,Lower recorded crime,False,Marginally Above Average,4.87,0.35,12.13,2.57,3.18,1.584
+D16,Knocklyon,Knocklyon,rathfarnham,67.1,Lower recorded crime,False,Marginally Above Average,4.87,0.35,12.13,2.57,3.18,2.509
+D16,Marlay,Marlay,rathfarnham,67.1,Lower recorded crime,False,Marginally Above Average,4.87,0.35,12.13,2.57,3.18,2.586
+D16,Rockbrook,Rockbrook,rathfarnham,67.1,Lower recorded crime,False,Marginally Above Average,4.87,0.35,12.13,2.57,3.18,4.026
+D16,Scholarstown,Scholarstown,rathfarnham,67.1,Lower recorded crime,False,Affluent,4.87,0.35,12.13,2.57,3.18,2.731
+D16,Whitechurch,Whitechurch,rathfarnham,67.1,Lower recorded crime,False,Marginally Above Average,4.87,0.35,12.13,2.57,3.18,2.168
+D16,Woodstown,Woodstown,rathfarnham,67.1,Lower recorded crime,False,Affluent,4.87,0.35,12.13,2.57,3.18,3.116
+D17,Belmayne,Belmayne,coolock,51.9,Below-benchmark crime,False,Marginally Above Average,7.99,0.84,21.95,4.64,6.5,2.485
+D17,Donaghmede,Donaghmede,coolock,51.9,Below-benchmark crime,True,Disadvantaged,7.99,0.84,21.95,4.64,6.5,2.007
+D17,Coyne Woods,Coyne Woods,santry,49.8,Above-benchmark crime,False,Marginally Below Average,11.96,0.58,29.55,4.32,5.12,0.838
+D18,Carrickmines,Carrickmines,cabinteely,65.9,Lower recorded crime,False,Affluent,4.18,0.42,17.53,2.26,2.55,1.634
+D18,Cherrywood,Cherrywood,cabinteely,65.9,Lower recorded crime,False,Affluent,4.18,0.42,17.53,2.26,2.55,1.693
+D18,Ballyogan,Ballyogan,dundrum,62.5,Lower recorded crime,False,Affluent,5.26,0.51,17.48,2.71,2.66,1.283
+D18,Glencullen,Glencullen,dundrum,62.5,Lower recorded crime,False,Affluent,5.26,0.51,17.48,2.71,2.66,3.494
+D18,Kilternan,Kilternan,dundrum,62.5,Lower recorded crime,False,Affluent,5.26,0.51,17.48,2.71,2.66,2.449
+D18,Sandyford,Sandyford,dundrum,62.5,Lower recorded crime,False,Marginally Above Average,5.26,0.51,17.48,2.71,2.66,1.938
+D18,Stepaside,Stepaside,dundrum,62.5,Lower recorded crime,False,Affluent,5.26,0.51,17.48,2.71,2.66,0.043
+D18,Old Connaught,Old Connaught,shankill,57.5,Lower recorded crime,False,Marginally Above Average,6.92,0.78,14.67,3.22,3.74,2.84
+D18,Rathmichael,Rathmichael,shankill,57.5,Lower recorded crime,False,Marginally Above Average,6.92,0.78,14.67,3.22,3.74,1.101
+D18,Shankill,Shankill,shankill,57.5,Lower recorded crime,False,Marginally Above Average,6.92,0.78,14.67,3.22,3.74,0.425
+D20,Ballyfermot,Ballyfermot (D20 part),ballyfermot,51.5,Below-benchmark crime,False,Marginally Above Average,9.4,0.66,19.7,5.88,7.93,0.663
+D20,Chapelizod,Chapelizod,ballyfermot,51.5,Below-benchmark crime,False,Marginally Above Average,9.4,0.66,19.7,5.88,7.93,0.923
+D20,Palmerstown,Palmerstown,ballyfermot,51.5,Below-benchmark crime,True,Disadvantaged,9.4,0.66,19.7,5.88,7.93,1.504
+D22,Bawnogue,Bawnogue,clondalkin,48.3,Above-benchmark crime,True,Disadvantaged,10.37,0.87,23.92,5.45,7.23,1.193
+D22,Clondalkin,Clondalkin,clondalkin,48.3,Above-benchmark crime,False,Marginally Below Average,10.37,0.87,23.92,5.45,7.23,0.138
+D22,Grange Castle,Grange Castle,clondalkin,48.3,Above-benchmark crime,True,Disadvantaged,10.37,0.87,23.92,5.45,7.23,2.617
+D22,Adamstown,Adamstown,lucan,56.8,Below-benchmark crime,False,Marginally Above Average,11.0,0.49,15.59,2.73,3.44,2.089
+D22,Lucan,Lucan,lucan,56.8,Below-benchmark crime,False,Marginally Above Average,11.0,0.49,15.59,2.73,3.44,0.091
+D22,Newcastle,Newcastle,rathcoole,54.3,Below-benchmark crime,False,Marginally Above Average,17.72,0.24,27.87,2.4,3.46,3.196
+D22,Neilstown,Neilstown,ronanstown,40.0,Above-benchmark crime,True,Disadvantaged,17.72,0.83,39.95,7.41,10.33,0.19
+D22,Ronanstown,Ronanstown,ronanstown,40.0,Above-benchmark crime,True,Very Disadvantaged,17.72,0.83,39.95,7.41,10.33,0.637
+D24,Citywest,Citywest,rathcoole,54.3,Below-benchmark crime,False,Marginally Below Average,17.72,0.24,27.87,2.4,3.46,2.846
+D24,Rathcoole,Rathcoole,rathcoole,54.3,Below-benchmark crime,False,Marginally Above Average,17.72,0.24,27.87,2.4,3.46,0.232
+D24,Saggart,Saggart,rathcoole,54.3,Below-benchmark crime,False,Marginally Above Average,17.72,0.24,27.87,2.4,3.46,1.346
+D24,Ballycullen,Ballycullen,rathfarnham,67.1,Lower recorded crime,False,Marginally Above Average,4.87,0.35,12.13,2.57,3.18,3.18
+D24,Firhouse,Firhouse,rathfarnham,67.1,Lower recorded crime,False,Marginally Above Average,4.87,0.35,12.13,2.57,3.18,1.954
+D24,Brittas,Brittas,tallaght,45.9,Above-benchmark crime,False,Marginally Above Average,13.06,0.72,27.64,6.32,9.08,5.122
+D24,Deerpark,Deerpark,tallaght,45.9,Above-benchmark crime,False,Marginally Below Average,13.06,0.72,27.64,6.32,9.08,1.883
+D24,Fettercairn,Fettercairn,tallaght,45.9,Above-benchmark crime,False,Marginally Below Average,13.06,0.72,27.64,6.32,9.08,2.066
+D24,Fortunestown,Fortunestown,tallaght,45.9,Above-benchmark crime,False,Marginally Below Average,13.06,0.72,27.64,6.32,9.08,2.905
+D24,Jobstown,Jobstown,tallaght,45.9,Above-benchmark crime,False,Marginally Below Average,13.06,0.72,27.64,6.32,9.08,2.377
+D24,Killinarden,Killinarden,tallaght,45.9,Above-benchmark crime,True,Very Disadvantaged,13.06,0.72,27.64,6.32,9.08,1.578
+D24,Kilnamanagh,Kilnamanagh,tallaght,45.9,Above-benchmark crime,False,Marginally Below Average,13.06,0.72,27.64,6.32,9.08,2.435
+D24,Kiltipper,Kiltipper,tallaght,45.9,Above-benchmark crime,False,Marginally Below Average,13.06,0.72,27.64,6.32,9.08,1.733
+D24,Old Bawn,Old Bawn,tallaght,45.9,Above-benchmark crime,False,Marginally Below Average,13.06,0.72,27.64,6.32,9.08,0.895
+D24,Springfield,Springfield,tallaght,45.9,Above-benchmark crime,False,Marginally Below Average,13.06,0.72,27.64,6.32,9.08,1.138
+D24,Tallaght,Tallaght,tallaght,45.9,Above-benchmark crime,False,Marginally Below Average,13.06,0.72,27.64,6.32,9.08,0.375

@@ -1,0 +1,60 @@
+District,Station,residents,share,station_score
+D1,store street,32213,0.6093,20.6
+D1,fitzgibbon street,20659,0.3907,39.2
+D2,pearse street,18327,1.0,29.1
+D3,clontarf,21114,0.9179,61.5
+D3,fitzgibbon street,1889,0.0821,39.2
+D4,donnybrook,22645,0.4607,64.4
+D4,irishtown,18192,0.3701,53.3
+D4,pearse street,8320,0.1693,29.1
+D5,raheny,14448,0.4478,63.5
+D5,coolock,13788,0.4274,51.9
+D5,clontarf,4026,0.1248,61.5
+D6,rathmines,28207,0.6219,54.1
+D6,donnybrook,13439,0.2963,64.4
+D6,terenure,3712,0.0818,62.9
+D6W,terenure,24646,0.7972,62.9
+D6W,sundrive,3738,0.1209,49.8
+D6W,crumlin,2533,0.0819,55.9
+D7,bridewell,25970,0.3643,34.2
+D7,cabra,24723,0.3468,58.6
+D7,mountjoy,20588,0.2888,36.9
+D8,kevin street,27141,0.5009,31.8
+D8,kilmainham,27047,0.4991,38.8
+D9,santry,26513,0.326,49.8
+D9,ballymun,23608,0.2903,44.2
+D9,finglas,14095,0.1733,50.5
+D9,clontarf,10165,0.125,61.5
+D9,mountjoy,6937,0.0853,36.9
+D10,ballyfermot,19260,0.6291,21.9
+D10,clondalkin,11357,0.3709,30.5
+D11,finglas,31891,1.0,50.5
+D12,crumlin,24247,0.4653,55.9
+D12,sundrive,22820,0.4379,49.8
+D12,kilmainham,2728,0.0523,38.8
+D12,clondalkin,2320,0.0445,48.3
+D13,howth,22284,0.579,66.9
+D13,raheny,8767,0.2278,63.5
+D13,coolock,7438,0.1933,51.9
+D14,rathfarnham,26023,0.5552,67.1
+D14,dundrum,20849,0.4448,62.5
+D15,blanchardstown,107091,0.9838,54.1
+D15,lucan,1765,0.0162,56.8
+D16,rathfarnham,28130,0.5126,67.1
+D16,dundrum,21075,0.384,62.5
+D16,tallaght,5672,0.1034,45.9
+D17,coolock,28384,0.8202,51.9
+D17,santry,6224,0.1798,49.8
+D18,dundrum,32440,0.7452,62.5
+D18,shankill,5731,0.1316,57.5
+D18,cabinteely,5362,0.1232,65.9
+D20,ronanstown,17812,0.7154,40.0
+D20,ballyfermot,7086,0.2846,51.5
+D22,lucan,55785,0.6298,56.8
+D22,clondalkin,20686,0.2335,48.3
+D22,ronanstown,6551,0.074,40.0
+D22,rathcoole,5552,0.0627,54.3
+D24,tallaght,68926,0.6442,45.9
+D24,rathcoole,24173,0.2259,54.3
+D24,rathfarnham,12254,0.1145,67.1
+D24,clondalkin,1635,0.0153,48.3
