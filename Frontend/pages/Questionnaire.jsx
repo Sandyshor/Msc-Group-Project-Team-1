@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import './Questionnaire.css'
-import CommuteFields from './CommuteFields'
+import { NO_LIMIT, TRAVEL_MODES } from './CommuteFields'
+import { FlowPhoto, FlowRow, FlowSidebar, FlowIcon } from './FlowLayout'
 import PrioritySlider, { DEFAULT_IMPORTANCE } from './PrioritySlider'
 
 // Values match the university names in the backend's commute data.
@@ -23,30 +24,53 @@ const UNIVERSITIES = [
   ['IADT - Dun Laoghaire', 'IADT — Dún Laoghaire'],
 ]
 
-// label, icon, backend accommodation key (null = no rent data yet)
+// label, backend accommodation key (null = no rent data yet)
 const ROOM_TYPES = [
-  ['1 BHK apartment', '⌂', 'one_bed'],
-  ['2 BHK apartment', '⌂', 'two_bed'],
-  ['Private room', '▣', 'private_room'],
-  ['Double sharing', '♧', 'shared_room'],
-  ['Student accommodation', '⌂', null],
+  ['1 BHK apartment', 'one_bed'],
+  ['2 BHK apartment', 'two_bed'],
+  ['Private room', 'private_room'],
+  ['Double sharing', 'shared_room'],
+  ['Student accommodation', null],
 ]
 
-// name, hint, items that can be rated separately instead (as in the backend)
+const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
+
+// Shown on the page, not used for ranking yet - each result already shows its area's safety
+const SAFETY_LEVELS = ['High', 'Medium', 'Low']
+
+// name, icon, hint, items that can be rated separately instead (as in the backend)
 const FACTORS = [
-  ['Rent', 'Cheaper rent'],
-  ['Commute', 'A short commute to your university'],
-  ['Shopping & Groceries', 'Supermarkets, grocery shops and shopping centres',
+  ['Rent', 'euro', 'Cheaper rent'],
+  ['Commute', 'clock', 'A short commute to your university'],
+  ['Shopping & Groceries', 'basket', 'Supermarkets, grocery shops and shopping centres',
     ['Supermarkets', 'Grocery Shops', 'Shopping Malls']],
-  ['Restaurants', 'Places to eat out'],
-  ['Healthcare', 'Hospitals and pharmacies', ['Hospitals', 'Pharmacies']],
-  ['Recreation & Wellness', 'Gyms and parks', ['Gyms', 'Parks']],
+  ['Restaurants', 'fork', 'Places to eat out'],
+  ['Healthcare', 'heart', 'Hospitals and pharmacies', ['Hospitals', 'Pharmacies']],
+  ['Recreation & Wellness', 'tree', 'Gyms and parks', ['Gyms', 'Parks']],
 ]
 
 function joinWords(items) {
   return items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`
 }
 
+function ChoiceButtons({ label, options, value, onChange, className = '' }) {
+  return (
+    <div className={`flow-choices ${className}`.trim()} role="group" aria-label={label}>
+      {options.map(([optionValue, optionLabel, icon]) => (
+        <button
+          key={optionValue}
+          type="button"
+          aria-pressed={value === optionValue}
+          className={value === optionValue ? 'flow-choice selected' : 'flow-choice'}
+          onClick={() => onChange(optionValue)}
+        >
+          {icon && <FlowIcon name={icon} />}
+          {optionLabel}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 function Questionnaire() {
   const [step, setStep] = useState(1)
@@ -54,18 +78,20 @@ function Questionnaire() {
   const [destination, setDestination] = useState('')
   const [roomType, setRoomType] = useState('Private room')
   const [commute, setCommute] = useState({ travelMode: 'public_transport', maxCommute: null })
+  const [safety, setSafety] = useState('Medium')
   const [importance, setImportance] = useState(
     Object.fromEntries(
-      FACTORS.flatMap(([name, , items = []]) => [name, ...items]).map((name) => [name, DEFAULT_IMPORTANCE])
+      FACTORS.flatMap(([name, , , items = []]) => [name, ...items]).map((name) => [name, DEFAULT_IMPORTANCE])
     )
   )
   const [separately, setSeparately] = useState({})
   const navigate = useNavigate()
 
-  const accommodation = ROOM_TYPES.find(([label]) => label === roomType)[2]
+  const accommodation = ROOM_TYPES.find(([label]) => label === roomType)[1]
+  const situationDone = Boolean(destination && accommodation)
   // A category rated "separately" is replaced by its items, as in the backend.
   const activeImportance = Object.fromEntries(
-    FACTORS.flatMap(([name, , items]) =>
+    FACTORS.flatMap(([name, , , items]) =>
       items && separately[name] ? items.map((item) => [item, importance[item]]) : [[name, importance[name]]]
     )
   )
@@ -77,8 +103,7 @@ function Questionnaire() {
 
   function handleContinue(event) {
     event.preventDefault()
-    setStep(2)
-    window.scrollTo(0, 0)
+    if (situationDone) setStep(2)
   }
 
   function handleSubmit(event) {
@@ -92,216 +117,172 @@ function Questionnaire() {
         importance: activeImportance,
         travelMode: commute.travelMode,
         maxCommute: commute.maxCommute,
+        safety,
       },
     })
   }
 
   return (
-    <section className="questionnaire-page">
-      <div className="questionnaire-container">
-        {step === 1 ? (
-          <Link className="back-link" to="/">
-            ← Back to home
-          </Link>
-        ) : (
-          <button className="back-link back-button" type="button" onClick={() => setStep(1)}>
-            ← Back to your situation
-          </button>
-        )}
+    <section className="flow-page">
+      <FlowSidebar step={step} onStep={setStep} canGoTo={(n) => n === 1 || (n === 2 && situationDone)} />
 
-        {/* Heading and progress sit in their own panel (left column on wide screens) */}
-        <div className="questionnaire-intro">
-          <p className="eyebrow">LET'S FIND YOUR PLACE</p>
+      {step === 1 ? (
+        <>
+          <FlowPhoto
+            step={1}
+            label="YOUR SITUATION"
+            title="First, tell us a little"
+            accent="about your life."
+            description="We'll use your answers to find Dublin neighbourhoods that fit your budget and everyday routine."
+          />
 
-          <div className="progress-info">
-            <span>{step === 1 ? 'YOUR SITUATION' : 'YOUR PRIORITIES'}</span>
-            <span>STEP {step} OF 3</span>
-          </div>
-
-          <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${(step / 3) * 100}%` }} />
-          </div>
-
-          {step === 1 ? (
-            <>
-              <h1>
-                First, tell us a little
-                <em> about your life.</em>
-              </h1>
-
-              <p className="questionnaire-description">
-                We'll use your answers to find Dublin neighbourhoods
-                that fit your budget and everyday routine.
-              </p>
-            </>
-          ) : (
-            <>
-              <h1>
-                What matters most
-                <em> to you?</em>
-              </h1>
-
-              <p className="questionnaire-description">
-                Tell us how important each of these is. We'll weigh them to rank
-                the neighbourhoods that suit you best.
-              </p>
-            </>
-          )}
-        </div>
-
-        {step === 1 ? (
-          <>
-            <form onSubmit={handleContinue}>
-              <div className="question-group">
-                <label htmlFor="budget">
-                  What's your monthly accommodation budget?
-                </label>
-
-                <p className="field-hint">
-                  Enter the amount you can spend on rent each month.
-                </p>
-
-                <div className="budget-display">
-                  <span>Monthly budget</span>
-                  <strong>€{budget.toLocaleString('en-IE')}</strong>
-                </div>
-
-                <input
-                  id="budget"
-                  type="range"
-                  min="400"
-                  max="2500"
-                  step="50"
-                  value={budget}
-                  onChange={(event) => setBudget(Number(event.target.value))}
-                />
-
-                <div className="range-labels">
-                  <span>€400</span>
-                  <span>€2,500+</span>
-                </div>
+          <form className="flow-rows" onSubmit={handleContinue}>
+            <FlowRow icon="euro" title="Budget" question="What's your monthly accommodation budget?" htmlFor="budget">
+              <div className="flow-value">
+                <span>Monthly budget</span>
+                <strong>€{budget.toLocaleString('en-IE')}</strong>
               </div>
+              <input
+                id="budget"
+                type="range"
+                min="400"
+                max="2500"
+                step="50"
+                value={budget}
+                onChange={(event) => setBudget(Number(event.target.value))}
+              />
+            </FlowRow>
 
-              <div className="question-group">
-                <label htmlFor="destination">
-                  Which university will you attend?
-                </label>
+            <FlowRow icon="cap" title="University" question="Which university will you attend?" htmlFor="destination">
+              <select id="destination" value={destination} onChange={(event) => setDestination(event.target.value)}>
+                <option value="">Select your university</option>
+                {UNIVERSITIES.map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </FlowRow>
 
-                <p className="field-hint">
-                  Choose your university.
-                </p>
+            <FlowRow icon="home" title="Accommodation" question="What type of accommodation do you prefer?">
+              <ChoiceButtons
+                label="Accommodation type"
+                className="flow-choices-rooms"
+                options={ROOM_TYPES.map(([label]) => [label, label])}
+                value={roomType}
+                onChange={setRoomType}
+              />
+              {!accommodation && (
+                <p className="flow-note">We don't have rent data for student accommodation yet - please choose another option.</p>
+              )}
+            </FlowRow>
 
-                <select
-                  id="destination"
-                  value={destination}
-                  onChange={(event) => setDestination(event.target.value)}
-                  required
-                >
-                  <option value="">Select</option>
-                  {UNIVERSITIES.map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
+            <FlowRow icon="route" title="Getting there" question="How will you get to university?">
+              <ChoiceButtons
+                label="Travel mode"
+                options={TRAVEL_MODES.map(([value, label]) => [value, label, MODE_ICONS[value]])}
+                value={commute.travelMode}
+                onChange={(travelMode) => setCommute({ ...commute, travelMode })}
+              />
+            </FlowRow>
+
+            <FlowRow icon="clock" title="Commute" question="What's the longest commute you'd accept?" htmlFor="max-commute">
+              <div className="flow-value">
+                <span>One way</span>
+                <strong>{commute.maxCommute ? `${commute.maxCommute} min` : 'No limit'}</strong>
               </div>
+              <input
+                id="max-commute"
+                type="range"
+                min="10"
+                max={NO_LIMIT}
+                step="5"
+                value={commute.maxCommute ?? NO_LIMIT}
+                onChange={(event) => {
+                  const value = Number(event.target.value)
+                  setCommute({ ...commute, maxCommute: value === NO_LIMIT ? null : value })
+                }}
+              />
+            </FlowRow>
 
-              <CommuteFields {...commute} onChange={setCommute} />
+            <FlowRow icon="shield" title="Safety" question="How important is safety to you when choosing a neighbourhood?">
+              <ChoiceButtons
+                label="Safety"
+                options={SAFETY_LEVELS.map((level) => [level, level])}
+                value={safety}
+                onChange={setSafety}
+              />
+            </FlowRow>
 
-              <div className="question-group">
-                <label>What type of accommodation do you prefer?</label>
-
-                <div className="room-options">
-                  {ROOM_TYPES.map(([type, icon]) => (
-                    <button
-                      key={type}
-                      type="button"
-                      className={`room-option${roomType === type ? ' selected' : ''}${type === 'Student accommodation' ? ' room-option-wide' : ''}`}
-                      onClick={() => setRoomType(type)}
-                    >
-                      <span>{icon}</span>
-                      {type}
-                      {roomType === type && <span>✓</span>}
-                    </button>
-                  ))}
-                </div>
-
-                {!accommodation && (
-                  <p className="field-note">
-                    We don't have rent data for student accommodation yet.
-                    Please choose another option to see recommendations.
-                  </p>
-                )}
-              </div>
-
-              <button className="questionnaire-next" type="submit" disabled={!accommodation}>
+            <div className="flow-actions">
+              {!destination && <p className="flow-note">Choose your university to continue.</p>}
+              <button className="flow-next" type="submit" disabled={!situationDone}>
                 Continue <span>→</span>
               </button>
-            </form>
-          </>
-        ) : (
-          <>
-            <form onSubmit={handleSubmit}>
-              {FACTORS.map(([name, hint, items]) => (
-                <fieldset
-                  // a category rated by its items needs the whole row for its sliders
-                  className={items && separately[name] ? 'question-group question-group-wide' : 'question-group'}
-                  key={name}
-                >
-                  <legend className="factor-name">{name}</legend>
-                  <p className="field-hint">{hint}</p>
+            </div>
+          </form>
+        </>
+      ) : (
+        <>
+          <FlowPhoto
+            step={2}
+            label="YOUR PRIORITIES"
+            title="What matters most"
+            accent="to you?"
+            description="Move each slider to show how important it is. We'll weigh them to rank the neighbourhoods that suit you best."
+          />
 
-                  {!(items && separately[name]) && (
-                    <PrioritySlider
-                      name={name}
-                      value={importance[name]}
-                      onChange={(value) => setFactorImportance(name, value)}
-                    />
-                  )}
-
-                  {items && (
-                    <label className="separate-toggle">
-                      <input
-                        type="checkbox"
-                        checked={!!separately[name]}
-                        onChange={(event) =>
-                          setSeparately({ ...separately, [name]: event.target.checked })
-                        }
+          <form className="flow-rows" onSubmit={handleSubmit}>
+            {FACTORS.map(([name, icon, hint, items]) => (
+              <FlowRow
+                key={name}
+                icon={icon}
+                title={name}
+                question={hint}
+                className={items && separately[name] ? 'flow-row-items' : ''}
+              >
+                {items && separately[name] ? (
+                  <div className="flow-item-sliders">
+                    {items.map((item) => (
+                      <PrioritySlider
+                        key={item}
+                        name={item}
+                        value={importance[item]}
+                        showName
+                        onChange={(value) => setFactorImportance(item, value)}
                       />
-                      Set priorities for {joinWords(items)} separately
-                    </label>
-                  )}
+                    ))}
+                  </div>
+                ) : (
+                  <PrioritySlider
+                    name={name}
+                    value={importance[name]}
+                    onChange={(value) => setFactorImportance(name, value)}
+                  />
+                )}
+                {items && (
+                  <label className="flow-separate">
+                    <input
+                      type="checkbox"
+                      checked={!!separately[name]}
+                      onChange={(event) => setSeparately({ ...separately, [name]: event.target.checked })}
+                    />
+                    Rate {joinWords(items)} separately
+                  </label>
+                )}
+              </FlowRow>
+            ))}
 
-                  {items && separately[name] && (
-                    <div className="item-ratings">
-                      {items.map((item) => (
-                        <div className="item-rating" key={item}>
-                          <p className="item-name">{item}</p>
-                          <PrioritySlider
-                            name={item}
-                            value={importance[item]}
-                            onChange={(value) => setFactorImportance(item, value)}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </fieldset>
-              ))}
-
-              {allNotImportant && (
-                <p className="field-note">
-                  Move at least one slider above 0 so we have something to rank on.
-                </p>
-              )}
-
-              <button className="questionnaire-next" type="submit" disabled={allNotImportant}>
+            <div className="flow-actions">
+              <button className="flow-back" type="button" onClick={() => setStep(1)}>
+                ← Back
+              </button>
+              {allNotImportant && <p className="flow-note">Move at least one slider above 0.</p>}
+              <button className="flow-next" type="submit" disabled={allNotImportant}>
                 See my matches <span>→</span>
               </button>
-            </form>
-          </>
-        )}
-      </div>
+            </div>
+          </form>
+        </>
+      )}
     </section>
   )
 }

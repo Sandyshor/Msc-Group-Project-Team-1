@@ -8,7 +8,7 @@ export const TRAVEL_MODES = [
 ]
 
 // The slider's last stop means "no limit"
-const NO_LIMIT = 95
+export const NO_LIMIT = 95
 
 function CommuteFields({ travelMode, maxCommute, onChange }) {
   return (
