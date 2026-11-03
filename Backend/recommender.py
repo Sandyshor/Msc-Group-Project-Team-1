@@ -18,8 +18,8 @@ DATA_FOLDER = os.environ.get(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Data"),
 )
 
-# Street safety score per district (robbery, public order, Garda distance; 50 = Dublin average), written by
-# safety_pipeline.py (refreshed weekly by .github/workflows/refresh-safety-data.yml). Shown on each result; not
+# Relative crime score per district (0-100, recorded crime against the Irish town and city rate; 50 = that rate;
+# four bands; an estimate from the Garda station areas its residents live in), written by safety_pipeline.py (refreshed weekly by .github/workflows/refresh-safety-data.yml). Shown on each result; not
 # used for ranking.
 SAFETY_CSV = os.environ.get(
     "SAFETY_CSV",
@@ -28,13 +28,15 @@ SAFETY_CSV = os.environ.get(
 # Other safety factors (street lighting, night public transport), from build_safety_context.py.
 # Shown with the safety score as context; they are not part of it.
 SAFETY_CONTEXT_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "safety_context.csv")
-# Street safety score per named neighbourhood (safety_pipeline.py), on the same Dublin-average scale.
+# Area safety score per named neighbourhood (safety_pipeline.py), on the same scale.
 SAFETY_NEIGHBOURHOODS_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "safety_neighbourhoods.csv")
 # Safety heat map: ED shapes per district (build_safety_map.py), ED scores (safety_pipeline.py) and where each
 # named neighbourhood is (build_neighbourhoods.py).
 SAFETY_MAP_GEOJSON = os.path.join(os.path.dirname(SAFETY_CSV), "safety_map_areas.geojson")
 SAFETY_MAP_DISTRICTS_GEOJSON = os.path.join(os.path.dirname(SAFETY_CSV), "safety_map_districts.geojson")
 SAFETY_EDS_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "safety_eds.csv")
+# The Garda station areas that make up each district's score, with their share of the district's residents.
+DISTRICT_STATIONS_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "district_station_shares.csv")
 NEIGHBOURHOOD_PLACES_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "neighbourhoods.csv")
 
 # Student residences per district, from OpenStreetMap plus a hand-checked list (build_accommodation.py). Rent listings aren't stored:
@@ -188,17 +190,27 @@ def _percent(value):
     return None if value is None else round(float(value) * 100)
 
 
+CRIME_GROUPS = ("violent", "robbery", "burglary_theft", "public_order", "damage")
+
+
+def _crime(row, prefix=""):
+    """{group: incidents per 1,000 people a year} from a pipeline row (prefix 'ireland_' for the Irish reference)."""
+    return {g: _round_or_none(row.get(f"{prefix}{g}_per_1k"), 1) for g in CRIME_GROUPS}
+
+
 def load_neighbourhoods(path=SAFETY_NEIGHBOURHOODS_CSV):
     """{area: [neighbourhood safety figures, safest first]}; {} if the file isn't there."""
     if not os.path.exists(path):
         return {}
     nb = pd.read_csv(path).sort_values(["safety_index_0_100", "Neighbourhood"], ascending=[False, True])
     return {
-        area: [{"name": row["Neighbourhood"],
+        area: [{"name": row.get("Label", row["Neighbourhood"]),
                 "score": _round_or_none(row["safety_index_0_100"], 1),
-                "robbery_per_100k": _round_or_none(row["robbery_per_100k"]),
-                "public_order_per_100k": _round_or_none(row["public_order_per_100k"]),
-                "garda_nearest_km": _round_or_none(row["garda_nearest_km"], 1)}
+                "station": str(row["Station"]).title(),
+                "check_street": bool(row.get("check_street", False)),
+                "tier": _none_if_nan(row.get("tier")),
+                "crime_per_1k": _crime(row),
+                "garda_nearest_km": _round_or_none(row.get("garda_nearest_km"), 1)}
                for _, row in group.iterrows()]
         for area, group in nb.groupby("District", sort=False)
     }
@@ -209,6 +221,11 @@ def load_safety(path=SAFETY_CSV, context_path=SAFETY_CONTEXT_CSV, neighbourhoods
     if not os.path.exists(path):
         return {}
     neighbourhoods = load_neighbourhoods(neighbourhoods_path)
+    parts = {}
+    if os.path.exists(DISTRICT_STATIONS_CSV):
+        for area, group in pd.read_csv(DISTRICT_STATIONS_CSV).groupby("District"):
+            parts[area] = [{"station": r["Station"].title(), "share_pct": _percent(r["share"]),
+                            "score": _round_or_none(r["station_score"], 1)} for _, r in group.iterrows()]
     safety = pd.read_csv(path)
     if os.path.exists(context_path):
         context = pd.read_csv(context_path)[["District", "lit_share_tagged", "night_transit_coverage"]]
@@ -217,10 +234,14 @@ def load_safety(path=SAFETY_CSV, context_path=SAFETY_CONTEXT_CSV, neighbourhoods
     for _, row in safety.iterrows():
         out[row["District"]] = {
             "index": _round_or_none(row.get("safety_index_0_100"), 1),
-            "robbery_per_100k": _round_or_none(row.get("robbery_per_100k")),
-            "public_order_per_100k": _round_or_none(row.get("public_order_per_100k")),
-            "dublin_robbery_per_100k": _round_or_none(row.get("dublin_robbery_per_100k")),
-            "dublin_public_order_per_100k": _round_or_none(row.get("dublin_public_order_per_100k")),
+            "tier": _none_if_nan(row.get("tier")),
+            "main_station": _none_if_nan(row.get("main_station")),
+            "main_station_pct": _percent(row.get("main_station_share")),
+            "station_areas": parts.get(row["District"], []),
+            "check_street_pct": _percent(row.get("check_street_share")),
+            "areas_to_check": [n["name"] for n in neighbourhoods.get(row["District"], []) if n.get("check_street")],
+            "crime_per_1k": _crime(row),
+            "ireland_crime_per_1k": _crime(row, "ireland_"),
             "crime_period": _none_if_nan(row.get("crime_reference_period")),
             "garda_nearest_km": _round_or_none(row.get("garda_nearest_km"), 1),
             "lit_streets_pct": _percent(row.get("lit_share_tagged")),
@@ -260,7 +281,9 @@ def load_safety_maps(shapes_path=SAFETY_MAP_GEOJSON, eds_path=SAFETY_EDS_CSV,
         nb = pd.read_csv(neighbourhoods_path).merge(
             pd.read_csv(places_path)[["District", "Neighbourhood", "lon", "lat"]], on=["District", "Neighbourhood"])
         for area, group in nb.groupby("District"):
-            places[area] = [{"name": r["Neighbourhood"], "score": _round_or_none(r["safety_index_0_100"], 1),
+            places[area] = [{"name": r.get("Label", r["Neighbourhood"]), "score": _round_or_none(r["safety_index_0_100"], 1),
+                             "tier": _none_if_nan(r.get("tier")),
+                             "check_street": bool(r.get("check_street", False)),
                              "lon": r["lon"], "lat": r["lat"]} for _, r in group.iterrows()]
     outlines = {}
     if os.path.exists(outlines_path):
@@ -275,9 +298,10 @@ def load_safety_maps(shapes_path=SAFETY_MAP_GEOJSON, eds_path=SAFETY_EDS_CSV,
         feature = {"type": "Feature", "geometry": f["geometry"], "properties": {
             "ed": f["properties"]["ED"].title(),
             "score": _round_or_none(ed["safety_index_0_100"], 1),
-            "robbery_per_100k": _round_or_none(ed["robbery_per_100k"]),
-            "public_order_per_100k": _round_or_none(ed["public_order_per_100k"]),
-            "garda_nearest_km": _round_or_none(ed["garda_nearest_km"], 1)}}
+            "tier": _none_if_nan(ed.get("tier")),
+            "check_street": bool(ed.get("check_street", False)),
+            **{f"{g}_per_1k": _round_or_none(ed.get(f"{g}_per_1k"), 1) for g in CRIME_GROUPS},
+            "garda_nearest_km": _round_or_none(ed.get("garda_nearest_km"), 1)}}
         maps.setdefault(f["properties"]["District"], []).append(feature)
     return {area: {"areas": {"type": "FeatureCollection", "features": features},
                    "bounds": _bounds(features),

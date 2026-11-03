@@ -9,9 +9,10 @@ maplibregl.setWorkerUrl(maplibreWorkerUrl)
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron'
 const REDUCED_MOTION = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-// Heat scale on the street safety score: 50 = Dublin average. Red below, amber around, green above.
+// Heat scale on the relative crime score (50 = the Irish town and city rate). Bands from the unrounded score:
+// Higher recorded crime below 40, Above-benchmark 40 to below 50, Below-benchmark 50 to below 57, Lower 57+.
 const HEAT_STOPS = [
-  [0, '#b23a2f'], [25, '#e0694a'], [40, '#f0a23f'], [50, '#f4cf62'], [60, '#b5cf6c'], [75, '#5fae6b'], [100, '#25704a'],
+  [0, '#b23a2f'], [30, '#c94a35'], [40, '#e0694a'], [50, '#f4cf62'], [57, '#b5cf6c'], [65, '#5fae6b'], [100, '#25704a'],
 ]
 const HEAT_COLOR = ['interpolate', ['linear'], ['get', 'score'], ...HEAT_STOPS.flat()]
 const WORLD = [[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]
@@ -26,11 +27,11 @@ function heatColor(score) {
   return `rgb(${a.map((x, k) => Math.round(x + (b[k] - x) * t)).join(',')})`
 }
 
-function label(raw) {
-  const score = Math.round(raw)
-  if (score >= 60) return 'Safer than Dublin average'
-  if (score >= 40) return 'Around Dublin average'
-  return 'Below Dublin average'
+function label(score) {
+  if (score >= 57) return 'Lower recorded crime'
+  if (score >= 50) return 'Below-benchmark crime'
+  if (score >= 40) return 'Above-benchmark crime'
+  return 'Higher recorded crime'
 }
 
 function areaPopup(p) {
@@ -41,17 +42,18 @@ function areaPopup(p) {
   const badge = document.createElement('span')
   badge.className = 'heat-popup-score'
   badge.style.background = heatColor(p.score)
-  badge.textContent = Math.round(p.score)
+  badge.textContent = p.score.toFixed(1)
   const name = document.createElement('div')
   const title = document.createElement('strong')
   title.textContent = p.ed
   const words = document.createElement('small')
-  words.textContent = label(p.score)
+  words.textContent = p.check_street ? `${label(p.score)} · check the specific street` : label(p.score)
   name.append(title, words)
   head.append(badge, name)
   const facts = document.createElement('ul')
-  for (const text of [`Robberies: ${p.robbery_per_100k} per 100,000 a year`,
-    `Public order: ${p.public_order_per_100k} per 100,000 a year`, `Garda station: ${p.garda_nearest_km} km away`]) {
+  for (const text of [`Violent crime: ${p.violent_per_1k} per 1,000 people a year`,
+    `Robbery: ${p.robbery_per_1k} per 1,000`, `Burglary and theft: ${p.burglary_theft_per_1k} per 1,000`,
+    `Public order: ${p.public_order_per_1k} per 1,000`, `Garda station: ${p.garda_nearest_km} km away`]) {
     const li = document.createElement('li')
     li.textContent = text
     facts.append(li)
@@ -66,13 +68,15 @@ function chipElement(place) {
   chip.className = 'heat-chip'
   const badge = document.createElement('span')
   badge.style.background = heatColor(place.score)
-  badge.textContent = Math.round(place.score)
+  badge.textContent = place.score.toFixed(1)
   const name = document.createElement('span')
   name.textContent = place.name
   const leader = document.createElement('i')
   leader.className = 'heat-chip-leader'
   chip.append(leader, badge, name)
-  chip.title = `${place.name}: ${Math.round(place.score)}/100 · ${label(place.score)}`
+  chip.title = place.check_street
+    ? `${place.name}: check the specific street (station-area score ${place.score.toFixed(1)} may not reflect it)`
+    : `${place.name}: ${place.score.toFixed(1)}/100 · ${label(place.score)}`
   return chip
 }
 
@@ -339,7 +343,7 @@ export default function SafetyHeatMap({ area, data, score, residences = NO_RESID
     <figure className="heat-map">
       <div className="heat-map-frame">
         <div ref={container} className="heat-map-canvas" role="img"
-          aria-label={`Map of ${area} coloured by street safety score, from red (below the Dublin average) to green (safer)`} />
+          aria-label={`Map of ${area} coloured by relative crime score, from red (more crime than Irish towns) to green (less)`} />
         {residences.length > 0 && (
           <div className="heat-toggles" role="radiogroup" aria-label="Show on the map">
             <button type="button" role="radio" aria-checked={view === 'names'} onClick={() => setView('names')}>
@@ -357,13 +361,13 @@ export default function SafetyHeatMap({ area, data, score, residences = NO_RESID
           <span className="heat-bar-average" aria-hidden="true" />
           {score != null && (
             <span className="heat-bar-marker" style={{ left: `${Math.max(0, Math.min(100, score))}%`, '--c': heatColor(score) }}>
-              <span>{area} {Math.round(score)}</span>
+              <span>{area} {score.toFixed(1)}</span>
             </span>
           )}
         </span>
-        <span className="heat-ticks"><span>Less safe</span><span>Dublin average</span><span>Safer</span></span>
+        <span className="heat-ticks"><span>More crime</span><span>Irish town average</span><span>Less crime</span></span>
         <span className="heat-note">
-          Each area is a Census Electoral Division · tap an area for its figures
+          Each area is a Census Electoral Division, coloured by its Garda station area's score · tap an area for its figures
         </span>
       </figcaption>
     </figure>

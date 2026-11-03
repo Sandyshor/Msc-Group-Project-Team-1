@@ -1,0 +1,13 @@
+scenario,rank_correlation_with_published,same_top_3,same_bottom_3
+"published (35/25/20/15/5) | people over a day (16 h home, 8 h day)",1.0,True,True
+published (35/25/20/15/5) | residents only,0.948,True,True
+"published (35/25/20/15/5) | half residents, half daytime",0.992,True,True
+"equal (20 each) | people over a day (16 h home, 8 h day)",0.983,False,True
+equal (20 each) | residents only,0.942,False,True
+"equal (20 each) | half residents, half daytime",0.976,False,True
+"harm to the person (45/30/10/10/5) | people over a day (16 h home, 8 h day)",0.994,True,True
+harm to the person (45/30/10/10/5) | residents only,0.97,True,True
+"harm to the person (45/30/10/10/5) | half residents, half daytime",0.977,True,True
+"property-led (25/15/40/10/10) | people over a day (16 h home, 8 h day)",0.993,True,True
+property-led (25/15/40/10/10) | residents only,0.947,True,True
+"property-led (25/15/40/10/10) | half residents, half daytime",0.994,True,True

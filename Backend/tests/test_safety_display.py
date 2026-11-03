@@ -11,9 +11,10 @@ import recommender
 UNIVERSITY = "TU Dublin - Grangegorman"
 RATINGS = {"Rent": 1, "Commute": 2, "Shopping & Groceries": 2, "Restaurants": 3, "Healthcare": 4,
            "Recreation & Wellness": 3}
-FIELDS = {"index", "robbery_per_100k", "public_order_per_100k", "dublin_robbery_per_100k",
-          "dublin_public_order_per_100k", "crime_period", "garda_nearest_km", "lit_streets_pct", "night_transit_pct",
-          "neighbourhoods"}
+FIELDS = {"index", "tier", "main_station", "main_station_pct", "station_areas", "check_street_pct", "areas_to_check",
+          "crime_per_1k", "ireland_crime_per_1k", "crime_period",
+          "garda_nearest_km", "lit_streets_pct", "night_transit_pct", "neighbourhoods"}
+TIERS = {"Lower recorded crime", "Below-benchmark crime", "Above-benchmark crime", "Higher recorded crime"}
 
 
 @pytest.fixture(scope="module")
@@ -27,7 +28,9 @@ def test_every_district_has_safety_figures(data):
         assert set(figures) == FIELDS
         assert 0 <= figures["index"] <= 100
         assert 0 <= figures["lit_streets_pct"] <= 100 and 0 <= figures["night_transit_pct"] <= 100
-        assert figures["robbery_per_100k"] > 0 and figures["public_order_per_100k"] > 0 and figures["garda_nearest_km"] > 0
+        assert figures["tier"] in TIERS and figures["garda_nearest_km"] > 0
+        assert set(figures["crime_per_1k"]) == set(recommender.CRIME_GROUPS)
+        assert all(v > 0 for v in figures["crime_per_1k"].values())
         assert figures["crime_period"] == "2023-2025 average"
 
 
@@ -35,28 +38,76 @@ def test_figures_match_the_pipeline_output(data):
     csv = pd.read_csv(recommender.SAFETY_CSV).set_index("District")
     d7 = data["safety"]["D7"]
     assert d7["index"] == round(csv.loc["D7", "safety_index_0_100"], 1)
-    assert d7["robbery_per_100k"] == round(csv.loc["D7", "robbery_per_100k"])
-    assert d7["public_order_per_100k"] == round(csv.loc["D7", "public_order_per_100k"])
+    assert d7["tier"] == csv.loc["D7", "tier"]
+    assert d7["crime_per_1k"]["violent"] == round(csv.loc["D7", "violent_per_1k"], 1)
+    assert d7["ireland_crime_per_1k"]["burglary_theft"] == round(float(csv.loc["D7", "ireland_burglary_theft_per_1k"]), 1)
+    assert d7["main_station"] == "bridewell" and d7["main_station_pct"] == 36
     assert d7["garda_nearest_km"] == round(csv.loc["D7", "garda_nearest_km"], 1)
 
 
 def test_d7_scores(data):
-    assert data["safety"]["D7"]["index"] == 39.8
-    got = [(n["name"], round(n["score"])) for n in data["safety"]["D7"]["neighbourhoods"]]
-    assert got == [("Cabra West", 64), ("Cabra", 63), ("Ashtown", 59), ("Phibsborough", 46), ("Glasnevin", 44),
-                   ("Cabra East", 39), ("Smithfield", 32), ("Stoneybatter", 28), ("Grangegorman", 27), ("Oxmantown", 27)]
+    d7 = data["safety"]["D7"]
+    assert d7["index"] == 43.4 and d7["tier"] == "Above-benchmark crime"
+    got = [(n["name"], round(n["score"])) for n in d7["neighbourhoods"]]
+    assert got == [("Ashtown (D7 part)", 59), ("Cabra", 59), ("Cabra West", 59), ("Navan Road", 59),
+                   ("Cabra East", 37), ("Glasnevin (D7 part)", 37), ("Phibsborough", 37), ("Arbour Hill", 34),
+                   ("Broadstone", 34), ("Grangegorman", 34), ("Oxmantown", 34), ("Smithfield", 34), ("Stoneybatter", 34)]
+
+
+def test_every_district_score_is_reproducible_from_its_station_areas(data):
+    overridden = set(pd.read_csv(recommender.os.path.join(recommender.os.path.dirname(recommender.SAFETY_CSV),
+                                                          "manual_overrides.csv")).query("kind == 'district'")["id"])
+    for area, figures in data["safety"].items():
+        if area in overridden:
+            continue
+        parts = figures["station_areas"]
+        assert parts and sum(p["share_pct"] for p in parts) in (99, 100, 101)
+        rebuilt = sum(p["share_pct"] / 100 * p["score"] for p in parts)
+        assert abs(rebuilt - figures["index"]) < 0.6, area   # shares are shown as whole percents
+
+
+def test_d20_is_mostly_ronanstown(data):
+    parts = {p["station"]: p for p in data["safety"]["D20"]["station_areas"]}
+    assert parts["Ronanstown"]["share_pct"] == 72 and parts["Ballyfermot"]["share_pct"] == 28
+
+
+def test_disadvantaged_areas_ask_users_to_check_the_street(data):
+    d10 = data["safety"]["D10"]
+    assert "Cherry Orchard" in d10["areas_to_check"] and d10["check_street_pct"] > 0
+    cherry = next(n for n in d10["neighbourhoods"] if n["name"] == "Cherry Orchard")
+    assert cherry["check_street"]
+    assert cherry["score"] == 22.2 and d10["index"] == 25.1     # manual_overrides.csv (CRIME_SCORE.md A9)
+    assert data["safety"]["D14"]["areas_to_check"] == []
+
+
+def test_names_in_two_districts_are_labelled_as_parts(data):
+    d7 = {n["name"] for n in data["safety"]["D7"]["neighbourhoods"]}
+    d9 = {n["name"] for n in data["safety"]["D9"]["neighbourhoods"]}
+    assert "Glasnevin (D7 part)" in d7 and "Glasnevin (D9 part)" in d9
+
+
+def test_d2_lists_its_well_known_areas(data):
+    # Only Temple Bar is an OSM place point in D2; the rest come from data/safety/extra_places.csv
+    names = {n["name"] for n in data["safety"]["D2"]["neighbourhoods"]}
+    assert {"Temple Bar", "Grafton Street", "St Stephen's Green", "Merrion Square", "Trinity College"} <= names
+
+
+def test_no_score_is_zero(data):
+    scores = [f["index"] for f in data["safety"].values()]
+    scores += [n["score"] for f in data["safety"].values() for n in f["neighbourhoods"]]
+    assert min(scores) > 15 and max(scores) < 80
 
 
 def test_phibsborough_matches_the_verified_source_figures(data):
-    # Mountjoy station 2023-25 (CSO CJA07): robbery 32/35/39, public order 224/318/327.
-    # Mountjoy's official Garda sub-district: 27,525 residents (Census 2022) and 23,407 daytime population
-    # (Census 2016); people in area = (27,525 + 23,407) / 2.
-    people = (27525 + 23407) / 2
+    # Mountjoy station 2023-25 (CSO CJA11) violent = assault 354/441/462 + dangerous acts 88/92/110 + kidnapping
+    # 3/3/3; people over a day = (16 h x 27,525 residents, Census 2022 + 8 h x 23,407 daytime, Census 2016, scaled
+    # by 2,320,297 / 2,006,641 people at work 2016 -> 2022) / 24 = 27,372.
     ph = next(n for n in data["safety"]["D7"]["neighbourhoods"] if n["name"] == "Phibsborough")
-    # within 1: the pipeline stores rates to one decimal before the API rounds them
-    assert abs(ph["robbery_per_100k"] - (32 + 35 + 39) / 3 / people * 1e5) <= 1
-    assert abs(ph["public_order_per_100k"] - (224 + 318 + 327) / 3 / people * 1e5) <= 1
-    assert ph["score"] == 45.6  # hand-computed against the Dublin averages (robbery 93.2, public order 787.9)
+    people = round((16 * 27525 + 8 * 23407 * 2320297 / 2006641) / 24)
+    violent = (354 + 441 + 462 + 88 + 92 + 110 + 3 * 3) / 3 / people * 1000
+    assert abs(ph["crime_per_1k"]["violent"] - violent) <= 0.05
+    # 0.35 x 100 x 11.27/(11.27+20.37) + robbery, burglary and theft, public order and damage the same way
+    assert ph["score"] == 36.9 and ph["tier"] == "Higher recorded crime"
 
 
 def test_glasnevin_is_listed_in_d7_and_d9(data):
@@ -64,14 +115,14 @@ def test_glasnevin_is_listed_in_d7_and_d9(data):
     glas = nb[nb["Neighbourhood"] == "Glasnevin"].set_index("District")
     assert set(glas.index) == {"D7", "D9"}
     assert glas.loc["D7", "Station"] == "mountjoy" and glas.loc["D9", "Station"] == "santry"
-    assert "Glasnevin" in {n["name"] for n in data["safety"]["D7"]["neighbourhoods"]}
+    assert "Glasnevin (D7 part)" in {n["name"] for n in data["safety"]["D7"]["neighbourhoods"]}
 
 
 def test_every_district_lists_its_neighbourhoods_safest_first(data):
     csv = pd.read_csv(recommender.SAFETY_NEIGHBOURHOODS_CSV)
     for area, figures in data["safety"].items():
         names = [n["name"] for n in figures["neighbourhoods"]]
-        assert names and set(names) == set(csv.loc[csv["District"] == area, "Neighbourhood"])
+        assert names and set(names) == set(csv.loc[csv["District"] == area, "Label"])
         scores = [n["score"] for n in figures["neighbourhoods"]]
         assert scores == sorted(scores, reverse=True) and all(0 <= s <= 100 for s in scores)
 
@@ -134,7 +185,7 @@ def test_every_district_has_a_heat_map_of_scored_areas(data):
         assert heat["outline"]["type"] in ("Polygon", "MultiPolygon")
     d7 = {f["properties"]["ed"]: f["properties"]["score"] for f in data["safety_maps"]["D7"]["areas"]["features"]}
     assert d7["Botanic C"] == round(eds.set_index("ED").loc["BOTANIC C", "safety_index_0_100"], 1)
-    assert d7["Cabra West A"] > 60 > 40 > d7["Arran Quay B"]
+    assert d7["Cabra West A"] > 50 > 40 > d7["Arran Quay B"]
 
 
 def test_safety_map_endpoint():
