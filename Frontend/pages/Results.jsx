@@ -1,13 +1,14 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Results.css'
 import { districts } from '../District Profile/districtData.js'
-import CommuteFields, { TRAVEL_MODES } from './CommuteFields'
+import { NO_LIMIT, TRAVEL_MODES } from './CommuteFields'
+import { FlowChoices, FlowIcon, FlowSidebar } from './FlowLayout'
 import PrioritySlider from './PrioritySlider'
 
-const SafetyHeatMap = lazy(() => import('./SafetyHeatMap'))
-
 // '' = same address as the website (Azure serves both); unset = the Render API.
+const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
 const ANSWERS_KEY = 'questionnaireAnswers'
 
@@ -55,43 +56,7 @@ function SafetyScore({ label, score }) {
   )
 }
 
-// The district's safety heat map (GET /safety-map/{area}). maplibre is loaded only when a card scrolls into view.
-function SafetyMap({ area, score, residences }) {
-  const box = useRef(null)
-  const [visible, setVisible] = useState(false)
-  const [data, setData] = useState(null)
-  const [missing, setMissing] = useState(false)
-
-  useEffect(() => {
-    if (!box.current || !('IntersectionObserver' in window)) { setVisible(true); return undefined }
-    const seen = new IntersectionObserver(([entry]) => entry.isIntersecting && setVisible(true), { rootMargin: '300px' })
-    seen.observe(box.current)
-    return () => seen.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!visible) return undefined
-    let cancelled = false
-    fetch(`${API_URL}/safety-map/${encodeURIComponent(area)}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
-      .then((d) => { if (!cancelled) setData(d) })
-      .catch(() => { if (!cancelled) setMissing(true) })
-    return () => { cancelled = true }
-  }, [visible, area])
-
-  if (missing) return null
-  return (
-    <div ref={box} className="heat-map-slot">
-      {data && (
-        <Suspense fallback={null}>
-          <SafetyHeatMap area={area} data={data} score={score} residences={residences} />
-        </Suspense>
-      )}
-    </div>
-  )
-}
-
-function SafetyScores({ area, safety, residences }) {
+function SafetyScores({ area, safety }) {
   if (!safety) return null
 
   return (
@@ -101,7 +66,6 @@ function SafetyScores({ area, safety, residences }) {
       <dl className="result-stats safety-stats">
         <SafetyScore label="Street safety score" score={safety.index} />
       </dl>
-      <SafetyMap area={area} score={safety.index} residences={residences} />
       <details>
         <summary>What&apos;s behind this score</summary>
         <h4>Used in the score</h4>
@@ -136,8 +100,7 @@ function SafetyScores({ area, safety, residences }) {
       </details>
       <p className="home-credits">
         Crime data: Central Statistics Office (CSO), Garda recorded crime, CC BY 4.0. Population and boundaries: CSO
-        Census and Tailte Éireann, CC BY 4.0. Map data: ©{' '}
-        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>.
+        Census and Tailte Éireann, CC BY 4.0.
       </p>
     </section>
   )
@@ -201,10 +164,7 @@ function PlacesToLive({ area, places }) {
               {showAll ? 'Show fewer' : `Show all ${residences.length} residences`}
             </button>
           )}
-          <p className="home-note">
-            Switch the safety map above to <strong>Student homes</strong> to see where they are. Check rooms, prices
-            and who can apply on each website.
-          </p>
+          <p className="home-note">Check rooms, prices and who can apply on each website.</p>
         </>
       )}
       <p className="home-credits">
@@ -341,7 +301,7 @@ function AboutArea({ result }) {
         <h3>About this area</h3>
         <p>{result.profile}</p>
       </>
-    ) : null
+    ) : <p className="result-muted">No area profile for {result.area} yet.</p>
   }
   const groups = stats.largest_groups ?? []
 
@@ -374,153 +334,181 @@ function AboutArea({ result }) {
   )
 }
 
-function ResultCard({ result, modeWords, maxCommute }) {
+function RentNote({ result }) {
+  const ownRent = result.rent_is_for === 'neighbourhood' && result.neighbourhood
+  // A place with enough room listings of its own shows their average; otherwise its district's
+  return (
+    <span className="rent-note">
+      {ownRent
+        ? `From ${result.rent_listings} listings in ${result.neighbourhood.name}`
+        : `For all of ${result.area}${result.rent_listings != null
+          ? ` · from ${result.rent_listings} listings`
+          : ' · registered rents (RTB)'}`}
+    </span>
+  )
+}
+
+function BudgetTag({ result }) {
+  const withinBudget = result.budget_status === 'Within budget'
+  return (
+    <span className={withinBudget ? 'budget-tag within' : 'budget-tag above'}>
+      {withinBudget
+        ? `${euro(-result.budget_difference)} under budget`
+        : `${euro(result.budget_difference)} over budget`}
+    </span>
+  )
+}
+
+function commuteText(result, modeWords) {
+  if (result.commute_minutes == null) return 'Commute not available'
+  return `${result.commute_minutes} min ${result.walk_faster ? 'on foot' : modeWords}`
+}
+
+// One of the top matches, as a card the student clicks to see its details
+function MatchCard({ result, modeWords, selected, onSelect }) {
+  return (
+    <button
+      type="button"
+      className={selected ? 'flow-match selected' : 'flow-match'}
+      aria-pressed={selected}
+      onClick={onSelect}
+    >
+      <span className="flow-match-top">
+        <span className="result-rank">#{result.rank}</span>
+        <span className="flow-match-score">{result.match_score.toFixed(1)}%<small>match</small></span>
+      </span>
+      <strong className="flow-match-name">
+        {result.area}
+        {result.neighbourhood && <span> · {result.neighbourhood.name}</span>}
+      </strong>
+      <span className="flow-match-line">
+        <FlowIcon name="euro" /> {euro(result.rent)}/month <BudgetTag result={result} />
+      </span>
+      <span className="flow-match-line">
+        <FlowIcon name="clock" /> {commuteText(result, modeWords)}
+      </span>
+    </button>
+  )
+}
+
+const DETAIL_TABS = ['Why it fits', 'About the area', 'Safety', 'Places to live', 'Compare', 'Letting agents']
+
+function MatchDetail({ result, results, budget, modeWords, maxCommute, tab, onTab }) {
   const navigate = useNavigate()
   const hasProfile = districts.some((d) => d.id === result.area)
-  const withinBudget = result.budget_status === 'Within budget'
-  const ownRent = result.rent_is_for === 'neighbourhood' && result.neighbourhood
+  const place = result.neighbourhood ? `${result.neighbourhood.name}, ${result.area}` : result.area
 
   return (
-    <article className="result-card">
-      <header className="result-header">
+    <article className="flow-detail result-card">
+      <header className="flow-detail-head">
         <div>
-          <span className="result-rank">#{result.rank}</span>
-          <h2>
-            {result.area}
-            {result.neighbourhood
-              ? <span className="result-lea"> · {result.neighbourhood.name}</span>
-              : result.lea && <span className="result-lea"> · {result.lea}</span>}
-          </h2>
+          <h2>{place}</h2>
+          <p className="result-muted">
+            {euro(result.rent)}/month · <RentNote result={result} />
+          </p>
+          <p className="result-muted">
+            {commuteText(result, modeWords)}
+            {result.distance && ` · ${result.distance}`}
+            {result.walk_faster && ' (walking is quicker than public transport from here)'}
+          </p>
+          <CommuteDetails area={result.area} commute={result.commute} maxCommute={maxCommute} />
         </div>
-        <div className="result-score">
-          <strong>{result.match_score.toFixed(1)}%</strong>
-          <span>match</span>
-        </div>
+        {hasProfile && (
+          <button
+            type="button"
+            className="result-profile-link"
+            onClick={() => navigate('/districts', { state: { district: result.area } })}
+          >
+            {result.area} district profile <span>→</span>
+          </button>
+        )}
       </header>
 
-      <dl className="result-stats">
-        <div>
-          <dt>Average rent in {ownRent ? result.neighbourhood.name : result.area}</dt>
-          <dd>
-            {euro(result.rent)}/month
-            <span className={withinBudget ? 'budget-tag within' : 'budget-tag above'}>
-              {withinBudget
-                ? `${euro(-result.budget_difference)} under budget`
-                : `${euro(result.budget_difference)} over budget`}
-            </span>
-            {/* A place with enough room listings of its own shows their average; otherwise its district's */}
-            <span className="rent-note">
-              {ownRent
-                ? `From ${result.rent_listings} listings in ${result.neighbourhood.name}`
-                : `For all of ${result.area}${result.rent_listings != null
-                  ? ` · from ${result.rent_listings} listings`
-                  : ' · registered rents (RTB)'}`}
-            </span>
-          </dd>
-        </div>
-        <div>
-          <dt>Commute</dt>
-          <dd>
-            {result.commute_minutes != null
-              ? `${result.commute_minutes} min ${result.walk_faster ? 'on foot' : modeWords}`
-              : 'Not available'}
-            {result.distance && <span className="result-muted"> · {result.distance}</span>}
-            {/* public transport search, but walking from here is quicker than any bus, train or Luas */}
-            {result.walk_faster && <span className="rent-note">Walking is quicker than public transport from here</span>}
-          </dd>
-        </div>
-      </dl>
+      <div className="flow-tabs" role="tablist" aria-label="Details">
+        {DETAIL_TABS.map((name) => (
+          <button
+            key={name}
+            type="button"
+            role="tab"
+            aria-selected={tab === name}
+            className={tab === name ? 'flow-tab selected' : 'flow-tab'}
+            onClick={() => onTab(name)}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
 
-      <CommuteDetails area={result.area} commute={result.commute} maxCommute={maxCommute} />
-
-      <WhyThisPlace
-        result={result}
-        place={result.neighbourhood ? `${result.neighbourhood.name}, ${result.area}` : result.area}
-      />
-
-      <AboutArea result={result} />
-
-      <SafetyScores area={result.area} safety={result.safety} residences={result.places_to_live?.residences} />
-
-      <PlacesToLive area={result.area} places={result.places_to_live} />
-
-      {hasProfile && (
-        <button
-          type="button"
-          className="result-profile-link"
-          onClick={() => navigate('/districts', { state: { district: result.area } })}
-        >
-          View {result.area} district profile <span>→</span>
-        </button>
-      )}
+      <div className="flow-tab-body" role="tabpanel" aria-label={tab}>
+        {tab === 'Why it fits' && <WhyThisPlace result={result} place={place} />}
+        {tab === 'About the area' && <AboutArea result={result} />}
+        {tab === 'Safety' && (
+          result.safety
+            ? <SafetyScores area={result.area} safety={result.safety} />
+            : <p className="result-muted">No safety data for {result.area} yet.</p>
+        )}
+        {tab === 'Places to live' && <PlacesToLive area={result.area} places={result.places_to_live} />}
+        {tab === 'Compare' && <CompareAreas results={results} budget={budget} />}
+        {tab === 'Letting agents' && <LettingAgents />}
+      </div>
     </article>
   )
 }
 
 function LettingAgents() {
-  const [open, setOpen] = useState(false)
   const [agents, setAgents] = useState(null)
   const [failed, setFailed] = useState(false)
 
-  function toggle() {
-    setOpen(!open)
-    if (!agents) {
-      fetch(`${API_URL}/agencies`)
-        .then((r) => (r.ok ? r.json() : Promise.reject()))
-        .then(setAgents)
-        .catch(() => setFailed(true))
-    }
-  }
+  useEffect(() => {
+    fetch(`${API_URL}/agencies`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then(setAgents)
+      .catch(() => setFailed(true))
+  }, [])
 
   return (
     <div className="agencies">
-      <button type="button" className="questionnaire-next" onClick={toggle} aria-expanded={open}>
-        {open ? 'Hide letting agents' : 'Letting agents in Dublin'} <span>{open ? '↑' : '↓'}</span>
-      </button>
-
-      {open && (
-        <div className="agencies-panel">
-          <p className="agencies-intro">
-            A selection of licensed letting agents operating in Dublin. This is not a complete
-            list, and agents are shown in alphabetical order. Being listed here does not mean we
-            recommend them.
+      <div className="agencies-panel">
+        <p className="agencies-intro">
+          A selection of licensed letting agents operating in Dublin. This is not a complete
+          list, and agents are shown in alphabetical order. Being listed here does not mean we
+          recommend them.
+        </p>
+        {failed && <p>We couldn't load the letting agents. Please try again later.</p>}
+        {!agents && !failed && <p>Loading…</p>}
+        {agents && agents.length > 0 && (
+          <div className="agent-grid">
+            {[...agents].sort((a, b) => a.Name.localeCompare(b.Name)).map((a) => (
+              <article className="agent-card" key={a.Name}>
+                <div className="agent-top">
+                  <span className="agent-initial" aria-hidden="true">{a.Name.charAt(0)}</span>
+                  <div>
+                    <h3 className="agent-name">{a.Name}</h3>
+                    {a.Areas && <span className="agent-area">{a.Areas}</span>}
+                  </div>
+                </div>
+                {a.Address && <p className="agent-address">📍 {a.Address}</p>}
+                <div className="agent-bottom">
+                  {a.PSRA_Licence && <span className="agent-psra">✓ PSRA {a.PSRA_Licence}</span>}
+                  {a.Website && (
+                    <a className="agent-link" href={a.Website} target="_blank" rel="noreferrer">
+                      Visit website ↗
+                    </a>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+        {agents && agents.length > 0 && (
+          <p className="agencies-note">
+            Find Your Dublin is a student project and is not affiliated with, endorsed by or paid
+            by any of these agents. Details were correct when checked in October 2026, so please
+            confirm them directly with the agent. Never pay a deposit before viewing a property
+            and checking the agent's PSRA licence.
           </p>
-          {failed && <p>We couldn't load the letting agents. Please try again later.</p>}
-          {!agents && !failed && <p>Loading…</p>}
-          {agents && agents.length > 0 && (
-            <div className="agent-grid">
-              {[...agents].sort((a, b) => a.Name.localeCompare(b.Name)).map((a) => (
-                <article className="agent-card" key={a.Name}>
-                  <div className="agent-top">
-                    <span className="agent-initial" aria-hidden="true">{a.Name.charAt(0)}</span>
-                    <div>
-                      <h3 className="agent-name">{a.Name}</h3>
-                      {a.Areas && <span className="agent-area">{a.Areas}</span>}
-                    </div>
-                  </div>
-                  {a.Address && <p className="agent-address">📍 {a.Address}</p>}
-                  <div className="agent-bottom">
-                    {a.PSRA_Licence && <span className="agent-psra">✓ PSRA {a.PSRA_Licence}</span>}
-                    {a.Website && (
-                      <a className="agent-link" href={a.Website} target="_blank" rel="noreferrer">
-                        Visit website ↗
-                      </a>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-          {agents && agents.length > 0 && (
-            <p className="agencies-note">
-              Find Your Dublin is a student project and is not affiliated with, endorsed by or paid
-              by any of these agents. Details were correct when checked in October 2026, so please
-              confirm them directly with the agent. Never pay a deposit before viewing a property
-              and checking the agent's PSRA licence.
-            </p>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
@@ -534,71 +522,64 @@ const COMPARE_ROWS = [
 ]
 
 function CompareAreas({ results, budget }) {
-  const [open, setOpen] = useState(false)
-  if (!results || results.length < 2) return null
+  if (!results || results.length < 2) return <p className="result-muted">Only one area matched, so there is nothing to compare.</p>
 
   // only show rows where at least two areas have a value
   const rows = COMPARE_ROWS.filter((row) => results.filter((r) => row.get(r) != null).length >= 2)
 
   return (
     <div className="compare-wrap">
-      <button type="button" className="questionnaire-next" onClick={() => setOpen(!open)} aria-expanded={open}>
-        {open ? 'Hide comparison' : `Compare these ${results.length} areas`} <span>{open ? '↑' : '↓'}</span>
-      </button>
+      <section className="compare" aria-label="Compare your top areas">
+        <h2 className="compare-title">Your top {results.length} side by side</h2>
+        <p className="compare-subtitle">The best area for each row is highlighted.</p>
 
-      {open && (
-        <section className="compare" aria-label="Compare your top areas">
-          <h2 className="compare-title">Your top {results.length} side by side</h2>
-          <p className="compare-subtitle">The best area for each row is highlighted.</p>
+        <div className="compare-table" style={{ '--areas': results.length }}>
+          <div className="compare-corner" />
+          {results.map((r) => (
+            <div className="compare-head" key={r.rank}>
+              <span className="compare-rank">#{r.rank}</span>
+              <strong>{r.area}</strong>
+              {r.neighbourhood && <span className="compare-sub">{r.neighbourhood.name}</span>}
+            </div>
+          ))}
 
-          <div className="compare-table" style={{ '--areas': results.length }}>
-            <div className="compare-corner" />
-            {results.map((r) => (
-              <div className="compare-head" key={r.rank}>
-                <span className="compare-rank">#{r.rank}</span>
-                <strong>{r.area}</strong>
-                {r.neighbourhood && <span className="compare-sub">{r.neighbourhood.name}</span>}
-              </div>
-            ))}
-
-            {rows.map((row) => {
-              const values = results.map((r) => row.get(r))
-              const known = values.filter((v) => v != null)
-              const best = row.better === 'low' ? Math.min(...known) : Math.max(...known)
-              const max = Math.max(...known)
-              return [
-                <div className="compare-label" key={row.label}>{row.label}</div>,
-                ...results.map((r, i) => {
-                  const v = values[i]
-                  const isBest = v != null && v === best
-                  return (
-                    <div className={isBest ? 'compare-cell best' : 'compare-cell'} key={row.label + r.rank}>
-                      {v == null ? (
-                        <span className="compare-na">Not available</span>
-                      ) : (
-                        <>
-                          <span className="compare-value">
-                            {row.show(v)}
-                            {isBest && <span className="compare-badge">Best</span>}
+          {rows.map((row) => {
+            const values = results.map((r) => row.get(r))
+            const known = values.filter((v) => v != null)
+            const best = row.better === 'low' ? Math.min(...known) : Math.max(...known)
+            const max = Math.max(...known)
+            return [
+              <div className="compare-label" key={row.label}>{row.label}</div>,
+              ...results.map((r, i) => {
+                const v = values[i]
+                const isBest = v != null && v === best
+                return (
+                  <div className={isBest ? 'compare-cell best' : 'compare-cell'} key={row.label + r.rank}>
+                    {v == null ? (
+                      <span className="compare-na">Not available</span>
+                    ) : (
+                      <>
+                        <span className="compare-value">
+                          {row.show(v)}
+                          {isBest && <span className="compare-badge">Best</span>}
+                        </span>
+                        <span className="compare-bar">
+                          <span style={{ width: `${max ? Math.max((v / max) * 100, 4) : 0}%` }} />
+                        </span>
+                        {row.label === 'Monthly rent' && budget && (
+                          <span className={v <= budget ? 'compare-note ok' : 'compare-note over'}>
+                            {v <= budget ? 'Within budget' : `${euro(v - budget)} over`}
                           </span>
-                          <span className="compare-bar">
-                            <span style={{ width: `${max ? Math.max((v / max) * 100, 4) : 0}%` }} />
-                          </span>
-                          {row.label === 'Monthly rent' && budget && (
-                            <span className={v <= budget ? 'compare-note ok' : 'compare-note over'}>
-                              {v <= budget ? 'Within budget' : `${euro(v - budget)} over`}
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  )
-                }),
-              ]
-            })}
-          </div>
-        </section>
-      )}
+                        )}
+                      </>
+                    )}
+                  </div>
+                )
+              }),
+            ]
+          })}
+        </div>
+      </section>
     </div>
   )
 }
@@ -611,6 +592,8 @@ function Results() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  const [selected, setSelected] = useState(0) // which match the detail panel shows
+  const [tab, setTab] = useState(DETAIL_TABS[0]) // kept when switching matches, to compare them
 
   const travelMode = answers?.travelMode ?? 'public_transport'
   const maxCommute = answers?.maxCommute ?? null
@@ -670,71 +653,86 @@ function Results() {
 
   if (!answers) {
     return (
-      <section className="questionnaire-page">
-        <div className="questionnaire-container">
+      <section className="flow-page flow-page-results">
+        <FlowSidebar step={3} onStep={() => navigate('/questionnaire')} canGoTo={(n) => n === 1} />
+        <div className="flow-empty">
           <h1>No answers yet.</h1>
-          <p className="questionnaire-description">
-            Answer a few questions and we'll match you with Dublin neighbourhoods.
-          </p>
-          <Link className="questionnaire-next" to="/questionnaire">
-            Find my match <span>→</span>
-          </Link>
+          <p className="result-muted">Answer a few questions and we'll match you with Dublin neighbourhoods.</p>
+          <Link className="flow-next" to="/questionnaire">Find my match <span>→</span></Link>
         </div>
       </section>
     )
   }
 
+  const results = data?.recommendations ?? []
+  const shown = results[Math.min(selected, results.length - 1)]
+
   return (
-    <section className="questionnaire-page">
-      <div className="questionnaire-container results-container">
-        <Link className="back-link" to="/questionnaire">
-          ← Change my answers
-        </Link>
+    <section className="flow-page flow-page-results">
+      <FlowSidebar
+        step={3}
+        canGoTo={(n) => n < 3}
+        // back to the questionnaire with these answers filled in
+        onStep={(n) => navigate('/questionnaire', { state: { answers, step: n } })}
+      />
 
-        <p className="eyebrow">YOUR MATCHES</p>
-
-        <div className="progress-info">
+      {/* The search: change anything here and the matches update straight away */}
+      <aside className="flow-panel">
+        <p className="flow-eyebrow">YOUR MATCHES</p>
+        <div className="flow-progress-info">
           <span>YOUR RESULTS</span>
           <span>STEP 3 OF 3</span>
         </div>
-
-        <div className="progress-track">
-          <div className="progress-fill" style={{ width: '100%' }} />
-        </div>
-
-        <h1>
-          Your top Dublin
-          <em> neighbourhoods.</em>
-        </h1>
-
-        <p className="questionnaire-description">
-          {answers.accommodationLabel} · budget {euro(answers.budget)}/month · studying at{' '}
-          {answers.university}
+        <div className="flow-progress" aria-hidden="true"><span style={{ width: '100%' }} /></div>
+        <h1>Your top Dublin <em>neighbourhoods.</em></h1>
+        <p className="flow-summary">
+          {answers.accommodationLabel} · {euro(answers.budget)}/month · {answers.university}
           {data && <> · compared {data.areas_compared} areas</>}
         </p>
 
-        <div className="commute-controls">
-          <CommuteFields travelMode={travelMode} maxCommute={maxCommute} onChange={updateAnswers} />
+        <div className="flow-panel-group">
+          <h2>Getting there</h2>
+          <FlowChoices
+            label="Travel mode"
+            options={TRAVEL_MODES.map(([value, label]) => [value, label, MODE_ICONS[value]])}
+            value={travelMode}
+            onChange={(mode) => updateAnswers({ travelMode: mode })}
+          />
+          <div className="flow-value">
+            <label htmlFor="max-commute">Longest commute</label>
+            <strong>{maxCommute ? `${maxCommute} min` : 'No limit'}</strong>
+          </div>
+          <input
+            id="max-commute"
+            type="range"
+            min="10"
+            max={NO_LIMIT}
+            step="5"
+            value={maxCommute ?? NO_LIMIT}
+            onChange={(event) => {
+              const value = Number(event.target.value)
+              updateAnswers({ maxCommute: value === NO_LIMIT ? null : value })
+            }}
+          />
         </div>
 
         {answers.importance && (
-          <details className="priority-controls">
-            <summary>Adjust your priorities</summary>
-            <p className="result-muted">Move a slider and your matches update straight away.</p>
-            <div className="priority-grid">
-              {Object.entries(answers.importance).map(([name, value]) => (
-                <PrioritySlider
-                  key={name}
-                  name={name}
-                  value={value}
-                  showName
-                  onChange={(changed) => updateAnswers({ importance: { ...answers.importance, [name]: changed } })}
-                />
-              ))}
-            </div>
-          </details>
+          <div className="flow-panel-group">
+            <h2>Your priorities</h2>
+            {Object.entries(answers.importance).map(([name, value]) => (
+              <PrioritySlider
+                key={name}
+                name={name}
+                value={value}
+                showName
+                onChange={(changed) => updateAnswers({ importance: { ...answers.importance, [name]: changed } })}
+              />
+            ))}
+          </div>
         )}
+      </aside>
 
+      <div className={loading ? 'flow-results results-updating' : 'flow-results'}>
         {!data && !error && (
           <div className="results-status" role="status">
             <span className="results-spinner" aria-hidden="true" />
@@ -748,27 +746,35 @@ function Results() {
         {error && (
           <div className="results-status results-error" role="alert">
             <p>{error}</p>
-            <button type="button" className="questionnaire-next" onClick={() => setAttempt(attempt + 1)}>
+            <button type="button" className="flow-next" onClick={() => setAttempt(attempt + 1)}>
               Try again <span>↻</span>
             </button>
           </div>
         )}
 
-        {data && (
+        {data && shown && (
           <>
             {data.warning && <p className="results-warning">{data.warning}</p>}
-            <div className={loading ? 'results-list results-updating' : 'results-list'}>
-              {data.recommendations.map((result) => (
-                <ResultCard
+            <div className="flow-matches">
+              {results.map((result, index) => (
+                <MatchCard
                   key={`${result.area}-${result.neighbourhood?.name ?? result.rank}`}
                   result={result}
                   modeWords={modeWords}
-                  maxCommute={maxCommute}
+                  selected={result === shown}
+                  onSelect={() => setSelected(index)}
                 />
               ))}
             </div>
-            <CompareAreas results={data.recommendations} budget={data.budget} />
-            <LettingAgents />
+            <MatchDetail
+              result={shown}
+              results={results}
+              budget={data.budget}
+              modeWords={modeWords}
+              maxCommute={maxCommute}
+              tab={tab}
+              onTab={setTab}
+            />
           </>
         )}
       </div>
