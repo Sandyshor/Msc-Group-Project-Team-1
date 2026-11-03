@@ -98,3 +98,23 @@ export function FlowRow({ icon, title, question, htmlFor, children, className = 
     </div>
   )
 }
+
+// A row of buttons, one of which is selected: options are [value, label, icon?]
+export function FlowChoices({ label, options, value, onChange, className = '' }) {
+  return (
+    <div className={`flow-choices ${className}`.trim()} role="group" aria-label={label}>
+      {options.map(([optionValue, optionLabel, icon]) => (
+        <button
+          key={optionValue}
+          type="button"
+          aria-pressed={value === optionValue}
+          className={value === optionValue ? 'flow-choice selected' : 'flow-choice'}
+          onClick={() => onChange(optionValue)}
+        >
+          {icon && <FlowIcon name={icon} />}
+          {optionLabel}
+        </button>
+      ))}
+    </div>
+  )
+}

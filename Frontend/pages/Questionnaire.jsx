@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import './Questionnaire.css'
 import { NO_LIMIT, TRAVEL_MODES } from './CommuteFields'
-import { FlowPhoto, FlowRow, FlowSidebar, FlowIcon } from './FlowLayout'
+import { FlowChoices, FlowPhoto, FlowRow, FlowSidebar } from './FlowLayout'
 import PrioritySlider, { DEFAULT_IMPORTANCE } from './PrioritySlider'
 
 // Values match the university names in the backend's commute data.
@@ -53,38 +53,28 @@ function joinWords(items) {
   return items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`
 }
 
-function ChoiceButtons({ label, options, value, onChange, className = '' }) {
-  return (
-    <div className={`flow-choices ${className}`.trim()} role="group" aria-label={label}>
-      {options.map(([optionValue, optionLabel, icon]) => (
-        <button
-          key={optionValue}
-          type="button"
-          aria-pressed={value === optionValue}
-          className={value === optionValue ? 'flow-choice selected' : 'flow-choice'}
-          onClick={() => onChange(optionValue)}
-        >
-          {icon && <FlowIcon name={icon} />}
-          {optionLabel}
-        </button>
-      ))}
-    </div>
-  )
-}
-
 function Questionnaire() {
-  const [step, setStep] = useState(1)
-  const [budget, setBudget] = useState(1000)
-  const [destination, setDestination] = useState('')
-  const [roomType, setRoomType] = useState('Private room')
-  const [commute, setCommute] = useState({ travelMode: 'public_transport', maxCommute: null })
-  const [safety, setSafety] = useState('Medium')
-  const [importance, setImportance] = useState(
-    Object.fromEntries(
+  // Coming back from the results page ("Your situation" / "Your priorities"): start from the earlier answers
+  const { state } = useLocation()
+  const earlier = state?.answers
+  const [step, setStep] = useState(earlier ? state.step ?? 1 : 1)
+  const [budget, setBudget] = useState(earlier?.budget ?? 1000)
+  const [destination, setDestination] = useState(earlier?.university ?? '')
+  const [roomType, setRoomType] = useState(earlier?.accommodationLabel ?? 'Private room')
+  const [commute, setCommute] = useState({
+    travelMode: earlier?.travelMode ?? 'public_transport',
+    maxCommute: earlier?.maxCommute ?? null,
+  })
+  const [safety, setSafety] = useState(earlier?.safety ?? 'Medium')
+  const [importance, setImportance] = useState({
+    ...Object.fromEntries(
       FACTORS.flatMap(([name, , , items = []]) => [name, ...items]).map((name) => [name, DEFAULT_IMPORTANCE])
-    )
+    ),
+    ...earlier?.importance,
+  })
+  const [separately, setSeparately] = useState(
+    Object.fromEntries(FACTORS.map(([name, , , items = []]) => [name, items.some((item) => item in (earlier?.importance ?? {}))]))
   )
-  const [separately, setSeparately] = useState({})
   const navigate = useNavigate()
 
   const accommodation = ROOM_TYPES.find(([label]) => label === roomType)[1]
@@ -163,7 +153,7 @@ function Questionnaire() {
             </FlowRow>
 
             <FlowRow icon="home" title="Accommodation" question="What type of accommodation do you prefer?">
-              <ChoiceButtons
+              <FlowChoices
                 label="Accommodation type"
                 className="flow-choices-rooms"
                 options={ROOM_TYPES.map(([label]) => [label, label])}
@@ -176,7 +166,7 @@ function Questionnaire() {
             </FlowRow>
 
             <FlowRow icon="route" title="Getting there" question="How will you get to university?">
-              <ChoiceButtons
+              <FlowChoices
                 label="Travel mode"
                 options={TRAVEL_MODES.map(([value, label]) => [value, label, MODE_ICONS[value]])}
                 value={commute.travelMode}
@@ -204,7 +194,7 @@ function Questionnaire() {
             </FlowRow>
 
             <FlowRow icon="shield" title="Safety" question="How important is safety to you when choosing a neighbourhood?">
-              <ChoiceButtons
+              <FlowChoices
                 label="Safety"
                 options={SAFETY_LEVELS.map((level) => [level, level])}
                 value={safety}
