@@ -378,6 +378,7 @@ function ResultCard({ result, modeWords, maxCommute }) {
   const navigate = useNavigate()
   const hasProfile = districts.some((d) => d.id === result.area)
   const withinBudget = result.budget_status === 'Within budget'
+  const ownRent = result.rent_is_for === 'neighbourhood' && result.neighbourhood
 
   return (
     <article className="result-card">
@@ -399,7 +400,7 @@ function ResultCard({ result, modeWords, maxCommute }) {
 
       <dl className="result-stats">
         <div>
-          <dt>Average rent in {result.area}</dt>
+          <dt>Average rent in {ownRent ? result.neighbourhood.name : result.area}</dt>
           <dd>
             {euro(result.rent)}/month
             <span className={withinBudget ? 'budget-tag within' : 'budget-tag above'}>
@@ -407,10 +408,13 @@ function ResultCard({ result, modeWords, maxCommute }) {
                 ? `${euro(-result.budget_difference)} under budget`
                 : `${euro(result.budget_difference)} over budget`}
             </span>
-            {/* Rent data is per postal district, so every place in a district shows the same average */}
+            {/* A place with enough room listings of its own shows their average; otherwise its district's */}
             <span className="rent-note">
-              For all of {result.area}
-              {result.rent_listings != null ? ` · from ${result.rent_listings} listings` : ' · registered rents (RTB)'}
+              {ownRent
+                ? `From ${result.rent_listings} listings in ${result.neighbourhood.name}`
+                : `For all of ${result.area}${result.rent_listings != null
+                  ? ` · from ${result.rent_listings} listings`
+                  : ' · registered rents (RTB)'}`}
             </span>
           </dd>
         </div>
