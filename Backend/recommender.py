@@ -65,6 +65,9 @@ PRIVATE_ROOM_LABELS = ["single", "double", "single & twin", "single & double"]
 # A room rent needs at least this many listings; fewer is too unreliable to compare districts on
 MIN_ROOM_LISTINGS = 3
 SHARED_ROOM_LABELS = ["twin", "shared", "double & twin", "twin & shared"]
+# Each listing's Neighbourhood is matched to a part of its district by name. The same rule as for districts
+# applies: a part with MIN_ROOM_LISTINGS or more listings uses its own average, otherwise its district's.
+RENT_NAME_ALIASES = {"ifsc": "international financial services centre"}
 
 # "group" factors are scored as one category by default (the average of their
 # amenities' 0-1 sub-scores). A student can instead rate a category's "items"
@@ -383,6 +386,9 @@ def load_data():
     is_shared = room_data["Room type"].isin(SHARED_ROOM_LABELS)
     shared_room_rent, shared_listings = _room_rent(room_data[is_shared])
     private_room_rent, private_listings = _room_rent(room_data[is_private])
+    neighbourhood_commute = _load_neighbourhood_commute()
+    parts = _district_parts(commute_points, places, prefer_neighbourhoods=not neighbourhood_commute.empty)
+    room_data["Part"] = _listing_parts(room_data, parts)
 
     rtb["Area"] = "D" + rtb["Location"].astype(str).str.extract(
         r"Dublin\s*(\d+W?)", flags=re.IGNORECASE, expand=False
@@ -402,7 +408,6 @@ def load_data():
         if factor["kind"] == "group":
             area_data[factor["column"]] = area_data[factor["columns"]].sum(axis=1, skipna=False)
 
-    neighbourhood_commute = _load_neighbourhood_commute()
     agencies_file = _path("letting_agencies.csv")
     if os.path.exists(agencies_file):
         agencies = _clean_columns(pd.read_csv(agencies_file, dtype=str)).fillna("")
@@ -422,9 +427,12 @@ def load_data():
         # Dublin-wide "enough" level for each amenity, so amenity scores don't depend on the search
         "amenity_targets": {col: float(AMENITY_ENOUGH[col]) for col in AMENITY_COLUMNS},
         # Parts of each district (neighbourhoods and commute points) that are scored individually
-        "parts": _district_parts(commute_points, places, prefer_neighbourhoods=not neighbourhood_commute.empty),
+        "parts": parts,
         "neighbourhood_commute": neighbourhood_commute,
         "rent_listings": {"shared_room": shared_listings, "private_room": private_listings},
+        # room rent of the parts with enough listings of their own: (Area, Part) -> mean, count
+        "part_rent": {"shared_room": _part_room_rent(room_data[is_shared]),
+                      "private_room": _part_room_rent(room_data[is_private])},
         "universities": sorted(commute_by_university["University"].unique()),
         "safety": load_safety(),
         "safety_maps": load_safety_maps(),
@@ -443,6 +451,38 @@ def _room_rent(rooms):
     stats = rooms.groupby("Area")["Rent"].agg(["mean", "count"])
     reliable = stats[stats["count"] >= MIN_ROOM_LISTINGS]
     return reliable["mean"], reliable["count"].astype(int)
+
+
+def _part_room_rent(rooms):
+    """Average room rent and number of listings for each part of a district with enough listings of its own."""
+    stats = rooms.dropna(subset=["Part"]).groupby(["Area", "Part"])["Rent"].agg(["mean", "count"])
+    return stats[stats["count"] >= MIN_ROOM_LISTINGS]
+
+
+def _place_key(name):
+    """'Grand Canal Dock (part)' and 'St Stephen\u2019s Green' compared like 'grand canal dock', 'st stephens green'."""
+    key = re.sub(r"\(part\)", "", str(name).lower()).replace("&", " and ")
+    key = re.sub(r"\s+", " ", re.sub(r"['\u2019.]", "", key)).strip()
+    return RENT_NAME_ALIASES.get(key, key)
+
+
+def _listing_parts(rooms, parts):
+    """The part of its district each listing is in, from the listing's Neighbourhood: the part with the same name,
+    or the only part whose name starts with it ('Blanchardstown' -> 'Blanchardstown Village'). None otherwise -
+    the listing then only counts towards its district's average."""
+    names = {area: {_place_key(part): part for part in group["Part"]} for area, group in parts.groupby("Area")}
+
+    def part_of(area, neighbourhood):
+        if pd.isna(neighbourhood):
+            return None
+        keys, key = names.get(area, {}), _place_key(neighbourhood)
+        if key in keys:
+            return keys[key]
+        starts = [part for name, part in keys.items() if name.startswith(key + " ")]
+        return starts[0] if len(starts) == 1 else None
+
+    neighbourhoods = rooms["Neighbourhood"] if "Neighbourhood" in rooms else pd.Series(None, index=rooms.index)
+    return [part_of(area, name) for area, name in zip(rooms["Area"], neighbourhoods)]
 
 
 def _km(lat, lon, lats, lons):
@@ -716,12 +756,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
 
     # Rent + budget
     area_data["Rent"] = area_data["Area"].map(selected_rent)
-    area_data["Budget Difference"] = area_data["Rent"] - budget
-    area_data["Budget Status"] = np.select(
-        [area_data["Rent"].isna(), area_data["Rent"] <= budget],
-        ["Rent data unavailable", "Within budget"],
-        default="Above budget",
-    )
+    area_data["Rent Listings"] = area_data["Area"].map(data["rent_listings"].get(accommodation, pd.Series(dtype=int)))
 
     # Keep only areas with data for every factor the student cares about
     needed_columns = []
@@ -730,6 +765,18 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
     needed_columns = list(dict.fromkeys(needed_columns + ["Rent"]))
     candidates = parts.merge(area_data, on="Area")  # one row per part, with its district's figures
     candidates = candidates[candidates[needed_columns].notna().all(axis=1)].copy()
+    # A part with enough room listings of its own uses its own rent instead of its district's average
+    candidates["Rent Is For"] = "district"
+    own = data["part_rent"].get(accommodation)
+    if own is not None and not own.empty:
+        key = pd.MultiIndex.from_frame(candidates[["Area", "Part"]])
+        own_rent = own["mean"].reindex(key).to_numpy(dtype=float)
+        found = ~np.isnan(own_rent)
+        candidates.loc[found, "Rent"] = own_rent[found]
+        candidates.loc[found, "Rent Listings"] = own["count"].reindex(key).to_numpy(dtype=float)[found]
+        candidates.loc[found, "Rent Is For"] = "neighbourhood"
+    candidates["Budget Difference"] = candidates["Rent"] - budget
+    candidates["Budget Status"] = np.where(candidates["Rent"] <= budget, "Within budget", "Above budget")
     if candidates.empty:
         raise RecommendationError("No area has complete data for your accommodation type and chosen factors.")
     if max_commute:
@@ -1032,7 +1079,6 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
                         "match_score": round(float(other["Match Score"]), 1)} for _, other in others.iterrows()],
         }
 
-    listings = data["rent_listings"].get(accommodation, pd.Series(dtype=int))
     results = []
     for idx, row in top.iterrows():
         position = idx + 1
@@ -1042,7 +1088,9 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             "lea": _none_if_nan(row.get("LEA")),
             "rent": round(float(row["Rent"]), 2),
             # number of room listings behind the rent (None for apartments, which use RTB averages)
-            "rent_listings": int(listings[row["Area"]]) if row["Area"] in listings.index else None,
+            "rent_listings": None if pd.isna(row["Rent Listings"]) else int(row["Rent Listings"]),
+            # "neighbourhood": the place's own listings; "district": the district's average
+            "rent_is_for": row["Rent Is For"],
             "budget_status": row["Budget Status"],
             "budget_difference": round(float(row["Budget Difference"]), 2),
             "commute_minutes": None if pd.isna(row["Commute Minutes"]) else round(float(row["Commute Minutes"])),
