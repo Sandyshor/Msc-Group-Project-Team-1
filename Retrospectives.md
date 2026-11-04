@@ -227,6 +227,22 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - all agreed to update their workflow tomorrow
 - catherine was not available for the meeting
 
+**Meeting 4 Monday (9:00 - 9:30)**
+- attendees: Sowmiya, Catherine, Santhosh, Vignesh
+- Catherine discussed on the map integration part. she explained what difficulties she was facing.
+- Vignesh was almost done with crime data collection
+- Santhosh discussed all the functionalities in the website before changing anything.
+- Together, we began to work on improving the UI design and layout
+- Shreyas informed through chat that he has completed rent data collection of all areas in all postal districts
+
+**Meeting 5 (9:15 - 9:45)**
+- attendees: Shreyas, Santhosh, Vignesh, Sowmiya. Catherine and Sowmiya had a seperate call as Catherine was not able to attend the team meeting.
+- Catherine mentioned and explained the improvements she was making in map integration.
+- Vignesh was done with the crime data collection.
+- Sowmiya reminded the team members to submit the diary on time. She also discussed on the user flow diagram.
+- Santhosh was gathering ideas for layout designs.
+- At last, we talked about the user evaluation and the different ways we can make it work. Shreyas agreed to create a survey.
+
   
 
   
