@@ -31,8 +31,9 @@ function euro(value) {
 
 // One safety score per postal district, straight from safety_indicators.csv (via the API).
 // Relative crime scores: 0-100 against the recorded-crime rate of Irish towns and cities (50 = that rate), in four bands.
-const SAFETY_TIERS = [[57, 'Lower recorded crime'], [50, 'Below-benchmark crime'], [40, 'Above-benchmark crime'], [0, 'Higher recorded crime']]
-const TIER_TONE = { 'Lower recorded crime': 'good', 'Below-benchmark crime': 'good', 'Above-benchmark crime': 'mid', 'Higher recorded crime': 'low' }
+// Plain-language bands so anyone (e.g. a new international student) can read them. "Average" = Irish towns and cities.
+const SAFETY_TIERS = [[57, 'Much safer than average'], [50, 'A little safer than average'], [40, 'A little less safe than average'], [0, 'Much less safe than average']]
+const TIER_TONE = { 'Much safer than average': 'good', 'A little safer than average': 'good', 'A little less safe than average': 'mid', 'Much less safe than average': 'low' }
 
 // Bands from the unrounded score (the card shows one decimal, so the number and its band always agree).
 function safetyTier(score) {
@@ -44,13 +45,10 @@ function safetyLevel(raw) {
   return [TIER_TONE[tier], tier]
 }
 
-const CRIME_GROUPS = [
-  ['violent', 'Violent crime and assault (35%)'],
-  ['robbery', 'Robbery (25%)'],
-  ['burglary_theft', 'Burglary and theft (20%)'],
-  ['public_order', 'Public order (15%)'],
-  ['damage', 'Criminal damage (5%)'],
-]
+// Plain verdict for one area: at or above the Irish town/city rate (50) counts as safe.
+function safeOrUnsafe(score) {
+  return score >= 50 ? ['good', 'Safe'] : ['low', 'Unsafe']
+}
 
 function SafetyScore({ label, score }) {
   if (score == null) return null
@@ -71,79 +69,31 @@ function SafetyScore({ label, score }) {
 
 function SafetyScores({ area, safety }) {
   if (!safety) return null
+  const parts = (safety.station_areas ?? []).filter((p) => p.score != null)
 
   return (
     <section className="result-safety" aria-label={`Safety in ${area}`}>
       <h3>Safety</h3>
-      <p className="result-muted">
-        50 = the recorded-crime rate of Irish towns and cities · above 50 = less recorded crime, below 50 = more. A
-        comparative index, not the chance of becoming a victim: 70 is not twice as safe as 35.
-      </p>
       <dl className="result-stats safety-stats">
-        <SafetyScore label="Relative crime score (estimate)" score={safety.index} />
+        <SafetyScore label={`Safety score for ${area}`} score={safety.index} />
       </dl>
-      {safety.areas_to_check?.length > 0 && (
-        <div className="safety-check" role="note">
-          <strong>Check the specific street before choosing:</strong> {safety.areas_to_check.join(', ')}
-          {safety.check_street_pct ? ` (${safety.check_street_pct}% of this district's residents)` : ''}.
-          <span className="result-muted">
-            {' '}These parts are classed as disadvantaged in the official Pobal Deprivation Index 2022, and Garda crime
-            figures cover whole station areas, so the score above may not reflect a particular street. Visit the
-            street, ask locals and look at the surroundings before signing a lease.
-          </span>
-        </div>
-      )}
-      <details>
-        <summary>What&apos;s behind this score</summary>
-        <h4>How the score is made</h4>
-        <p className="result-muted">
-          Recorded crime per 1,000 people in each Garda station area, compared with the rate across Irish towns and
-          cities. It measures recorded crime only, not every aspect of safety. Garda areas don&apos;t follow postal
-          districts, so this district&apos;s score is the average of the station areas its residents live in:
-        </p>
-        {safety.station_areas?.length > 0 && (
-          <ul>
-            {safety.station_areas.map((part) => (
-              <li key={part.station}>
-                {part.station} station area: {part.score} ({part.share_pct}% of residents)
-              </li>
-            ))}
-          </ul>
-        )}
-        {safety.crime_per_1k && (
-          <>
-            <h4>Recorded crime{safety.crime_period ? ` (${safety.crime_period})` : ''}</h4>
-            <ul>
-              {CRIME_GROUPS.filter(([key]) => safety.crime_per_1k[key] != null).map(([key, name]) => (
-                <li key={key}>
-                  {name}: {safety.crime_per_1k[key].toLocaleString('en-IE')} per 1,000 people a year
-                  {safety.ireland_crime_per_1k?.[key] != null
-                    && ` (Irish towns and cities ${safety.ireland_crime_per_1k[key].toLocaleString('en-IE')})`}
+      {parts.length > 0 && (
+        <>
+          <h4>Areas in {area}</h4>
+          <ul className="safety-areas">
+            {parts.map((part) => {
+              const [tone, verdict] = safeOrUnsafe(part.score)
+              return (
+                <li key={part.station}>
+                  <span>{part.station}</span>
+                  <span>{part.score.toFixed(1)}<span className="result-muted">/100</span></span>
+                  <span className={`safety-tag ${tone}`}>{verdict}</span>
                 </li>
-              ))}
-            </ul>
-          </>
-        )}
-        <p className="result-muted">
-          Recorded crime statistics reflect incidents known to and recorded by An Garda Síochána. They do not capture
-          all criminal activity, unreported incidents, or residents&apos; perceptions of safety. Consider this score
-          alongside the other indicators here, such as lighting and transport.
-        </p>
-        {safety.garda_nearest_km != null && (
-          <p className="result-muted">Nearest Garda station: {safety.garda_nearest_km.toFixed(1)} km on average (not part of the score)</p>
-        )}
-        {(safety.lit_streets_pct != null || safety.night_transit_pct != null) && (
-          <>
-            <h4>Other safety factors</h4>
-            <ul>
-              {safety.lit_streets_pct != null && <li>Street lighting (where mapped): {safety.lit_streets_pct}% of streets lit</li>}
-              {safety.night_transit_pct != null && (
-                <li>Night bus, Luas or train within a 5-minute walk: {safety.night_transit_pct}% of streets</li>
-              )}
-            </ul>
-          </>
-        )}
-      </details>
+              )
+            })}
+          </ul>
+        </>
+      )}
       <p className="home-credits">
         Crime data: Central Statistics Office (CSO), Garda recorded crime, CC BY 4.0. Population and boundaries: CSO
         Census and Tailte Éireann, CC BY 4.0.
