@@ -384,9 +384,6 @@ function GettingThere({ result, university, universityLocation, mode, onMode }) 
   return (
     <div className="flow-panel-group">
       <h2>Getting there</h2>
-      <p className="result-muted">
-        From {place ? `${place.name}, ${result.area}` : result.area} to {university}, arriving by 9am on a weekday
-      </p>
       <FlowChoices
         label="Travel mode"
         options={TRAVEL_MODES.map(([value, optionLabel]) => [value, optionLabel, MODE_ICONS[value]])}
