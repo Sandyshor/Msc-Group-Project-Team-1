@@ -216,8 +216,8 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     
     map.setPaintProperty('district-fill', 'fill-opacity', showHeat
       ? ['interpolate', ['linear'], ['zoom'],
-        11, ['case', isVisible, 0.72, 0.15],
-        12.3, ['case', isVisible, 0.5, 0.1],
+        11, ['case', isVisible, 0.45, 0.1],
+        12.3, ['case', isVisible, 0.3, 0.06],
         13.2, ['case', isSel, 0.06, 0.03]]
       : ['interpolate', ['linear'], ['zoom'],
         11, ['case', isSel, 0.5, isVisible, 0.55, 0.12],
@@ -293,7 +293,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
   function flyToDistrict(code) {
     const feature = store.current.features[code];
     const bounds = feature && getGeometryBounds(feature.geometry);
-    if (bounds) mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 14, pitch: 45, bearing: -12, duration: 1300 });
+    if (bounds) mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 14, pitch: 0, bearing: 0, duration: 1300 });
   }
 
   function openStopPopup(stop) {
@@ -379,8 +379,8 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
           style: MAP_STYLE,
           center: [-6.2603, 53.3498],
           zoom: 10.8,
-          pitch: 45,
-          bearing: -12,
+          pitch: 0,
+          bearing: 0,
           maxPitch: 70,
           attributionControl: true,
           canvasContextAttributes: { antialias: true },
