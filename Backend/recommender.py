@@ -669,6 +669,12 @@ def _compare_word(value, average):
 
 # 3. MAIN ENTRY POINT
 
+def _university_location(data, university):
+    points = data["commute_points"]
+    row = points[points["University"] == university].iloc[0]
+    return {"lat": float(row["Destination_Latitude"]), "lon": float(row["Destination_Longitude"])}
+
+
 def _part_commutes(data, university, mode):
     """Minutes and km from every part of every district to the university by one travel mode.
     Commute points use their own times; neighbourhoods use their own OTP times when they've been
@@ -771,6 +777,21 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
         parts.loc[faster, "Commute Estimated"] = walk["Commute Estimated"].reindex(key).to_numpy(dtype=bool)[faster]
         parts.loc[faster, "Walk Faster"] = True
     parts = parts.dropna(subset=["Minutes"]).rename(columns={"Minutes": "Commute Minutes"})
+    # Every place's commute by each way of travelling, so the results page can show them without a new search
+    by_mode = {mode: _part_commutes(data, university, mode).set_index(["Area", "Part"]) for mode in TRAVEL_MODES}
+
+    def commute_by_mode(area, part):
+        found = {}
+        for mode, table in by_mode.items():
+            minutes = table["Minutes"].get((area, part), np.nan)
+            km = table["Distance_km"].get((area, part), np.nan)
+            walk = by_mode["walk"]["Minutes"].get((area, part), np.nan)
+            walk_faster = mode == "public_transport" and pd.notna(walk) and (pd.isna(minutes) or walk <= minutes)
+            if walk_faster:  # same rule as above: nobody takes a bus that is slower than walking
+                minutes, km = walk, by_mode["walk"]["Distance_km"].get((area, part), np.nan)
+            found[mode] = None if pd.isna(minutes) else {
+                "minutes": round(float(minutes)), "km": _round_or_none(km, 1), "walk_faster": bool(walk_faster)}
+        return found
     parts["Distance"] = parts["Distance_km"].map(lambda km: f"{km:.1f} km" if pd.notna(km) else None)
     parts["Within Limit"] = parts["Commute Minutes"] <= max_commute if max_commute else True
     # District figures (rent, census); amenities and commute come from the parts
@@ -1120,6 +1141,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             "commute_minutes": None if pd.isna(row["Commute Minutes"]) else round(float(row["Commute Minutes"])),
             # public transport search, but walking is quicker from here (the time and distance are the walk's)
             "walk_faster": bool(row["Walk Faster"]),
+            "commute_by_mode": commute_by_mode(row["Area"], row["Part"]),
             "distance": _none_if_nan(row.get("Distance")),
             "neighbourhood": neighbourhood_info(row),
             "commute": commute_info(row["Area"]),
@@ -1142,6 +1164,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
 
     return {
         "university": university,
+        "university_location": _university_location(data, university),
         "accommodation": accommodation_name,
         "budget": budget,
         "travel_mode": travel_mode,

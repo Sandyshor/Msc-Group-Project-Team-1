@@ -2171,6 +2171,19 @@ html {
   color: #a14d30;
 }
 
+/* the current page, as a pill */
+.nav-links a.active {
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(255, 253, 247, 0.16);
+  font-weight: 700;
+}
+
+.navbar-home .nav-links a.active {
+  background: #dff3d4;
+  color: #123d31;
+}
+
 .navbar-home .nav-cta {
   border-radius: 999px;
   background: #123d31;

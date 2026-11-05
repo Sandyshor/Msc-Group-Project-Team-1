@@ -54,10 +54,10 @@ function joinWords(items) {
 }
 
 function Questionnaire() {
-  // Coming back from the results page ("Your situation" / "Your priorities"): start from the earlier answers
+  // Coming back from the results page ("About you" / "Your priorities"): start from the earlier answers
   const { state } = useLocation()
   const earlier = state?.answers
-  const [step, setStep] = useState(earlier ? state.step ?? 1 : 1)
+  const [step, setStep] = useState(state?.step === 2 ? 2 : 1)
   const [budget, setBudget] = useState(earlier?.budget ?? 1000)
   const [destination, setDestination] = useState(earlier?.university ?? '')
   const [roomType, setRoomType] = useState(earlier?.accommodationLabel ?? 'Private room')
@@ -91,13 +91,31 @@ function Questionnaire() {
     setImportance({ ...importance, [name]: value })
   }
 
+  const [needUniversity, setNeedUniversity] = useState(false)
+
   function handleContinue(event) {
     event.preventDefault()
     if (situationDone) setStep(2)
   }
 
+  // Every step in the sidebar can be clicked; the matches need a university and an accommodation type first
+  function goToStep(number) {
+    if (number < 3) {
+      setStep(number)
+    } else if (situationDone) {
+      showMatches()
+    } else {
+      setNeedUniversity(true)
+      setStep(1)
+    }
+  }
+
   function handleSubmit(event) {
     event.preventDefault()
+    if (situationDone) showMatches()
+  }
+
+  function showMatches() {
     navigate('/results', {
       state: {
         university: destination,
@@ -114,13 +132,13 @@ function Questionnaire() {
 
   return (
     <section className="flow-page">
-      <FlowSidebar step={step} onStep={setStep} canGoTo={(n) => n === 1 || (n === 2 && situationDone)} />
+      <FlowSidebar step={step} onStep={goToStep} />
 
       {step === 1 ? (
         <>
           <FlowPhoto
             step={1}
-            label="YOUR SITUATION"
+            label="ABOUT YOU"
             title="First, tell us a little"
             accent="about your life."
             description="We'll use your answers to find Dublin neighbourhoods that fit your budget and everyday routine."
@@ -203,7 +221,11 @@ function Questionnaire() {
             </FlowRow>
 
             <div className="flow-actions">
-              {!destination && <p className="flow-note">Choose your university to continue.</p>}
+              {!destination && (
+                <p className={needUniversity ? 'flow-note flow-note-strong' : 'flow-note'} role="status">
+                  Choose your university to continue.
+                </p>
+              )}
               <button className="flow-next" type="submit" disabled={!situationDone}>
                 Continue <span>→</span>
               </button>
@@ -266,7 +288,10 @@ function Questionnaire() {
                 ← Back
               </button>
               {allNotImportant && <p className="flow-note">Move at least one slider above 0.</p>}
-              <button className="flow-next" type="submit" disabled={allNotImportant}>
+              {!situationDone && !allNotImportant && (
+                <p className="flow-note">Choose your university in "About you" first.</p>
+              )}
+              <button className="flow-next" type="submit" disabled={allNotImportant || !situationDone}>
                 See my matches <span>→</span>
               </button>
             </div>
