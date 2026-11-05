@@ -83,10 +83,7 @@
   color: #a8753f;
 }
 
-.flow-step:disabled:not(.is-current) {
-  opacity: 0.45;
-  cursor: default;
-}
+
 
 .flow-step:focus-visible {
   outline: 2px solid #f0c49b;
@@ -301,6 +298,10 @@
   margin: 0;
   color: #8a3b2b;
   font-size: 12px;
+}
+
+.flow-note-strong {
+  font-weight: 700;
 }
 
 /* Priority sliders inside rows: the words and number on one line, no end labels */
@@ -698,6 +699,72 @@
   .flow-detail-head {
     flex-direction: column;
   }
+}
+
+/* "Getting there" on the results page: time and distance, and the route on a map */
+.flow-panel-group > .result-muted {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.route-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+
+.route-summary strong {
+  font-family: Georgia, serif;
+  font-size: 24px;
+}
+
+.route-map-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.route-map {
+  height: 260px;
+  border: 1px solid var(--flow-line);
+  border-radius: 12px;
+  background: #e8eee1;
+}
+
+.route-map-note {
+  margin: 0;
+  color: var(--flow-muted);
+  font-size: 11.5px;
+}
+
+.route-pin-wrap {
+  border: 0;
+  background: transparent;
+}
+
+.route-pin {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 3px solid #fffdf7;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  color: #fffdf7;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.route-pin-from {
+  background: #a8753f;
+}
+
+.route-pin-to {
+  background: #173f32;
 }
 
 /* Short laptop screens: tighter rows so everything still fits */

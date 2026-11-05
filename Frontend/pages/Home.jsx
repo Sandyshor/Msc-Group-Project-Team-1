@@ -572,6 +572,75 @@ function AttractionCard({ place }) {
   )
 }
 
+const HERO_ICONS = {
+  globe: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z', 'M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z'],
+  play: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z', 'm10 8.5 5.5 3.5-5.5 3.5v-7Z'],
+  check: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z', 'm8 12.5 2.6 2.5L16 9.5'],
+  pin: ['M12 21s-6.5-5.8-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.2 12 21 12 21Z', 'M12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z'],
+}
+
+function HeroIcon({ name, className = '' }) {
+  return (
+    <svg className={`fd-hero-icon ${className}`.trim()} viewBox="0 0 24 24" aria-hidden="true">
+      {HERO_ICONS[name].map((d) => <path d={d} key={d} />)}
+    </svg>
+  )
+}
+
+function HeroUnderline() {
+  return (
+    <svg className="fd-hero-underline" viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M4 18C70 6 170 4 296 12" />
+    </svg>
+  )
+}
+
+// A dashed flight path with a plane - arriving in Dublin
+function HeroFlightPath() {
+  return (
+    <svg className="fd-hero-flight" viewBox="0 0 520 260" aria-hidden="true">
+      <path className="fd-hero-flight-path" d="M10 250C70 120 190 40 330 60S470 50 500 30" />
+      <path className="fd-hero-plane" d="m478 38 26-14c3-1.5 6 1 4.5 4l-13 26-5-1 3-14-9 5-1 6-4 1-1.5-6.5L472 43l1-4 6 .5 9-5-14 3Z" />
+    </svg>
+  )
+}
+
+function HeroShamrock() {
+  const leaf = 'M0 0C-10-6-18-18-12-27c5-7 12-4 12 3 0-7 7-10 12-3 6 9-2 21-12 27Z'
+  return (
+    <svg className="fd-hero-shamrock" viewBox="-60 -70 120 130" aria-hidden="true">
+      <path className="fd-hero-shamrock-stem" d="M0 0C4 18 14 34 30 46" />
+      {[0, 120, 240].map((angle) => <path key={angle} d={leaf} transform={`rotate(${angle})`} />)}
+    </svg>
+  )
+}
+
+// Dublin's skyline as line art: Custom House, the Spire, Christ Church, the Ha'penny Bridge
+function HeroSkyline() {
+  return (
+    <svg className="fd-hero-skyline" viewBox="0 0 1200 150" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M0 140H1200" />
+      {/* trees */}
+      <path d="M60 140v-22m0 0a12 12 0 1 1 0-24 12 12 0 1 1 0 24ZM980 140v-22m0 0a12 12 0 1 1 0-24 12 12 0 1 1 0 24Z" />
+      {/* terrace of houses */}
+      <path d="M90 140V92h70v48M100 104h10M120 104h10M140 104h10M100 120h10M120 120h10M140 120h10M90 92l35-18 35 18" />
+      {/* Custom House with its dome */}
+      <path d="M190 140V96h180v44M200 96V84h160v12M230 84V72h100v12M260 72c0-18 40-18 40 0M280 54v-8" />
+      <path d="M205 110h12M225 110h12M245 110h12M303 110h12M323 110h12M343 110h12M205 126h12M225 126h12M343 126h12M323 126h12M268 140v-26h24v26" />
+      {/* the Spire */}
+      <path d="M430 140 440 8 450 140" />
+      {/* GPO-like front with columns */}
+      <path d="M480 140V98h120v42M480 98l60-20 60 20M495 104v36M515 104v36M535 104v36M555 104v36M575 104v36" />
+      {/* Christ Church: nave and two spires */}
+      <path d="M640 140V100h90v40M650 100V70l10-18 10 18v30M700 100V60l10-20 10 20v40M655 116h10M680 116h10M705 116h10" />
+      {/* the Ha'penny Bridge */}
+      <path d="M760 140c40-46 160-46 200 0M770 128c40-36 140-36 180 0M790 116v24M820 106v34M850 102v38M880 102v38M910 106v34M940 116v24" />
+      {/* modern blocks of the docklands */}
+      <path d="M1010 140V70h44v70M1062 140V96h40v44M1110 140V54h34v86M1020 84h8M1036 84h8M1020 100h8M1036 100h8M1120 70h6M1132 70h6M1120 88h6M1132 88h6" />
+    </svg>
+  )
+}
+
 function HeroRail({ title, label, children }) {
   const rowRef = useRef(null)
 
@@ -765,28 +834,39 @@ function Home() {
         <img className="fd-hero-image" src={cityImage} alt="Dublin city beside the River Liffey" />
         <div className="fd-hero-shade" />
 
+        <HeroFlightPath />
+
         <div className="fd-hero-copy">
-          <h1 id="fd-hero-title" className="fd-visually-hidden">Find Your Dublin</h1>
-          <nav className="fd-hero-links" aria-label="Explore the city guide">
-            <Link to="/districts"><span>01</span><strong>Neighbourhoods</strong><b>↗</b></Link>
-            <a href="#universities"><span>02</span><strong>Campus life</strong><b>↗</b></a>
-            <a href="#attractions"><span>03</span><strong>Places to explore</strong><b>↗</b></a>
-            {/* Separate page (not React) served from Frontend/public/journey-planner */}
-            <a href="/journey-planner/route.html"><span>04</span><strong>Journey planner</strong><b>↗</b></a>
-          </nav>
+          <p className="fd-hero-pill"><HeroIcon name="globe" /> A guide for international students</p>
+          <h1 id="fd-hero-title">
+            Are you new <em>to Dublin?</em>
+            <HeroUnderline />
+          </h1>
+          <p className="fd-hero-lead">
+            A personalised guide for international students to find the best area to live, study and explore in Dublin.
+          </p>
+          <div className="fd-hero-cta">
+            {/* same words as the menu bar's button, as both start the questionnaire */}
+            <Link className="fd-cta-primary" to="/questionnaire">Find my match <span aria-hidden="true">→</span></Link>
+            <a className="fd-cta-outline" href="#explore-dublin"><HeroIcon name="play" /> Watch intro</a>
+          </div>
         </div>
 
-        {/* Campuses and places: two rows the student scrolls sideways (swipe, trackpad or the arrows) */}
-        <div className="fd-hero-rails">
-          <HeroRail title="Find my campus" label="Universities and campuses">
-            {universities.map((school) => <UniversityCard school={school} key={school.id} />)}
-          </HeroRail>
-          <HeroRail title="Know your city" label="Places to explore in Dublin">
-            {attractions.map((place) => <AttractionCard place={place} key={place.id} />)}
-          </HeroRail>
-        </div>
+        <aside className="fd-hero-card" aria-label="What you can do here">
+          <span className="fd-hero-flag" aria-hidden="true"><i /><i /><i /></span>
+          <h2>New to Dublin?</h2>
+          <ul>
+            <li><Link to="/questionnaire"><HeroIcon name="check" className="gold" /> Find the right area to live</Link></li>
+            <li><Link to="/districts"><HeroIcon name="check" className="gold" /> Compare rent and living costs</Link></li>
+            <li><a href="/journey-planner/route.html"><HeroIcon name="check" /> Check commute to your university</a></li>
+            <li><a href="#attractions"><HeroIcon name="check" /> Explore amenities &amp; student life</a></li>
+          </ul>
+        </aside>
 
-        <div className="fd-hero-footer-left">BAILE ÁTHA CLIATH <span>—</span> DUBLIN, IRELAND</div>
+        <p className="fd-hero-place"><HeroIcon name="pin" /> Samuel Beckett Bridge, Dublin</p>
+        <HeroShamrock />
+        <HeroSkyline />
+
       </section>
 
       <section className="fd-search-wrap" aria-label="Explore Dublin districts">
@@ -837,6 +917,11 @@ function Home() {
           <p>Explore universities and colleges across the city and nearby coast. Check your course location before deciding how you’ll travel each day.</p>
         </div>
 
+        <div className="fd-section-rail">
+          <HeroRail title="Find my campus" label="Universities and campuses">
+            {universities.map((school) => <UniversityCard school={school} key={school.id} />)}
+          </HeroRail>
+        </div>
         <DublinMap title="Find the campuses across Dublin." locations={universities} variant="campuses" />
       </section>
 
@@ -849,6 +934,11 @@ function Home() {
           <p>Landmarks, history and green spaces for the days when you close your laptop and go exploring.</p>
         </div>
 
+        <div className="fd-section-rail">
+          <HeroRail title="Know your city" label="Places to explore in Dublin">
+            {attractions.map((place) => <AttractionCard place={place} key={place.id} />)}
+          </HeroRail>
+        </div>
         <DublinMap title="Landmarks, all around the city." locations={attractions} variant="attractions" />
       </section>
 

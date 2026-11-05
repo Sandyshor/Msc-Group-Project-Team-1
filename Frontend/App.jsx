@@ -1,5 +1,5 @@
 import './App.css'
-import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import { Routes, Route, Link, NavLink, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import HowItWorks from './pages/Howitworks'
 import Questionnaire from './pages/Questionnaire'
@@ -27,9 +27,13 @@ function App() {
 
         
 <nav className="nav-links">
-  <Link to="/">Home</Link>
-  <Link to="/districts">Explore districts</Link>
-  <Link to="/how-it-works">How it works</Link>
+  {/* NavLink marks the current page */}
+  <NavLink to="/" end>Home</NavLink>
+  <NavLink to="/districts">Explore districts</NavLink>
+  <a href="/#universities">Universities</a>
+  {/* Separate page (not React) served from Frontend/public/journey-planner */}
+  <a href="/journey-planner/route.html">Journey planner</a>
+  <NavLink to="/how-it-works">How it works</NavLink>
 </nav>
 
 

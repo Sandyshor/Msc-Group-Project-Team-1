@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Results.css'
 import { districts } from '../District Profile/districtData.js'
-import { NO_LIMIT, TRAVEL_MODES } from './CommuteFields'
+import { TRAVEL_MODES } from './CommuteFields'
 import { FlowChoices, FlowIcon, FlowSidebar } from './FlowLayout'
-import PrioritySlider from './PrioritySlider'
+import RouteMap from './RouteMap'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
 const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
@@ -360,6 +360,53 @@ function commuteText(result, modeWords) {
   return `${result.commute_minutes} min ${result.walk_faster ? 'on foot' : modeWords}`
 }
 
+// The selected match's commute by the way of travelling the student picks, with the route on a map.
+// The matches themselves stay as searched (to change them, go back to "About you").
+function GettingThere({ result, university, universityLocation, mode, onMode }) {
+  const commute = result.commute_by_mode?.[mode]
+  const place = result.neighbourhood
+  const [, label, words] = TRAVEL_MODES.find(([value]) => value === mode)
+
+  return (
+    <div className="flow-panel-group">
+      <h2>Getting there</h2>
+      <p className="result-muted">
+        From {place ? `${place.name}, ${result.area}` : result.area} to {university}, arriving by 9am on a weekday
+      </p>
+      <FlowChoices
+        label="Travel mode"
+        options={TRAVEL_MODES.map(([value, optionLabel]) => [value, optionLabel, MODE_ICONS[value]])}
+        value={mode}
+        onChange={onMode}
+      />
+      <p className="route-summary" aria-live="polite">
+        {commute ? (
+          <>
+            <strong>{commute.minutes} min</strong>
+            <span>
+              {commute.walk_faster ? 'on foot - quicker than public transport from here' : words}
+              {commute.km != null && ` · ${commute.km} km`}
+            </span>
+          </>
+        ) : (
+          <span>No {label.toLowerCase()} time for this place yet.</span>
+        )}
+      </p>
+      {place && universityLocation && (
+        <RouteMap
+          fromLat={place.lat}
+          fromLon={place.lon}
+          fromName={place.name}
+          toLat={universityLocation.lat}
+          toLon={universityLocation.lon}
+          toName={university}
+          mode={commute?.walk_faster ? 'walk' : mode}
+        />
+      )}
+    </div>
+  )
+}
+
 // One of the top matches, as a card the student clicks to see its details
 function MatchCard({ result, modeWords, selected, onSelect }) {
   return (
@@ -583,7 +630,7 @@ function CompareAreas({ results, budget }) {
 function Results() {
   const location = useLocation()
   const navigate = useNavigate()
-  const [answers, setAnswers] = useState(() => loadAnswers(location.state))
+  const [answers] = useState(() => loadAnswers(location.state))
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -595,12 +642,7 @@ function Results() {
   const maxCommute = answers?.maxCommute ?? null
   const modeWords = TRAVEL_MODES.find(([value]) => value === travelMode)[2]
 
-  // Changing the commute or a priority on this page searches again straight away.
-  function updateAnswers(changes) {
-    const updated = loadAnswers({ ...answers, ...changes })
-    setAnswers(updated)
-    navigate('/results', { replace: true, state: updated }) // so a refresh keeps the new choice
-  }
+  const [routeMode, setRouteMode] = useState(travelMode) // "Getting there": only changes the map, not the matches
 
   useEffect(() => {
     if (!answers) return
@@ -650,7 +692,7 @@ function Results() {
   if (!answers) {
     return (
       <section className="flow-page flow-page-results">
-        <FlowSidebar step={3} onStep={() => navigate('/questionnaire')} canGoTo={(n) => n === 1} />
+        <FlowSidebar step={3} onStep={(n) => navigate('/questionnaire', { state: { step: n } })} />
         <div className="flow-empty">
           <h1>No answers yet.</h1>
           <p className="result-muted">Answer a few questions and we'll match you with Dublin neighbourhoods.</p>
@@ -667,7 +709,6 @@ function Results() {
     <section className="flow-page flow-page-results">
       <FlowSidebar
         step={3}
-        canGoTo={(n) => n < 3}
         // back to the questionnaire with these answers filled in
         onStep={(n) => navigate('/questionnaire', { state: { answers, step: n } })}
       />
@@ -686,45 +727,14 @@ function Results() {
           {data && <> · compared {data.areas_compared} areas</>}
         </p>
 
-        <div className="flow-panel-group">
-          <h2>Getting there</h2>
-          <FlowChoices
-            label="Travel mode"
-            options={TRAVEL_MODES.map(([value, label]) => [value, label, MODE_ICONS[value]])}
-            value={travelMode}
-            onChange={(mode) => updateAnswers({ travelMode: mode })}
+        {shown && (
+          <GettingThere
+            result={shown}
+            university={data.university}
+            universityLocation={data.university_location}
+            mode={routeMode}
+            onMode={setRouteMode}
           />
-          <div className="flow-value">
-            <label htmlFor="max-commute">Longest commute</label>
-            <strong>{maxCommute ? `${maxCommute} min` : 'No limit'}</strong>
-          </div>
-          <input
-            id="max-commute"
-            type="range"
-            min="10"
-            max={NO_LIMIT}
-            step="5"
-            value={maxCommute ?? NO_LIMIT}
-            onChange={(event) => {
-              const value = Number(event.target.value)
-              updateAnswers({ maxCommute: value === NO_LIMIT ? null : value })
-            }}
-          />
-        </div>
-
-        {answers.importance && (
-          <div className="flow-panel-group">
-            <h2>Your priorities</h2>
-            {Object.entries(answers.importance).map(([name, value]) => (
-              <PrioritySlider
-                key={name}
-                name={name}
-                value={value}
-                showName
-                onChange={(changed) => updateAnswers({ importance: { ...answers.importance, [name]: changed } })}
-              />
-            ))}
-          </div>
         )}
       </aside>
 

@@ -1174,3 +1174,393 @@
     transition: none;
   }
 }
+
+/* ---------- Homepage hero, new design: "Are you new to Dublin?" ---------- */
+.fd-hero {
+  --fd-lime: #c8f25a;
+  align-items: center;
+  min-height: min(900px, 100svh);
+  padding: 150px 7% 200px;
+}
+
+.fd-hero-image {
+  object-position: 70% 55%;
+}
+
+.fd-hero .fd-hero-shade {
+  background:
+    radial-gradient(ellipse at 0% 100%, rgba(12, 74, 48, 0.95) 0%, rgba(12, 74, 48, 0) 45%),
+    linear-gradient(90deg, rgba(6, 46, 33, 0.94) 0%, rgba(8, 58, 40, 0.82) 34%, rgba(8, 58, 40, 0.25) 62%, rgba(8, 58, 40, 0) 80%),
+    linear-gradient(0deg, rgba(6, 46, 33, 0.9) 0%, rgba(6, 46, 33, 0) 34%);
+}
+
+.fd-hero .fd-hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+}
+
+.fd-hero-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fd-hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 30px;
+  padding: 10px 22px 10px 14px;
+  border: 1.5px solid rgba(255, 250, 240, 0.75);
+  border-radius: 999px;
+  color: #fffaf0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.fd-hero-pill .fd-hero-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.fd-hero h1 {
+  position: relative;
+  max-width: none;
+  margin: 0;
+  color: #fff;
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(46px, 6vw, 88px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1.02;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+.fd-hero h1 em {
+  display: block;
+  color: var(--fd-lime);
+  font-style: normal;
+  font-weight: 800;
+  /* Manrope has no italic, so it is slanted instead */
+  transform: skewX(-9deg);
+  transform-origin: left bottom;
+}
+
+.fd-hero-underline {
+  display: block;
+  width: min(420px, 70%);
+  height: 18px;
+  margin: 2px 0 0 12%;
+  fill: none;
+  stroke: var(--fd-lime);
+  stroke-linecap: round;
+  stroke-width: 5;
+}
+
+.fd-hero-lead {
+  max-width: 520px;
+  margin: 26px 0 0;
+  color: #f1f5ec;
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.6;
+}
+
+.fd-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 34px;
+}
+
+.fd-cta-primary,
+.fd-cta-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 58px;
+  padding: 0 30px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.fd-cta-primary {
+  background: var(--fd-lime);
+  color: #0d3a28;
+  box-shadow: 0 10px 30px rgba(200, 242, 90, 0.35);
+}
+
+.fd-cta-primary span {
+  font-size: 22px;
+}
+
+.fd-cta-outline {
+  border: 1.5px solid rgba(255, 250, 240, 0.85);
+  color: #fffaf0;
+  font-weight: 700;
+}
+
+.fd-cta-primary:hover,
+.fd-cta-outline:hover {
+  transform: translateY(-2px);
+}
+
+.fd-cta-outline:hover {
+  background: rgba(255, 250, 240, 0.12);
+}
+
+.fd-cta-primary:focus-visible,
+.fd-cta-outline:focus-visible,
+.fd-hero-card a:focus-visible {
+  outline: 3px solid #fffaf0;
+  outline-offset: 3px;
+}
+
+/* "New to Dublin?" card */
+.fd-hero-card {
+  position: absolute;
+  z-index: 2;
+  top: 150px;
+  right: 6%;
+  width: min(360px, 30vw);
+  padding: 26px 26px 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 20px 50px rgba(6, 46, 33, 0.3);
+  color: #123d31;
+}
+
+.fd-hero-flag {
+  position: absolute;
+  top: -20px;
+  left: 22px;
+  display: flex;
+  overflow: hidden;
+  width: 62px;
+  height: 42px;
+  border-radius: 6px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+  transform: rotate(-10deg);
+}
+
+.fd-hero-flag i {
+  flex: 1;
+}
+
+.fd-hero-flag i:nth-child(1) { background: #169b62; }
+.fd-hero-flag i:nth-child(2) { background: #fff; }
+.fd-hero-flag i:nth-child(3) { background: #ff883e; }
+
+.fd-hero-card h2 {
+  margin: 6px 0 14px 64px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.fd-hero-card ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fd-hero-card a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 6px;
+  border-radius: 10px;
+  color: #1a392d;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.fd-hero-card a:hover {
+  background: #eef6e6;
+}
+
+.fd-hero-card .fd-hero-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #22a45d;
+  color: #fff;
+  stroke-width: 2.4;
+}
+
+.fd-hero-card .fd-hero-icon.gold {
+  background: #d99a2b;
+}
+
+/* the check icon's circle is drawn by the background */
+.fd-hero-card .fd-hero-icon path:first-child {
+  stroke: none;
+}
+
+.fd-hero-place {
+  position: absolute;
+  z-index: 2;
+  right: 12%;
+  bottom: 230px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #fffaf0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px;
+  font-style: italic;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.fd-hero-flight {
+  position: absolute;
+  z-index: 1;
+  top: 95px;
+  left: 32%;
+  width: min(520px, 36vw);
+  pointer-events: none;
+}
+
+.fd-hero-flight-path {
+  fill: none;
+  stroke: rgba(255, 250, 240, 0.8);
+  stroke-dasharray: 6 9;
+  stroke-linecap: round;
+  stroke-width: 2.5;
+}
+
+.fd-hero-plane {
+  fill: #fffaf0;
+}
+
+.fd-hero-shamrock {
+  position: absolute;
+  z-index: 1;
+  bottom: 70px;
+  left: -10px;
+  width: clamp(90px, 9vw, 150px);
+  fill: #3db552;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3));
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+.fd-hero-shamrock-stem {
+  fill: none;
+  stroke: #2e9a43;
+  stroke-linecap: round;
+  stroke-width: 6;
+}
+
+.fd-hero-skyline {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 18px;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  fill: none;
+  stroke: var(--fd-lime);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px rgba(200, 242, 90, 0.55));
+  pointer-events: none;
+}
+
+/* the search bar no longer overlaps the hero, so the skyline stays visible */
+.fd-search-wrap {
+  margin-top: 28px;
+}
+
+/* the campus and place cards, back in their own sections: scrolled sideways by hand */
+.fd-section-rail {
+  margin: 0 9% 8px;
+}
+
+.fd-section-rail .fd-hero-rail-title {
+  color: #a14d30;
+}
+
+.fd-section-rail .fd-hero-rail-arrows button {
+  border-color: #c9c4b1;
+  background: #fffaf0;
+  color: #123d31;
+}
+
+.fd-section-rail .fd-hero-rail-arrows button:hover,
+.fd-section-rail .fd-hero-rail-arrows button:focus-visible {
+  background: #123d31;
+  color: #fffaf0;
+}
+
+.fd-section-rail .fd-hero-rail-row {
+  scrollbar-color: #b9b39f transparent;
+}
+
+.fd-section-rail .fd-university-card,
+.fd-section-rail .fd-attraction-card {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1000px) {
+  .fd-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+    padding: 130px 6% 190px;
+  }
+
+  .fd-hero-card {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: min(420px, 100%);
+    margin-top: 16px;
+  }
+
+  .fd-hero-flight,
+  .fd-hero-place {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .fd-hero {
+    padding-top: 200px;
+  }
+
+  .fd-hero-pill {
+    font-size: 13px;
+  }
+
+  .fd-cta-primary,
+  .fd-cta-outline {
+    min-height: 50px;
+    padding: 0 22px;
+    font-size: 16px;
+  }
+
+  .fd-hero-skyline {
+    height: 90px;
+  }
+
+  .fd-section-rail {
+    margin-inline: 6%;
+  }
+}

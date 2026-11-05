@@ -31,13 +31,14 @@ export function FlowIcon({ name }) {
 
 // label, icon
 const STEPS = [
-  ['Your situation', 'person'],
+  ['About you', 'person'],
   ['Your priorities', 'sliders'],
   ['Your matches', 'pin'],
 ]
 
-// step: 1-3 (the current one); onStep(n) when a step the student can go to is clicked; canGoTo(n) -> bool
-export function FlowSidebar({ step, onStep, canGoTo = () => false }) {
+// step: 1-3 (the current one); onStep(n) when another step is clicked - every step can be clicked, so students
+// can go back and forth (the page decides what to do if a step isn't ready yet)
+export function FlowSidebar({ step, onStep }) {
   return (
     <nav className="flow-sidebar" aria-label="Steps">
       {STEPS.map(([label, icon], index) => {
@@ -49,7 +50,7 @@ export function FlowSidebar({ step, onStep, canGoTo = () => false }) {
             type="button"
             className={current ? 'flow-step is-current' : 'flow-step'}
             aria-current={current ? 'step' : undefined}
-            disabled={current || !canGoTo(number)}
+            disabled={current}
             onClick={() => onStep(number)}
           >
             <FlowIcon name={icon} />
