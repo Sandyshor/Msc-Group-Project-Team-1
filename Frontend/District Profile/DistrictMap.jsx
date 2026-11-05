@@ -13,7 +13,8 @@ const luasGreenUrl = '/data/luas-green-line.geojson';
 
 maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
-
+// Street map from Stadia Maps. Other styles: alidade_smooth_dark, outdoors, osm_bright, stamen_terrain, stamen_toner_lite.
+// On the live site, add your domain in the Stadia dashboard (no key needed), or put VITE_STADIA_API_KEY in Frontend/.env
 const STADIA_STYLE = 'alidade_smooth';
 const STADIA_KEY = import.meta.env.VITE_STADIA_API_KEY;
 const MAP_STYLE = `https://tiles.stadiamaps.com/styles/${STADIA_STYLE}.json${STADIA_KEY ? `?api_key=${STADIA_KEY}` : ''}`;
@@ -21,10 +22,11 @@ const MAP_STYLE = `https://tiles.stadiamaps.com/styles/${STADIA_STYLE}.json${STA
 const ALL_DISTRICTS = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D6W', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12',
   'D13', 'D14', 'D15', 'D16', 'D17', 'D18', 'D20', 'D22', 'D24'];
 
-
+// Districts that have a full profile (shared with App.jsx)
 export const ACTIVE_DISTRICTS = ALL_DISTRICTS;
 
-
+// Relative crime score colours (same scale as the results page): 50 = Irish town and city rate,
+// red = more recorded crime, green = less. Bands come from the unrounded score.
 export const HEAT_STOPS = [
   [0, '#b23a2f'], [30, '#c94a35'], [40, '#e0694a'], [50, '#f4cf62'], [57, '#b5cf6c'], [65, '#5fae6b'], [100, '#25704a'],
 ];
@@ -36,7 +38,7 @@ export const SAFETY_BANDS = [
 ];
 export const safetyLabel = (score) => (SAFETY_BANDS.find(([min]) => score >= min) || SAFETY_BANDS[3])[1];
 export const safetyPlain = (score) => (SAFETY_BANDS.find(([min]) => score >= min) || SAFETY_BANDS[3])[2];
-
+// The colour for a score, blended between the stops
 export function heatColor(score) {
   const i = Math.max(1, HEAT_STOPS.findIndex(([v]) => v >= score));
   const [[v0, c0], [v1, c1]] = [HEAT_STOPS[i - 1], HEAT_STOPS[i] ?? HEAT_STOPS[i - 1]];
@@ -45,11 +47,11 @@ export function heatColor(score) {
   const [a, b2] = [rgb(c0), rgb(c1)];
   return `rgb(${a.map((x, k) => Math.round(x + (b2[k] - x) * Math.max(0, Math.min(1, t)))).join(',')})`;
 }
-
+// Dark text on the yellow and light-green part of the scale, white on red and dark green
 export const textOnHeat = (score) => (score >= 44 && score < 66 ? '#1f2d24' : '#ffffff');
 export { ALL_DISTRICTS };
 
-
+// [key, label, icon, colour]
 export const AMENITY_TYPES = [
   ['supermarket', 'Supermarkets', 'cart', '#2f7fd0'],
   ['grocery', 'Groceries', 'basket', '#3aa38a'],
@@ -62,7 +64,7 @@ export const AMENITY_TYPES = [
   ['mall', 'Shopping centres', 'mall', '#c09020'],
 ];
 
-
+// District colours come from the hue stored for each district in district-profiles.json
 export const strongColor = (hue) => `hsl(${hue} 55% 38%)`;
 export const pastelColor = (hue) => `hsl(${hue} 60% 80%)`;
 export const bannerColor = (hue) => `hsl(${hue} 42% 26%)`;
@@ -201,17 +203,17 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     const visible = ACTIVE_DISTRICTS.filter((c) => filter === 'all' || profiles[c]?.side === filter);
     const zoom = map.getZoom();
 
-    // district colours
+   
     const colorMatch = ['match', ['get', 'districtId']];
     const safety = profileData.safety || {};
-    ACTIVE_DISTRICTS.forEach((c) => colorMatch.push(c, showHeat && safety[c]
+    ACTIVE_DISTRICTS.forEach((c) => colorMatch.push(c, showHeat && typeof safety[c]?.score === 'number'
       ? heatColor(safety[c].score)
       : (c === sel ? strongColor(profiles[c].hue) : pastelColor(profiles[c].hue))));
     colorMatch.push('#cfd8cc');
     const isSel = ['==', ['get', 'districtId'], sel];
     const isVisible = ['in', ['get', 'districtId'], ['literal', visible]];
     map.setPaintProperty('district-fill', 'fill-color', colorMatch);
-    // Safety view: whole districts in their safety colour, fading as the Census areas appear when zoomed in
+    
     map.setPaintProperty('district-fill', 'fill-opacity', showHeat
       ? ['interpolate', ['linear'], ['zoom'],
         11, ['case', isVisible, 0.72, 0.15],
@@ -231,7 +233,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
       const node = m.getElement();
       if (!ACTIVE_DISTRICTS.includes(c)) return;
       const sc = profileData.safety?.[c]?.score;
-      if (showHeat && sc != null) {
+      if (showHeat && typeof sc === 'number') {
         node.style.background = heatColor(sc);
         node.style.color = textOnHeat(sc);
         node.innerHTML = `${c}<b>${sc.toFixed(0)}</b>`;
@@ -255,7 +257,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
       });
     });
 
-    // dashed spokes from the district centre to its places
+    
     const centre = profileData.labels[sel];
     const spokeFeatures = (placesByDistrict[sel] || []).filter((p) => p.lngLat).map((p) => ({
       type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[centre[1], centre[0]], p.lngLat] },
@@ -404,7 +406,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
               paint: { 'line-color': '#ffffff', 'line-width': 1.5 },
             });
 
-            
+            // Safety by Census area (shown when zoomed in)
             const heatColour = ['interpolate', ['linear'], ['get', 'score']];
             HEAT_STOPS.forEach(([v, c]) => heatColour.push(v, c));
             map.addSource('dm-crime-areas', { type: 'geojson', data: crimeAreasUrl });
@@ -426,7 +428,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
                 `<div class="safe-pop"><span class="safe-pop-score" style="background:${heatColor(sc)};color:${textOnHeat(sc)}">${sc.toFixed(0)}</span>`
                 + `<div><b>${p.ed}</b> · ${p.d}<br><small>${safetyLabel(sc)}</small></div></div>`
                 + (String(p.check) === 'true' ? '<p class="safe-pop-check">⚠ Check the specific street before choosing</p>' : '')
-                + `<p class="safe-pop-facts">Violent crime ${p.viol} · Robbery ${p.rob} · Theft ${p.burg} per 1,000 people a year</p>`,
+                + (p.viol != null ? `<p class="safe-pop-facts">Violent crime ${p.viol} · Robbery ${p.rob} · Theft ${p.burg} per 1,000 people a year</p>` : ''),
               ).addTo(map);
             });
             map.on('mouseleave', 'dm-crime-areas', () => crimeHover.remove());
@@ -434,7 +436,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
             map.addSource('dm-spokes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
             map.addLayer({ id: 'dm-spokes-line', type: 'line', source: 'dm-spokes', paint: { 'line-width': 1.6, 'line-dasharray': [2, 3], 'line-opacity': 0.85 } });
 
-            
+            // Luas route lines from your files
             [['red', '#d71920', 'Luas Red Line', luasRedUrl], ['green', '#008531', 'Luas Green Line', luasGreenUrl]].forEach(([k, colour, ref, url]) => {
               map.addSource(`luas-${k}-route`, { type: 'geojson', data: url });
               map.addLayer({
@@ -445,7 +447,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
               });
             });
 
-            
+            // Amenity dots
             map.addSource('dm-amenities', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
             const amenColour = ['match', ['get', 'cat']];
             AMENITY_TYPES.forEach(([k, , , c]) => amenColour.push(k, c));
@@ -464,7 +466,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
             });
             map.on('mouseleave', 'dm-amenities-dots', () => { map.getCanvas().style.cursor = ''; amenPopup.remove(); });
 
-            
+            // Luas stops (one point per stop, with the district it is in)
             map.addSource('dm-stops', {
               type: 'geojson',
               data: {
@@ -498,7 +500,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
             });
             map.on('mouseleave', 'dm-stops-hit', () => { map.getCanvas().style.cursor = ''; stopHover.remove(); });
 
-            
+            // Click a district to select it
             map.on('click', 'district-fill', (event) => {
               if (map.queryRenderedFeatures(event.point, { layers: ['dm-stops-hit', 'dm-amenities-dots'] }).length) return;
               const id = event.features?.[0]?.properties?.districtId;
@@ -524,7 +526,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
               store.current.areaMarkers.push(new maplibregl.Marker({ element: el('div', 'dm-area', name) }).setLngLat([lng, lat]).addTo(map));
             }));
 
-            
+           
             ACTIVE_DISTRICTS.forEach((c) => {
               store.current.placeMarkers[c] = (placesByDistrict[c] || []).map((place, i) => {
                 if (!place.lngLat) return null;
@@ -566,7 +568,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
       mapRef.current = null;
       store.current = { features: {}, codeMarkers: {}, placeMarkers: {}, areaMarkers: [], lastAmenKey: '', firstSelect: true };
     };
-    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   
@@ -577,7 +579,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
       if (store.current.stopPopupDistrict !== props.selectedDistrict) store.current.stopPopup?.remove();
       flyToDistrict(props.selectedDistrict);
     }
-    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.selectedDistrict]);
 
   useEffect(() => { applyState(); }, [props.filter, props.showLuas, props.showAmenities, props.hiddenAmenities, props.showHeat]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -588,7 +590,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     document.querySelector(`.dm-place[data-district="${props.selectedDistrict}"][data-index="${props.hoverPlace}"]`)?.classList.add('on');
   }, [props.hoverPlace, props.selectedDistrict]);
 
- 
+  
   useImperativeHandle(ref, () => ({
     getMap() { return mapRef.current; },
     flyToPlace(code, index) {
@@ -608,21 +610,6 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
   return (
     <div className="district-map z-low">
       <div ref={mapContainerRef} className="district-map-canvas" aria-label="Interactive 3D map of Dublin districts" />
-      {props.showHeat && (
-        <div className="safety-key" aria-label="Safety colours legend">
-          <b>How safe is each area?</b>
-          <span className="safety-key-bar" style={{ background: `linear-gradient(90deg, ${HEAT_STOPS.map(([v, c]) => `${c} ${v}%`).join(', ')})` }}>
-            <i style={{ left: '50%' }} />
-          </span>
-          <span className="safety-key-ends"><span>More crime</span><span>50 = Irish town average</span><span>Less crime</span></span>
-          <ul>
-            {SAFETY_BANDS.map(([, name], i) => (
-              <li key={name}><i style={{ background: heatColor(i === 0 ? 62 : i === 1 ? 53 : i === 2 ? 45 : 30) }} />{name}<small>{i === 0 ? '57+' : i === 1 ? '50–57' : i === 2 ? '40–50' : 'under 40'}</small></li>
-            ))}
-          </ul>
-          <small>Numbers on the map are each district’s score out of 100. Zoom in for neighbourhood areas.</small>
-        </div>
-      )}
     </div>
   );
 });
