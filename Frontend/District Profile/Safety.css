@@ -1,0 +1,47 @@
+.dm-code b { margin-left: 5px; padding-left: 5px; border-left: 1px solid currentColor; font-variant-numeric: tabular-nums; opacity: 0.95; }
+
+
+.safety-key { position: absolute; left: 12px; bottom: 28px; z-index: 3; display: flex; flex-direction: column; gap: 6px; width: 250px; max-width: calc(100% - 24px); padding: 11px 13px; border: 1px solid #e0e8d9; border-radius: 11px; background: rgba(255, 254, 250, 0.96); box-shadow: 0 4px 14px rgba(43, 73, 48, 0.14); color: #4f6c57; font-size: 0.68rem; }
+.safety-key > b { color: #214b39; font-size: 0.8rem; }
+.safety-key-bar { position: relative; display: block; height: 10px; border-radius: 5px; }
+.safety-key-bar i { position: absolute; top: -3px; width: 2px; height: 16px; margin-left: -1px; background: #173f32; }
+.safety-key-ends { display: flex; justify-content: space-between; gap: 6px; font-size: 0.6rem; font-weight: 700; }
+.safety-key ul { display: grid; gap: 3px; margin: 2px 0 0; padding: 0; list-style: none; }
+.safety-key li { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 7px; color: #2f4a3a; font-weight: 700; }
+.safety-key li i { width: 14px; height: 10px; border-radius: 3px; }
+.safety-key li small { color: #8a9685; font-weight: 700; font-variant-numeric: tabular-nums; }
+.safety-key > small { color: #8a9685; font-size: 0.6rem; line-height: 1.4; }
+@media (max-width: 650px) { .safety-key { width: 200px; padding: 8px 10px; } .safety-key ul { display: none; } }
+
+
+.safe-pop { display: flex; align-items: center; gap: 9px; }
+.safe-pop-score { display: grid; min-width: 34px; height: 34px; place-items: center; border-radius: 9px; font-weight: 800; font-size: 14px; }
+.safe-pop small { color: #6c7d6c; }
+.safe-pop-check { margin: 6px 0 0; color: #9a4a12; font-size: 11px; font-weight: 700; }
+.safe-pop-facts { margin: 5px 0 0; color: #6c7d6c; font-size: 11px; }
+
+
+.banner-safety { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 5px 12px 5px 5px; border: 0; border-radius: 999px; background: rgba(255, 254, 250, 0.14); color: #fffdf3; font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+.banner-safety b { display: grid; min-width: 32px; height: 26px; padding: 0 6px; place-items: center; border-radius: 999px; font-size: 0.85rem; }
+.banner-safety:hover { background: rgba(255, 254, 250, 0.24); }
+
+
+.safety-verdict { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 14px; }
+.safety-verdict strong { display: grid; min-width: 64px; height: 64px; place-items: center; border-radius: 16px; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em; }
+.safety-verdict div { display: flex; flex-direction: column; gap: 3px; }
+.safety-verdict b { color: #214b39; font-size: 1rem; }
+.safety-verdict span { color: #4f6c57; font-size: 0.76rem; line-height: 1.45; }
+.safety-check { margin: 12px 0 0; padding: 10px 12px; border: 1px solid #f1d2a8; border-radius: 10px; background: #fff6e8; color: #7a4210; font-size: 0.74rem; line-height: 1.45; }
+.safety-rates { width: 100%; border-collapse: collapse; font-size: 0.74rem; }
+.safety-rates th { padding: 0 4px 6px; color: #8a9685; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.06em; text-align: right; text-transform: uppercase; }
+.safety-rates th:first-child { text-align: left; }
+.safety-rates td { padding: 8px 4px; border-top: 1px dotted #e3e8dc; color: #4f6c57; text-align: right; font-variant-numeric: tabular-nums; }
+.safety-rates td:first-child { color: #214b39; font-weight: 700; text-align: left; }
+.safety-rates td small { display: block; color: #8a9685; font-weight: 600; }
+.safety-rates .ratio { font-weight: 800; }
+.safety-hoods b em { margin-left: 6px; color: #9a4a12; font-style: normal; }
+.safety-stations { display: flex; flex-direction: column; gap: 6px; }
+.safety-stations div { display: grid; grid-template-columns: minmax(0, 1fr) 58px 40px; align-items: center; gap: 8px; color: #4f6c57; font-size: 0.74rem; }
+.safety-stations span.bar { height: 6px; border-radius: 3px; background: #e6ece1; overflow: hidden; }
+.safety-stations span.bar i { display: block; height: 100%; background: #214b39; }
+.safety-stations b { color: #214b39; text-align: right; font-variant-numeric: tabular-nums; }
