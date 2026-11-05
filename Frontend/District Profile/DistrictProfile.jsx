@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { universities } from './cityPlaces';
-import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './DistrictMap';
-
+import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, SAFETY_BANDS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './DistrictMap';
 const TABS = [['places', 'Places'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['commute', 'Commute'], ['area', 'Area'], ['unis', 'Universities']];
 const eur = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
 const num = (v) => Number(v).toLocaleString('en-IE');
