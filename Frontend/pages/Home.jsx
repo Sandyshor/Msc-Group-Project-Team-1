@@ -110,11 +110,12 @@ function Home() {
         <aside className="fd-hero-card" aria-label="What you can do here">
           <span className="fd-hero-flag" aria-hidden="true"><i /><i /><i /></span>
           <h2>New to Dublin?</h2>
+          {/* what the site does, as plain points (not links) */}
           <ul>
-            <li><Link to="/questionnaire"><HeroIcon name="check" className="gold" /> Find the right area to live</Link></li>
-            <li><Link to="/districts"><HeroIcon name="check" className="gold" /> Compare rent and living costs</Link></li>
-            <li><a href="/journey-planner/route.html"><HeroIcon name="check" /> Check commute to your university</a></li>
-            <li><Link to="/attractions"><HeroIcon name="check" /> Explore amenities &amp; student life</Link></li>
+            <li><HeroIcon name="check" className="gold" /> Find the right area to live</li>
+            <li><HeroIcon name="check" className="gold" /> Compare rent and living costs</li>
+            <li><HeroIcon name="check" /> Check commute to your university</li>
+            <li><HeroIcon name="check" /> Explore amenities &amp; student life</li>
           </ul>
         </aside>
 
