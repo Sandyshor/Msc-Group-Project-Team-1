@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import './HomePage.css'
 
 // The film's poster frame
@@ -7,38 +6,6 @@ const cityImage =
   '/images/hero-dublin.jpg'
 // Hero background: the Ha'penny Bridge (a dusk colour treatment is added in HomePage.css)
 const heroImage = '/images/attraction-ha-penny-bridge.jpg'
-
-const districtAliases = {
-  D1: ['city centre', 'city center', 'dublin city centre', 'dublin city center', "o'connell street", 'oconnell street', 'henry street'],
-  D2: ['temple bar', 'dublin city south'],
-  D3: ['clontarf', 'fairview', 'marino'],
-  D4: ['ballsbridge', 'donnybrook', 'sandymount'],
-  D6: ['ranelagh', 'rathmines'],
-  D7: ['phibsborough', 'stoneybatter'],
-}
-
-function normaliseSearch(value) {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9]/g, '')
-}
-
-function resolveDistrict(value) {
-  const normalised = normaliseSearch(value)
-  const codeMatch = normalised.match(/^(?:d|dublin)(0?[1-9]|1[0-9]|2[0-4])$/)
-  if (codeMatch) {
-    const number = Number(codeMatch[1])
-    return `D${number}`
-  }
-
-  for (const [code, names] of Object.entries(districtAliases)) {
-    if (names.some((name) => normaliseSearch(name) === normalised)) return code
-  }
-  return null
-}
 
 const HERO_ICONS = {
   globe: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z', 'M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z'],
@@ -110,28 +77,6 @@ function HeroSkyline() {
 }
 
 function Home() {
-  const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchMessage, setSearchMessage] = useState('')
-
-  function handleSearch(event) {
-    event.preventDefault()
-    const query = searchQuery.trim()
-
-    if (!query) {
-      setSearchMessage('Enter a district code or a neighbourhood name to begin.')
-      return
-    }
-
-    const districtCode = resolveDistrict(query)
-    if (!districtCode) {
-      setSearchMessage('We couldn’t match that yet. Try D1, D 1, Dublin 1, or a neighbourhood such as City Centre.')
-      return
-    }
-
-    navigate(`/districts?district=${encodeURIComponent(districtCode)}&search=${encodeURIComponent(query)}`)
-  }
-
   return (
     <div className="fd-home">
       <section className="fd-hero" aria-labelledby="fd-hero-title">
@@ -175,29 +120,6 @@ function Home() {
         <HeroShamrock />
         <HeroSkyline />
 
-      </section>
-
-      <section className="fd-search-wrap" aria-label="Explore Dublin districts">
-        <form className="fd-search-bar" onSubmit={handleSearch}>
-          <span className="fd-search-symbol" aria-hidden="true">⌕</span>
-          <div className="fd-search-field">
-            <label htmlFor="fd-site-search">FIND A DISTRICT OR NEIGHBOURHOOD</label>
-            <input
-              id="fd-site-search"
-              type="search"
-              value={searchQuery}
-              onChange={(event) => {
-                setSearchQuery(event.target.value)
-                setSearchMessage('')
-              }}
-              placeholder="Try D1, D 1, Dublin 1 or City Centre…"
-              autoComplete="off"
-            />
-          </div>
-          <button type="submit">Explore <span>↗</span></button>
-        </form>
-        {searchMessage && <p className="fd-search-message" role="status">{searchMessage}</p>}
-        <div className="fd-search-hints"><span>TRY:</span> D1 <i>·</i> D 1 <i>·</i> Dublin 1 <i>·</i> City Centre</div>
       </section>
 
       <section className="fd-film-section" id="explore-dublin">
