@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DistrictMap, { ACTIVE_DISTRICTS, ALL_DISTRICTS, strongColor } from './DistrictMap';
 import DistrictProfile from './DistrictProfile';
+import CityLayers from './CityLayers';
 import { districtProfiles } from './districtProfiles';
 import './App.css';
-// Bundled with the page, so it always loads with the right path
+
 import profilesUrl from './district-profiles.json?url';
 
 const DATA_URL = profilesUrl;
 const DEFAULT_UNIVERSITY = 'TU Dublin - Grangegorman';
 const TOUR_MS = 4500;
 
-// Coordinates for team famous places that are not in the profile data. Format: [lng, lat]
+
 const LANDMARK_LOCATIONS = {
   'Herbert Park': [-6.2352, 53.3261],
   'Aviva Stadium': [-6.2285, 53.3352],
@@ -45,22 +46,23 @@ const storage = {
 function districtFromUrl() {
   const { pathname, search, hash } = window.location;
   const params = new URLSearchParams(search);
-  const raw = [params.get('district'), params.get('d'), params.get('code'), params.get('search'), pathname, hash].filter(Boolean).join(' ');
+  // The results page opens this page with navigate('/districts', { state: { district: 'D7' } })
+  const fromResults = window.history.state?.usr?.district;
+  const raw = [fromResults, params.get('district'), params.get('d'), params.get('code'), params.get('search'), pathname, hash].filter(Boolean).join(' ');
   const m = decodeURIComponent(raw).match(/(?:^|[^A-Za-z0-9])(?:D|Dublin[\s_-]*)0?(\d{1,2})(W?)(?![0-9])/i);
   if (m) {
     const id = `D${Number(m[1])}${m[2].toUpperCase()}`;
     if (ACTIVE_DISTRICTS.includes(id)) return id;
   }
   try {
-    // Set when an "Explore district profile" button is clicked on the results page
+    
     const saved = JSON.parse(localStorage.getItem('explore-district') || 'null');
     if (saved && Date.now() - saved.t < 120000 && ACTIVE_DISTRICTS.includes(saved.id)) return saved.id;
   } catch { /* ignore */ }
   return 'D1';
 }
 
-// Remember which district an "Explore D7 district profile" button was for, so the
-// district explorer opens on it: on a new page, in a new tab, or on the same page.
+
 if (typeof window !== 'undefined' && !window.__districtExploreClicks) {
   window.__districtExploreClicks = true;
   const CODE_RE = /(?:^|[^A-Za-z0-9])D(\d{1,2})(W?)(?![0-9A-Za-z])/i;
@@ -80,7 +82,7 @@ if (typeof window !== 'undefined' && !window.__districtExploreClicks) {
   }, true);
 }
 
-// Team famous places (from districtProfiles.js) win; the sample places fill the gaps.
+
 function buildPlaces(profileData) {
   const byDistrict = {};
   ACTIVE_DISTRICTS.forEach((code) => {
@@ -102,7 +104,7 @@ function buildPlaces(profileData) {
   return byDistrict;
 }
 
-/* ---------------- page ---------------- */
+
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -110,7 +112,11 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(districtFromUrl);
   const [filter, setFilter] = useState('all');
   const [showLuas, setShowLuas] = useState(true);
-  const [showHeat, setShowHeat] = useState(false);
+  const [showHeat, setShowHeat] = useState(true); // safety colours on by default
+  const [showCampuses, setShowCampuses] = useState(true);
+  const [showLandmarks, setShowLandmarks] = useState(false);
+  const [focusCampus, setFocusCampus] = useState(null);
+  const [hoverCampus, setHoverCampus] = useState(null);
   const [touring, setTouring] = useState(false);
   const [tab, setTabState] = useState(() => storage.get('district-tab', 'places'));
   const [uni, setUniState] = useState(() => storage.get('district-uni', DEFAULT_UNIVERSITY));
@@ -125,12 +131,12 @@ export default function App() {
       .then((r) => { if (!r.ok) throw new Error(`${DATA_URL} returned ${r.status}`); return r.json(); })
       .then((d) => { setData(d); if (!d.unis.includes(uni)) setUniState(d.unis[0]); })
       .catch((e) => setError(e.message));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); 
 
-  // The saved "Explore" choice is used once
+  
   useEffect(() => { try { localStorage.removeItem('explore-district'); } catch { /* ignore */ } }, []);
 
-  // An "Explore D7 district profile" button clicked while this page is already open
+  
   useEffect(() => {
     const onExplore = (e) => {
       if (!ACTIVE_DISTRICTS.includes(e.detail)) return;
@@ -142,7 +148,7 @@ export default function App() {
     return () => window.removeEventListener('explore-district', onExplore);
   }, []);
 
-  // If the address changes while this page is open, show that district
+  
   useEffect(() => {
     let last = window.location.href;
     const id = setInterval(() => {
@@ -193,7 +199,7 @@ export default function App() {
   if (!data) return <div className="district-page"><p className="empty-note">Loading district map…</p></div>;
 
   const teamName = districtProfiles?.[selectedId]?.name;
-  // Use the team's name unless it is just "Dublin N"
+
   const team = teamName && !/^Dublin\s/i.test(teamName) ? { name: teamName } : null;
   const places = placesByDistrict[selectedId] || [];
 
@@ -228,8 +234,14 @@ export default function App() {
         <button type="button" className="luas-toggle" aria-pressed={showLuas} onClick={() => setShowLuas((v) => !v)}>
           <i className="red-line" /><i className="green-line" /> Luas lines
         </button>
+        <button type="button" className="luas-toggle layer-toggle" aria-pressed={showCampuses || tab === 'unis'} onClick={() => setShowCampuses((v) => !v)}>
+          <i className="dot-campus" /> Campuses
+        </button>
+        <button type="button" className="luas-toggle layer-toggle" aria-pressed={showLandmarks} onClick={() => setShowLandmarks((v) => !v)}>
+          <i className="dot-landmark" /> Landmarks
+        </button>
         <button type="button" className="heat-toggle" aria-pressed={showHeat || tab === 'safety'} onClick={() => setShowHeat((v) => !v)}>
-          <i /> Crime heat map
+          <i /> Safety colours
         </button>
       </div>
 
@@ -247,7 +259,7 @@ export default function App() {
             <div>
               <p className="eyebrow">Interactive map</p>
               <h2>Choose a district</h2>
-              <p className="map-subtitle">Click a district, a famous place or any Luas stop. Turn on the crime heat map to compare safety.</p>
+              <p className="map-subtitle">Click a district, a famous place, a campus or any Luas stop. Colours show how safe each area is: red = more crime, green = less.</p>
             </div>
             <span className="map-live"><i /> Live street map</span>
           </div>
@@ -267,12 +279,15 @@ export default function App() {
             onHoverPlace={setHoverPlace}
             onPlaceClick={onPlaceClick}
           />
+          <CityLayers mapApi={mapApi} showCampuses={showCampuses || tab === 'unis'} showLandmarks={showLandmarks} focus={focusCampus} hoverId={hoverCampus} />
 
           <div className="map-legend">
             <span><i className="legend-dot district-dot" />District areas</span>
             <span><i className="legend-line red-line" />Luas Red Line</span>
             <span><i className="legend-line green-line" />Luas Green Line</span>
             <span><i className="legend-dot stop-dot" />Luas stops (click for details)</span>
+            {(showCampuses || tab === 'unis') && <span><i className="legend-dot campus-dot" />Universities and campuses</span>}
+            {showLandmarks && <span><i className="legend-dot landmark-dot" />Landmarks</span>}
           </div>
         </section>
 
@@ -295,6 +310,8 @@ export default function App() {
           onPlaceClick={onPlaceClick}
           onStopClick={(n) => { setTouring(false); mapApi.current?.openStop(n); }}
           onSelect={(c) => selectDistrict(c)}
+          onCampusClick={(id) => { setTouring(false); setFocusCampus({ id, t: Date.now() }); }}
+          onCampusHover={setHoverCampus}
         />
       </div>
     </div>
