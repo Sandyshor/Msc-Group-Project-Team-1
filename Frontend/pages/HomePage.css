@@ -1448,6 +1448,7 @@
 
 .fd-hero-plane {
   fill: #fffaf0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .fd-hero-shamrock {
