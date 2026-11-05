@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { universities } from './cityPlaces';
 import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, SAFETY_BANDS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './DistrictMap';
+
 const TABS = [['places', 'Places'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['commute', 'Commute'], ['area', 'Area'], ['unis', 'Universities']];
 const eur = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
 const num = (v) => Number(v).toLocaleString('en-IE');
 const Icon = ({ name, html, ...rest }) => <span {...rest} dangerouslySetInnerHTML={{ __html: html || iconFor(name) }} />;
-
 
 
 function EmptyNote({ children }) {
@@ -24,7 +24,8 @@ function SectionTitle({ eyebrow, title, icon, extra }) {
   );
 }
 
-
+// Wikipedia article for each place, used to fetch a photo when a place has no image
+// (or its image link is broken). Add a line here for any new place.
 const WIKI_TITLES = {
   'Croke Park': 'Croke Park', 'The Spire': 'Spire of Dublin', GPO: 'General Post Office, Dublin',
   'Custom House': 'Custom House, Dublin', 'Moore Street Market': 'Moore Street', 'Garden of Remembrance': 'Garden of Remembrance (Dublin)',
@@ -287,21 +288,47 @@ const CRIME_TYPES = [
   ['damage', 'Criminal damage', 5],
 ];
 
+// Colour key for the safety colours (shown at the top of the Safety tab)
+function SafetyKey() {
+  const samples = [62, 53, 45, 30];
+  const ranges = ['57+', '50–57', '40–50', 'under 40'];
+  return (
+    <div className="safety-key in-tab" aria-label="Safety colours legend">
+      <b>How safe is each area?</b>
+      <span className="safety-key-bar" style={{ background: `linear-gradient(90deg, ${HEAT_STOPS.map(([v, c]) => `${c} ${v}%`).join(', ')})` }}>
+        <i style={{ left: '50%' }} />
+      </span>
+      <span className="safety-key-ends"><span>More crime</span><span>50 = Irish town average</span><span>Less crime</span></span>
+      <ul>
+        {SAFETY_BANDS.map(([, name], i) => (
+          <li key={name}><i style={{ background: heatColor(samples[i]) }} />{name}<small>{ranges[i]}</small></li>
+        ))}
+      </ul>
+      <small>Numbers on the map are each district’s score out of 100. Zoom in for neighbourhood areas.</small>
+    </div>
+  );
+}
+
 function SafetySection({ code, data }) {
   const s = data.safety?.[code];
-  if (!s) return <EmptyNote>crime data for {code}</EmptyNote>;
+  if (!s || typeof s.score !== 'number') return <><SafetyKey /><EmptyNote>crime data for {code}</EmptyNote></>;
   const colour = heatColor(s.score);
-  const compare = (local, ireland) => {
-    const ratio = local / ireland;
+  const rates = s.rates || {};
+  const ireland = s.ireland || {};
+  const hasRates = CRIME_TYPES.some(([k]) => rates[k] != null && ireland[k] != null);
+  const compare = (local, ire) => {
+    const ratio = local / ire;
     if (ratio >= 1.1) return [`${ratio.toFixed(1)}× more`, '#b3261e'];
     if (ratio <= 0.9) return [`${Math.round((1 - ratio) * 100)}% less`, '#2d6748'];
     return ['About the same', '#6c7d6c'];
   };
   return (
     <>
+      <SafetyKey />
+
       <section className="profile-section">
         <SectionTitle eyebrow="RELATIVE CRIME SCORE" title="How safe is it?" icon="landmark" />
-        <div className="safety-verdict" style={{ background: `${colour.replace('rgb', 'rgba').replace(')', ', 0.16)')}` }}>
+        <div className="safety-verdict" style={{ background: colour.replace('rgb', 'rgba').replace(')', ', 0.16)') }}>
           <strong style={{ background: colour, color: textOnHeat(s.score) }}>{s.score.toFixed(0)}</strong>
           <div>
             <b>{safetyLabel(s.score)}</b>
@@ -322,31 +349,33 @@ function SafetySection({ code, data }) {
         )}
       </section>
 
-      <section className="profile-section">
-        <SectionTitle eyebrow={`${s.period.toUpperCase()} · PER 1,000 PEOPLE A YEAR`} title="Recorded crime" icon="landmark" />
-        <table className="safety-rates">
-          <thead><tr><th>Crime (weight)</th><th>{code}</th><th>Ireland</th><th>Compared</th></tr></thead>
-          <tbody>
-            {CRIME_TYPES.map(([k, name, w]) => {
-              const [text, c] = compare(s.rates[k], s.ireland[k]);
-              return (
-                <tr key={k}>
-                  <td>{name}<small>{w}% of the score</small></td>
-                  <td>{s.rates[k].toFixed(2)}</td>
-                  <td>{s.ireland[k].toFixed(2)}</td>
-                  <td className="ratio" style={{ color: c }}>{text}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <p className="section-description top-gap">“Ireland” is the rate across Ireland’s 105 town and city Garda stations. People = residents plus daytime workers and students.</p>
-      </section>
+      {hasRates && (
+        <section className="profile-section">
+          <SectionTitle eyebrow={`${(s.period || '').toUpperCase()} · PER 1,000 PEOPLE A YEAR`} title="Recorded crime" icon="landmark" />
+          <table className="safety-rates">
+            <thead><tr><th>Crime (weight)</th><th>{code}</th><th>Ireland</th><th>Compared</th></tr></thead>
+            <tbody>
+              {CRIME_TYPES.filter(([k]) => rates[k] != null && ireland[k] != null).map(([k, name, w]) => {
+                const [text, c] = compare(rates[k], ireland[k]);
+                return (
+                  <tr key={k}>
+                    <td>{name}<small>{w}% of the score</small></td>
+                    <td>{Number(rates[k]).toFixed(2)}</td>
+                    <td>{Number(ireland[k]).toFixed(2)}</td>
+                    <td className="ratio" style={{ color: c }}>{text}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p className="section-description top-gap">“Ireland” is the rate across Ireland’s 105 town and city Garda stations. People = residents plus daytime workers and students.</p>
+        </section>
+      )}
 
       <section className="profile-section">
         <SectionTitle eyebrow="ALSO WORTH KNOWING" title="Around the area" icon="village" />
         <div className="rent-grid">
-          <div className="rent-tile"><span>Nearest Garda station</span><strong>{s.garda.toFixed(1)} km</strong><small>average from homes in {code}</small></div>
+          {s.garda != null && <div className="rent-tile"><span>Nearest Garda station</span><strong>{Number(s.garda).toFixed(1)} km</strong><small>average from homes in {code}</small></div>}
           {s.night != null && <div className="rent-tile"><span>Night transport</span><strong>{Math.round(s.night * 100)}%</strong><small>of streets near a stop served 23:00–05:00</small></div>}
           {s.lit != null && <div className="rent-tile"><span>Street lighting</span><strong>{Math.round(s.lit * 100)}%</strong><small>of mapped streets are lit</small></div>}
         </div>
@@ -359,9 +388,9 @@ function SafetySection({ code, data }) {
           <div className="safety-hoods">
             {s.hoods.map(([name, score, check]) => (
               <div key={name}>
-                <i style={{ background: heatColor(score) }} />
+                <i style={{ background: heatColor(Number(score)) }} />
                 <span>{name}</span>
-                <b>{score.toFixed(0)}{check && <em title="Check the specific street before choosing">⚠ check street</em>}</b>
+                <b>{Number(score).toFixed(0)}{check && <em title="Check the specific street before choosing">⚠ check street</em>}</b>
               </div>
             ))}
           </div>
@@ -374,7 +403,7 @@ function SafetySection({ code, data }) {
           <div className="safety-stations">
             {s.stations.map(([name, share, score]) => (
               <div key={name}>
-                <span>{name} <small>· {score.toFixed(1)}</small></span>
+                <span>{name} <small>· {Number(score).toFixed(1)}</small></span>
                 <span className="bar"><i style={{ width: `${Math.round(share * 100)}%` }} /></span>
                 <b>{Math.round(share * 100)}%</b>
               </div>
@@ -445,6 +474,7 @@ export default function DistrictProfile({
   const profile = data.profiles[selectedId];
   const index = ACTIVE_DISTRICTS.indexOf(selectedId);
   const step = (dir) => onSelect(ACTIVE_DISTRICTS[(index + dir + ACTIVE_DISTRICTS.length) % ACTIVE_DISTRICTS.length]);
+  const sc = data.safety?.[selectedId]?.score;
 
   return (
     <aside className="profile-card">
@@ -456,10 +486,10 @@ export default function DistrictProfile({
         <h2>{team?.name || profile.name}</h2>
         <p>{team?.description || profile.areas.map((a) => a[0]).join(' · ')}</p>
         <p className="eircode-line">Eircode routing key <b>{profile.eircode}</b></p>
-        {data.safety?.[selectedId] && (
+        {typeof sc === 'number' && (
           <button type="button" className="banner-safety" onClick={() => setTab('safety')} title="See the Safety tab">
-            <b style={{ background: heatColor(data.safety[selectedId].score), color: textOnHeat(data.safety[selectedId].score) }}>{data.safety[selectedId].score.toFixed(0)}</b>
-            {safetyLabel(data.safety[selectedId].score)}
+            <b style={{ background: heatColor(sc), color: textOnHeat(sc) }}>{sc.toFixed(0)}</b>
+            {safetyLabel(sc)}
           </button>
         )}
         <span className="banner-decoration">{selectedId.replace('D', '')}</span>
