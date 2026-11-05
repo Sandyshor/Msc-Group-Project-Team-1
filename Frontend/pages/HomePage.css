@@ -1321,8 +1321,7 @@
 }
 
 .fd-cta-primary:focus-visible,
-.fd-cta-outline:focus-visible,
-.fd-hero-card a:focus-visible {
+.fd-cta-outline:focus-visible {
   outline: 3px solid #fffaf0;
   outline-offset: 3px;
 }
@@ -1378,21 +1377,14 @@
   list-style: none;
 }
 
-.fd-hero-card a {
+.fd-hero-card li {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 7px 6px;
-  border-radius: 10px;
   color: #1a392d;
   font-size: 15px;
   font-weight: 600;
-  text-decoration: none;
-  transition: background 0.2s;
-}
-
-.fd-hero-card a:hover {
-  background: #eef6e6;
 }
 
 .fd-hero-card .fd-hero-icon {
