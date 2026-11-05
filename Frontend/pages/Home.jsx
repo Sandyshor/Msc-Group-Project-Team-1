@@ -34,8 +34,13 @@ function HeroUnderline() {
 function HeroFlightPath() {
   return (
     <svg className="fd-hero-flight" viewBox="0 0 520 260" aria-hidden="true">
-      <path className="fd-hero-flight-path" d="M10 250C70 120 190 40 330 60S470 50 500 30" />
-      <path className="fd-hero-plane" d="m478 38 26-14c3-1.5 6 1 4.5 4l-13 26-5-1 3-14-9 5-1 6-4 1-1.5-6.5L472 43l1-4 6 .5 9-5-14 3Z" />
+      <path className="fd-hero-flight-path" d="M10 250C70 120 190 40 330 60S455 58 482 42" />
+      {/* an aeroplane (nose up in its own 24x24 box), moved to the end of the path and turned to fly along it */}
+      <path
+        className="fd-hero-plane"
+        transform="translate(494 34) rotate(57) scale(1.6) translate(-12 -12)"
+        d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
+      />
     </svg>
   )
 }
