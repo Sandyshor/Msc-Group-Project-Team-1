@@ -45,3 +45,5 @@
 .safety-stations span.bar { height: 6px; border-radius: 3px; background: #e6ece1; overflow: hidden; }
 .safety-stations span.bar i { display: block; height: 100%; background: #214b39; }
 .safety-stations b { color: #214b39; text-align: right; font-variant-numeric: tabular-nums; }
+.safety-key.in-tab { position: static; width: auto; max-width: none; margin-bottom: 18px; box-shadow: none; background: #fffefa; }
+@media (max-width: 650px) { .safety-key.in-tab ul { display: grid; } }
