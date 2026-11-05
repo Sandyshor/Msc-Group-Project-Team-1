@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Results.css'
 import { districts } from '../District Profile/districtData.js'
@@ -641,33 +641,157 @@ function CompareAreas({ results, budget }) {
   )
 }
 
-function ShareResults() {
-  const [copied, setCopied] = useState(false)
+const SHARE_ICONS = {
+  bookmark: ['M6 3h12v18l-6-4-6 4z'],
+  share: ['M12 3v12', 'M7 8l5-5 5 5', 'M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6'],
+  copy: ['M9 9h11v11H9z', 'M5 15H4V4h11v1'],
+  mail: ['M3 6h18v12H3z', 'M3 7l9 6 9-6'],
+  print: ['M7 9V3h10v6', 'M7 17H4v-7h16v7h-3', 'M7 14h10v7H7z'],
+  more: ['M5 12h.01', 'M12 12h.01', 'M19 12h.01'],
+}
 
-  async function share() {
-    const url = window.location.href
+function ShareIcon({ name }) {
+  return (
+    <svg className="share-icon" viewBox="0 0 24 24" aria-hidden="true">
+      {SHARE_ICONS[name].map((d) => <path d={d} key={d} />)}
+    </svg>
+  )
+}
+
+function shareApps(url, text) {
+  const u = encodeURIComponent(url)
+  const t = encodeURIComponent(text)
+  return [
+    ['WhatsApp', 'fa-whatsapp', '#25d366', `https://wa.me/?text=${t}%20${u}`],
+    ['Facebook', 'fa-facebook-f', '#1877f2', `https://www.facebook.com/sharer/sharer.php?u=${u}`],
+    ['X', 'fa-x-twitter', '#000000', `https://x.com/intent/tweet?text=${t}&url=${u}`],
+    ['LinkedIn', 'fa-linkedin-in', '#0a66c2', `https://www.linkedin.com/sharing/share-offsite/?url=${u}`],
+    ['Telegram', 'fa-telegram', '#229ed9', `https://t.me/share/url?url=${u}&text=${t}`],
+    ['Reddit', 'fa-reddit-alien', '#ff4500', `https://www.reddit.com/submit?url=${u}&title=${t}`],
+    ['Pinterest', 'fa-pinterest-p', '#e60023', `https://pinterest.com/pin/create/button/?url=${u}&description=${t}`],
+  ]
+}
+
+function ShareResults() {
+  const [open, setOpen] = useState(false)
+  const [message, setMessage] = useState('')
+  const menuRef = useRef(null)
+
+  const url = window.location.href
+  const text = 'My Dublin neighbourhood matches from Find Your Dublin'
+  const isMac = /Mac|iPhone|iPad/.test(navigator.userAgent)
+  const isPhone = window.matchMedia('(pointer: coarse)').matches
+
+  useEffect(() => {
+    if (!open) return
+    const onClick = (event) => {
+      if (!menuRef.current?.contains(event.target)) setOpen(false)
+    }
+    const onKey = (event) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onClick)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  function save() {
+    setOpen(false)
+    setMessage(isPhone
+      ? 'Open your browser menu and tap "Add bookmark" to save these results.'
+      : `Press ${isMac ? '⌘' : 'Ctrl'} + D to bookmark this page and come back to these results.`)
+  }
+
+  async function copyLink() {
     try {
-      if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
-        await navigator.share({ title: 'My Dublin matches', url })
-        return
-      }
       await navigator.clipboard.writeText(url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setMessage('Link copied. Paste it anywhere to share your results.')
+    } catch {
+      setMessage('Could not copy the link. Copy it from the address bar instead.')
+    }
+    setOpen(false)
+  }
+
+  function print() {
+    setOpen(false)
+    setTimeout(() => window.print(), 100) 
+  }
+
+  async function moreOptions() {
+    setOpen(false)
+    try {
+      await navigator.share({ title: text, url })
     } catch {
     }
   }
 
   return (
     <div className="share-results">
-      <button type="button" className="share-button" onClick={share}>
-        {copied ? 'Link copied ✓' : 'Save or share these results'}
-      </button>
-      <p className="result-muted">Bookmark this page or send the link. It opens these same results.</p>
+      <div className="share-buttons">
+        <button type="button" className="share-button" onClick={save}>
+          <ShareIcon name="bookmark" /> Save
+        </button>
+
+        <div className="share-menu-wrap" ref={menuRef}>
+          <button
+            type="button"
+            className="share-button"
+            aria-expanded={open}
+            aria-haspopup="menu"
+            onClick={() => setOpen(!open)}
+          >
+            <ShareIcon name="share" /> Share
+          </button>
+
+          {open && (
+            <div className="share-menu" role="menu">
+              <button type="button" role="menuitem" className="share-wide" onClick={copyLink}>
+                <ShareIcon name="copy" /> Copy link
+              </button>
+
+              {shareApps(url, text).map(([name, logo, colour, link]) => (
+                <a
+                  key={name}
+                  role="menuitem"
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                >
+                  <span className="share-badge" style={{ background: colour }} aria-hidden="true"><i className={`fa-brands ${logo}`} /></span>
+                  {name}
+                </a>
+              ))}
+
+              <a
+                role="menuitem"
+                href={`mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(`Here are my results: ${url}`)}`}
+                onClick={() => setOpen(false)}
+              >
+                <ShareIcon name="mail" /> Email
+              </a>
+              <button type="button" role="menuitem" onClick={print}>
+                <ShareIcon name="print" /> Print
+              </button>
+              {navigator.share && (
+                <button type="button" role="menuitem" className="share-wide" onClick={moreOptions}>
+                  <ShareIcon name="more" /> More options
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <p className="result-muted" role="status">
+        {message || 'Save this page or send the link. It opens these same results.'}
+      </p>
     </div>
   )
 }
-
 function Results() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -676,8 +800,8 @@ function Results() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [attempt, setAttempt] = useState(0)
-  const [selected, setSelected] = useState(0) // which match the detail panel shows
-  const [tab, setTab] = useState(DETAIL_TABS[0]) // kept when switching matches, to compare them
+  const [selected, setSelected] = useState(0) 
+  const [tab, setTab] = useState(DETAIL_TABS[0]) 
   
   useEffect(() => {
     if (answers) navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}`, { replace: true })
