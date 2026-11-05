@@ -92,7 +92,11 @@ FACTORS = [
      "kind": "group", "noun": "recreation and wellness amenities",
      "items": [{"name": "Gyms",  "column": "Gyms",  "noun": "gyms"},
                {"name": "Parks", "column": "Parks", "noun": "parks"}]},
+    # Each place's relative crime score from safety_pipeline.py (0-100, 50 = the Irish towns and cities rate)
+    {"name": "Safety",                 "column": "Safety Score",       "kind": "safety"},
 ]
+# Factors a search may leave out (older searches were made before they existed); left out = not important
+OPTIONAL_FACTORS = {"Safety"}
 for _factor in FACTORS:
     if _factor["kind"] == "group":
         _factor["columns"] = [item["column"] for item in _factor["items"]]
@@ -117,6 +121,8 @@ AMENITY_ENOUGH = {"Supermarkets": 2, "Groceries": 3, "Shopping_Malls": 1, "Resta
                   "Hospitals": 1, "Pharmacies": 2, "Gyms": 1, "Parks": 2}
 COMMUTE_BEST_MIN = 10         # 10 minutes or less scores 1 ...
 COMMUTE_WORST_MIN = 60        # ... falling to 0 at an hour (or at the student's own limit, if lower)
+SAFETY_WORST = 30             # a safety score of 30 or less scores 0 ...
+SAFETY_BEST = 60              # ... rising to 1 at 60 (the "lower recorded crime" band starts at 57)
 RENT_COMFORT = 0.75           # rent at 75% of the budget or less scores 1 ...
 RENT_LIMIT = 1.5              # ... falling to 0 at 150% of the budget
 # A commute point this close to a named neighbourhood is the same place, so only the neighbourhood is kept
@@ -650,6 +656,8 @@ def _score_column(name):
         return "Rent Score"
     if factor["kind"] == "commute":
         return "Commute Score"
+    if factor["kind"] == "safety":
+        return "Safety Fit"
     if factor["kind"] == "group":
         return f"{factor['name']} Score"
     return f"{factor['column']} Score"
@@ -725,6 +733,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             raise RecommendationError("Please say how important each factor is.")
         importance = {name: RATING_TO_IMPORTANCE[int(rating)] for name, rating in ratings.items()}
     importance = {name: float(value) for name, value in importance.items()}
+    importance = {**{name: 0.0 for name in OPTIONAL_FACTORS}, **importance}
     unknown = [name for name in importance if name not in FACTOR_LOOKUP]
     if unknown:
         raise RecommendationError(
@@ -734,7 +743,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
     missing = []
     for factor in FACTORS:
         if factor["kind"] != "group":
-            if factor["name"] not in importance:
+            if factor["name"] not in importance and factor["name"] not in OPTIONAL_FACTORS:
                 missing.append(factor["name"])
             continue
         item_names = [item["name"] for item in factor["items"]]
@@ -839,6 +848,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
         worst = min(COMMUTE_WORST_MIN, max_commute) if max_commute else COMMUTE_WORST_MIN
         worst = max(worst, COMMUTE_BEST_MIN + 5)
         candidates["Commute Score"] = _scale(candidates["Commute Minutes"], worst=worst, best=COMMUTE_BEST_MIN)
+    candidates["Safety Fit"] = _scale(candidates["Safety Score"], worst=SAFETY_WORST, best=SAFETY_BEST)
     targets = data["amenity_targets"]
     for factor in FACTORS:
         if factor["kind"] == "count":
@@ -897,6 +907,10 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             if value == ranked[col].min():
                 return f"is the cheapest area for a {accommodation_name.lower()} (€{value:,.0f} a month)"
             return f"has lower rent than most areas (€{value:,.0f} a month)"
+        if factor["kind"] == "safety":
+            if value == ranked[col].max():
+                return f"is the safest of the areas (safety score {value:.0f}/100)"
+            return f"is safer than most areas (safety score {value:.0f}/100)"
         if value == ranked[col].max():
             return f"has the most {factor['noun']} nearby ({_nearby(col, value)})"
         return f"has more {factor['noun']} nearby than most areas ({_nearby(col, value)})"
@@ -909,6 +923,8 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             return f"The commute is longer – about {value:.0f} minutes to {university} {mode_words}."
         if factor["kind"] == "rent":
             return f"The rent is higher than in most areas (€{value:,.0f} a month)."
+        if factor["kind"] == "safety":
+            return f"It has more recorded crime than most areas (safety score {value:.0f}/100)."
         if value == ranked[col].min():
             return f"It has the fewest {factor['noun']} nearby of all the areas ({_nearby(col, value)})."
         return f"It has fewer {factor['noun']} nearby than most areas ({_nearby(col, value)})."
@@ -919,6 +935,8 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             return "a shorter commute"
         if factor["kind"] == "rent":
             return "cheaper rent"
+        if factor["kind"] == "safety":
+            return "better safety"
         return f"more {factor['noun']}"
 
     def why_ahead(row_a, row_b, top=2):
@@ -1034,6 +1052,8 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
                 shown = f"{value:.0f} min {TRAVEL_MODES['walk'] if row['Walk Faster'] else mode_words}"
             elif factor["kind"] == "rent":
                 shown = f"{_euros(value)}/month"
+            elif factor["kind"] == "safety":
+                shown = f"Safety score {value:.0f}/100"
             else:
                 shown = _nearby(factor["column"], value)
             items.append({
