@@ -12,16 +12,30 @@ const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
 const ANSWERS_KEY = 'questionnaireAnswers'
 
-// Keep the answers for this tab so refreshing /results still works.
-function loadAnswers(state) {
+function answersToLink(answers) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(answers))))
+}
+
+function answersFromLink(text) {
   try {
-    if (state) {
-      sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(state))
-      return state
+    const answers = JSON.parse(decodeURIComponent(escape(atob(text))))
+    return answers?.university && answers?.budget ? answers : null
+  } catch {
+    return null
+  }
+}
+
+
+function loadAnswers(state, search) {
+  const answers = state ?? answersFromLink(new URLSearchParams(search).get('a') ?? '')
+  try {
+    if (answers) {
+      sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(answers))
+      return answers
     }
     return JSON.parse(sessionStorage.getItem(ANSWERS_KEY))
   } catch {
-    return state ?? null
+    return answers ?? null
   }
 }
 
@@ -627,16 +641,47 @@ function CompareAreas({ results, budget }) {
   )
 }
 
+function ShareResults() {
+  const [copied, setCopied] = useState(false)
+
+  async function share() {
+    const url = window.location.href
+    try {
+      if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
+        await navigator.share({ title: 'My Dublin matches', url })
+        return
+      }
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+    }
+  }
+
+  return (
+    <div className="share-results">
+      <button type="button" className="share-button" onClick={share}>
+        {copied ? 'Link copied ✓' : 'Save or share these results'}
+      </button>
+      <p className="result-muted">Bookmark this page or send the link. It opens these same results.</p>
+    </div>
+  )
+}
+
 function Results() {
   const location = useLocation()
   const navigate = useNavigate()
-  const [answers] = useState(() => loadAnswers(location.state))
+  const [answers] = useState(() => loadAnswers(location.state, location.search))
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const [selected, setSelected] = useState(0) // which match the detail panel shows
   const [tab, setTab] = useState(DETAIL_TABS[0]) // kept when switching matches, to compare them
+  
+  useEffect(() => {
+    if (answers) navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}`, { replace: true })
+  }, [answers, navigate])
 
   const travelMode = answers?.travelMode ?? 'public_transport'
   const maxCommute = answers?.maxCommute ?? null
@@ -726,6 +771,8 @@ function Results() {
           {answers.accommodationLabel} · {euro(answers.budget)}/month · {answers.university}
           {data && <> · compared {data.areas_compared} areas</>}
         </p>
+        
+        {data && <ShareResults />}
 
         {shown && (
           <GettingThere
