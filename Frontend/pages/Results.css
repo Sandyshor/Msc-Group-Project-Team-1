@@ -1255,3 +1255,30 @@
   color: #9aa69f;
   font-size: 13px;
 }
+
+
+.share-results {
+  margin: 4px 0 18px;
+}
+
+.share-button {
+  padding: 9px 16px;
+  border: 1px solid #173f32;
+  border-radius: 20px;
+  background: #fffdf7;
+  color: #173f32;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.share-button:hover {
+  background: #173f32;
+  color: #fffdf7;
+}
+
+.share-results p {
+  margin: 6px 0 0;
+  font-size: 12px;
+}
