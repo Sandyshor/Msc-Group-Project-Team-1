@@ -186,18 +186,6 @@ function PlacesToLive({ area, places }) {
   )
 }
 
-function CommuteDetails({ area, commute, maxCommute }) {
-  if (!commute) return null
-
-  return (
-    <p className="result-muted">
-      Quickest from {commute.fastest_from} ({commute.fastest_minutes} min)
-      {commute.parts_within_limit != null &&
-        ` · ${commute.parts_within_limit} of ${commute.parts} parts of ${area} are within ${maxCommute} min`}
-    </p>
-  )
-}
-
 // compared: 1 = better than most areas, 0 = about average, -1 = worse (icon + words, never colour alone)
 const COMPARED = {
   1: ['better', '▲ Better than most'],
@@ -447,7 +435,7 @@ function MatchCard({ result, modeWords, selected, onSelect }) {
 
 const DETAIL_TABS = ['Why it fits', 'About the area', 'Safety', 'Places to live', 'Compare', 'Letting agents']
 
-function MatchDetail({ result, results, budget, modeWords, maxCommute, tab, onTab }) {
+function MatchDetail({ result, results, budget, tab, onTab }) {
   const navigate = useNavigate()
   const hasProfile = districts.some((d) => d.id === result.area)
   const place = result.neighbourhood ? `${result.neighbourhood.name}, ${result.area}` : result.area
@@ -460,12 +448,6 @@ function MatchDetail({ result, results, budget, modeWords, maxCommute, tab, onTa
           <p className="result-muted">
             {euro(result.rent)}/month · <RentNote result={result} />
           </p>
-          <p className="result-muted">
-            {commuteText(result, modeWords)}
-            {result.distance && ` · ${result.distance}`}
-            {result.walk_faster && ' (walking is quicker than public transport from here)'}
-          </p>
-          <CommuteDetails area={result.area} commute={result.commute} maxCommute={maxCommute} />
         </div>
         {hasProfile && (
           <button
@@ -944,8 +926,6 @@ function Results() {
               result={shown}
               results={results}
               budget={data.budget}
-              modeWords={modeWords}
-              maxCommute={maxCommute}
               tab={tab}
               onTab={setTab}
             />
