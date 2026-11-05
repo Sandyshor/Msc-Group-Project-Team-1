@@ -46,7 +46,7 @@ const storage = {
 function districtFromUrl() {
   const { pathname, search, hash } = window.location;
   const params = new URLSearchParams(search);
-  // The results page opens this page with navigate('/districts', { state: { district: 'D7' } })
+
   const fromResults = window.history.state?.usr?.district;
   const raw = [fromResults, params.get('district'), params.get('d'), params.get('code'), params.get('search'), pathname, hash].filter(Boolean).join(' ');
   const m = decodeURIComponent(raw).match(/(?:^|[^A-Za-z0-9])(?:D|Dublin[\s_-]*)0?(\d{1,2})(W?)(?![0-9])/i);
@@ -70,7 +70,7 @@ if (typeof window !== 'undefined' && !window.__districtExploreClicks) {
     const target = e.target.closest?.('a, button');
     if (!target || target.closest('.mini-map, .district-page')) return;
     if (!/district|profile|explore/i.test(target.textContent || '')) return;
-    // District code on the button itself, or else on the card around it
+    
     let m = (target.textContent || '').match(CODE_RE);
     for (let node = target.parentElement, level = 0; !m && node && level < 8; node = node.parentElement, level += 1) {
       m = (node.innerText || node.textContent || '').match(CODE_RE);
@@ -105,7 +105,6 @@ function buildPlaces(profileData) {
 }
 
 
-
 export default function App() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -131,7 +130,7 @@ export default function App() {
       .then((r) => { if (!r.ok) throw new Error(`${DATA_URL} returned ${r.status}`); return r.json(); })
       .then((d) => { setData(d); if (!d.unis.includes(uni)) setUniState(d.unis[0]); })
       .catch((e) => setError(e.message));
-  }, []); 
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   
   useEffect(() => { try { localStorage.removeItem('explore-district'); } catch { /* ignore */ } }, []);
@@ -199,7 +198,7 @@ export default function App() {
   if (!data) return <div className="district-page"><p className="empty-note">Loading district map…</p></div>;
 
   const teamName = districtProfiles?.[selectedId]?.name;
-
+  
   const team = teamName && !/^Dublin\s/i.test(teamName) ? { name: teamName } : null;
   const places = placesByDistrict[selectedId] || [];
 
