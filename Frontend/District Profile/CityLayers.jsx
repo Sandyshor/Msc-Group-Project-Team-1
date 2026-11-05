@@ -3,8 +3,6 @@ import * as maplibregl from 'maplibre-gl';
 import { universities, attractions, mapIconPaths } from './cityPlaces';
 import './CityLayers.css';
 
-
-
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -52,7 +50,7 @@ function popupFor(place, kind) {
 export default function CityLayers({ mapApi, showCampuses, showLandmarks, focus, hoverId }) {
   const markers = useRef({ campus: [], landmark: [] });
 
- 
+  
   useEffect(() => {
     let timer;
     const add = () => {
@@ -87,7 +85,7 @@ export default function CityLayers({ mapApi, showCampuses, showLandmarks, focus,
   };
   useEffect(apply, [showCampuses, showLandmarks]); // eslint-disable-line react-hooks/exhaustive-deps
 
- 
+
   useEffect(() => {
     if (!focus) return;
     const map = mapApi.current?.getMap?.();
@@ -98,6 +96,7 @@ export default function CityLayers({ mapApi, showCampuses, showLandmarks, focus,
     map.once('moveend', () => { if (!marker.getPopup().isOpen()) marker.togglePopup(); });
   }, [focus]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  
   useEffect(() => {
     markers.current.campus.forEach((m) => m.getElement().classList.toggle('on', m.getElement().dataset.id === hoverId));
   }, [hoverId]);
