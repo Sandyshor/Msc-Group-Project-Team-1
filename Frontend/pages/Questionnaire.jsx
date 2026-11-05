@@ -35,8 +35,6 @@ const ROOM_TYPES = [
 
 const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
 
-// Shown on the page, not used for ranking yet - each result already shows its area's safety
-const SAFETY_LEVELS = ['High', 'Medium', 'Low']
 
 // name, icon, hint, items that can be rated separately instead (as in the backend)
 const FACTORS = [
@@ -47,6 +45,7 @@ const FACTORS = [
   ['Restaurants', 'fork', 'Places to eat out'],
   ['Healthcare', 'heart', 'Hospitals and pharmacies', ['Hospitals', 'Pharmacies']],
   ['Recreation & Wellness', 'tree', 'Gyms and parks', ['Gyms', 'Parks']],
+  ['Safety', 'shield', 'Less recorded crime in the area'],
 ]
 
 function joinWords(items) {
@@ -65,7 +64,6 @@ function Questionnaire() {
     travelMode: earlier?.travelMode ?? 'public_transport',
     maxCommute: earlier?.maxCommute ?? null,
   })
-  const [safety, setSafety] = useState(earlier?.safety ?? 'Medium')
   const [importance, setImportance] = useState({
     ...Object.fromEntries(
       FACTORS.flatMap(([name, , , items = []]) => [name, ...items]).map((name) => [name, DEFAULT_IMPORTANCE])
@@ -125,7 +123,6 @@ function Questionnaire() {
         importance: activeImportance,
         travelMode: commute.travelMode,
         maxCommute: commute.maxCommute,
-        safety,
       },
     })
   }
@@ -208,15 +205,6 @@ function Questionnaire() {
                   const value = Number(event.target.value)
                   setCommute({ ...commute, maxCommute: value === NO_LIMIT ? null : value })
                 }}
-              />
-            </FlowRow>
-
-            <FlowRow icon="shield" title="Safety" question="How important is safety to you when choosing a neighbourhood?">
-              <FlowChoices
-                label="Safety"
-                options={SAFETY_LEVELS.map((level) => [level, level])}
-                value={safety}
-                onChange={setSafety}
               />
             </FlowRow>
 
