@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, ICONS, iconFor, strongColor, bannerColor, safetyLabel } from './DistrictMap';
+import { universities } from './cityPlaces';
+import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './DistrictMap';
 
-const TABS = [['places', 'Places'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['commute', 'Commute'], ['area', 'Area']];
+const TABS = [['places', 'Places'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['commute', 'Commute'], ['area', 'Area'], ['unis', 'Universities']];
 const eur = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
 const num = (v) => Number(v).toLocaleString('en-IE');
 const Icon = ({ name, html, ...rest }) => <span {...rest} dangerouslySetInnerHTML={{ __html: html || iconFor(name) }} />;
+
 
 
 function EmptyNote({ children }) {
@@ -278,97 +280,168 @@ function AreaSection({ code, data }) {
   );
 }
 
-function heatColourFor(score) {
-  let colour = HEAT_STOPS[0][1];
-  HEAT_STOPS.forEach(([v, c]) => { if (score >= v) colour = c; });
-  return colour;
-}
+const CRIME_TYPES = [
+  ['violent', 'Violent crime and assault', 35],
+  ['robbery', 'Robbery', 25],
+  ['burglary_theft', 'Burglary and theft', 20],
+  ['public_order', 'Public order', 15],
+  ['damage', 'Criminal damage', 5],
+];
 
 function SafetySection({ code, data }) {
   const s = data.safety?.[code];
   if (!s) return <EmptyNote>crime data for {code}</EmptyNote>;
-  const vsAvg = (value, avg) => {
-    const ratio = value / avg;
-    if (ratio >= 1.15) return `${ratio.toFixed(1)}× the Dublin average`;
-    if (ratio <= 0.87) return `${Math.round((1 - ratio) * 100)}% below the Dublin average`;
-    return 'About the Dublin average';
+  const colour = heatColor(s.score);
+  const compare = (local, ireland) => {
+    const ratio = local / ireland;
+    if (ratio >= 1.1) return [`${ratio.toFixed(1)}× more`, '#b3261e'];
+    if (ratio <= 0.9) return [`${Math.round((1 - ratio) * 100)}% less`, '#2d6748'];
+    return ['About the same', '#6c7d6c'];
   };
   return (
     <>
       <section className="profile-section">
-        <SectionTitle eyebrow="STREET SAFETY SCORE" title={safetyLabel(s.score)} icon="landmark" />
-        <div className="safety-score">
-          <strong style={{ color: s.score < 45 ? '#b3261e' : '#2d6748' }}>{Math.round(s.score)}</strong>
-          <span>/ 100</span>
+        <SectionTitle eyebrow="RELATIVE CRIME SCORE" title="How safe is it?" icon="landmark" />
+        <div className="safety-verdict" style={{ background: `${colour.replace('rgb', 'rgba').replace(')', ', 0.16)')}` }}>
+          <strong style={{ background: colour, color: textOnHeat(s.score) }}>{s.score.toFixed(0)}</strong>
+          <div>
+            <b>{safetyLabel(s.score)}</b>
+            <span>{safetyPlain(s.score)}. Score {s.score.toFixed(1)} / 100, where 50 is the recorded-crime rate of Ireland’s towns and cities.</span>
+          </div>
         </div>
         <div className="safety-meter" aria-hidden="true">
-          <span className="safety-meter-fill" style={{ background: `linear-gradient(90deg, ${HEAT_STOPS.map(([, c]) => c).join(', ')})` }} />
-          <span className="safety-meter-avg" style={{ left: '50%' }} title="Dublin average" />
+          <span className="safety-meter-fill" style={{ background: `linear-gradient(90deg, ${HEAT_STOPS.map(([v, c]) => `${c} ${v}%`).join(', ')})` }} />
+          <span className="safety-meter-avg" style={{ left: '50%' }} title="Irish town and city average" />
           <span className="safety-meter-dot" style={{ left: `${Math.max(0, Math.min(100, s.score))}%` }} />
         </div>
-        <div className="safety-meter-labels"><span>More crime</span><span>Dublin average = 50</span><span>Less crime</span></div>
+        <div className="safety-meter-labels"><span>More crime</span><span>Irish town average = 50</span><span>Less crime</span></div>
+        {s.checkShare > 0 && (
+          <p className="safety-check">⚠ {Math.round(s.checkShare * 100)}% of residents in {code} live in areas marked “check the specific street before choosing” (Pobal deprivation index). Crime figures cover whole Garda station areas and can hide local problems.</p>
+        )}
+        {s.override && (
+          <p className="safety-check">The {code} scores were set by the project team from local knowledge of the area, not calculated from the crime figures below.</p>
+        )}
       </section>
 
       <section className="profile-section">
-        <SectionTitle eyebrow={s.period.toUpperCase()} title="Recorded crime" icon="landmark" />
+        <SectionTitle eyebrow={`${s.period.toUpperCase()} · PER 1,000 PEOPLE A YEAR`} title="Recorded crime" icon="landmark" />
+        <table className="safety-rates">
+          <thead><tr><th>Crime (weight)</th><th>{code}</th><th>Ireland</th><th>Compared</th></tr></thead>
+          <tbody>
+            {CRIME_TYPES.map(([k, name, w]) => {
+              const [text, c] = compare(s.rates[k], s.ireland[k]);
+              return (
+                <tr key={k}>
+                  <td>{name}<small>{w}% of the score</small></td>
+                  <td>{s.rates[k].toFixed(2)}</td>
+                  <td>{s.ireland[k].toFixed(2)}</td>
+                  <td className="ratio" style={{ color: c }}>{text}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <p className="section-description top-gap">“Ireland” is the rate across Ireland’s 105 town and city Garda stations. People = residents plus daytime workers and students.</p>
+      </section>
+
+      <section className="profile-section">
+        <SectionTitle eyebrow="ALSO WORTH KNOWING" title="Around the area" icon="village" />
         <div className="rent-grid">
-          <div className="rent-tile">
-            <span>Robberies per 100,000 people</span>
-            <strong>{Math.round(s.rob)}</strong>
-            <small>{vsAvg(s.rob, s.dubRob)} ({Math.round(s.dubRob)})</small>
-          </div>
-          <div className="rent-tile">
-            <span>Public order offences per 100,000</span>
-            <strong>{Math.round(s.po).toLocaleString('en-IE')}</strong>
-            <small>{vsAvg(s.po, s.dubPo)} ({Math.round(s.dubPo)})</small>
-          </div>
-          <div className="rent-tile">
-            <span>Nearest Garda station</span>
-            <strong>{s.garda.toFixed(1)} km</strong>
-            <small>average from homes in {code}</small>
-          </div>
-          {s.night != null && (
-            <div className="rent-tile">
-              <span>Night transport</span>
-              <strong>{Math.round(s.night * 100)}%</strong>
-              <small>of streets near a stop served 23:00–05:00</small>
-            </div>
-          )}
-          {s.lit != null && (
-            <div className="rent-tile">
-              <span>Street lighting</span>
-              <strong>{Math.round(s.lit * 100)}%</strong>
-              <small>of mapped streets are lit</small>
-            </div>
-          )}
+          <div className="rent-tile"><span>Nearest Garda station</span><strong>{s.garda.toFixed(1)} km</strong><small>average from homes in {code}</small></div>
+          {s.night != null && <div className="rent-tile"><span>Night transport</span><strong>{Math.round(s.night * 100)}%</strong><small>of streets near a stop served 23:00–05:00</small></div>}
+          {s.lit != null && <div className="rent-tile"><span>Street lighting</span><strong>{Math.round(s.lit * 100)}%</strong><small>of mapped streets are lit</small></div>}
         </div>
+        <p className="section-description top-gap">Shown for context. These are not part of the crime score.</p>
       </section>
 
       {s.hoods?.length > 0 && (
         <section className="profile-section">
           <SectionTitle eyebrow="NEIGHBOURHOODS" title={`Safety across ${code}`} extra={<span className="place-count">{s.hoods.length} areas</span>} />
           <div className="safety-hoods">
-            {s.hoods.map(([name, score]) => (
+            {s.hoods.map(([name, score, check]) => (
               <div key={name}>
-                <i style={{ background: heatColourFor(score) }} />
+                <i style={{ background: heatColor(score) }} />
                 <span>{name}</span>
-                <b>{Math.round(score)}</b>
+                <b>{score.toFixed(0)}{check && <em title="Check the specific street before choosing">⚠ check street</em>}</b>
               </div>
             ))}
           </div>
         </section>
       )}
+
+      {s.stations?.length > 0 && (
+        <section className="profile-section">
+          <SectionTitle eyebrow="WHERE THE SCORE COMES FROM" title="Garda station areas" icon="landmark" />
+          <div className="safety-stations">
+            {s.stations.map(([name, share, score]) => (
+              <div key={name}>
+                <span>{name} <small>· {score.toFixed(1)}</small></span>
+                <span className="bar"><i style={{ width: `${Math.round(share * 100)}%` }} /></span>
+                <b>{Math.round(share * 100)}%</b>
+              </div>
+            ))}
+          </div>
+          <p className="section-description top-gap">The district score is the average of these station areas, weighted by how many residents live in each.</p>
+        </section>
+      )}
+
       <p className="section-description top-gap">
-        Score from robbery (55%) and public order offences (30%) per 100,000 people in each Garda station area, and distance to the nearest Garda station (15%). 50 is the Dublin average. Source: CSO recorded crime (CJA07) and Census 2022.
+        Score = 100 × R ÷ (R + L) for each crime type, where R is the Irish town and city rate and L the local rate; the five types are weighted as shown. Recorded crime only: not the chance of becoming a victim. Source: CSO recorded crime (CJA11), 2023–2025, and Census 2022.
       </p>
     </>
   );
 }
 
+// District of a campus from its address, e.g. "Aungier Street, Dublin 2" → "D2"
+const campusDistrict = (u) => {
+  const m = String(u.location || '').match(/Dublin\s*(\d{1,2})(\s*W)?\b/i);
+  return m ? `D${Number(m[1])}${m[2] ? 'W' : ''}` : null;
+};
+
+function UniversitiesSection({ code, onCampusClick, onCampusHover }) {
+  const here = universities.filter((u) => campusDistrict(u) === code);
+  const others = universities.filter((u) => campusDistrict(u) !== code);
+  const row = (u, i) => (
+    <li key={u.id}>
+      <button
+        type="button"
+        className="uni-row"
+        style={{ '--place-index': i }}
+        onClick={() => onCampusClick(u.id)}
+        onMouseEnter={() => onCampusHover(u.id)}
+        onMouseLeave={() => onCampusHover(null)}
+        onFocus={() => onCampusHover(u.id)}
+        onBlur={() => onCampusHover(null)}
+      >
+        <span className="uni-row-icon"><Icon html={ICONS.university} /></span>
+        <span className="uni-row-text">
+          <strong>{u.name}</strong>
+          <small>{u.location}</small>
+        </span>
+        {campusDistrict(u) && <span className="uni-row-code">{campusDistrict(u)}</span>}
+      </button>
+      <a className="uni-row-link" href={u.url} target="_blank" rel="noreferrer" aria-label={`${u.name} website`}>↗</a>
+    </li>
+  );
+  return (
+    <>
+      <section className="profile-section">
+        <SectionTitle eyebrow="CAMPUS LIFE" title={here.length ? `Universities in ${code}` : `No campus in ${code}`} extra={<span className="place-count">{universities.length} campuses</span>} />
+        {here.length ? <ul className="uni-list">{here.map(row)}</ul> : <p className="section-description">Pick a campus below to see where it is and how far it is from {code}.</p>}
+      </section>
+      <section className="profile-section">
+        <SectionTitle eyebrow="ACROSS DUBLIN" title="All universities and colleges" icon="university" />
+        <p className="section-description">Click a campus to show it on the map. ↗ opens its website.</p>
+        <ul className="uni-list top-gap">{others.map((u, i) => row(u, i + here.length))}</ul>
+      </section>
+    </>
+  );
+}
 
 export default function DistrictProfile({
   selectedId, data, team, places, tab, setTab, rentMode, setRentMode, hiddenAmenities, toggleAmenity,
   uni, setUni, hoverPlace, setHoverPlace, onPlaceClick, onStopClick, onSelect,
+  onCampusClick = () => {}, onCampusHover = () => {},
 }) {
   const profile = data.profiles[selectedId];
   const index = ACTIVE_DISTRICTS.indexOf(selectedId);
@@ -384,6 +457,12 @@ export default function DistrictProfile({
         <h2>{team?.name || profile.name}</h2>
         <p>{team?.description || profile.areas.map((a) => a[0]).join(' · ')}</p>
         <p className="eircode-line">Eircode routing key <b>{profile.eircode}</b></p>
+        {data.safety?.[selectedId] && (
+          <button type="button" className="banner-safety" onClick={() => setTab('safety')} title="See the Safety tab">
+            <b style={{ background: heatColor(data.safety[selectedId].score), color: textOnHeat(data.safety[selectedId].score) }}>{data.safety[selectedId].score.toFixed(0)}</b>
+            {safetyLabel(data.safety[selectedId].score)}
+          </button>
+        )}
         <span className="banner-decoration">{selectedId.replace('D', '')}</span>
       </div>
 
@@ -407,8 +486,7 @@ export default function DistrictProfile({
         {tab === 'safety' && <SafetySection code={selectedId} data={data} />}
         {tab === 'commute' && <CommuteSection code={selectedId} data={data} uni={uni} setUni={setUni} onStopClick={onStopClick} />}
         {tab === 'area' && <AreaSection code={selectedId} data={data} />}
-
-        
+        {tab === 'unis' && <UniversitiesSection code={selectedId} onCampusClick={onCampusClick} onCampusHover={onCampusHover} />}
       </div>
     </aside>
   );
