@@ -7,6 +7,7 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Districts from './pages/Districts'
 import Results from './pages/Results'
+import { AttractionsPage, UniversitiesPage } from './pages/CityGuide'
 import LanguageSwitcher from './LanguageSwitcher'
 
 function App() {
@@ -30,9 +31,8 @@ function App() {
   {/* NavLink marks the current page */}
   <NavLink to="/" end>Home</NavLink>
   <NavLink to="/districts">Explore districts</NavLink>
-  <a href="/#universities">Universities</a>
-  {/* Separate page (not React) served from Frontend/public/journey-planner */}
-  <a href="/journey-planner/route.html">Journey planner</a>
+  <NavLink to="/universities">Universities</NavLink>
+  <NavLink to="/attractions">Famous attractions</NavLink>
   <NavLink to="/how-it-works">How it works</NavLink>
 </nav>
 
@@ -55,6 +55,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/districts" element={<Districts />} />
+          <Route path="/universities" element={<UniversitiesPage />} />
+          <Route path="/attractions" element={<AttractionsPage />} />
           <Route path="/results" element={<Results />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
@@ -67,14 +69,6 @@ function App() {
         </Routes>
       </main>
 
-      <footer className="footer">
-        <Link className="brand footer-brand" to="/">
-          <img className="footer-logo" src="/images/find-your-dublin-logo.png" alt="" />
-          <span>Find Your Dublin</span>
-        </Link>
-        <p>Helping you find your place in Dublin.</p>
-        <Link to="/">Back to home ↑</Link>
-      </footer>
     </div>
   )
 }
