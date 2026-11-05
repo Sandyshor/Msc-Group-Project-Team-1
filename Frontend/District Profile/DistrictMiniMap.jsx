@@ -24,7 +24,8 @@ if (typeof window !== 'undefined' && !window.__districtExploreClicks) {
   }, true);
 }
 
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+const STADIA_KEY = import.meta.env.VITE_STADIA_API_KEY;
+const MAP_STYLE = `https://tiles.stadiamaps.com/styles/alidade_smooth.json${STADIA_KEY ? `?api_key=${STADIA_KEY}` : ''}`;
 const EXPLORER_URL = '/districts'; // full district explorer page
 const BOUNDARIES_URL = '/data/dublin_postcode_boundaries.geojson';
 const LUAS_URLS = { red: '/data/luas-red-line.geojson', green: '/data/luas-green-line.geojson' };
