@@ -702,10 +702,10 @@ function DublinMap({ title, locations, variant }) {
 }
 
 // One page: heading, the cards and the map
-function GuidePage({ kicker, title, accent, description, railTitle, label, items, renderCard, mapTitle, variant }) {
+function GuidePage({ kicker, title, accent, description, railTitle, label, items, renderCard, mapTitle, variant, tourTarget }) {
   return (
     <div className="fd-home fd-guide-page">
-      <section className={`fd-moving-section fd-guide-section fd-guide-${variant}`}>
+      <section className={`fd-moving-section fd-guide-section fd-guide-${variant}`} data-site-tour={tourTarget}>
         <div className="fd-moving-heading">
           <div>
             <p className="fd-section-kicker">{kicker}</p>
@@ -735,6 +735,7 @@ export function UniversitiesPage() {
       renderCard={(school) => <UniversityCard school={school} key={school.id} />}
       mapTitle="Find the campuses across Dublin."
       variant="campuses"
+      tourTarget="universities"
     />
   )
 }
@@ -752,6 +753,7 @@ export function AttractionsPage() {
       renderCard={(place) => <AttractionCard place={place} key={place.id} />}
       mapTitle="Landmarks, all around the city."
       variant="attractions"
+      tourTarget="attractions"
     />
   )
 }

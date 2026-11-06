@@ -839,7 +839,7 @@ function Results() {
 
   if (!answers) {
     return (
-      <section className="flow-page flow-page-results">
+      <section className="flow-page flow-page-results" data-site-tour="results">
         <FlowSidebar step={3} onStep={(n) => navigate('/questionnaire', { state: { step: n } })} />
         <div className="flow-empty">
           <h1>No answers yet.</h1>
@@ -854,7 +854,7 @@ function Results() {
   const shown = results[Math.min(selected, results.length - 1)]
 
   return (
-    <section className="flow-page flow-page-results">
+    <section className="flow-page flow-page-results" data-site-tour="results">
       <FlowSidebar
         step={3}
         // back to the questionnaire with these answers filled in

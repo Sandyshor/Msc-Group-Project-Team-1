@@ -84,7 +84,7 @@ function HeroSkyline() {
 function Home() {
   return (
     <div className="fd-home">
-      <section className="fd-hero" aria-labelledby="fd-hero-title">
+      <section className="fd-hero" aria-labelledby="fd-hero-title" data-site-tour="home">
         <img className="fd-hero-image" src={heroImage} alt="The Ha'penny Bridge over the River Liffey" />
         <div className="fd-hero-dusk" />
         <div className="fd-hero-shade" />
@@ -128,7 +128,7 @@ function Home() {
 
       </section>
 
-      <section className="fd-film-section" id="explore-dublin">
+      <section className="fd-film-section" id="explore-dublin" data-site-tour="home-film">
         <div className="fd-film-copy">
           <p className="fd-section-kicker">01 / FIRST LOOK</p>
           <h2>Explore Dublin.<br /><em>Feel the place.</em></h2>
