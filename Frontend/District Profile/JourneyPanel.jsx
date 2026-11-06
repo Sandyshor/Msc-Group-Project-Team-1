@@ -3,8 +3,6 @@ import { universities } from './cityPlaces';
 import { TRAVEL_MODES, MODE_STYLE, legColor, lineLabel, formatMinutes, formatDistance, formatTime, fetchRoutes, dublinNowInputValue } from './journey';
 import './Journey.css';
 
-
-
 const uniPoint = (u) => ({ lng: u.coordinates[1], lat: u.coordinates[0], label: u.name, id: u.id });
 export const DEFAULT_DESTINATION = uniPoint(universities.find((u) => u.id === 'tu-grangegorman') || universities[0]);
 
