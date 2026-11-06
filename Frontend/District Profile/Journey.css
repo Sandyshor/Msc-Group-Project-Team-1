@@ -1,0 +1,33 @@
+/* JOURNEY TAB AND ROUTE ON THE MAP */
+.jr-label { display: flex; align-items: center; gap: 6px; margin: 12px 0 5px; color: #8a9685; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.jr-pin-mini { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; color: #fff; font-size: 0.6rem; letter-spacing: 0; }
+.jr-from, .jr-pin-mini.jr-from { background: #214b39; }
+.jr-to, .jr-pin-mini.jr-to { background: #d94351; }
+.jr-picking { margin: 10px 0 0; padding: 9px 11px; border: 1px dashed #214b39; border-radius: 10px; background: #f3f6ef; color: #214b39; font-size: 0.74rem; font-weight: 700; }
+.jr-picking button { margin-left: 6px; padding: 0; border: 0; background: none; color: #b8323f; font: inherit; text-decoration: underline; cursor: pointer; }
+.jr-modes { margin-top: 14px; }
+.jr-when { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.jr-when .uni-select { flex: 1 1 140px; width: auto; }
+.jr-go { width: 100%; margin-top: 14px; padding: 11px 14px; border: 0; border-radius: 11px; background: #214b39; color: #fffdf3; font: inherit; font-size: 0.85rem; font-weight: 800; cursor: pointer; }
+.jr-go:disabled { opacity: 0.6; cursor: default; }
+.jr-error { margin: 10px 0 0; padding: 10px 12px; border: 1px solid #f1c7c2; border-radius: 10px; background: #fff3f1; color: #9b2c22; font-size: 0.74rem; line-height: 1.45; }
+
+.jr-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 6px; }
+.jr-tabs button { display: flex; flex-direction: column; gap: 5px; padding: 9px; border: 1px solid #e3e9de; border-radius: 11px; background: #fffefa; color: #214b39; font: inherit; text-align: left; cursor: pointer; }
+.jr-tabs button[aria-selected="true"] { border-color: #214b39; box-shadow: inset 0 0 0 1px #214b39; }
+.jr-tabs strong { font-size: 0.95rem; }
+.jr-tabs span { display: flex; flex-wrap: wrap; gap: 3px; }
+.jr-chip { padding: 1px 6px; border-radius: 6px; background: var(--c); color: #fff; font-size: 0.62rem; font-style: normal; font-weight: 800; }
+.jr-steps { margin: 14px 0 0; padding: 0; list-style: none; }
+.jr-steps li { position: relative; padding: 0 0 12px 20px; border-left: 4px solid var(--c); margin-left: 6px; }
+.jr-steps li.walk { border-left-style: dotted; }
+.jr-steps li::before { content: ''; position: absolute; left: -9px; top: 2px; width: 10px; height: 10px; border: 2px solid var(--c); border-radius: 50%; background: #fffefa; }
+.jr-steps p { margin: 0; color: #2f4a3a; font-size: 0.78rem; line-height: 1.4; }
+.jr-steps small { color: #8a9685; font-size: 0.68rem; }
+
+.jr-pin { display: grid; width: 30px; height: 30px; place-items: center; border: 3px solid #fffefa; border-radius: 50% 50% 50% 0; color: #fff; font-size: 13px; font-weight: 800; box-shadow: 0 3px 9px rgba(0, 0, 0, 0.3); transform: rotate(-45deg); }
+.jr-pin.jr-from { background: #214b39; }
+.jr-pin.jr-to { background: #d94351; }
+.jr-pin span { transform: rotate(45deg); }
+.jr-pin-wrap { padding-bottom: 4px; }
+.legend-line.jr-legend-line { background: #214b39; box-shadow: 0 0 0 2px #fff; }
