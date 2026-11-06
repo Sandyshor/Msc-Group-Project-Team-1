@@ -128,7 +128,7 @@ function Questionnaire() {
   }
 
   return (
-    <section className="flow-page">
+    <section className="flow-page" data-site-tour="questionnaire">
       <FlowSidebar step={step} onStep={goToStep} />
 
       {step === 1 ? (

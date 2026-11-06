@@ -155,7 +155,7 @@ function StepVisual({ type }) {
 function HowItWorks() {
   return (
     <div className="how-page">
-      <section className="how-process" id="how-steps" aria-labelledby="how-process-title">
+      <section className="how-process" id="how-steps" aria-labelledby="how-process-title" data-site-tour="how-it-works">
         <div className="how-section-heading">
           <div>
             <p className="how-section-kicker">YOUR JOURNEY, STEP BY STEP</p>
