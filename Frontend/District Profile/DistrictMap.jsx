@@ -5,16 +5,21 @@ import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import proj4 from 'proj4';
 import crimeAreasUrl from './crime-heatmap.geojson?url';
 import './Safety.css';
+import './Bikes.css';
 
 
 const boundariesUrl = '/data/dublin_postcode_boundaries.geojson';
 const luasRedUrl = '/data/luas-red-line.geojson';
 const luasGreenUrl = '/data/luas-green-line.geojson';
 
+const bikesUrl = '/data/dublin-bikes-stations.geojson';
+const BIKES_STATUS_URL = 'https://api.cyclocity.fr/contracts/dublin/gbfs/v2/station_status.json';
+const BIKES_COLOUR = '#1f6fb2';
+const BIKES_STATUS_MAX_AGE_MS = 60 * 1000;
+
 maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
-// Street map from Stadia Maps. Other styles: alidade_smooth_dark, outdoors, osm_bright, stamen_terrain, stamen_toner_lite.
-// On the live site, add your domain in the Stadia dashboard (no key needed), or put VITE_STADIA_API_KEY in Frontend/.env
+
 const STADIA_STYLE = 'alidade_smooth';
 const STADIA_KEY = import.meta.env.VITE_STADIA_API_KEY;
 const MAP_STYLE = `https://tiles.stadiamaps.com/styles/${STADIA_STYLE}.json${STADIA_KEY ? `?api_key=${STADIA_KEY}` : ''}`;
@@ -22,11 +27,10 @@ const MAP_STYLE = `https://tiles.stadiamaps.com/styles/${STADIA_STYLE}.json${STA
 const ALL_DISTRICTS = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D6W', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12',
   'D13', 'D14', 'D15', 'D16', 'D17', 'D18', 'D20', 'D22', 'D24'];
 
-// Districts that have a full profile (shared with App.jsx)
+
 export const ACTIVE_DISTRICTS = ALL_DISTRICTS;
 
-// Relative crime score colours (same scale as the results page): 50 = Irish town and city rate,
-// red = more recorded crime, green = less. Bands come from the unrounded score.
+
 export const HEAT_STOPS = [
   [0, '#b23a2f'], [30, '#c94a35'], [40, '#e0694a'], [50, '#f4cf62'], [57, '#b5cf6c'], [65, '#5fae6b'], [100, '#25704a'],
 ];
@@ -38,7 +42,7 @@ export const SAFETY_BANDS = [
 ];
 export const safetyLabel = (score) => (SAFETY_BANDS.find(([min]) => score >= min) || SAFETY_BANDS[3])[1];
 export const safetyPlain = (score) => (SAFETY_BANDS.find(([min]) => score >= min) || SAFETY_BANDS[3])[2];
-// The colour for a score, blended between the stops
+
 export function heatColor(score) {
   const i = Math.max(1, HEAT_STOPS.findIndex(([v]) => v >= score));
   const [[v0, c0], [v1, c1]] = [HEAT_STOPS[i - 1], HEAT_STOPS[i] ?? HEAT_STOPS[i - 1]];
@@ -47,11 +51,11 @@ export function heatColor(score) {
   const [a, b2] = [rgb(c0), rgb(c1)];
   return `rgb(${a.map((x, k) => Math.round(x + (b2[k] - x) * Math.max(0, Math.min(1, t)))).join(',')})`;
 }
-// Dark text on the yellow and light-green part of the scale, white on red and dark green
+
 export const textOnHeat = (score) => (score >= 44 && score < 66 ? '#1f2d24' : '#ffffff');
 export { ALL_DISTRICTS };
 
-// [key, label, icon, colour]
+
 export const AMENITY_TYPES = [
   ['supermarket', 'Supermarkets', 'cart', '#2f7fd0'],
   ['grocery', 'Groceries', 'basket', '#3aa38a'],
@@ -64,7 +68,7 @@ export const AMENITY_TYPES = [
   ['mall', 'Shopping centres', 'mall', '#c09020'],
 ];
 
-// District colours come from the hue stored for each district in district-profiles.json
+
 export const strongColor = (hue) => `hsl(${hue} 55% 38%)`;
 export const pastelColor = (hue) => `hsl(${hue} 60% 80%)`;
 export const bannerColor = (hue) => `hsl(${hue} 42% 26%)`;
@@ -104,7 +108,6 @@ export const iconFor = (name) => ICONS[name] || ICONS.landmark;
 
 const ZOOM_AREAS = 12.5; // neighbourhood names appear
 const ZOOM_ALL_PLACES = 14; // famous places of every district appear
-const ZOOM_AMENITIES = 14.5; // amenity dots appear without opening the Amenities tab
 
 function districtIdFromPostcode(value) {
   const match = String(value ?? '').trim().match(/^Dublin\s*(\d{1,2}W?)$/i);
@@ -184,6 +187,10 @@ function createPlacePopup(place) {
   return container;
 }
 
+function liveCount(status, type) {
+  return status.vehicle_types_available?.find((v) => v.vehicle_type_id === type)?.count ?? 0;
+}
+
 const DistrictMap = forwardRef(function DistrictMap(props, ref) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -198,15 +205,15 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
   function applyState() {
     const map = mapRef.current;
     if (!map || !readyRef.current) return;
-    const { selectedDistrict: sel, filter, showLuas, showAmenities, hiddenAmenities, showHeat } = latest.current;
+    const { selectedDistrict: sel, filter, showLuas, showBikes, showHeat } = latest.current;
     const profiles = profileData.profiles;
     const visible = ACTIVE_DISTRICTS.filter((c) => filter === 'all' || profiles[c]?.side === filter);
     const zoom = map.getZoom();
 
-   
+
     const colorMatch = ['match', ['get', 'districtId']];
     const safety = profileData.safety || {};
-    ACTIVE_DISTRICTS.forEach((c) => colorMatch.push(c, showHeat && typeof safety[c]?.score === 'number'
+    ACTIVE_DISTRICTS.forEach((c) => colorMatch.push(c, showHeat && safety[c]
       ? heatColor(safety[c].score)
       : (c === sel ? strongColor(profiles[c].hue) : pastelColor(profiles[c].hue))));
     colorMatch.push('#cfd8cc');
@@ -216,8 +223,8 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     
     map.setPaintProperty('district-fill', 'fill-opacity', showHeat
       ? ['interpolate', ['linear'], ['zoom'],
-        11, ['case', isVisible, 0.45, 0.1],
-        12.3, ['case', isVisible, 0.3, 0.06],
+        11, ['case', isVisible, 0.72, 0.15],
+        12.3, ['case', isVisible, 0.5, 0.1],
         13.2, ['case', isSel, 0.06, 0.03]]
       : ['interpolate', ['linear'], ['zoom'],
         11, ['case', isSel, 0.5, isVisible, 0.55, 0.12],
@@ -228,12 +235,12 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     map.setPaintProperty('district-outline', 'line-color', ['case', isSel, showHeat ? '#173f32' : strongColor(profiles[sel].hue), '#ffffff']);
     map.setPaintProperty('district-outline', 'line-width', ['case', isSel, 4, 1.5]);
 
-   
+    // district code chips
     Object.entries(store.current.codeMarkers).forEach(([c, m]) => {
       const node = m.getElement();
       if (!ACTIVE_DISTRICTS.includes(c)) return;
       const sc = profileData.safety?.[c]?.score;
-      if (showHeat && typeof sc === 'number') {
+      if (showHeat && sc != null) {
         node.style.background = heatColor(sc);
         node.style.color = textOnHeat(sc);
         node.innerHTML = `${c}<b>${sc.toFixed(0)}</b>`;
@@ -257,7 +264,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
       });
     });
 
-    
+   
     const centre = profileData.labels[sel];
     const spokeFeatures = (placesByDistrict[sel] || []).filter((p) => p.lngLat).map((p) => ({
       type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[centre[1], centre[0]], p.lngLat] },
@@ -274,15 +281,21 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
         features: pts.map(([name, cat, lat, lng]) => ({ type: 'Feature', properties: { name, cat }, geometry: { type: 'Point', coordinates: [lng, lat] } })),
       });
     }
-    map.setFilter('dm-amenities-dots', ['!', ['in', ['get', 'cat'], ['literal', [...hiddenAmenities]]]]);
-    map.setLayoutProperty('dm-amenities-dots', 'visibility', showAmenities || zoom >= ZOOM_AMENITIES ? 'visible' : 'none');
+    
+    map.setLayoutProperty('dm-amenities-dots', 'visibility', 'none');
 
     // Luas
     ['luas-red-route-line', 'luas-green-route-line', 'dm-stops-points', 'dm-stops-hit'].forEach((id) => {
       if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', showLuas ? 'visible' : 'none');
     });
 
-    
+    // Dublin Bikes
+    ['dm-bikes-points', 'dm-bikes-hit'].forEach((id) => {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', showBikes ? 'visible' : 'none');
+    });
+    if (!showBikes) store.current.bikePopup?.remove();
+
+    // zoom classes for neighbourhood labels
     const box = mapContainerRef.current?.parentElement;
     if (box) {
       box.classList.toggle('z-low', zoom < ZOOM_AREAS);
@@ -290,13 +303,55 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     }
   }
 
+  // Live bikes and free stands for every dock; one request serves all clicks for a minute.
+  async function bikeStatus() {
+    const cached = store.current.bikeStatus;
+    if (cached && Date.now() - cached.at < BIKES_STATUS_MAX_AGE_MS) return cached.byId;
+    const response = await fetch(BIKES_STATUS_URL);
+    if (!response.ok) throw new Error(`Dublin Bikes status returned ${response.status}`);
+    const stations = (await response.json()).data?.stations || [];
+    const byId = Object.fromEntries(stations.map((st) => [String(st.station_id), st]));
+    store.current.bikeStatus = { at: Date.now(), byId };
+    return byId;
+  }
+
+  function openBikePopup(dock, lngLat) {
+    const map = mapRef.current;
+    const box = el('div', 'stop-popup');
+    box.append(el('span', 'stop-line bikes', 'Dublin Bikes'), el('h3', null, dock.name));
+    if (dock.address && dock.address.toLowerCase() !== dock.name.toLowerCase()) box.append(el('p', 'bike-address', dock.address));
+    const tags = el('div', 'stop-tags');
+    tags.append(el('span', null, `${dock.capacity} stands`));
+    box.append(tags);
+    const live = el('p', 'bike-live', 'Checking live availability…');
+    box.append(live);
+
+    store.current.bikePopup?.remove();
+    const popup = new maplibregl.Popup({ offset: 10, maxWidth: '280px' }).setLngLat(lngLat).setDOMContent(box).addTo(map);
+    store.current.bikePopup = popup;
+
+    bikeStatus().then((byId) => {
+      const st = byId[String(dock.id)];
+      if (!st) { live.textContent = 'No live data for this dock right now.'; return; }
+      if (!st.is_installed || !st.is_renting) { live.textContent = 'This dock is closed at the moment.'; return; }
+      const ebikes = liveCount(st, 'electrical');
+      live.replaceChildren();
+      const row = el('div', 'bike-counts');
+      row.append(
+        el('span', null, `${st.num_bikes_available} bike${st.num_bikes_available === 1 ? '' : 's'}${ebikes ? ` (${ebikes} electric)` : ''}`),
+        el('span', null, `${st.num_docks_available} free stand${st.num_docks_available === 1 ? '' : 's'}`),
+      );
+      const when = st.last_reported ? new Date(st.last_reported * 1000).toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' }) : null;
+      live.append(row, el('small', null, `Live data: JCDecaux (dublinbikes), Open Licence${when ? `, updated ${when}` : ''}`));
+    }).catch(() => { live.textContent = 'Live availability could not be loaded.'; });
+  }
+
   function flyToDistrict(code) {
     const feature = store.current.features[code];
     const bounds = feature && getGeometryBounds(feature.geometry);
-    if (bounds) mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 14, pitch: 0, bearing: 0, duration: 1300 });
+    if (bounds) mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 14, pitch: 45, bearing: -12, duration: 1300 });
   }
-
-  function openStopPopup(stop) {
+    function openStopPopup(stop) {
     const map = mapRef.current;
     const { profiles, amenities, lines } = profileData;
     const lngLat = [stop.lng, stop.lat];
@@ -351,7 +406,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     store.current.stopPopupDistrict = stop.d;
   }
 
-  
+ 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return undefined;
     let cancelled = false;
@@ -379,8 +434,8 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
           style: MAP_STYLE,
           center: [-6.2603, 53.3498],
           zoom: 10.8,
-          pitch: 0,
-          bearing: 0,
+          pitch: 45,
+          bearing: -12,
           maxPitch: 70,
           attributionControl: true,
           canvasContextAttributes: { antialias: true },
@@ -406,7 +461,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
               paint: { 'line-color': '#ffffff', 'line-width': 1.5 },
             });
 
-            // Safety by Census area (shown when zoomed in)
+            
             const heatColour = ['interpolate', ['linear'], ['get', 'score']];
             HEAT_STOPS.forEach(([v, c]) => heatColour.push(v, c));
             map.addSource('dm-crime-areas', { type: 'geojson', data: crimeAreasUrl });
@@ -421,14 +476,14 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
             const crimeHover = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 8, className: 'amenity-hover' });
             map.on('mousemove', 'dm-crime-areas', (e) => {
               const f = e.features?.[0];
-              if (!f || map.queryRenderedFeatures(e.point, { layers: ['dm-stops-hit', 'dm-amenities-dots'] }).length) { crimeHover.remove(); return; }
+              if (!f || map.queryRenderedFeatures(e.point, { layers: ['dm-stops-hit', 'dm-bikes-hit', 'dm-amenities-dots'] }).length) { crimeHover.remove(); return; }
               const p = f.properties;
               const sc = Number(p.score);
               crimeHover.setLngLat(e.lngLat).setHTML(
                 `<div class="safe-pop"><span class="safe-pop-score" style="background:${heatColor(sc)};color:${textOnHeat(sc)}">${sc.toFixed(0)}</span>`
                 + `<div><b>${p.ed}</b> · ${p.d}<br><small>${safetyLabel(sc)}</small></div></div>`
                 + (String(p.check) === 'true' ? '<p class="safe-pop-check">⚠ Check the specific street before choosing</p>' : '')
-                + (p.viol != null ? `<p class="safe-pop-facts">Violent crime ${p.viol} · Robbery ${p.rob} · Theft ${p.burg} per 1,000 people a year</p>` : ''),
+                + `<p class="safe-pop-facts">Violent crime ${p.viol} · Robbery ${p.rob} · Theft ${p.burg} per 1,000 people a year</p>`,
               ).addTo(map);
             });
             map.on('mouseleave', 'dm-crime-areas', () => crimeHover.remove());
@@ -436,7 +491,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
             map.addSource('dm-spokes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
             map.addLayer({ id: 'dm-spokes-line', type: 'line', source: 'dm-spokes', paint: { 'line-width': 1.6, 'line-dasharray': [2, 3], 'line-opacity': 0.85 } });
 
-            // Luas route lines from your files
+           
             [['red', '#d71920', 'Luas Red Line', luasRedUrl], ['green', '#008531', 'Luas Green Line', luasGreenUrl]].forEach(([k, colour, ref, url]) => {
               map.addSource(`luas-${k}-route`, { type: 'geojson', data: url });
               map.addLayer({
@@ -466,6 +521,34 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
             });
             map.on('mouseleave', 'dm-amenities-dots', () => { map.getCanvas().style.cursor = ''; amenPopup.remove(); });
 
+            // Dublin Bikes docks
+            map.addSource('dm-bikes', { type: 'geojson', data: bikesUrl });
+            map.addLayer({
+              id: 'dm-bikes-points', type: 'circle', source: 'dm-bikes',
+              paint: {
+                'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 2.5, 14, 5, 16, 7],
+                'circle-color': BIKES_COLOUR,
+                'circle-stroke-color': '#ffffff',
+                'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 11, 1, 14, 2],
+              },
+            });
+            map.addLayer({
+              id: 'dm-bikes-hit', type: 'circle', source: 'dm-bikes',
+              paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 7, 14, 12], 'circle-color': '#000000', 'circle-opacity': 0 },
+            });
+            const bikeHover = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 8, className: 'amenity-hover' });
+            map.on('click', 'dm-bikes-hit', (e) => {
+              if (latest.current.picking) return;
+              const f = e.features?.[0];
+              if (f) { bikeHover.remove(); openBikePopup(f.properties, f.geometry.coordinates); }
+            });
+            map.on('mouseenter', 'dm-bikes-hit', (e) => {
+              map.getCanvas().style.cursor = 'pointer';
+              const f = e.features?.[0];
+              if (f) bikeHover.setLngLat(f.geometry.coordinates).setText(`Dublin Bikes · ${f.properties.name}`).addTo(map);
+            });
+            map.on('mouseleave', 'dm-bikes-hit', () => { map.getCanvas().style.cursor = ''; bikeHover.remove(); });
+
             // Luas stops (one point per stop, with the district it is in)
             map.addSource('dm-stops', {
               type: 'geojson',
@@ -490,6 +573,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
             });
             const stopHover = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 8, className: 'amenity-hover' });
             map.on('click', 'dm-stops-hit', (e) => {
+              if (latest.current.picking) return;
               const f = e.features?.[0];
               if (f) { stopHover.remove(); openStopPopup(profileData.stops[f.properties.i]); }
             });
@@ -502,14 +586,15 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
 
             // Click a district to select it
             map.on('click', 'district-fill', (event) => {
-              if (map.queryRenderedFeatures(event.point, { layers: ['dm-stops-hit', 'dm-amenities-dots'] }).length) return;
+              if (latest.current.picking) return; // choosing a journey start or end point
+              if (map.queryRenderedFeatures(event.point, { layers: ['dm-stops-hit', 'dm-bikes-hit', 'dm-amenities-dots'] }).length) return;
               const id = event.features?.[0]?.properties?.districtId;
               if (ACTIVE_DISTRICTS.includes(id)) latest.current.onSelectDistrict(id);
             });
             map.on('mouseenter', 'district-fill', () => { map.getCanvas().style.cursor = 'pointer'; });
             map.on('mouseleave', 'district-fill', () => { map.getCanvas().style.cursor = ''; });
 
-            
+            // District code chips
             ALL_DISTRICTS.forEach((c) => {
               const pos = profileData.labels[c];
               if (!pos) return;
@@ -521,12 +606,12 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
               store.current.codeMarkers[c] = new maplibregl.Marker({ element: node }).setLngLat([pos[1], pos[0]]).addTo(map);
             });
 
-            
+            // Neighbourhood names
             ACTIVE_DISTRICTS.forEach((c) => (profileData.profiles[c].areas || []).forEach(([name, lat, lng]) => {
               store.current.areaMarkers.push(new maplibregl.Marker({ element: el('div', 'dm-area', name) }).setLngLat([lng, lat]).addTo(map));
             }));
 
-           
+            // Famous places
             ACTIVE_DISTRICTS.forEach((c) => {
               store.current.placeMarkers[c] = (placesByDistrict[c] || []).map((place, i) => {
                 if (!place.lngLat) return null;
@@ -571,7 +656,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  
+
   useEffect(() => {
     applyState();
     if (readyRef.current) {
@@ -579,10 +664,10 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
       if (store.current.stopPopupDistrict !== props.selectedDistrict) store.current.stopPopup?.remove();
       flyToDistrict(props.selectedDistrict);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [props.selectedDistrict]);
 
-  useEffect(() => { applyState(); }, [props.filter, props.showLuas, props.showAmenities, props.hiddenAmenities, props.showHeat]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { applyState(); }, [props.filter, props.showLuas, props.showBikes, props.showHeat]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     document.querySelectorAll('.dm-place.on').forEach((n) => n.classList.remove('on'));
