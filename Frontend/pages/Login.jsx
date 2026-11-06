@@ -1,17 +1,39 @@
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../firebase'
+import { getAuthErrorMessage } from '../authErrors'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  function handleLogin(event) {
+  const navigate = useNavigate()
+
+  async function handleLogin(event) {
     event.preventDefault()
+    setError('')
+    setShowSignupPrompt(false)
+    setLoading(true)
 
-    console.log('Login form submitted:', { email })
-    alert('Login authentication will be connected later.')
+    try {
+      await signInWithEmailAndPassword(auth, email.trim(), password)
+      navigate('/')
+    } catch (error) {
+      setShowSignupPrompt([
+        'auth/invalid-credential',
+        'auth/wrong-password',
+        'auth/user-not-found',
+      ].includes(error?.code))
+      setError(getAuthErrorMessage(error, 'log in'))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -79,8 +101,25 @@ function Login() {
             </div>
           </div>
 
-          <button type="submit" className="login-submit">
-            Log in <span>→</span>
+          {error && (
+            <p className="signup-error" role="alert">
+              {error}
+              {showSignupPrompt && (
+                <>
+                  {' '}Are you new to Find My Dublin? Then{' '}
+                  <Link to="/signup">create an account</Link>.
+                </>
+              )}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className="login-submit"
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Log in'}
+            {!loading && <span>→</span>}
           </button>
         </form>
 
@@ -88,12 +127,11 @@ function Login() {
           <span>YOUR NEXT CHAPTER</span>
         </div>
 
-        
-<p className="login-bottom">
-  New to Find Your Dublin?
-  <br />
-  <Link to="/signup">Sign up →</Link>
-</p>
+        <p className="login-bottom">
+          New to Find Your Dublin?
+          <br />
+          <Link to="/signup">Sign up →</Link>
+        </p>
       </div>
     </section>
   )
