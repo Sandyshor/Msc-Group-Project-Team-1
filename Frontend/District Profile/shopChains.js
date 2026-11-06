@@ -20,7 +20,7 @@ export const CHAINS = [
 const byKey = Object.fromEntries(CHAINS.map((c) => [c[0], c]));
 export const chainInfo = (key) => byKey[key];
 
-// Which chain a shop belongs to, from its name (null if none)
+
 export function chainOf(name) {
   const low = String(name || '').toLowerCase();
   // "eurospar" and "spar" are both Spar; check longer names first so "Super Valu" is not "Spar"
@@ -30,7 +30,7 @@ export function chainOf(name) {
   return null;
 }
 
-// Every shop of every chain: [{ chain, name, district, lng, lat }]
+
 export function allChainShops(amenities) {
   const out = [];
   Object.entries(amenities || {}).forEach(([district, pts]) => (pts || []).forEach(([name, cat, lat, lng]) => {
