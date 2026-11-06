@@ -26,18 +26,18 @@ const steps = [
       'Search by district name or code, such as D1 or Dublin 1. District profiles show the details currently available.',
   },
   {
-    path: '/universities',
+    path: '/campuses',
     target: 'universities',
     title: 'Find your campus',
     description:
-      'Browse Dublin colleges and campuses, explore their locations on the map, and open official university information.',
+      'Browse Dublin colleges and campuses, and open official university information. Their locations are on the district maps.',
   },
   {
     path: '/attractions',
     target: 'attractions',
     title: 'Discover the city',
     description:
-      'Browse Dublin landmarks and places to visit, with map locations and links for more information.',
+      'Browse Dublin landmarks and places to visit, with photos and links for more information.',
   },
   {
     path: '/how-it-works',
