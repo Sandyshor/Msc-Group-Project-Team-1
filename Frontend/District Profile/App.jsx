@@ -2,9 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import DistrictMap, { ACTIVE_DISTRICTS, ALL_DISTRICTS, strongColor } from './DistrictMap';
 import DistrictProfile from './DistrictProfile';
 import CityLayers from './CityLayers';
+import ChainLayer from './ChainLayer';
+import JourneyLayer from './JourneyLayer';
+import { DEFAULT_DESTINATION } from './JourneyPanel';
 import { districtProfiles } from './districtProfiles';
 import './App.css';
-
+// Bundled with the page, so it always loads with the right path
 import profilesUrl from './district-profiles.json?url';
 
 const DATA_URL = profilesUrl;
@@ -46,7 +49,7 @@ const storage = {
 function districtFromUrl() {
   const { pathname, search, hash } = window.location;
   const params = new URLSearchParams(search);
-
+  
   const fromResults = window.history.state?.usr?.district;
   const raw = [fromResults, params.get('district'), params.get('d'), params.get('code'), params.get('search'), pathname, hash].filter(Boolean).join(' ');
   const m = decodeURIComponent(raw).match(/(?:^|[^A-Za-z0-9])(?:D|Dublin[\s_-]*)0?(\d{1,2})(W?)(?![0-9])/i);
@@ -55,7 +58,7 @@ function districtFromUrl() {
     if (ACTIVE_DISTRICTS.includes(id)) return id;
   }
   try {
-    
+    // Set when an "Explore district profile" button is clicked on the results page
     const saved = JSON.parse(localStorage.getItem('explore-district') || 'null');
     if (saved && Date.now() - saved.t < 120000 && ACTIVE_DISTRICTS.includes(saved.id)) return saved.id;
   } catch { /* ignore */ }
@@ -104,6 +107,7 @@ function buildPlaces(profileData) {
   return byDistrict;
 }
 
+/* ---------------- page ---------------- */
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -120,8 +124,12 @@ export default function App() {
   const [tab, setTabState] = useState(() => storage.get('district-tab', 'places'));
   const [uni, setUniState] = useState(() => storage.get('district-uni', DEFAULT_UNIVERSITY));
   const [rentMode, setRentMode] = useState('rooms');
-  const [hiddenAmenities, setHiddenAmenities] = useState(() => new Set());
+  const [chain, setChain] = useState(null); // supermarket chain shown on the map (Tesco, Lidl...)
   const [hoverPlace, setHoverPlace] = useState(null);
+  const [showBikes, setShowBikes] = useState(true);
+  // Journey planner: route from this district to a university, drawn on the map
+  const [journey, setJourney] = useState({ from: null, to: null, mode: 'transit', timeType: 'now', time: '', status: 'idle', error: '', itineraries: [], selected: 0 });
+  const [picking, setPicking] = useState(null); // 'from' | 'to' while the user clicks the map
   const mapApi = useRef(null);
   const chipsRef = useRef(null);
 
@@ -132,10 +140,10 @@ export default function App() {
       .catch((e) => setError(e.message));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  
+  // The saved "Explore" choice is used once
   useEffect(() => { try { localStorage.removeItem('explore-district'); } catch { /* ignore */ } }, []);
 
-  
+  // An "Explore D7 district profile" button clicked while this page is already open
   useEffect(() => {
     const onExplore = (e) => {
       if (!ACTIVE_DISTRICTS.includes(e.detail)) return;
@@ -147,7 +155,7 @@ export default function App() {
     return () => window.removeEventListener('explore-district', onExplore);
   }, []);
 
-  
+  // If the address changes while this page is open, show that district
   useEffect(() => {
     let last = window.location.href;
     const id = setInterval(() => {
@@ -170,11 +178,6 @@ export default function App() {
 
   const setTab = (t) => { setTabState(t); storage.set('district-tab', t); };
   const setUni = (u) => { setUniState(u); storage.set('district-uni', u); };
-  const toggleAmenity = (k) => setHiddenAmenities((prev) => {
-    const next = new Set(prev);
-    if (next.has(k)) next.delete(k); else next.add(k);
-    return next;
-  });
 
   useEffect(() => {
     chipsRef.current?.querySelector('[aria-pressed="true"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -194,11 +197,15 @@ export default function App() {
     return () => clearInterval(id);
   }, [touring]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // A new district means a new start point; leaving the Journey tab stops map picking
+  useEffect(() => { setJourney((j) => ({ ...j, from: null, itineraries: [], status: 'idle' })); setPicking(null); }, [selectedId]);
+  useEffect(() => { if (tab !== 'journey') setPicking(null); }, [tab]);
+
   if (error) return <div className="district-page"><p className="empty-note">Could not load district data: {error}</p></div>;
   if (!data) return <div className="district-page"><p className="empty-note">Loading district map…</p></div>;
 
   const teamName = districtProfiles?.[selectedId]?.name;
-  
+  // Use the team's name unless it is just "Dublin N"
   const team = teamName && !/^Dublin\s/i.test(teamName) ? { name: teamName } : null;
   const places = placesByDistrict[selectedId] || [];
 
@@ -209,6 +216,10 @@ export default function App() {
     setHoverPlace(i);
     mapApi.current?.flyToPlace(code, i);
   };
+
+  const centre = data.labels[selectedId];
+  const journeyFrom = journey.from || (centre ? { lat: centre[0], lng: centre[1], label: `Centre of ${selectedId}` } : null);
+  const journeyTo = journey.to || DEFAULT_DESTINATION;
 
   return (
     <div className="district-page">
@@ -238,6 +249,9 @@ export default function App() {
         </button>
         <button type="button" className="luas-toggle layer-toggle" aria-pressed={showLandmarks} onClick={() => setShowLandmarks((v) => !v)}>
           <i className="dot-landmark" /> Landmarks
+        </button>
+        <button type="button" className="luas-toggle bikes-toggle" aria-pressed={showBikes} onClick={() => setShowBikes((v) => !v)}>
+          <i className="bike-dot" /> Dublin Bikes
         </button>
         <button type="button" className="heat-toggle" aria-pressed={showHeat || tab === 'safety'} onClick={() => setShowHeat((v) => !v)}>
           <i /> Safety colours
@@ -271,12 +285,23 @@ export default function App() {
             onSelectDistrict={(c) => selectDistrict(c)}
             filter={filter}
             showLuas={showLuas}
-            showAmenities={tab === 'amen'}
+            showBikes={showBikes}
+            picking={picking}
             showHeat={showHeat || tab === 'safety'}
-            hiddenAmenities={hiddenAmenities}
             hoverPlace={hoverPlace}
             onHoverPlace={setHoverPlace}
             onPlaceClick={onPlaceClick}
+          />
+          <ChainLayer mapApi={mapApi} amenities={data.amenities} chain={chain} district={selectedId} />
+          <JourneyLayer
+            mapApi={mapApi}
+            active={tab === 'journey'}
+            from={journeyFrom}
+            to={journeyTo}
+            itineraries={journey.itineraries}
+            selected={journey.selected}
+            picking={tab === 'journey' ? picking : null}
+            onPick={(which, p) => { setJourney((j) => ({ ...j, [which]: p, itineraries: [], status: 'idle' })); setPicking(null); }}
           />
           <CityLayers mapApi={mapApi} showCampuses={showCampuses || tab === 'unis'} showLandmarks={showLandmarks} focus={focusCampus} hoverId={hoverCampus} />
 
@@ -287,6 +312,8 @@ export default function App() {
             <span><i className="legend-dot stop-dot" />Luas stops (click for details)</span>
             {(showCampuses || tab === 'unis') && <span><i className="legend-dot campus-dot" />Universities and campuses</span>}
             {showLandmarks && <span><i className="legend-dot landmark-dot" />Landmarks</span>}
+            {showBikes && <span><i className="legend-dot bike-dot" />Dublin Bikes docks (click for live bikes)</span>}
+            {tab === 'journey' && <span><i className="legend-line jr-legend-line" />Your journey (A to B)</span>}
           </div>
         </section>
 
@@ -300,8 +327,8 @@ export default function App() {
           setTab={setTab}
           rentMode={rentMode}
           setRentMode={setRentMode}
-          hiddenAmenities={hiddenAmenities}
-          toggleAmenity={toggleAmenity}
+          chain={chain}
+          setChain={setChain}
           uni={uni}
           setUni={setUni}
           hoverPlace={hoverPlace}
@@ -311,6 +338,12 @@ export default function App() {
           onSelect={(c) => selectDistrict(c)}
           onCampusClick={(id) => { setTouring(false); setFocusCampus({ id, t: Date.now() }); }}
           onCampusHover={setHoverCampus}
+          journey={journey}
+          setJourney={setJourney}
+          journeyFrom={journeyFrom}
+          journeyTo={journeyTo}
+          picking={picking}
+          setPicking={setPicking}
         />
       </div>
     </div>
