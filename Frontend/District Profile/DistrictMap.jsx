@@ -349,7 +349,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
   function flyToDistrict(code) {
     const feature = store.current.features[code];
     const bounds = feature && getGeometryBounds(feature.geometry);
-    if (bounds) mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 14, pitch: 45, bearing: -12, duration: 1300 });
+    if (bounds) mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 14, pitch: 0, bearing: 0, duration: 1300 });
   }
   function openStopPopup(stop) {
     const map = mapRef.current;
@@ -434,8 +434,8 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
           style: MAP_STYLE,
           center: [-6.2603, 53.3498],
           zoom: 10.8,
-          pitch: 45,
-          bearing: -12,
+          pitch: 0,
+          bearing: 0,
           maxPitch: 70,
           attributionControl: true,
           canvasContextAttributes: { antialias: true },
@@ -681,7 +681,7 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
     flyToPlace(code, index) {
       const marker = store.current.placeMarkers[code]?.find((m) => Number(m.getElement().dataset.index) === index);
       if (!marker || !mapRef.current) return;
-      mapRef.current.flyTo({ center: marker.getLngLat(), zoom: 15.5, pitch: 55, duration: 1200, essential: true });
+      mapRef.current.flyTo({ center: marker.getLngLat(), zoom: 15.5, pitch: 0, duration: 1200, essential: true });
       mapRef.current.once('moveend', () => { if (!marker.getPopup().isOpen()) marker.togglePopup(); });
     },
     openStop(name) {
