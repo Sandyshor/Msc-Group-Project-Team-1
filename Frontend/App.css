@@ -67,6 +67,23 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .nav-cta span { margin-left: 10px; }
 
+.tour-trigger {
+  padding: 10px 12px;
+  border: 1px solid #d8c59e;
+  border-radius: 6px;
+  background: transparent;
+  color: #fffdf7;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tour-trigger:hover {
+  background: #ffffff14;
+}
+
 .hero {
   display: grid;
   grid-template-columns: .9fr 1.1fr;
@@ -282,6 +299,7 @@ h1 em { color: #8a9d79; font-weight: 500; }
   .nav-links { order: 3; width: 100%; justify-content: space-between; gap: 10px; }
   .nav-links a { font-size: 11px; }
   .nav-cta { padding: 10px 12px; font-size: 11px; }
+  .tour-trigger { padding: 9px 10px; font-size: 11px; }
   .hero { grid-template-columns: 1fr; }
   .hero-content { padding: 52px 7% 42px; }
   h1 { font-size: clamp(42px, 11vw, 62px); }
@@ -2136,6 +2154,15 @@ html {
   transition: transform 0.3s ease;
 }
 
+.brand-wordmark {
+  display: block;
+  width: 178px;
+  height: 37px;
+  padding: 0;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .brand:hover .brand-logo {
   transform: scale(1.04);
 }
@@ -2191,6 +2218,11 @@ html {
 }
 
 .navbar-home .login-link {
+  color: #123d31;
+}
+
+.navbar-home .tour-trigger {
+  border-color: #123d31;
   color: #123d31;
 }
 
