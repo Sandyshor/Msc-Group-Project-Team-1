@@ -47,3 +47,5 @@
 .safety-stations b { color: #214b39; text-align: right; font-variant-numeric: tabular-nums; }
 .safety-key.in-tab { position: static; width: auto; max-width: none; margin-bottom: 18px; box-shadow: none; background: #fffefa; }
 @media (max-width: 650px) { .safety-key.in-tab ul { display: grid; } }
+/* Safety colours button, same style as the Dublin Bikes button */
+.luas-toggle.layer-toggle i.dot-safety { background: linear-gradient(135deg, #b23a2f 0%, #f4cf62 50%, #25704a 100%); }
