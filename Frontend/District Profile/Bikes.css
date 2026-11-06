@@ -1,0 +1,9 @@
+/* DUBLIN BIKES  */
+.bike-dot { background: #1f6fb2; border: 2px solid #fff; box-shadow: 0 0 0 1px #1f6fb2; }
+.luas-toggle i.bike-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+.stop-line.bikes { background: #1f6fb2; }
+.bike-address { margin: 0 0 2px; color: #6b8170; font-size: 12px; }
+.bike-live { margin: 8px 0 0; font-size: 12px; }
+.bike-counts { display: flex; gap: 6px; margin-bottom: 4px; }
+.bike-counts span { padding: 3px 8px; border-radius: 6px; background: #e6f0f9; color: #174f80; font-size: 12px; font-weight: 800; }
+.bike-live small { color: #91a18c; font-size: 10px; }
