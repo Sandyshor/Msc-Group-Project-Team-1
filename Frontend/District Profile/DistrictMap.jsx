@@ -550,6 +550,33 @@ const DistrictMap = forwardRef(function DistrictMap(props, ref) {
             map.on('mouseleave', 'dm-bikes-hit', () => { map.getCanvas().style.cursor = ''; bikeHover.remove(); });
 
             // Luas stops (one point per stop, with the district it is in)
+                        // Dublin Bikes docks
+            map.addSource('dm-bikes', { type: 'geojson', data: bikesUrl });
+            map.addLayer({
+              id: 'dm-bikes-points', type: 'circle', source: 'dm-bikes',
+              paint: {
+                'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 3.5, 13, 5.5, 16, 8],
+                'circle-color': BIKES_COLOUR,
+                'circle-stroke-color': '#ffffff',
+                'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 11, 1, 14, 2],
+              },
+            });
+            map.addLayer({
+              id: 'dm-bikes-hit', type: 'circle', source: 'dm-bikes',
+              paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 7, 14, 12], 'circle-color': '#000000', 'circle-opacity': 0 },
+            });
+            const bikeHover = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 8, className: 'amenity-hover' });
+            map.on('click', 'dm-bikes-hit', (e) => {
+              if (latest.current.picking) return;
+              const f = e.features?.[0];
+              if (f) { bikeHover.remove(); openBikePopup(f.properties, f.geometry.coordinates); }
+            });
+            map.on('mouseenter', 'dm-bikes-hit', (e) => {
+              map.getCanvas().style.cursor = 'pointer';
+              const f = e.features?.[0];
+              if (f) bikeHover.setLngLat(f.geometry.coordinates).setText(`Dublin Bikes · ${f.properties.name}`).addTo(map);
+            });
+            map.on('mouseleave', 'dm-bikes-hit', () => { map.getCanvas().style.cursor = ''; bikeHover.remove(); });
             map.addSource('dm-stops', {
               type: 'geojson',
               data: {
