@@ -49,3 +49,12 @@
 @media (max-width: 650px) { .safety-key.in-tab ul { display: grid; } }
 /* Safety colours button, same style as the Dublin Bikes button */
 .luas-toggle.layer-toggle i.dot-safety { background: linear-gradient(135deg, #b23a2f 0%, #f4cf62 50%, #25704a 100%); }
+/* LAYOUT: map stays still on the left, the profile scrolls on the right (wide screens only) */
+@media (min-width: 1101px) {
+  .district-layout { align-items: start; }
+  .map-card { position: sticky; top: 16px; }
+  .district-map { height: calc(100vh - 230px); min-height: 420px; max-height: none; }
+  .profile-card { position: sticky; top: 16px; display: flex; flex-direction: column; max-height: calc(100vh - 32px); }
+  .profile-card .profile-banner { flex: 0 0 auto; }
+  .profile-card .profile-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c9d6c2 transparent; }
+}
