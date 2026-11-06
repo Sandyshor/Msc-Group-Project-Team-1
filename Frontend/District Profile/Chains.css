@@ -1,0 +1,21 @@
+
+.chain-marker { display: inline-flex; align-items: center; gap: 4px; max-width: 120px; padding: 4px 8px; border: 2px solid #fffefa; border-radius: 999px; color: #ffffff; font-size: 11px; font-weight: 800; line-height: 1; white-space: nowrap; box-shadow: 0 3px 8px rgba(20, 30, 25, 0.35); cursor: pointer; }
+.chain-marker img { display: none; width: 18px; height: 18px; border-radius: 4px; object-fit: contain; background: #fff; }
+.chain-marker.has-logo img { display: block; }
+.chain-marker::after { content: ''; position: absolute; left: 50%; bottom: -6px; margin-left: -5px; border: 5px solid transparent; border-top-color: #fffefa; border-bottom: 0; }
+.chain-popup { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+.chain-popup b { color: #214b39; font-size: 13px; }
+.chain-popup span { color: #6c7d6c; }
+
+.chain-picker { display: flex; flex-wrap: wrap; gap: 7px; }
+.chain-picker button { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border: 1px solid #dce6d7; border-radius: 999px; background: #fffefa; color: #2f4a3a; font: inherit; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
+.chain-picker button i { width: 10px; height: 10px; border-radius: 50%; }
+.chain-picker button small { color: #8a9685; font-weight: 700; }
+.chain-picker button[aria-pressed="true"] { border-color: transparent; color: #ffffff; }
+.chain-picker button[aria-pressed="true"] small { color: rgba(255, 255, 255, 0.85); }
+.chain-picker button[aria-pressed="true"] i { background: #ffffff !important; }
+.chain-picker button:disabled { opacity: 0.4; cursor: default; }
+.chain-result { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: #f3f6ef; color: #4f6c57; font-size: 0.74rem; line-height: 1.45; }
+.chain-result b { color: #214b39; }
+.chain-clear { margin-left: 6px; padding: 0; border: 0; background: none; color: #214b39; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
+div.amenity-tile:hover { transform: none; background: #fffefa; }
