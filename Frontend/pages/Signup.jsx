@@ -1,9 +1,6 @@
 
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { auth } from '../firebase'
-import { getAuthErrorMessage } from '../authErrors'
+import { Link } from 'react-router-dom'
 
 function Signup() {
   const [name, setName] = useState('')
@@ -13,45 +10,17 @@ function Signup() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
 
-  async function handleSignup(event) {
+  // Accounts are not connected yet, so the form only checks the passwords and shows a message.
+  function handleSignup(event) {
     event.preventDefault()
-    setError('')
 
     if (password !== confirmPassword) {
       setError('Your passwords do not match. Please try again.')
       return
     }
 
-    setLoading(true)
-
-    try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        email.trim(),
-        password
-      )
-      try {
-        await updateProfile(user, { displayName: name.trim() })
-      } catch (profileError) {
-        console.error(
-          'Profile name update error:',
-          profileError?.code || profileError?.message || profileError
-        )
-        setError(
-          'Your account was created and you are signed in, but we could not save your name.'
-        )
-        return
-      }
-
-      navigate('/')
-    } catch (error) {
-      setError(getAuthErrorMessage(error, 'create your account'))
-    } finally {
-      setLoading(false)
-    }
+    setError('Log in and sign up are coming soon. You can still use everything else on the site.')
   }
 
   return (
@@ -161,9 +130,9 @@ function Signup() {
             </p>
           )}
 
-          <button type="submit" className="login-submit" disabled={loading}>
-            {loading ? 'Creating account...' : 'Create account'}
-            {!loading && <span>→</span>}
+          <button type="submit" className="login-submit">
+            Create account
+            <span>→</span>
           </button>
         </form>
 
