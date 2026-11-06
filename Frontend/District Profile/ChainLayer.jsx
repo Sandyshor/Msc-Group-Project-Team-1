@@ -3,6 +3,7 @@ import * as maplibregl from 'maplibre-gl';
 import { allChainShops, chainInfo } from './shopChains';
 import './Chains.css';
 
+
 const LOGO_DIR = '/images/brands/';
 
 function el(tag, className, text) {
@@ -47,7 +48,7 @@ export default function ChainLayer({ mapApi, amenities, chain, district }) {
           .setPopup(new maplibregl.Popup({ offset: 22, closeButton: false }).setDOMContent(pop))
           .addTo(map);
       });
-     
+      // Zoom to this chain's shops in the selected district, or to all of them
       const here = list.filter((s) => s.district === district);
       const focus = here.length ? here : list;
       if (focus.length) {
