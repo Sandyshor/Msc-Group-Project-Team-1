@@ -1,4 +1,5 @@
 import './App.css'
+import { useState } from 'react'
 import { Routes, Route, Link, NavLink, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import HowItWorks from './pages/Howitworks'
@@ -9,9 +10,12 @@ import Districts from './pages/Districts'
 import Results from './pages/Results'
 import { AttractionsPage, UniversitiesPage } from './pages/CityGuide'
 import LanguageSwitcher from './LanguageSwitcher'
+import SiteTour from './SiteTour'
 
 function App() {
   const location = useLocation()
+  const [tourOpen, setTourOpen] = useState(false)
+
   return (
     <div className="site-shell">
       <header className={`navbar ${location.pathname === '/' ? 'navbar-home' : ''}`}>
@@ -22,7 +26,11 @@ function App() {
     src="/images/find-your-dublin-logo.png"
     alt=""
   />
-  <span>Find Your Dublin</span>
+  <img
+    className="brand-wordmark"
+    src="/images/find-my-dublin-wordmark-dark.png"
+    alt="Find My Dublin"
+  />
 </Link>
 
 
@@ -43,6 +51,17 @@ function App() {
   <Link className="nav-cta" to="/questionnaire">
     Find my match <span>↗</span>
   </Link>
+
+  <button
+    type="button"
+    className="tour-trigger"
+    onClick={() => setTourOpen(true)}
+    aria-haspopup="dialog"
+    aria-expanded={tourOpen}
+    aria-controls={tourOpen ? 'site-tour-panel' : undefined}
+  >
+    Take a tour
+  </button>
 
   <Link className="login-link" to="/login">
     Log in
@@ -69,6 +88,7 @@ function App() {
         </Routes>
       </main>
 
+      {tourOpen && <SiteTour onClose={() => setTourOpen(false)} />}
     </div>
   )
 }
