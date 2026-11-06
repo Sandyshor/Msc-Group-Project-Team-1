@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { universities } from './cityPlaces';
+import JourneyPanel from './JourneyPanel';
+import { CHAINS, allChainShops, chainInfo } from './shopChains';
 import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, SAFETY_BANDS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './DistrictMap';
 
-const TABS = [['places', 'Places'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['commute', 'Commute'], ['area', 'Area'], ['unis', 'Universities']];
+const TABS = [['places', 'Places'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['commute', 'Commute'], ['journey', 'Journey'], ['area', 'Area'], ['unis', 'Universities']];
 const eur = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
 const num = (v) => Number(v).toLocaleString('en-IE');
 const Icon = ({ name, html, ...rest }) => <span {...rest} dangerouslySetInnerHTML={{ __html: html || iconFor(name) }} />;
 
+/* ---------------- profile card sections ---------------- */
 
 function EmptyNote({ children }) {
   return <p className="empty-note">Not collected yet: {children}</p>;
@@ -24,8 +27,7 @@ function SectionTitle({ eyebrow, title, icon, extra }) {
   );
 }
 
-// Wikipedia article for each place, used to fetch a photo when a place has no image
-// (or its image link is broken). Add a line here for any new place.
+
 const WIKI_TITLES = {
   'Croke Park': 'Croke Park', 'The Spire': 'Spire of Dublin', GPO: 'General Post Office, Dublin',
   'Custom House': 'Custom House, Dublin', 'Moore Street Market': 'Moore Street', 'Garden of Remembrance': 'Garden of Remembrance (Dublin)',
@@ -171,30 +173,58 @@ function RentSection({ code, data, rentMode, setRentMode }) {
   );
 }
 
-function AmenitiesSection({ code, data, hiddenAmenities, toggleAmenity }) {
+function AmenitiesSection({ code, data, chain, setChain }) {
   const counts = data.amenCounts[code];
-  const hasPoints = Boolean(data.amenities[code]);
-  if (!counts) return <EmptyNote>amenity data for {code}</EmptyNote>;
+  const shops = allChainShops(data.amenities);
+  const inCity = (k) => shops.filter((x) => x.chain === k).length;
+  const inHere = (k) => shops.filter((x) => x.chain === k && x.district === code).length;
+  const picked = chain ? chainInfo(chain) : null;
   return (
-    <section className="profile-section">
-      <SectionTitle eyebrow="WITHIN THE DISTRICT" title="Amenities" icon="cart" />
-      <p className="section-description">
-        {hasPoints ? 'Tap a category to show or hide its dots on the map.' : 'Counts only. Location points for this district have not been uploaded yet.'}
-      </p>
-      <div className="amenities-grid">
-        {AMENITY_TYPES.map(([k, label, icon, colour]) => {
-          const off = hiddenAmenities.has(k);
-          return (
-            <button type="button" key={k} className={`amenity-tile ${off ? 'is-off' : ''}`} aria-pressed={!off} disabled={!hasPoints} onClick={() => toggleAmenity(k)}>
-              <Icon className="amenity-icon" style={{ color: colour }} html={ICONS[icon]} />
-              <span className="amenity-label">{label}</span>
-              <strong>{counts[k] ?? 0}</strong>
+    <>
+      <section className="profile-section">
+        <SectionTitle eyebrow="SUPERMARKETS" title="Find a chain on the map" icon="cart" />
+        <p className="section-description">Pick a chain to see all its shops on the map. The number is how many are in {code}.</p>
+        <div className="chain-picker top-gap">
+          {CHAINS.map(([k, label, colour]) => (
+            <button
+              type="button"
+              key={k}
+              aria-pressed={chain === k}
+              disabled={!inCity(k)}
+              style={chain === k ? { background: colour } : undefined}
+              onClick={() => setChain(chain === k ? null : k)}
+            >
+              <i style={{ background: colour }} />{label}<small>{inHere(k)}</small>
             </button>
-          );
-        })}
-      </div>
-      {counts.asian != null && <p className="section-description top-gap">Includes {counts.asian} Asian restaurants.</p>}
-    </section>
+          ))}
+        </div>
+        {picked && (
+          <p className="chain-result">
+            <b>{inHere(chain)} {picked[1]}</b> in {code} · {inCity(chain)} across Dublin, all shown on the map.
+            <button type="button" className="chain-clear" onClick={() => setChain(null)}>Clear</button>
+          </p>
+        )}
+        {!data.amenities[code] && <p className="section-description top-gap">Shop locations for {code} have not been collected yet, so only other districts can show.</p>}
+      </section>
+
+      <section className="profile-section">
+        <SectionTitle eyebrow="WITHIN THE DISTRICT" title="Amenities" icon="cart" />
+        {counts ? (
+          <>
+            <div className="amenities-grid">
+              {AMENITY_TYPES.map(([k, label, icon, colour]) => (
+                <div key={k} className="amenity-tile">
+                  <Icon className="amenity-icon" style={{ color: colour }} html={ICONS[icon]} />
+                  <span className="amenity-label">{label}</span>
+                  <strong>{counts[k] ?? 0}</strong>
+                </div>
+              ))}
+            </div>
+            {counts.asian != null && <p className="section-description top-gap">Includes {counts.asian} Asian restaurants.</p>}
+          </>
+        ) : <EmptyNote>amenity data for {code}</EmptyNote>}
+      </section>
+    </>
   );
 }
 
@@ -467,9 +497,10 @@ function UniversitiesSection({ code, onCampusClick, onCampusHover }) {
 }
 
 export default function DistrictProfile({
-  selectedId, data, team, places, tab, setTab, rentMode, setRentMode, hiddenAmenities, toggleAmenity,
+  selectedId, data, team, places, tab, setTab, rentMode, setRentMode, chain = null, setChain = () => {},
   uni, setUni, hoverPlace, setHoverPlace, onPlaceClick, onStopClick, onSelect,
   onCampusClick = () => {}, onCampusHover = () => {},
+  journey, setJourney, journeyFrom, journeyTo, picking = null, setPicking = () => {},
 }) {
   const profile = data.profiles[selectedId];
   const index = ACTIVE_DISTRICTS.indexOf(selectedId);
@@ -511,9 +542,10 @@ export default function DistrictProfile({
 
         {tab === 'places' && <PlacesSection code={selectedId} places={places} hoverPlace={hoverPlace} onHoverPlace={setHoverPlace} onPlaceClick={onPlaceClick} />}
         {tab === 'rent' && <RentSection code={selectedId} data={data} rentMode={rentMode} setRentMode={setRentMode} />}
-        {tab === 'amen' && <AmenitiesSection code={selectedId} data={data} hiddenAmenities={hiddenAmenities} toggleAmenity={toggleAmenity} />}
+        {tab === 'amen' && <AmenitiesSection code={selectedId} data={data} chain={chain} setChain={setChain} />}
         {tab === 'safety' && <SafetySection code={selectedId} data={data} />}
         {tab === 'commute' && <CommuteSection code={selectedId} data={data} uni={uni} setUni={setUni} onStopClick={onStopClick} />}
+        {tab === 'journey' && journey && <JourneyPanel code={selectedId} data={data} journey={journey} setJourney={setJourney} from={journeyFrom} to={journeyTo} picking={picking} setPicking={setPicking} />}
         {tab === 'area' && <AreaSection code={selectedId} data={data} />}
         {tab === 'unis' && <UniversitiesSection code={selectedId} onCampusClick={onCampusClick} onCampusHover={onCampusHover} />}
       </div>
