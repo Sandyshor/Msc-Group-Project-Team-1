@@ -8,7 +8,11 @@ function Districts() {
   const [searchParams] = useSearchParams()
   const district = location.state?.district ?? searchParams.get('district') ?? undefined
 
-  return <DistrictProfile key={location.key} initialDistrictId={district?.toUpperCase()} />
+  return (
+    <div data-site-tour="districts">
+      <DistrictProfile key={location.key} initialDistrictId={district?.toUpperCase()} />
+    </div>
+  )
 }
 
 export default Districts

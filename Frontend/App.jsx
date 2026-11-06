@@ -26,11 +26,7 @@ function App() {
     src="/images/find-your-dublin-logo.png"
     alt=""
   />
-  <img
-    className="brand-wordmark"
-    src="/images/find-my-dublin-wordmark-dark.png"
-    alt="Find My Dublin"
-  />
+  <span>Find Your Dublin</span>
 </Link>
 
 
