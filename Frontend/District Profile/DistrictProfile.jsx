@@ -334,7 +334,6 @@ function SafetyKey() {
           <li key={name}><i style={{ background: heatColor(samples[i]) }} />{name}<small>{ranges[i]}</small></li>
         ))}
       </ul>
-      <small>Numbers on the map are each district’s score out of 100. Zoom in for neighbourhood areas.</small>
     </div>
   );
 }
@@ -398,7 +397,6 @@ function SafetySection({ code, data }) {
               })}
             </tbody>
           </table>
-          <p className="section-description top-gap">“Ireland” is the rate across Ireland’s 105 town and city Garda stations. People = residents plus daytime workers and students.</p>
         </section>
       )}
 
@@ -409,7 +407,6 @@ function SafetySection({ code, data }) {
           {s.night != null && <div className="rent-tile"><span>Night transport</span><strong>{Math.round(s.night * 100)}%</strong><small>of streets near a stop served 23:00–05:00</small></div>}
           {s.lit != null && <div className="rent-tile"><span>Street lighting</span><strong>{Math.round(s.lit * 100)}%</strong><small>of mapped streets are lit</small></div>}
         </div>
-        <p className="section-description top-gap">Shown for context. These are not part of the crime score.</p>
       </section>
 
       {s.hoods?.length > 0 && (
@@ -439,13 +436,8 @@ function SafetySection({ code, data }) {
               </div>
             ))}
           </div>
-          <p className="section-description top-gap">The district score is the average of these station areas, weighted by how many residents live in each.</p>
         </section>
       )}
-
-      <p className="section-description top-gap">
-        Score = 100 × R ÷ (R + L) for each crime type, where R is the Irish town and city rate and L the local rate; the five types are weighted as shown. Recorded crime only: not the chance of becoming a victim. Source: CSO recorded crime (CJA11), 2023–2025, and Census 2022.
-      </p>
     </>
   );
 }
