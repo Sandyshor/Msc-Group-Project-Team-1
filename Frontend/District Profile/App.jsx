@@ -200,7 +200,13 @@ export default function App() {
   // A new district means a new start point; leaving the Journey tab stops map picking
   useEffect(() => { setJourney((j) => ({ ...j, from: null, itineraries: [], status: 'idle' })); setPicking(null); }, [selectedId]);
   useEffect(() => { if (tab !== 'journey') setPicking(null); }, [tab]);
-
+  
+  const lastTab = useRef(tab);
+  useEffect(() => {
+    if (lastTab.current === tab) return;
+    lastTab.current = tab;
+    setShowHeat(tab === 'safety');
+  }, [tab]);
   if (error) return <div className="district-page"><p className="empty-note">Could not load district data: {error}</p></div>;
   if (!data) return <div className="district-page"><p className="empty-note">Loading district map…</p></div>;
 
@@ -245,16 +251,13 @@ export default function App() {
           <i className="red-line" /><i className="green-line" /> Luas lines
         </button>
         <button type="button" className="luas-toggle layer-toggle" aria-pressed={showCampuses || tab === 'unis'} onClick={() => setShowCampuses((v) => !v)}>
-          <i className="dot-campus" /> Campuses
-        </button>
-        <button type="button" className="luas-toggle layer-toggle" aria-pressed={showLandmarks} onClick={() => setShowLandmarks((v) => !v)}>
-          <i className="dot-landmark" /> Landmarks
+          <i className="dot-campus" /> Campuses  
         </button>
         <button type="button" className="luas-toggle bikes-toggle" aria-pressed={showBikes} onClick={() => setShowBikes((v) => !v)}>
           <i className="bike-dot" /> Dublin Bikes
         </button>
-        <button type="button" className="heat-toggle" aria-pressed={showHeat || tab === 'safety'} onClick={() => setShowHeat((v) => !v)}>
-          <i /> Safety colours
+                <button type="button" className="luas-toggle layer-toggle" aria-pressed={showHeat} onClick={() => setShowHeat((v) => !v)}>
+          <i className="dot-safety" /> Safety colours
         </button>
       </div>
 
@@ -272,7 +275,6 @@ export default function App() {
             <div>
               <p className="eyebrow">Interactive map</p>
               <h2>Choose a district</h2>
-              <p className="map-subtitle">Click a district, a famous place, a campus or any Luas stop. Colours show how safe each area is: red = more crime, green = less.</p>
             </div>
             <span className="map-live"><i /> Live street map</span>
           </div>
