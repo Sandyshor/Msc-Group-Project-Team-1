@@ -1,7 +1,6 @@
-// The Universities and Famous attractions pages: photo cards the student scrolls sideways, and a map of all of them.
-import { useEffect, useRef, useState } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+// The Universities and Famous attractions pages: photo cards the student scrolls sideways.
+// The maps now live in the district profiles, so these pages have no map of their own.
+import { useRef } from 'react'
 import './HomePage.css'
 
 // Photographs are from the institutions' sites or published campus-photo pages.
@@ -561,148 +560,8 @@ function CardRail({ title, label, children }) {
   )
 }
 
-function DublinMap({ title, locations, variant }) {
-  const isCampusMap = variant === 'campuses'
-  const mapContainerRef = useRef(null)
-  const mapRef = useRef(null)
-  const markersRef = useRef(new Map())
-  const [activeLocation, setActiveLocation] = useState(null)
-
-  useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return undefined
-
-    const map = L.map(mapContainerRef.current, {
-      scrollWheelZoom: false,
-      zoomControl: true,
-    })
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-      maxZoom: 19,
-    }).addTo(map)
-
-    const markers = new Map()
-    locations.forEach((location) => {
-      const locationKey = location.id
-      const paths = mapIconPaths[location.icon]
-        .map((path) => `<path d="${path}" />`)
-        .join('')
-      const markerClass = isCampusMap ? 'fd-map-marker-campus' : 'fd-map-marker-attraction'
-      const icon = L.divIcon({
-        className: 'fd-map-marker',
-        html: `<span class="${markerClass}"><svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg></span>`,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20],
-        popupAnchor: [0, -18],
-      })
-      const marker = L.marker(location.coordinates, {
-        icon,
-        title: location.name,
-        alt: location.name,
-        keyboard: true,
-      }).addTo(map)
-      const popup = document.createElement('div')
-      const name = document.createElement('strong')
-      const address = document.createElement('p')
-      const link = document.createElement('a')
-
-      name.textContent = location.name
-      address.textContent = location.location || 'Dublin, Ireland'
-      link.href = location.url
-      link.target = '_blank'
-      link.rel = 'noreferrer'
-      link.textContent = `${isCampusMap ? 'Official website' : 'Explore more'} ↗`
-      popup.append(name, address, link)
-      marker.bindPopup(popup, { className: 'fd-map-popup' })
-      marker.on('click', (event) => {
-        L.DomEvent.stopPropagation(event)
-        setActiveLocation(locationKey)
-      })
-      markers.set(locationKey, marker)
-    })
-
-    map.fitBounds(
-      L.latLngBounds(locations.map((location) => location.coordinates)),
-      { padding: [28, 28], maxZoom: 13 },
-    )
-    map.on('click', () => setActiveLocation(null))
-    mapRef.current = map
-    markersRef.current = markers
-    requestAnimationFrame(() => map.invalidateSize())
-
-    return () => {
-      map.remove()
-      mapRef.current = null
-      markersRef.current = new Map()
-    }
-  }, [isCampusMap, locations])
-
-  useEffect(() => {
-    const map = mapRef.current
-    if (!map) return
-
-    markersRef.current.forEach((marker, locationKey) => {
-      const isActive = locationKey === activeLocation
-      marker.getElement()?.classList.toggle('is-active', isActive)
-      if (isActive) {
-        map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 15), { duration: 0.45 })
-        marker.openPopup()
-      } else {
-        marker.closePopup()
-      }
-    })
-  }, [activeLocation])
-
-  return (
-    <section className={`fd-location-map fd-location-map-${variant}`} aria-labelledby={`${variant}-map-heading`}>
-      <div className="fd-map-heading">
-        <div>
-          <p className="fd-section-kicker">DUBLIN AT A GLANCE</p>
-          <h3 id={`${variant}-map-heading`}>{title}</h3>
-        </div>
-        <span className="fd-map-caption"><i /> INTERACTIVE OPENSTREETMAP</span>
-      </div>
-      <div className="fd-map-panel">
-        <div className="fd-map-canvas">
-          <div
-            ref={mapContainerRef}
-            className="fd-leaflet-map"
-            role="region"
-            aria-label={`${title} interactive OpenStreetMap`}
-          />
-        </div>
-        <ol className="fd-map-legend">
-          {locations.map((location) => {
-            const locationKey = location.id
-
-            return (
-              <li key={locationKey}>
-                <a
-                  className={activeLocation === locationKey ? 'is-active' : ''}
-                  href={location.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  onMouseEnter={() => setActiveLocation(locationKey)}
-                  onMouseLeave={() => setActiveLocation(null)}
-                  onFocus={() => setActiveLocation(locationKey)}
-                  onBlur={() => setActiveLocation(null)}
-                  aria-current={activeLocation === locationKey ? 'location' : undefined}
-                >
-                  <MapIcon name={location.icon} className="fd-map-legend-icon" />
-                  <span><strong>{location.name}</strong><small>{location.location || location.category}</small></span>
-                  <b aria-hidden="true">↗</b>
-                </a>
-              </li>
-            )
-          })}
-        </ol>
-      </div>
-      <p className="fd-map-disclaimer">Explore a live OpenStreetMap with pan, zoom and place markers. Map tiles and street data are provided by OpenStreetMap contributors; opening hours and travel conditions can change.</p>
-    </section>
-  )
-}
-
-// One page: heading, the cards and the map
-function GuidePage({ kicker, title, accent, description, railTitle, label, items, renderCard, mapTitle, variant, tourTarget }) {
+// One page: heading and the cards
+function GuidePage({ kicker, title, accent, description, railTitle, label, items, renderCard, variant, tourTarget }) {
   return (
     <div className="fd-home fd-guide-page">
       <section className={`fd-moving-section fd-guide-section fd-guide-${variant}`} data-site-tour={tourTarget}>
@@ -716,7 +575,6 @@ function GuidePage({ kicker, title, accent, description, railTitle, label, items
         <div className="fd-section-rail">
           <CardRail title={railTitle} label={label}>{items.map(renderCard)}</CardRail>
         </div>
-        <DublinMap title={mapTitle} locations={items} variant={variant} />
       </section>
     </div>
   )
@@ -733,7 +591,6 @@ export function UniversitiesPage() {
       label="Universities and campuses"
       items={universities}
       renderCard={(school) => <UniversityCard school={school} key={school.id} />}
-      mapTitle="Find the campuses across Dublin."
       variant="campuses"
       tourTarget="universities"
     />
@@ -751,7 +608,6 @@ export function AttractionsPage() {
       label="Places to explore in Dublin"
       items={attractions}
       renderCard={(place) => <AttractionCard place={place} key={place.id} />}
-      mapTitle="Landmarks, all around the city."
       variant="attractions"
       tourTarget="attractions"
     />

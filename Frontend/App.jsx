@@ -28,7 +28,8 @@ function App() {
   />
   <img
     className="brand-wordmark"
-    src="/images/find-my-dublin-wordmark-4k.png"
+    // Dark letters on the light homepage bar, light letters on the dark green bar of the other pages
+    src={location.pathname === '/' ? '/images/find-my-dublin-wordmark-4k.png' : '/images/find-my-dublin-wordmark-light.png'}
     alt="Find My Dublin"
   />
 </Link>
@@ -39,7 +40,7 @@ function App() {
   {/* NavLink marks the current page */}
   <NavLink to="/" end>Home</NavLink>
   <NavLink to="/districts">Explore districts</NavLink>
-  <NavLink to="/universities">Universities</NavLink>
+  <NavLink to="/campuses">Universities</NavLink>
   <NavLink to="/attractions">Famous attractions</NavLink>
   <NavLink to="/how-it-works">How it works</NavLink>
 </nav>
@@ -74,7 +75,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/districts" element={<Districts />} />
-          <Route path="/universities" element={<UniversitiesPage />} />
+          {/* Not /universities: the backend already uses that address for its list of universities */}
+          <Route path="/campuses" element={<UniversitiesPage />} />
           <Route path="/attractions" element={<AttractionsPage />} />
           <Route path="/results" element={<Results />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
