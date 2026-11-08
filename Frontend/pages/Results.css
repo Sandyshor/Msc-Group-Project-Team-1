@@ -1478,3 +1478,12 @@
 .res-here { background: #dcebd6; color: #1f5641; }
 .res-source { justify-self: start; margin-top: 2px; color: #4d6b5c; font-size: 11.5px; text-decoration: underline; text-underline-offset: 2px; }
 .res-source.is-listing { color: #8a5a17; }
+
+/* Phones: residence cards use the full width (no icon column) */
+@media (max-width: 520px) {
+  .home-card { grid-template-columns: minmax(0, 1fr); gap: 4px; padding: 12px 14px; }
+  .home-icon { display: none; }
+  .home-body strong { white-space: normal; }
+  .home-card > * { grid-column: 1 / -1; justify-self: start; text-align: left; }
+  .result-card { padding: 16px; }
+}

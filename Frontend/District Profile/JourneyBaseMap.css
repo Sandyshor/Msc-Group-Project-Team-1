@@ -290,3 +290,13 @@
 .dp-info-card b:first-child { margin-top: 0; }
 .dp-info-card p { margin: 3px 0 0; }
 .dp-info-card a { color: #1f5a45; font-weight: 700; }
+
+/* Phones: the hint sits under the Layers button and wraps, instead of being cut off behind it */
+@media (max-width: 600px) {
+  .jp-map-hint { top: 62px; left: 12px; right: auto; max-width: calc(100% - 72px); transform: none; padding: 8px 12px; border-radius: 14px; white-space: normal; line-height: 1.35; }
+  .jp-map-hint .jp-hint-text { white-space: normal; overflow: visible; }
+}
+/* Phones: "County Dublin" gets two cells so its label fits */
+@media (max-width: 600px) {
+  .map-toolbar .district-chips .county-toggle { grid-column: span 2; justify-content: center; }
+}
