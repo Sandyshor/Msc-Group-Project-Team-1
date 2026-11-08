@@ -117,3 +117,6 @@
 .navbar.nav-tight-2 .tour-trigger, .navbar.nav-tight-2 .login-link { padding: 9px 10px; font-size: 14px; }
 .navbar.nav-tight-2 .tour-trigger .nav-icon, .navbar.nav-tight-2 .login-link .nav-icon { display: none; }
 .navbar.nav-tight-2 .lang-switch-button { padding-inline: 10px; }
+
+/* Side padding grows smoothly with the window (no jump at 1600px), so zooming out never squeezes the header */
+.navbar:not(.navbar-home) { padding-inline: clamp(16px, 2.5vw, 56px); }

@@ -87,3 +87,22 @@
   .cap-hat, .cap-tassel, .brand-cap.toss-a .cap-hat, .brand-cap.toss-b .cap-hat,
   .brand-cap.toss-a .cap-tassel, .brand-cap.toss-b .cap-tassel, .brand:hover .brand-logo { animation: none; }
 }
+
+/* The cap is placed in % of the wordmark box, so the box must always have the image's exact shape
+   (3230 x 768). Header sizes set only the width; the height follows, so the cap stays on the D at every size. */
+.navbar .brand-word .brand-wordmark { height: auto !important; aspect-ratio: 3230 / 768; object-fit: fill; }
+
+/* One logo size per header level (not per screen width), so zooming in or out changes it in steady steps
+   instead of jumping between the older width-based sizes. */
+.navbar .brand-word .brand-wordmark { width: 190px !important; }
+.navbar .brand .brand-logo { width: 44px !important; height: 53px !important; }
+.navbar.nav-tight-1 .brand-word .brand-wordmark { width: 175px !important; }
+.navbar.nav-tight-1 .brand .brand-logo { width: 42px !important; height: 50px !important; }
+.navbar.nav-tight-2 .brand-word .brand-wordmark { width: 160px !important; }
+.navbar.nav-tight-2 .brand .brand-logo { width: 39px !important; height: 47px !important; }
+.navbar.nav-compact .brand-word .brand-wordmark { width: 150px !important; }
+.navbar.nav-compact .brand .brand-logo { width: 36px !important; height: 44px !important; }
+@media (max-width: 360px) {
+  .navbar .brand-word .brand-wordmark { width: 124px !important; }
+  .navbar .brand .brand-logo { width: 28px !important; height: 36px !important; }
+}
