@@ -137,7 +137,7 @@ export default function ThingsToKnow() {
   const pct = Math.round((count / ALL_IDS.length) * 100)
 
   return (
-    <div className="cg-page ttk-page">
+    <div className="cg-page ttk-page" data-site-tour="things-to-know">
       <header className="cg-hero">
         <img className="cg-hero-img" src="/images/flow/georgian-doors.jpg" alt="" />
         <div className="cg-hero-text">
