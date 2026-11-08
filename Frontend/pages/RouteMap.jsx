@@ -91,6 +91,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, mode, defa
   const [start, setStart] = useState(null) // null = the neighbourhood centre; else { lat, lng, name }
   const [trip, setTrip] = useState({ status: 'idle' }) // route for a picked start: minutes, km, estimate?
   const [near, setNear] = useState(null) // nearby transport for the card: bus routes, Luas/rail stop, bike docks
+  const [tripBuses, setTripBuses] = useState({ direct: false, lines: [] }) // bus lines the planned trip uses
   const animRef = useRef({ timer: null, frame: null, traveller: null })
 
   function stopTraveller() {
@@ -238,6 +239,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, mode, defa
     const straightKm = km(from, to)
     draw([{ points: [from, to], colour: '#9aa79f', dashed: true }], { animate: false })
     if (start) setTrip({ status: 'loading' })
+    setTripBuses({ direct: false, lines: [] })
     const query = new URLSearchParams({
       from_lat: from[0], from_lon: from[1], to_lat: to[0], to_lon: to[1],
       mode: ROUTE_MODES[mode], when: nextWeekdayNine(), arrive_by: 'true',
@@ -254,6 +256,8 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, mode, defa
         }))
         if (!lines.length) throw new Error('no route line')
         draw(lines)
+        const rides = best.legs.filter((leg) => leg.mode !== 'WALK' && leg.mode !== 'BICYCLE')
+        setTripBuses({ direct: rides.length === 1, lines: [...new Set(rides.filter((leg) => leg.mode === 'BUS' && leg.line).map((leg) => leg.line))] })
         if (start) setTrip({ status: 'done', minutes: Math.round(best.total_minutes), km: best.total_distance_km, transfers: best.transfers })
         else setTrip({ status: 'idle', routeShown: true })
       })
@@ -291,13 +295,25 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, mode, defa
           const [lng, lat] = f.geometry.coordinates
           stations.push({ name: f.properties.name, kind: f.properties.dart ? 'DART / rail' : 'Rail', lat, lng })
         })
-        const routes = new Set()
+        // only the buses that go to the university: a route with a stop within 500 m of the start AND within 500 m of the university
+        const atStart = new Set()
+        const atUni = new Set()
         ;(bus?.features || []).forEach((f) => {
+          if (!f.properties.routes) return
           const [lng, lat] = f.geometry.coordinates
-          if (f.properties.routes && metres(from, [lat, lng]) <= 400) f.properties.routes.split(';').forEach((r) => { const v = r.trim(); if (v && !/^(none|n\/a|unknown)$/i.test(v)) routes.add(v) })
+          const nearStart = metres(from, [lat, lng]) <= 500
+          const nearUni = metres(to, [lat, lng]) <= 500
+          if (!nearStart && !nearUni) return
+          f.properties.routes.split(';').forEach((r) => {
+            const v = r.trim()
+            if (!v || /^(none|n\/a|unknown)$/i.test(v)) return
+            if (nearStart) atStart.add(v)
+            if (nearUni) atUni.add(v)
+          })
         })
+        const direct = [...atStart].filter((r) => atUni.has(r)).sort(naturalSort)
         const nearest = stations.map((st) => ({ ...st, m: metres(from, [st.lat, st.lng]) })).sort((a, b) => a.m - b.m)[0]
-        setNear({ kind: 'transit', busRoutes: [...routes].sort(naturalSort), station: nearest })
+        setNear({ kind: 'transit', busRoutes: direct, station: nearest })
       })
     } else if (mode === 'cycle') {
       Promise.all([getJson(BIKES_INFO_URL), fetch(BIKES_STATUS_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null)]).then(([info, status]) => {
@@ -320,6 +336,11 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, mode, defa
   const fmtKm = (v) => (v == null ? '' : v < 1 ? `${Math.round(v * 1000)} m` : `${v.toFixed(1)} km`)
   const words = MODE_WORDS[mode]
   const placeName = start ? start.name : fromName
+  // direct buses: from the stop data, plus the planner's bus when its trip needs no change
+  // (newer BusConnects lines such as E1 aren't in the stop data yet)
+  const directBuses = near?.kind === 'transit'
+    ? [...new Set([...(tripBuses.direct ? tripBuses.lines : []), ...near.busRoutes])].sort(naturalSort)
+    : []
 
   return (
     <div className="route-map-wrap">
@@ -338,8 +359,10 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, mode, defa
         </div>
         {near?.kind === 'transit' && (
           <div className="route-near">
-            {near.busRoutes.length > 0 && (
-              <p><b>Buses near {placeName}</b><span className="route-chips">{near.busRoutes.slice(0, 14).map((r) => <i key={r}>{r}</i>)}{near.busRoutes.length > 14 && <em>+{near.busRoutes.length - 14} more</em>}</span></p>
+            {directBuses.length > 0 ? (
+              <p><b>Buses to {toName}</b><span className="route-chips">{directBuses.slice(0, 14).map((r) => <i key={r}>{r}</i>)}{directBuses.length > 14 && <em>+{directBuses.length - 14} more</em>}</span></p>
+            ) : tripBuses.lines.length > 0 && (
+              <p><b>No direct bus · this trip uses</b><span className="route-chips">{tripBuses.lines.map((r) => <i key={r}>{r}</i>)}</span></p>
             )}
             {near.station && <p><b>Nearest {near.station.kind.startsWith('Luas') ? 'Luas' : 'rail'} stop</b><span>{near.station.name} · {fmtKm(near.station.m / 1000)} from {placeName}</span></p>}
           </div>
