@@ -1,0 +1,292 @@
+/* District features drawn on top of the journey planner map (JourneyBaseMap.jsx). */
+.district-map.jp-scope { background: #eef1ec; }
+.district-map .jp-route-map { font-family: "DM Sans", Arial, sans-serif; }
+
+/* divIcons that are centred on their point and sized by their own content */
+.dp-icon { background: transparent; border: 0; }
+.dp-anchor { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); white-space: nowrap; }
+.dp-anchor-bottom { transform: translate(-50%, calc(-100% - 6px)); }
+.dp-code .dm-code { cursor: pointer; }
+.dp-place .dm-place { cursor: pointer; }
+
+/* Leaflet popups in the district style */
+.district-map .leaflet-popup-content-wrapper { border-radius: 14px; box-shadow: 0 12px 30px rgba(16, 47, 42, 0.18); }
+.district-map .leaflet-popup-content { margin: 12px 14px; }
+.dp-popup-actions { display: grid; gap: 6px; margin-top: 10px; }
+.dp-popup-actions .stop-open { margin-top: 0; }
+.stop-open.dp-route-here { color: var(--forest, #173f37); background: #e8f0e9; }
+
+/* Layer list button (collapsed) */
+.district-map .leaflet-control-layers-toggle { width: 38px; height: 38px; border-radius: 10px; }
+.district-map .leaflet-top.leaflet-right { top: 4px; right: 4px; }
+
+/* ---------------------------------------------------------------- journey panel (profile Journey tab) */
+.jp-panel { display: grid; gap: 14px; }
+.jp-panel .jp-route-controls { margin-bottom: 0; }
+.jp-reset-button { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--forest); background: #fff; font: 700 12px "DM Sans", sans-serif; cursor: pointer; transition: background .2s, border-color .2s; }
+.jp-reset-button:hover { border-color: var(--forest-soft); background: var(--mint); }
+.jp-reset-button.jp-route-reset { margin-left: auto; }
+.jp-error-box { padding: 11px 13px; border: 1px solid #f0cbc4; border-radius: 12px; color: #8c302b; background: #fff6f3; font-size: 12px; line-height: 1.5; }
+.jp-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; justify-content: center; }
+.jp-quick button { padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; color: var(--forest); background: #fff; font: 700 11px "DM Sans", sans-serif; cursor: pointer; }
+.jp-quick button:hover { background: var(--mint); }
+
+/* Legend under the map */
+.map-legend .district-outline-line { height: 0; border-top: 3px dashed; border-radius: 0; background: none; }
+
+/* ---------------------------------------------------------------- one pin style for every marker
+   White circle + emoji + coloured ring (--ring). Size and labels follow the zoom level:
+   z-far (<12) small dots · z-mid (12-14) full pins · z-near (>=14) bigger + names for universities
+   and famous places · z-street (>=15.5) names for every amenity and shop. */
+.pm-icon { background: transparent; border: 0; }
+.pm { --size: 30px; --emoji: 16px; position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); }
+.pm-dot { display: grid; place-items: center; width: var(--size); height: var(--size); border: 2px solid var(--ring); border-radius: 50%; background: #fff; box-shadow: 0 3px 10px rgba(16, 47, 42, 0.25); font-size: var(--emoji); line-height: 1; cursor: pointer; transition: width .2s ease, height .2s ease, font-size .2s ease, transform .15s ease; }
+.pm:hover .pm-dot, .pm.on .pm-dot { transform: scale(1.15); }
+.pm-label { position: absolute; top: calc(100% + 3px); left: 50%; display: none; width: max-content; max-width: 150px; transform: translateX(-50%); color: #1f3d33; font: 700 11px/1.2 "DM Sans", sans-serif; text-align: center; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 6px #fff, 0 0 6px #fff; pointer-events: none; }
+
+.z-far .pm { --size: 20px; --emoji: 11px; }
+.z-far .pm-dot { border-width: 1.5px; box-shadow: 0 2px 5px rgba(16, 47, 42, 0.22); }
+.z-far .pm-amenity { --size: 16px; --emoji: 9px; }
+.z-mid .pm-amenity { --size: 24px; --emoji: 13px; }
+.z-near .pm { --size: 34px; --emoji: 18px; }
+.z-near .pm-amenity { --size: 28px; --emoji: 15px; }
+.z-near .pm-uni .pm-label, .z-near .pm-place .pm-label, .z-near .pm-landmark .pm-label { display: block; }
+.z-street .pm { --size: 38px; --emoji: 20px; }
+.z-street .pm-amenity { --size: 32px; --emoji: 17px; }
+.z-street .pm-amenity .pm-label { display: block; font-size: 10px; }
+.pm-uni { z-index: 2; }
+
+/* Layer list rows use the same pin */
+.pm-row { display: inline-flex; align-items: center; gap: 7px; vertical-align: middle; }
+.pm-row-dot { display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid var(--ring); border-radius: 50%; background: #fff; font-size: 12px; line-height: 1; }
+.pm-sub { display: inline-block; margin-left: 16px; }
+.district-map .leaflet-control-layers-expanded { padding: 8px 12px 8px 8px; }
+.district-map .leaflet-control-layers label { margin: 2px 0; }
+.map-legend .legend-pin i { display: inline-grid; place-items: center; width: 20px; height: 20px; border: 2px solid #173f37; border-radius: 50%; background: #fff; font-size: 11px; font-style: normal; }
+.map-legend .legend-more { color: #8a988b; }
+
+/* hidden overlays must stay hidden even though their classes set display */
+.jp-scope [hidden] { display: none !important; }
+.pm-label.pm-label-hidden { visibility: hidden; }
+
+/* Store word logos (TESCO, SPAR, CIRCLE K...) from the journey planner, on a white tile; scale with zoom */
+.pm-dot.pm-brand { width: auto; height: auto; padding: 3px; border-width: 0; border-radius: 9px; }
+.pm-brand .jp-brand-logo { width: 40px; height: 26px; font-size: 8px; }
+.pm-brand .jp-brand-logo-tesco, .pm-brand .jp-brand-logo-spar, .pm-brand .jp-brand-logo-aldi, .pm-brand .jp-brand-logo-lidl, .pm-brand .jp-brand-logo-gala { font-size: 9px; }
+.pm-brand .jp-brand-logo-lidl, .pm-brand .jp-brand-logo-circlek { width: 30px; height: 30px; }
+.z-far .pm-dot.pm-brand { transform: scale(.55); }
+.z-mid .pm-dot.pm-brand { transform: scale(.75); }
+.z-far .pm:hover .pm-dot.pm-brand { transform: scale(.65); }
+.z-mid .pm:hover .pm-dot.pm-brand { transform: scale(.85); }
+
+/* Dublin Bikes names */
+.z-near .pm-bike .pm-label { display: block; font-size: 10px; }
+
+/* Transit stops (Luas, DART and rail stations) */
+.tr-stop { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); }
+.tr-stop-dot { display: block; width: 12px; height: 12px; border: 3px solid var(--ring); border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px #fff, 0 2px 6px rgba(0, 0, 0, 0.3); cursor: pointer; transition: transform .15s ease; }
+.tr-stop:hover .tr-stop-dot { transform: scale(1.3); }
+.tr-rail .tr-stop-dot { border-radius: 4px; }
+.z-near .tr-stop-dot { width: 14px; height: 14px; border-width: 3.5px; }
+.tr-stop .pm-label { color: #2b3a33; font-size: 10.5px; }
+.z-near .tr-stop .pm-label { display: block; }
+
+/* Transport buttons above the map */
+.district-controls .tr-toggle i { display: inline-block; width: 12px; height: 12px; margin-right: 1px; border-radius: 50%; vertical-align: -1px; }
+.district-controls .tr-toggle .tr-luas { width: 22px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #e0312b 0 50%, #00a651 50%); }
+.district-controls .tr-toggle .tr-bus { background: #f5b400; box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px #d9a000; }
+.district-controls .tr-toggle .tr-bikes { background: #1f6fb2; box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px #1f6fb2; }
+.district-controls .tr-toggle .tr-rail { width: 22px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #7ac143 0 50%, #6f3f98 50%); }
+
+/* Placeholder card when no district is chosen yet */
+.welcome-card { padding: 26px 24px; }
+.welcome-card .eyebrow { margin-bottom: 6px; }
+.welcome-card h2 { margin: 0 0 8px; color: #214c39; font: 800 1.5rem/1.2 Manrope, sans-serif; letter-spacing: -0.03em; }
+.welcome-card > p { margin: 0 0 18px; color: #66766b; font-size: 0.9rem; line-height: 1.6; }
+.welcome-card h3 { margin: 22px 0 12px; color: #214c39; font: 800 1rem Manrope, sans-serif; }
+.district-controls .tr-toggle[aria-pressed="true"] { border-color: #a9c9b2; background: #eef6f0; color: #214c39; }
+
+/* Dublin Bikes: plain blue dots when zoomed out (115 docks), bike pins from street level */
+.z-far .pm-bike { --size: 9px; --emoji: 0px; }
+.z-far .pm-bike .pm-dot { border: 1.5px solid #fff; background: #1f6fb2; }
+.z-mid .pm-bike { --size: 13px; --emoji: 0px; }
+.z-mid .pm-bike .pm-dot { border: 2px solid #fff; background: #1f6fb2; }
+
+/* Map hint: one line of text in one font (the bold word no longer splits off with extra space) */
+.jp-map-hint .jp-hint-text { font: inherit; }
+.jp-map-hint strong { font: inherit; font-weight: 700; letter-spacing: inherit; }
+
+/* Nearby places at street level: names only, coloured by type (food, shops, health, parks) */
+.poi-text { position: absolute; left: 0; top: 0; width: max-content; max-width: 130px; transform: translate(-50%, -50%); color: var(--c); font: 600 10.5px/1.2 "DM Sans", sans-serif; text-align: center; text-shadow: 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #fff, 0 0 7px #fff; cursor: pointer; }
+.poi-text:hover { text-decoration: underline; }
+.z-street .poi-text { font-size: 11.5px; }
+.poi-text.pm-label-hidden { visibility: hidden; }
+
+/* ---------------------------------------------------------------- compact page layout
+   Short header; the filter, tour, transport buttons and district list sit inside the map card, and on
+   wide screens the map card fills the window height and stays put, so picking a district never
+   means scrolling away from the map. */
+.page-header.page-header-compact { display: block; margin: 0 0 16px; padding-left: 2px; }
+.page-header-compact h1 { margin: 0; font-size: clamp(1.6rem, 2.3vw, 2.1rem); line-height: 1.15; }
+.page-header-compact .page-description { max-width: none; margin-top: 4px; color: #66786b; font-size: 0.95rem; line-height: 1.5; }
+.district-page:has(.page-header-compact) { padding-top: clamp(12px, 1.6vw, 22px); }
+
+.map-card .map-toolbar { display: grid; gap: 8px; margin: 0 0 10px; }
+.map-toolbar .district-controls { margin: 0; gap: 6px; }
+.map-toolbar .toolbar-divider { width: 1px; height: 22px; margin: 0 2px; background: #dfe8da; }
+/* District buttons: one row of 22, evenly spaced across the map card */
+.map-toolbar .district-chips { display: grid; grid-template-columns: repeat(22, minmax(0, 1fr)) auto; gap: 4px; margin: 0; padding: 0; overflow: visible; }
+.map-toolbar .district-chips button, .map-toolbar .district-chips .chip-soon { min-height: 30px; padding: 5px 0; border-radius: 8px; font-size: 0.78rem; font-weight: 800; text-align: center; white-space: nowrap; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+.map-toolbar .district-chips button:hover { border-color: #9cbfa6; box-shadow: 0 3px 8px rgba(33, 75, 57, .12); transform: translateY(-1px); }
+@media (max-width: 1100px) { .map-toolbar .district-chips { grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); } }
+.map-card .map-legend { padding-top: 9px; }
+
+@media (min-width: 1101px) {
+  .district-layout { align-items: start; }
+  .map-card { position: sticky; top: 12px; display: flex; flex-direction: column; height: calc(100vh - 24px); min-height: 560px; }
+  .map-card .district-map { flex: 1 1 auto; height: auto; min-height: 360px; max-height: none; }
+  .profile-card { top: 12px; max-height: calc(100vh - 24px); }
+  .welcome-card { overflow-y: auto; }
+}
+
+/* Journey "From → To" with the place names */
+.jp-trip { position: relative; display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.jp-trip::before { content: ""; position: absolute; left: 21px; top: 30px; bottom: 30px; border-left: 2px dashed #c9d6cc; }
+.jp-trip li { position: relative; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 12px; background: #f4f7f2; color: var(--ink); }
+.jp-trip b { display: grid; flex: 0 0 22px; place-items: center; height: 22px; border-radius: 50%; color: #fff; font: 800 11px Manrope, sans-serif; }
+.jp-trip .is-a b { color: var(--lime); background: var(--forest); }
+.jp-trip .is-b b { background: #c8352b; }
+.jp-trip span { min-width: 0; overflow: hidden; font-size: 13px; font-weight: 700; line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+.jp-trip small { display: block; color: var(--muted); font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.jp-trip .is-empty span { color: var(--muted); font-weight: 500; }
+/* Map hint with both place names: keep it on one line inside the map */
+.jp-map-hint { max-width: calc(100% - 130px); }
+.jp-map-hint .jp-hint-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Safety map button, legend and tooltip */
+.district-controls .tr-toggle .tr-safety { width: 22px; height: 8px; border-radius: 3px; background: linear-gradient(90deg, #b23a2f, #e0694a, #f4cf62, #5fae6b, #25704a); }
+.map-legend .legend-safety { color: #687968; }
+.map-legend .legend-safety i { display: inline-block; width: 70px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #b23a2f, #e0694a, #f4cf62, #b5cf6c, #5fae6b, #25704a); }
+.leaflet-tooltip.safe-tooltip { max-width: 260px; white-space: normal; font-weight: 500; }
+
+/* Toolbar: compact buttons so filter, tour and all five map buttons fit on one line */
+.map-toolbar .district-controls { flex-wrap: nowrap; gap: 5px; }
+.map-toolbar .seg-toggle button { padding: 6px 10px; font-size: 0.74rem; }
+.map-toolbar .tour-button { padding: 7px 11px; font-size: 0.74rem; white-space: nowrap; }
+.map-toolbar .tr-toggle { padding: 6px 9px; gap: 5px; font-size: 0.72rem; white-space: nowrap; }
+.map-toolbar .toolbar-divider { margin: 0; }
+@media (max-width: 1250px) { .map-toolbar .district-controls { flex-wrap: wrap; } }
+.leaflet-tooltip.safe-tooltip { width: 250px; }
+.safe-tooltip .safe-pop > div { line-height: 1.35; }
+
+/* ================================================================ map polish */
+/* Frame: soft inner edge and a gentle top shade, so the map sits nicely inside the card */
+.map-card .district-map { border: 1px solid #d9e3d3; border-radius: 18px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 10px 30px rgba(33, 60, 44, 0.08); }
+.district-map .jp-map-vignette { box-shadow: inset 0 0 90px rgba(16, 47, 42, 0.14); background: linear-gradient(180deg, rgba(16, 47, 42, 0.08), transparent 110px); }
+
+/* Compass + zoom: one rounded column of buttons */
+.district-map .leaflet-bottom.leaflet-right { right: 6px; bottom: 18px; }
+.district-map .leaflet-bar { overflow: hidden; border: 0; border-radius: 14px; background: rgba(255, 255, 255, 0.94); box-shadow: 0 8px 22px rgba(16, 47, 42, 0.18); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.district-map .leaflet-bar a { width: 40px; height: 40px; line-height: 40px; color: #1f4a39; background: transparent; font-size: 20px; font-weight: 500; transition: background .15s ease, color .15s ease; }
+.district-map .leaflet-bar a:hover { background: #e8f2ec; color: #102f2a; }
+.district-map .dp-home-control { margin-bottom: 8px !important; }
+.dp-home { display: grid !important; place-items: center; }
+.dp-home svg { width: 24px; height: 24px; color: #1f4a39; }
+.dp-home .dp-needle { transform-origin: 12px 12px; }
+.dp-home.is-spinning .dp-needle { animation: dp-needle-spin .9s cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes dp-needle-spin { 0% { transform: rotate(0); } 60% { transform: rotate(400deg); } 100% { transform: rotate(360deg); } }
+
+/* Labelled Layers button */
+.district-map .leaflet-control-layers { border: 0; border-radius: 14px; box-shadow: 0 8px 22px rgba(16, 47, 42, 0.18); }
+.district-map .leaflet-control-layers-toggle {
+  display: inline-flex !important; align-items: center; gap: 7px; width: auto !important; height: 40px !important; padding: 0 14px 0 38px;
+  border-radius: 14px; background-color: rgba(255, 255, 255, 0.95); background-position: 11px center; background-size: 20px 20px;
+  color: #1f4a39; font: 800 12.5px "DM Sans", sans-serif; text-decoration: none;
+}
+.district-map .leaflet-control-layers-toggle:hover { background-color: #e8f2ec; }
+.district-map .leaflet-control-layers-expanded { padding: 10px 12px 10px 10px; border-radius: 14px; }
+
+/* Scale bar */
+.district-map .leaflet-control-scale { margin-left: 12px !important; margin-bottom: 18px !important; }
+.district-map .leaflet-control-scale-line { border: 2px solid #4b6457; border-top: 0; border-radius: 0 0 4px 4px; background: rgba(255, 255, 255, 0.85); color: #2f4a3e; font: 700 10px "DM Sans", sans-serif; }
+
+/* Selected district outline: dashes drift slowly around the boundary */
+.dp-outline-line { animation: dp-outline-march 22s linear infinite; }
+@keyframes dp-outline-march { to { stroke-dashoffset: -280; } }
+
+/* Pins pop in as they appear */
+.pm-dot, .tr-stop-dot { animation: dp-pin-pop .35s cubic-bezier(.3, 1.5, .5, 1) both; }
+@keyframes dp-pin-pop { from { opacity: 0; transform: scale(.4); } }
+.poi-text { animation: dp-fade .4s ease both; }
+@keyframes dp-fade { from { opacity: 0; } }
+
+/* Hint pill a touch richer */
+.district-map .jp-map-hint { border: 1px solid rgba(255, 255, 255, 0.85); background: rgba(255, 255, 255, 0.9); box-shadow: 0 10px 28px rgba(16, 47, 42, 0.18); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dp-outline-line, .pm-dot, .tr-stop-dot, .poi-text, .dp-home.is-spinning .dp-needle { animation: none; }
+}
+
+/* ================================================================ page polish */
+.district-page:has(.page-header-compact) {
+  background:
+    radial-gradient(900px 420px at 0% 0%, rgba(124, 182, 145, 0.16), transparent 70%),
+    radial-gradient(800px 380px at 100% 0%, rgba(217, 241, 126, 0.14), transparent 70%);
+}
+
+/* map card */
+.map-card { border-color: #e1eadc; box-shadow: 0 18px 44px rgba(33, 60, 44, 0.09); }
+.map-toolbar .district-controls { padding: 6px; border: 1px solid #e6ede1; border-radius: 16px; background: #f7f9f3; }
+.map-toolbar .seg-toggle { border-color: #e1e9dc; background: #fff; }
+.map-toolbar .tour-button { border-radius: 12px; box-shadow: 0 4px 12px rgba(217, 67, 81, 0.25); }
+.map-toolbar .tr-toggle { border-color: #e1e9dc; background: #fff; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
+.map-toolbar .tr-toggle:hover { transform: translateY(-1px); border-color: #b9d0bf; }
+.map-toolbar .tr-toggle[aria-pressed="false"] { opacity: 0.72; }
+.map-toolbar .district-chips button { background: #fff; box-shadow: 0 1px 2px rgba(33, 60, 44, 0.05); }
+.map-toolbar .district-chips button[aria-pressed="true"] { box-shadow: 0 6px 14px rgba(33, 60, 44, 0.22); transform: translateY(-1px); }
+
+/* legend under the map as small chips */
+.map-card .map-legend { gap: 6px; padding-top: 10px; }
+.map-card .map-legend > span { padding: 4px 10px; border: 1px solid #e6ede1; border-radius: 999px; background: #fbfcf8; font-size: 0.72rem; }
+.map-card .map-legend > span.legend-more { padding: 4px 2px; border: 0; background: none; }
+
+/* Selected district button: a small × shows it can be clicked again to clear */
+.map-toolbar .district-chips button { position: relative; }
+.map-toolbar .district-chips .chip-clear { position: absolute; top: -6px; right: -5px; display: grid; width: 15px; height: 15px; place-items: center; border: 1.5px solid #fff; border-radius: 50%; background: #1f2d29; color: #fff; font-size: 10px; font-weight: 800; line-height: 1; box-shadow: 0 2px 5px rgba(0,0,0,.25); }
+.map-toolbar .district-chips button[aria-pressed="true"]:hover .chip-clear { background: #d94351; }
+
+/* County Dublin areas: second row of buttons, each with its town name */
+.map-toolbar .district-chips.county-chips { grid-template-columns: auto repeat(12, minmax(0, 1fr)); align-items: stretch; }
+.map-toolbar .chips-label { display: grid; place-items: center; padding: 0 8px 0 2px; color: #5f7666; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; line-height: 1.15; text-align: center; text-transform: uppercase; white-space: normal; max-width: 70px; }
+.map-toolbar .county-chips button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; min-height: 34px; padding: 3px 2px; line-height: 1.1; }
+.map-toolbar .county-chips button small { overflow: hidden; max-width: 100%; color: #7a8a7e; font-size: 0.56rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.map-toolbar .county-chips button[aria-pressed="true"] small { color: rgba(255, 255, 255, 0.85); }
+@media (max-width: 1100px) { .map-toolbar .district-chips.county-chips { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); } .map-toolbar .chips-label { grid-column: 1 / -1; max-width: none; justify-self: start; } }
+
+/* "County Dublin" button at the end of the D1-D24 row: opens the row of A/K areas */
+.map-toolbar .county-toggle { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 5px 10px; border: 1px solid #c9dccd; border-radius: 8px; background: #eef6f0; color: #1f4a39; font: 800 0.74rem "DM Sans", sans-serif; white-space: nowrap; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+.map-toolbar .county-toggle:hover { border-color: #9cbfa6; background: #e2efe6; }
+.map-toolbar .county-toggle[aria-expanded="true"] { border-color: #1f4a39; background: #1f4a39; color: #fff; }
+.map-toolbar .county-toggle.has-selection::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #d94351; }
+.map-toolbar .county-chips { animation: dp-county-in .22s ease both; }
+@keyframes dp-county-in { from { opacity: 0; transform: translateY(-4px); } }
+
+/* Full-screen button sits above the compass */
+.district-map .dp-full-control { margin-bottom: 8px !important; }
+.dp-full { display: grid !important; place-items: center; }
+.dp-full svg { width: 20px; height: 20px; color: #1f4a39; }
+
+/* Full-screen view: the whole box fills the screen, square corners */
+.district-map.is-fullscreen, .district-map:fullscreen { width: 100vw; height: 100vh !important; max-height: none; border: 0; border-radius: 0; }
+.district-map:-webkit-full-screen { width: 100vw; height: 100vh !important; border-radius: 0; }
+
+/* (i) credits button and its card (bottom left, above the scale bar) */
+.dp-info-control { position: relative; margin-left: 12px !important; margin-bottom: 8px !important; }
+.dp-info { display: grid; width: 30px; height: 30px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.95); color: #1f4a39; box-shadow: 0 6px 16px rgba(16, 47, 42, 0.2); font: italic 800 15px Georgia, serif; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.dp-info:hover, .dp-info.is-open { background: #1f4a39; color: #fff; }
+.dp-info-card { position: absolute; left: 0; bottom: 40px; width: 300px; max-width: calc(100vw - 60px); padding: 12px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.97); color: #43524a; box-shadow: 0 12px 30px rgba(16, 47, 42, 0.22); font: 500 11.5px/1.5 "DM Sans", sans-serif; animation: dp-county-in .2s ease both; }
+.dp-info-card[hidden] { display: none; }
+.dp-info-card b { display: block; margin-top: 6px; color: #1f4a39; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.dp-info-card b:first-child { margin-top: 0; }
+.dp-info-card p { margin: 3px 0 0; }
+.dp-info-card a { color: #1f5a45; font-weight: 700; }

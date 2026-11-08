@@ -5,6 +5,7 @@ import { districts } from '../District Profile/districtData.js'
 import { TRAVEL_MODES } from './CommuteFields'
 import { FlowChoices, FlowIcon, FlowSidebar } from './FlowLayout'
 import RouteMap from './RouteMap'
+import { setChatContext } from '../chatContext'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
 const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
@@ -187,17 +188,41 @@ function PlacesToLive({ area, places }) {
 }
 
 // compared: 1 = better than most areas, 0 = about average, -1 = worse (icon + words, never colour alone)
-const COMPARED = {
-  1: ['better', '▲ Better than most'],
-  0: ['average', '● About average'],
-  [-1]: ['worse', '▼ Worse than most'],
+const TONES = { 1: 'better', 0: 'average', [-1]: 'worse' }
+const FACTOR_ICONS = {
+  Rent: 'euro', Safety: 'shield', Commute: 'clock',
+  'Shopping & Groceries': 'basket', Supermarkets: 'basket', 'Grocery Shops': 'basket', 'Shopping Malls': 'basket',
+  Restaurants: 'fork', Healthcare: 'heart', Hospitals: 'heart', Pharmacies: 'heart',
+  'Recreation & Wellness': 'tree', Gyms: 'tree', Parks: 'tree',
+}
+// what "better" and "worse" mean for each kind of factor, in plain words
+function comparedWords(factor, compared) {
+  if (compared === 0 || compared == null) return 'About average'
+  const better = compared > 0
+  if (factor === 'Rent') return better ? 'Cheaper than most areas' : 'Pricier than most areas'
+  if (factor === 'Commute') return better ? 'Quicker commute than most areas' : 'Longer commute than most areas'
+  if (factor === 'Safety') return better ? 'Safer than most areas' : 'Less safe than most areas'
+  return better ? 'More nearby than most areas' : 'Fewer nearby than most areas'
 }
 
 function joinWords(items) {
   return items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`
 }
 
-// Why the place ranked here: one bar per factor the student rated, most important first
+// How much the student cares: five dots (importance is 0-10)
+function ImportanceDots({ value, label }) {
+  const filled = Math.round((value ?? 0) / 2)
+  return (
+    <span className="why-importance" title={label} aria-label={`${label} to you`}>
+      <span className="why-dots" aria-hidden="true">
+        {[0, 1, 2, 3, 4].map((i) => <i key={i} className={i < filled ? 'on' : ''} />)}
+      </span>
+      {label}
+    </span>
+  )
+}
+
+// Why the place ranked here: a card per factor the student rated, most important first
 function WhyThisPlace({ result, place }) {
   const items = result.breakdown
   const title = `Why ${place} is #${result.rank}`
@@ -210,29 +235,46 @@ function WhyThisPlace({ result, place }) {
     )
   }
   const { ahead_of: ahead, behind } = result.compared_with ?? {}
+  const strong = items.filter((item) => item.compared > 0).map((item) => item.factor)
+  const weak = items.filter((item) => item.compared < 0).map((item) => item.factor)
 
   return (
     <section className="result-why" aria-label={title}>
       <h3>{title}</h3>
-      <p className="result-muted">
-        Each thing you rated, most important first. The bar shows how well this place meets your need (full = all
-        you need); the tag compares it with the other areas.
+      {(strong.length > 0 || weak.length > 0) && (
+        <div className="why-summary">
+          {strong.length > 0 && (
+            <p><span className="why-summary-label better">▲ Strong on</span>{strong.map((f) => <span key={f} className="why-chip better">{f}</span>)}</p>
+          )}
+          {weak.length > 0 && (
+            <p><span className="why-summary-label worse">▼ Weaker on</span>{weak.map((f) => <span key={f} className="why-chip worse">{f}</span>)}</p>
+          )}
+        </div>
+      )}
+      <p className="result-muted why-intro">
+        Everything you rated, most important to you first, compared with the other areas we looked at.
       </p>
-      <ul className="why-list">
+      <ul className="why-grid">
         {items.map((item) => {
-          const [tone, words] = COMPARED[item.compared] ?? COMPARED[0]
+          const tone = TONES[item.compared] ?? 'average'
+          const score = Math.max(0, Math.min(100, item.score ?? 0))
           return (
-            <li key={item.factor} className="why-row">
-              <div className="why-factor">
+            <li key={item.factor} className={`why-card ${tone}`}>
+              <div className="why-card-head">
+                <span className="why-icon"><FlowIcon name={FACTOR_ICONS[item.factor] ?? 'pin'} /></span>
                 <strong>{item.factor}</strong>
-                <span className="result-muted">{item.importance_label}</span>
+                <ImportanceDots value={item.importance} label={item.importance_label} />
               </div>
-              <span className="why-bar" role="img" aria-label={`${item.factor}: ${item.score} out of 100`}>
-                <span style={{ width: `${Math.max(3, item.score)}%` }} />
-              </span>
-              <div className="why-value">
-                <span>{item.value}</span>
-                <span className={`why-tag ${tone}`}>{words}</span>
+              <p className="why-card-value">{item.value}</p>
+              <p className={`why-card-compare ${tone}`}>
+                <span aria-hidden="true">{tone === 'better' ? '▲' : tone === 'worse' ? '▼' : '●'}</span>
+                {comparedWords(item.factor, item.compared)}
+              </p>
+              <div className="why-meter">
+                <span className="why-meter-label">Covers your need <b>{score}%</b></span>
+                <span className="why-meter-bar" role="img" aria-label={`Covers ${score}% of your need for ${item.factor}`}>
+                  <span style={{ width: `${Math.max(3, score)}%` }} />
+                </span>
               </div>
             </li>
           )
@@ -264,31 +306,65 @@ function WhyThisPlace({ result, place }) {
   )
 }
 
-// A share of the population, with the Dublin average marked on the same bar when there is one
-function ShareTile({ label, value, dublin, note }) {
-  const diff = dublin == null ? null : value - dublin
+// "about 2 in 5 people" - the closest simple fraction, an easier way to picture a percentage
+function oneIn(pct) {
+  if (pct < 1) return 'very few'
+  let best = null
+  for (const d of [2, 3, 4, 5, 6, 10, 20]) {
+    const n = Math.round((pct / 100) * d)
+    if (n < 1 || n >= d) continue
+    const err = Math.abs(n / d - pct / 100)
+    if (!best || err < best.err - 1e-9) best = { n, d, err }
+  }
+  if (!best) return pct >= 50 ? 'almost all' : 'very few'
+  return best.n === 1 && best.d === 2 ? 'about half' : `about ${best.n} in ${best.d}`
+}
+
+// small person / home icons for the picture rows (each one is 5%)
+const PICTO = {
+  person: 'M12 4.2a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2ZM7.4 20c.2-4.4 2-6.9 4.6-6.9s4.4 2.5 4.6 6.9Z',
+  home: 'M4 11.2 12 4.5l8 6.7V20h-5.6v-5h-4.8v5H4Z',
+}
+
+// One census figure for the area: the share, "1 in N", a picture row, the Dublin comparison and what it means
+function ShareTile({ label, icon, value, dublin, meaning, note, of = 'people', picto = 'person' }) {
+  const filled = Math.round(value / 5)
+  const tone = versus(value, dublin) ?? 'same'
   return (
     <div className="about-tile">
-      <span className="about-label">{label}</span>
-      <strong>{Math.round(value)}%</strong>
-      <span
-        className="share-bar"
-        role="img"
-        aria-label={`${label}: ${Math.round(value)}%${dublin != null ? `, Dublin average ${Math.round(dublin)}%` : ''}`}
-      >
-        <span style={{ width: `${Math.min(100, value)}%` }} />
-        {dublin != null && <i style={{ left: `${Math.min(100, dublin)}%` }} />}
+      <span className="about-label"><FlowIcon name={icon} />{label}</span>
+      <div className="about-figure">
+        <strong>{Math.round(value)}%</strong>
+        <span>{oneIn(value)} {of}</span>
+      </div>
+      <span className="about-picto" role="img" aria-label={`${Math.round(value)}% of ${of}`}>
+        {Array.from({ length: 20 }, (_, i) => (
+          <svg key={i} viewBox="5 3.5 14 17" className={i < filled ? 'on' : ''} aria-hidden="true"><path d={PICTO[picto]} /></svg>
+        ))}
       </span>
       {dublin != null && (
-        <span className="result-muted">
-          {Math.abs(diff) < 1 ? 'About the same as' : diff > 0 ? 'Higher than' : 'Lower than'} the Dublin
-          average ({Math.round(dublin)}%)
+        <span className={`about-compare ${tone}`}>
+          {tone === 'same' ? '● About the same as' : tone === 'up' ? '▲ Above' : '▼ Below'} the Dublin average of {Math.round(dublin)}%
         </span>
       )}
-      {note && <span className="result-muted">{note}</span>}
+      {meaning && <p className="about-meaning">{meaning}</p>}
+      {note}
     </div>
   )
 }
+
+// above / below the Dublin average: one rule for both the pill and the sentence (2 points either way)
+const versus = (v, d) => (d == null ? null : v - d >= 2 ? 'up' : v - d <= -2 ? 'down' : 'same')
+
+// what each figure means for a student, in plain words
+const meaningStudents = (v, d) => ({ up: 'More students than most of Dublin, so plenty of people studying nearby.',
+  down: 'Fewer students than most areas, with a more local feel.', same: 'A typical number of students for Dublin.' })[versus(v, d)] ?? null
+const meaningYoung = (v, d) => ({ up: 'A young, lively crowd in their twenties.',
+  down: 'An older, more settled population.', same: 'A typical age mix for Dublin.' })[versus(v, d)] ?? null
+const meaningInternational = (v) => (v >= 25 ? 'A very international area, easy to find people from all over.'
+  : v >= 15 ? 'A good international mix alongside Irish neighbours.' : 'A mostly Irish community.')
+const meaningApartments = (v) => (v >= 50 ? 'Mostly apartments, so flats are easier to find.'
+  : v >= 25 ? 'A mix of apartments and houses.' : 'Mostly houses: rooms in shared houses are the usual option.')
 
 function AboutArea({ result }) {
   const stats = result.profile_stats
@@ -307,26 +383,34 @@ function AboutArea({ result }) {
     <section className="result-about" aria-label="About this area">
       <h3>About this area</h3>
       {stats.population != null && (
-        <p className="result-muted">
-          Census figures for the wider {stats.lea} area, home to {stats.population.toLocaleString('en-IE')} people
-          · the line on each bar is the Dublin average
+        <p className="result-muted about-intro">
+          Who lives here, from the Census figures for the wider <strong>{stats.lea}</strong> area
+          ({stats.population.toLocaleString('en-IE')} people). Each icon is 5%.
         </p>
       )}
       <div className="about-tiles">
         {stats.students_pct != null && (
-          <ShareTile label="Students" value={stats.students_pct} dublin={stats.dublin_students_pct} />
+          <ShareTile label="Students" icon="cap" value={stats.students_pct} dublin={stats.dublin_students_pct}
+            meaning={meaningStudents(stats.students_pct, stats.dublin_students_pct)} />
         )}
         {stats.young_pct != null && (
-          <ShareTile label="Aged 20–29" value={stats.young_pct} dublin={stats.dublin_young_pct} />
+          <ShareTile label="Aged 20–29" icon="person" value={stats.young_pct} dublin={stats.dublin_young_pct}
+            meaning={meaningYoung(stats.young_pct, stats.dublin_young_pct)} />
         )}
         {stats.non_irish_pct != null && (
-          <ShareTile
-            label="Not Irish"
-            value={stats.non_irish_pct}
-            note={groups.length > 0 && `Biggest groups: ${groups.map((g) => `${g.name} ${g.pct}%`).join(' · ')}`}
+          <ShareTile label="Not Irish" icon="pin" value={stats.non_irish_pct} meaning={meaningInternational(stats.non_irish_pct)}
+            note={groups.length > 0 && (
+              <span className="about-groups">
+                <small>Largest groups</small>
+                {groups.map((g) => <span key={g.name} className="about-group">{g.name} <b>{g.pct}%</b></span>)}
+              </span>
+            )}
           />
         )}
-        {stats.apartments_pct != null && <ShareTile label="Homes that are apartments" value={stats.apartments_pct} />}
+        {stats.apartments_pct != null && (
+          <ShareTile label="Homes that are apartments" icon="home" value={stats.apartments_pct} of="homes" picto="home"
+            meaning={meaningApartments(stats.apartments_pct)} />
+        )}
       </div>
     </section>
   )
@@ -378,20 +462,7 @@ function GettingThere({ result, university, universityLocation, mode, onMode }) 
         value={mode}
         onChange={onMode}
       />
-      <p className="route-summary" aria-live="polite">
-        {commute ? (
-          <>
-            <strong>{commute.minutes} min</strong>
-            <span>
-              {commute.walk_faster ? 'on foot - quicker than public transport from here' : words}
-              {commute.km != null && ` · ${commute.km} km`}
-            </span>
-          </>
-        ) : (
-          <span>No {label.toLowerCase()} time for this place yet.</span>
-        )}
-      </p>
-      {place && universityLocation && (
+      {place && universityLocation ? (
         <RouteMap
           fromLat={place.lat}
           fromLon={place.lon}
@@ -400,7 +471,12 @@ function GettingThere({ result, university, universityLocation, mode, onMode }) 
           toLon={universityLocation.lon}
           toName={university}
           mode={commute?.walk_faster ? 'walk' : mode}
+          defaultMinutes={commute?.minutes ?? null}
+          defaultKm={commute?.km ?? null}
+          defaultWords={commute?.walk_faster ? 'on foot - quicker than public transport from here' : words}
         />
+      ) : (
+        <p className="route-summary">{commute ? `${commute.minutes} min ${words}` : `No ${label.toLowerCase()} time for this place yet.`}</p>
       )}
     </div>
   )
@@ -836,6 +912,26 @@ function Results() {
       controller.abort()
     }
   }, [answers, attempt])
+
+  // Share the student's matches with the AI assistant so it can answer about them
+  useEffect(() => {
+    const list = data?.recommendations ?? []
+    if (!answers || !list.length) { setChatContext(null); return undefined }
+    const word = { 1: 'better than most areas', 0: 'about average', [-1]: 'worse than most areas' }
+    const lines = list.slice(0, 8).map((r) => {
+      const name = r.neighbourhood ? `${r.neighbourhood.name} (${r.area})` : r.area
+      const facts = (r.breakdown ?? []).map((b) => `${b.factor}: ${b.value} (${word[b.compared] ?? 'about average'})`).join('; ')
+      return `#${r.rank} ${name}: ${r.match_score.toFixed(1)}% match, ${euro(r.rent)}/month${r.commute_minutes != null ? `, ${r.commute_minutes} min commute` : ''}. ${facts}`
+    })
+    const open = list[Math.min(selected, list.length - 1)]
+    setChatContext([
+      `Student's search: ${answers.accommodationLabel ?? 'room'}, budget ${euro(answers.budget)}/month, studying at ${answers.university}, travelling ${(answers.travelMode ?? 'public_transport').replace('_', ' ')}.`,
+      `Their top matches (out of ${data.areas_compared ?? list.length} areas compared):`,
+      ...lines,
+      open ? `They currently have #${open.rank} ${open.neighbourhood?.name ?? open.area} open.` : '',
+    ].filter(Boolean).join('\n'))
+    return () => setChatContext(null)
+  }, [data, selected, answers])
 
   if (!answers) {
     return (

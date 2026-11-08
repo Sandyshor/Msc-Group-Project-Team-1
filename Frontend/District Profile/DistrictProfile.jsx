@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { universities } from './cityPlaces';
-import JourneyPanel from './JourneyPanel';
-import { CHAINS, allChainShops, chainInfo } from './shopChains';
-import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, SAFETY_BANDS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './DistrictMap';
+import JourneyPlannerPanel from './JourneyPlannerPanel';
+import { CHAINS, chainInfo } from './shopChains';
+import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, SAFETY_BANDS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './mapShared';
+import './ProfileCard.css';
 
-const TABS = [['places', 'Places'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['commute', 'Commute'], ['journey', 'Journey'], ['area', 'Area'], ['unis', 'Universities']];
+export const TABS = [['places', 'Places'], ['journey', 'Journey'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['area', 'Area']];
 const eur = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
 const num = (v) => Number(v).toLocaleString('en-IE');
 const Icon = ({ name, html, ...rest }) => <span {...rest} dangerouslySetInnerHTML={{ __html: html || iconFor(name) }} />;
@@ -84,10 +84,15 @@ function PlaceImage({ place }) {
     })();
   };
 
-  useEffect(() => { if (!place.image) useWikipedia(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Checked photos (place-images.json) are used as they are; only unchecked places fall back to a Wikipedia lookup
+  useEffect(() => { if (!place.image && !place.photoChecked) useWikipedia(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!src) return <div className="place-image place-image-fallback"><Icon name={place.cat} /></div>;
-  return <img className="place-image" src={src} alt={place.name} loading="lazy" onError={useWikipedia} />;
+  return (
+    <img className="place-image" src={src} alt={place.name} loading="lazy" referrerPolicy="no-referrer"
+      title={place.imageCredit ? `Photo: ${place.imageCredit}` : undefined}
+      onError={place.photoChecked ? () => setSrc(null) : useWikipedia} />
+  );
 }
 
 function PlacesSection({ code, places, hoverPlace, onHoverPlace, onPlaceClick }) {
@@ -173,24 +178,23 @@ function RentSection({ code, data, rentMode, setRentMode }) {
   );
 }
 
-function AmenitiesSection({ code, data, chain, setChain }) {
-  const counts = data.amenCounts[code];
-  const shops = allChainShops(data.amenities);
-  const inCity = (k) => shops.filter((x) => x.chain === k).length;
+function AmenitiesSection({ code, data, chain, setChain, shops, verifiedCounts }) {
+  const counts = verifiedCounts?.[code] || data.amenCounts[code];
+  // Only this district's shops: the map shows the same ones
   const inHere = (k) => shops.filter((x) => x.chain === k && x.district === code).length;
   const picked = chain ? chainInfo(chain) : null;
   return (
     <>
       <section className="profile-section">
         <SectionTitle eyebrow="SUPERMARKETS" title="Find a chain on the map" icon="cart" />
-        <p className="section-description">Pick a chain to see all its shops on the map. The number is how many are in {code}.</p>
+        <p className="section-description">Pick a chain to see its shops in {code} on the map. The number is how many there are in {code}.</p>
         <div className="chain-picker top-gap">
           {CHAINS.map(([k, label, colour]) => (
             <button
               type="button"
               key={k}
               aria-pressed={chain === k}
-              disabled={!inCity(k)}
+              disabled={!inHere(k) && chain !== k}
               style={chain === k ? { background: colour } : undefined}
               onClick={() => setChain(chain === k ? null : k)}
             >
@@ -200,11 +204,12 @@ function AmenitiesSection({ code, data, chain, setChain }) {
         </div>
         {picked && (
           <p className="chain-result">
-            <b>{inHere(chain)} {picked[1]}</b> in {code} · {inCity(chain)} across Dublin, all shown on the map.
+            {inHere(chain)
+              ? <><b>{inHere(chain)} {picked[1]}</b> in {code}, shown on the map.</>
+              : <>No {picked[1]} in {code}.</>}
             <button type="button" className="chain-clear" onClick={() => setChain(null)}>Clear</button>
           </p>
         )}
-        {!data.amenities[code] && <p className="section-description top-gap">Shop locations for {code} have not been collected yet, so only other districts can show.</p>}
       </section>
 
       <section className="profile-section">
@@ -221,6 +226,7 @@ function AmenitiesSection({ code, data, chain, setChain }) {
               ))}
             </div>
             {counts.asian != null && <p className="section-description top-gap">Includes {counts.asian} Asian restaurants.</p>}
+            {verifiedCounts?.[code] && <p className="section-description">Named places from OpenStreetMap, counted by where they are inside {code}.</p>}
           </>
         ) : <EmptyNote>amenity data for {code}</EmptyNote>}
       </section>
@@ -229,65 +235,6 @@ function AmenitiesSection({ code, data, chain, setChain }) {
 }
 
 const MODE_NAMES = { WALK: 'Walk', TRAM: 'Luas', BUS: 'Bus', RAIL: 'DART/rail' };
-function CommuteSection({ code, data, uni, setUni, onStopClick }) {
-  const walk = data.walk[code]?.[uni];
-  const pt = data.commute?.[code]?.[uni];
-  const stops = data.stops.filter((s) => s.d === code);
-  const lines = [...new Set(stops.map((s) => s.line))];
-  return (
-    <>
-      <section className="profile-section">
-        <SectionTitle eyebrow="GETTING TO CLASS" title="Commute" icon="university" />
-        <label className="section-eyebrow" htmlFor="uni-select">YOUR UNIVERSITY</label>
-        <select id="uni-select" className="uni-select" value={uni} onChange={(e) => setUni(e.target.value)}>
-          {data.unis.map((u) => <option key={u}>{u}</option>)}
-        </select>
-        <div className="rent-grid top-gap">
-          {pt && (
-            <div className="rent-tile">
-              <span>Public transport</span>
-              <strong>{pt.center.min} min</strong>
-              <small>{pt.center.tr ? `${pt.center.tr} transfer${pt.center.tr > 1 ? 's' : ''}` : 'No transfers'} · edges {pt.lo}–{pt.hi} min</small>
-            </div>
-          )}
-          {walk ? (
-            <div className="rent-tile">
-              <span>Walking</span>
-              <strong>{walk.min} min</strong>
-              <small>{walk.km} km from {walk.center} · edges {walk.lo}–{walk.hi} min</small>
-            </div>
-          ) : <EmptyNote>walking time for this university</EmptyNote>}
-        </div>
-        {pt && (
-          <div className="mode-chain">
-            {pt.center.modes.split('→').map((m, i) => <span key={i}>{MODE_NAMES[m.trim()] || m.trim()}</span>)}
-          </div>
-        )}
-        <p className="section-description top-gap">
-          {pt ? 'Journey planner, weekday 8:00 departure, from the district centre.' : 'Public transport times are collected for TU Dublin Grangegorman so far.'}
-        </p>
-      </section>
-      <section className="profile-section">
-        <SectionTitle eyebrow="LUAS" title={`Stops in ${code}`} icon="landmark" />
-        {stops.length ? (
-          <>
-            <div className="stop-chips">
-              {stops.map((s) => (
-                <button type="button" key={s.name} onClick={() => onStopClick(s.name)}>
-                  <i className={s.line === 'Red' ? 'red-line' : 'green-line'} />{s.name}
-                </button>
-              ))}
-            </div>
-            <p className="section-description top-gap">
-              {lines.map((l) => { const ln = data.lines[l.toLowerCase()] || {}; return `${l} Line every ${ln.peak || ln.interval} min at peak`; }).join(' · ')}
-            </p>
-          </>
-        ) : <p className="empty-note">No Luas stop inside {code}. Check bus and DART links.</p>}
-      </section>
-    </>
-  );
-}
-
 function AreaSection({ code, data }) {
   const c = data.census[code];
   if (!c) return <EmptyNote>census figures for {code}</EmptyNote>;
@@ -304,7 +251,9 @@ function AreaSection({ code, data }) {
         <div className="rent-tile"><span>Internet at home</span><strong>{c['Internet_Access_%']}%</strong></div>
       </div>
       <p className="section-description top-gap">
-        Figures for the {c.LEA} local electoral area{shared.length > 1 ? `, which covers ${shared.join(', ')}. They are not exact for ${code} alone.` : '.'}
+        {c.source === 'eds'
+          ? `Census 2022 figures added up from the ${c.EDs} electoral division${c.EDs > 1 ? 's' : ''} that make up ${code} (${c.LEA} local electoral area${c.LEA.includes(',') ? 's' : ''}).`
+          : `Figures for the ${c.LEA} local electoral area${shared.length > 1 ? `, which covers ${shared.join(', ')}. They are not exact for ${code} alone.` : '.'}`}
       </p>
     </section>
   );
@@ -448,98 +397,77 @@ const campusDistrict = (u) => {
   return m ? `D${Number(m[1])}${m[2] ? 'W' : ''}` : null;
 };
 
-function UniversitiesSection({ code, onCampusClick, onCampusHover }) {
-  const here = universities.filter((u) => campusDistrict(u) === code);
-  const others = universities.filter((u) => campusDistrict(u) !== code);
-  const row = (u, i) => (
-    <li key={u.id}>
-      <button
-        type="button"
-        className="uni-row"
-        style={{ '--place-index': i }}
-        onClick={() => onCampusClick(u.id)}
-        onMouseEnter={() => onCampusHover(u.id)}
-        onMouseLeave={() => onCampusHover(null)}
-        onFocus={() => onCampusHover(u.id)}
-        onBlur={() => onCampusHover(null)}
-      >
-        <span className="uni-row-icon"><Icon html={ICONS.university} /></span>
-        <span className="uni-row-text">
-          <strong>{u.name}</strong>
-          <small>{u.location}</small>
-        </span>
-        {campusDistrict(u) && <span className="uni-row-code">{campusDistrict(u)}</span>}
-      </button>
-      <a className="uni-row-link" href={u.url} target="_blank" rel="noreferrer" aria-label={`${u.name} website`}>↗</a>
-    </li>
-  );
-  return (
-    <>
-      <section className="profile-section">
-        <SectionTitle eyebrow="CAMPUS LIFE" title={here.length ? `Universities in ${code}` : `No campus in ${code}`} extra={<span className="place-count">{universities.length} campuses</span>} />
-        {here.length ? <ul className="uni-list">{here.map(row)}</ul> : <p className="section-description">Pick a campus below to see where it is and how far it is from {code}.</p>}
-      </section>
-      <section className="profile-section">
-        <SectionTitle eyebrow="ACROSS DUBLIN" title="All universities and colleges" icon="university" />
-        <p className="section-description">Click a campus to show it on the map. ↗ opens its website.</p>
-        <ul className="uni-list top-gap">{others.map((u, i) => row(u, i + here.length))}</ul>
-      </section>
-    </>
-  );
-}
-
 export default function DistrictProfile({
   selectedId, data, team, places, tab, setTab, rentMode, setRentMode, chain = null, setChain = () => {},
-  uni, setUni, hoverPlace, setHoverPlace, onPlaceClick, onStopClick, onSelect,
-  onCampusClick = () => {}, onCampusHover = () => {},
-  journey, setJourney, journeyFrom, journeyTo, picking = null, setPicking = () => {},
+  hoverPlace, setHoverPlace, onPlaceClick, onSelect,
+  trip, setTrip, onTripReset = () => {}, journeyQuickStarts = [], chainShops = [], amenityCounts = null,
 }) {
   const profile = data.profiles[selectedId];
   const index = ACTIVE_DISTRICTS.indexOf(selectedId);
   const step = (dir) => onSelect(ACTIVE_DISTRICTS[(index + dir + ACTIVE_DISTRICTS.length) % ACTIVE_DISTRICTS.length]);
   const sc = data.safety?.[selectedId]?.score;
+  const accent = strongColor(profile.hue);
+  // At-a-glance figures for the banner
+  const rooms = data.rent?.[selectedId]?.rooms || {};
+  const roomMedians = [rooms.single?.median, rooms.double?.median].filter(Boolean);
+  const rtbAll = data.rtb?.[selectedId]?.district?.all;
+  const rentStat = roomMedians.length ? [eur(Math.min(...roomMedians)), 'room, per month']
+    : rtbAll ? [eur(rtbAll), 'home, per month'] : ['—', 'not collected yet'];
+  const prev = ACTIVE_DISTRICTS[(index - 1 + ACTIVE_DISTRICTS.length) % ACTIVE_DISTRICTS.length];
+  const next = ACTIVE_DISTRICTS[(index + 1) % ACTIVE_DISTRICTS.length];
 
   return (
-    <aside className="profile-card">
-      <div className="profile-banner" style={{ background: bannerColor(profile.hue) }}>
+    <aside className="profile-card pc" style={{ '--accent': accent, '--banner': bannerColor(profile.hue) }}>
+      <div className="profile-banner">
         <div className="profile-banner-top">
-          <span className="profile-kicker">DISTRICT PROFILE · {profile.side.toUpperCase()}</span>
+          <span className="profile-kicker">{profile.county ? 'County Dublin · approximate area' : profile.side} · Eircode {profile.eircode}</span>
           <span className="district-pill">{selectedId}</span>
         </div>
         <h2>{team?.name || profile.name}</h2>
-        <p>{team?.description || profile.areas.map((a) => a[0]).join(' · ')}</p>
-        <p className="eircode-line">Eircode routing key <b>{profile.eircode}</b></p>
-        {typeof sc === 'number' && (
-          <button type="button" className="banner-safety" onClick={() => setTab('safety')} title="See the Safety tab">
-            <b style={{ background: heatColor(sc), color: textOnHeat(sc) }}>{sc.toFixed(0)}</b>
-            {safetyLabel(sc)}
+        {team?.description
+          ? <p>{team.description}</p>
+          : <ul className="pc-hoods" aria-label="Neighbourhoods">{profile.areas.map((a) => <li key={a[0]}>{a[0]}</li>)}</ul>}
+
+        <div className="pc-stats">
+          {typeof sc === 'number' && (
+            <button type="button" onClick={() => setTab('safety')} title="See the Safety tab">
+              <small>Safety</small>
+              <b><i style={{ background: heatColor(sc), color: textOnHeat(sc) }}>{sc.toFixed(0)}</i></b>
+              <span>{safetyLabel(sc)}</span>
+            </button>
+          )}
+          <button type="button" onClick={() => setTab('rent')} title="See the Rent tab">
+            <small>Rent from</small>
+            <b>{rentStat[0]}</b>
+            <span>{rentStat[1]}</span>
           </button>
-        )}
+          <button type="button" onClick={() => setTab('places')} title="See the Places tab">
+            <small>Famous places</small>
+            <b>{places.length}</b>
+            <span>to explore</span>
+          </button>
+        </div>
         <span className="banner-decoration">{selectedId.replace('D', '')}</span>
       </div>
 
       <div className="profile-body">
-        <div className="district-navigation">
-          <button type="button" onClick={() => step(-1)}><span>←</span> {ACTIVE_DISTRICTS[(index - 1 + ACTIVE_DISTRICTS.length) % ACTIVE_DISTRICTS.length]}</button>
-          <span>{String(index + 1).padStart(2, '0')} <i /> {ACTIVE_DISTRICTS.length} districts</span>
-          <button type="button" onClick={() => step(1)}>{ACTIVE_DISTRICTS[(index + 1) % ACTIVE_DISTRICTS.length]} <span>→</span></button>
-        </div>
-
         <div className="profile-tabs" role="tablist">
           {TABS.map(([k, l]) => (
-            <button type="button" role="tab" key={k} aria-selected={tab === k} onClick={() => setTab(k)}
-              style={tab === k ? { color: strongColor(profile.hue), borderColor: strongColor(profile.hue) } : undefined}>{l}</button>
+            <button type="button" role="tab" key={k} aria-selected={tab === k} onClick={() => setTab(k)}>{l}</button>
           ))}
         </div>
 
         {tab === 'places' && <PlacesSection code={selectedId} places={places} hoverPlace={hoverPlace} onHoverPlace={setHoverPlace} onPlaceClick={onPlaceClick} />}
         {tab === 'rent' && <RentSection code={selectedId} data={data} rentMode={rentMode} setRentMode={setRentMode} />}
-        {tab === 'amen' && <AmenitiesSection code={selectedId} data={data} chain={chain} setChain={setChain} />}
+        {tab === 'amen' && <AmenitiesSection code={selectedId} data={data} chain={chain} setChain={setChain} shops={chainShops} verifiedCounts={amenityCounts} />}
         {tab === 'safety' && <SafetySection code={selectedId} data={data} />}
-        {tab === 'commute' && <CommuteSection code={selectedId} data={data} uni={uni} setUni={setUni} onStopClick={onStopClick} />}
-        {tab === 'journey' && journey && <JourneyPanel code={selectedId} data={data} journey={journey} setJourney={setJourney} from={journeyFrom} to={journeyTo} picking={picking} setPicking={setPicking} />}
+        {tab === 'journey' && trip && <JourneyPlannerPanel trip={trip} setTrip={setTrip} onReset={onTripReset} quickStarts={journeyQuickStarts} />}
         {tab === 'area' && <AreaSection code={selectedId} data={data} />}
-        {tab === 'unis' && <UniversitiesSection code={selectedId} onCampusClick={onCampusClick} onCampusHover={onCampusHover} />}
+
+        <nav className="district-navigation" aria-label="Other districts">
+          <button type="button" onClick={() => step(-1)}><span>←</span> {prev} · {data.profiles[prev]?.name}</button>
+          <button type="button" onClick={() => step(1)}>{next} · {data.profiles[next]?.name} <span>→</span></button>
+        </nav>
       </div>
     </aside>
   );

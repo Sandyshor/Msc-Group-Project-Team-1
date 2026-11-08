@@ -867,3 +867,360 @@
     grid-column: 1 / -1;
   }
 }
+
+/* ================================================================== questionnaire redesign (.flow-q)
+   Bigger text and buttons, compact rows (no stretched empty space), rotating photos, locked step 3. */
+.flow-page.flow-q {
+  grid-template-columns: 236px minmax(280px, 0.78fr) minmax(0, 1.65fr);
+  gap: 20px;
+  padding: 20px clamp(16px, 2vw, 28px);
+  background: radial-gradient(900px 500px at 100% 0%, rgba(217, 241, 126, 0.12), transparent 70%), #f3f0e7;
+}
+
+/* steps */
+.flow-q .flow-sidebar { gap: 8px; padding: 18px 12px; border-radius: 20px; box-shadow: 0 18px 40px rgba(23, 63, 50, 0.18); }
+.flow-q .flow-step { position: relative; gap: 14px; padding: 14px 14px; border-radius: 14px; font-size: 16px; }
+.flow-q .flow-step small { font-size: 11px; }
+.flow-q .flow-step.is-current { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18); }
+.flow-step-lock { display: grid; width: 26px; height: 26px; margin-left: auto; place-items: center; border-radius: 50%; background: rgba(255, 253, 247, 0.12); color: #f0c49b; }
+.flow-step-lock .flow-icon { width: 15px; height: 15px; }
+.flow-step.is-locked { color: #b9c9be; }
+.flow-step.is-locked:hover .flow-step-lock { background: rgba(240, 196, 155, 0.22); }
+
+/* photo panel: crossfading slideshow */
+.flow-photo { isolation: isolate; }
+.flow-photo-slide { position: absolute; inset: 0; z-index: -1; background-size: cover; opacity: 0; transform: scale(1.06); transition: opacity 1.2s ease, transform 6.5s ease-out; }
+.flow-photo-slide.is-shown { opacity: 1; transform: scale(1); }
+.flow-photo-dots { position: absolute; left: 50%; bottom: 18px; z-index: 2; display: flex; gap: 7px; padding: 7px 10px; border-radius: 999px; background: rgba(16, 47, 42, 0.35); transform: translateX(-50%); backdrop-filter: blur(6px); }
+.flow-photo-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.55); cursor: pointer; transition: width .3s ease, background .3s ease; }
+.flow-photo-dots button.is-shown { width: 22px; background: #fff; }
+.flow-photo-dots button:focus-visible { outline: 2px solid #f0c49b; outline-offset: 2px; }
+.flow-q .flow-photo { border-radius: 20px; box-shadow: 0 18px 40px rgba(23, 63, 50, 0.12); }
+.flow-q .flow-photo-text { padding: 30px 28px 80px; }
+.flow-q .flow-eyebrow { font-size: 12px; }
+.flow-q .flow-progress-info { font-size: 11.5px; }
+.flow-q .flow-progress { height: 6px; }
+.flow-q .flow-progress span { transition: width .5s ease; }
+.flow-q .flow-photo h1 { font-size: clamp(32px, 2.9vw, 46px); }
+.flow-q .flow-description { font-size: 16px; }
+
+/* rows: compact, aligned, bigger text */
+.flow-q .flow-rows { gap: 12px; padding: 2px 6px 2px 2px; }
+.flow-q .flow-row {
+  grid-template-columns: 54px minmax(0, 0.95fr) minmax(0, 1.35fr);
+  gap: 20px;
+  flex: 0 0 auto;
+  max-height: none;
+  padding: 18px 22px;
+  border: 1px solid #e6dfd0;
+  border-radius: 18px;
+  background: #fffdf8;
+  box-shadow: 0 4px 14px rgba(23, 63, 50, 0.05);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.flow-q .flow-row:hover, .flow-q .flow-row:focus-within { border-color: #c9d9cc; box-shadow: 0 10px 26px rgba(23, 63, 50, 0.09); }
+.flow-q .flow-row-icon { width: 54px; height: 54px; border-radius: 16px; background: linear-gradient(140deg, #e3eee5, #d5e5d9); }
+.flow-q .flow-row-icon .flow-icon { width: 26px; height: 26px; }
+.flow-q .flow-row-text h2 { font-size: 22px; letter-spacing: -0.01em; }
+.flow-q .flow-row-text p { margin-top: 4px; font-size: 15px; }
+.flow-q .flow-row-control { gap: 10px; }
+
+/* values above sliders */
+.flow-q .flow-value { font-size: 14px; }
+.flow-q .flow-value strong { font-size: 30px; line-height: 1; }
+
+/* sliders: thick track that fills up to the thumb */
+.flow-q .flow-row-control input[type="range"] {
+  -webkit-appearance: none; appearance: none; height: 10px; border-radius: 999px;
+  background: linear-gradient(90deg, #1f5a45 var(--fill, 50%), #e2dccd var(--fill, 50%));
+}
+.flow-q input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border: 4px solid #fff; border-radius: 50%; background: #173f32; box-shadow: 0 3px 10px rgba(23, 63, 50, 0.35); cursor: grab; transition: transform .15s ease; }
+.flow-q input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+.flow-q input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 4px solid #fff; border-radius: 50%; background: #173f32; box-shadow: 0 3px 10px rgba(23, 63, 50, 0.35); cursor: grab; }
+.flow-q input[type="range"]:focus-visible { outline: 2px solid #a8753f; outline-offset: 6px; }
+
+/* university picker */
+.flow-q .flow-row-control select {
+  min-height: 52px; padding: 0 44px 0 16px; border: 1.5px solid #d7cfbf; border-radius: 12px;
+  font-size: 16px; font-weight: 600; cursor: pointer; -webkit-appearance: none; appearance: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173f32' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center / 20px;
+}
+.flow-q .flow-row-control select:hover { border-color: #9cbfa6; }
+.flow-q .flow-row-control select:focus { outline: 0; border-color: #1f5a45; box-shadow: 0 0 0 4px rgba(31, 90, 69, 0.14); }
+
+/* choice buttons */
+.flow-q .flow-choices { gap: 10px; }
+.flow-q .flow-choice {
+  gap: 8px; min-height: 52px; padding: 8px 12px; border: 1.5px solid #ddd5c5; border-radius: 12px;
+  font-size: 15px; font-weight: 600; transition: border-color .15s ease, background .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.flow-q .flow-choice:hover { border-color: #9cbfa6; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(23, 63, 50, 0.08); }
+.flow-q .flow-choice .flow-icon { width: 20px; height: 20px; }
+.flow-q .flow-choice.selected { border: 1.5px solid #173f32; background: #173f32; color: #fffdf7; box-shadow: 0 8px 18px rgba(23, 63, 50, 0.22); }
+
+/* notes, checkboxes and the bottom bar */
+.flow-q .flow-note { font-size: 14px; }
+.flow-q .flow-separate { font-size: 14px; }
+.flow-q .flow-separate input { width: 18px; height: 18px; }
+.flow-q .flow-row .priority-value { font-size: 14px; }
+.flow-q .flow-row .priority-value strong { font-size: 22px; }
+.flow-q .flow-item-sliders .priority-value .priority-name { font-size: 15px; }
+.flow-q .flow-actions {
+  position: sticky; bottom: 0; z-index: 2; margin-top: auto; padding: 14px 4px 4px;
+  background: linear-gradient(rgba(243, 240, 231, 0), #f3f0e7 40%);
+}
+.flow-q .flow-next, .flow-q .flow-back { min-height: 54px; padding: 0 28px; border-radius: 14px; font-size: 16px; }
+.flow-q .flow-next { box-shadow: 0 10px 24px rgba(23, 63, 50, 0.25); transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease; }
+.flow-q .flow-next:hover:not([aria-disabled="true"]):not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(23, 63, 50, 0.3); }
+.flow-q .flow-next span { transition: transform .15s ease; }
+.flow-q .flow-next:hover span { transform: translateX(3px); }
+.flow-q .flow-next[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+/* short laptop screens: still roomy but a little tighter */
+@media (max-height: 820px) and (min-width: 761px) {
+  .flow-page.flow-q { gap: 16px; padding-block: 14px; }
+  .flow-q .flow-rows { gap: 10px; }
+  .flow-q .flow-row { padding: 13px 20px; }
+  .flow-q .flow-row-icon { width: 46px; height: 46px; }
+  .flow-q .flow-row-text h2 { font-size: 19px; }
+  .flow-q .flow-row-text p { font-size: 14px; }
+  .flow-q .flow-choice { min-height: 44px; }
+  .flow-q .flow-row-control select { min-height: 46px; }
+  .flow-q .flow-value strong { font-size: 25px; }
+  .flow-q .flow-next, .flow-q .flow-back { min-height: 48px; }
+  .flow-q .flow-photo h1 { font-size: clamp(28px, 2.5vw, 38px); }
+}
+@media (max-width: 1100px) { .flow-page.flow-q { grid-template-columns: 200px minmax(0, 1fr); } }
+@media (max-width: 760px) {
+  .flow-page.flow-q { grid-template-columns: minmax(0, 1fr); }
+  .flow-q .flow-row { grid-template-columns: 46px minmax(0, 1fr); }
+  .flow-q .flow-row-control { grid-column: 1 / -1; }
+  .flow-q .flow-choices-rooms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* "complete steps 1 and 2 first" pop-up */
+.flow-dialog-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(16, 37, 30, 0.45); backdrop-filter: blur(3px); animation: flow-fade .2s ease both; }
+.flow-dialog { position: relative; width: min(460px, 100%); padding: 30px 28px 24px; border-radius: 22px; background: #fffdf8; color: #173f32; box-shadow: 0 30px 70px rgba(10, 30, 24, 0.35); animation: flow-pop .28s cubic-bezier(.3, 1.4, .5, 1) both; }
+.flow-dialog-icon { display: grid; width: 52px; height: 52px; place-items: center; margin-bottom: 14px; border-radius: 16px; background: #fbeee0; color: #a8753f; }
+.flow-dialog-icon .flow-icon { width: 26px; height: 26px; }
+.flow-dialog h2 { margin: 0 0 8px; font-family: Georgia, serif; font-size: 26px; line-height: 1.15; }
+.flow-dialog-text { margin: 0 0 18px; color: #4d5e53; font-size: 15.5px; line-height: 1.55; }
+.flow-checklist { display: grid; gap: 10px; margin: 0 0 22px; padding: 0; list-style: none; }
+.flow-checklist li { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #ece4d4; border-radius: 14px; background: #fbf8f1; }
+.flow-checklist li > span { display: grid; flex: 0 0 34px; height: 34px; place-items: center; border: 2px solid #d7cfbf; border-radius: 50%; color: #8a7a64; font-weight: 800; }
+.flow-checklist li.is-done > span { border-color: #1f5a45; background: #1f5a45; color: #fff; }
+.flow-checklist li > span .flow-icon { width: 18px; height: 18px; stroke-width: 2.6; }
+.flow-checklist b { display: block; font-size: 15.5px; }
+.flow-checklist small { color: #8a3b2b; font-size: 13.5px; }
+.flow-checklist li.is-done small { color: #2e7d4f; }
+.flow-dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.flow-dialog-actions .flow-next, .flow-dialog-actions .flow-back { min-height: 50px; padding: 0 24px; border-radius: 14px; font-size: 15.5px; }
+.flow-dialog-actions .flow-back { margin-right: 0; }
+.flow-dialog-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; color: #617067; font-size: 24px; line-height: 1; cursor: pointer; }
+.flow-dialog-close:hover { background: #f1ece2; color: #173f32; }
+@keyframes flow-fade { from { opacity: 0; } }
+@keyframes flow-pop { from { opacity: 0; transform: translateY(10px) scale(.96); } }
+@media (prefers-reduced-motion: reduce) {
+  .flow-photo-slide { transition: none; transform: none; }
+  .flow-dialog-backdrop, .flow-dialog { animation: none; }
+}
+
+/* Choice buttons size to their text and wrap as whole buttons (no two-line labels) */
+.flow-q .flow-choices, .flow-q .flow-choices-rooms { display: flex; flex-wrap: wrap; }
+.flow-q .flow-choice { flex: 1 1 auto; white-space: nowrap; padding: 8px 16px; }
+
+/* When the rows don't fill the column, centre them with the buttons right underneath (no empty gap);
+   when they do (step 2), the auto margins become 0 and the list scrolls with the buttons pinned below */
+.flow-q .flow-rows > :first-child { margin-top: auto; }
+.flow-q .flow-actions { margin-top: 4px; margin-bottom: auto; }
+
+/* More room for the controls, less for the question text */
+.flow-q .flow-row { grid-template-columns: 54px minmax(170px, 0.62fr) minmax(0, 1.9fr); }
+.flow-q .flow-choice { padding: 8px 12px; font-size: 14.5px; }
+/* travel modes on one line; accommodation as a tidy 3-column grid */
+.flow-q .flow-choices { flex-wrap: nowrap; }
+.flow-q .flow-choices-rooms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.flow-q .flow-choices-rooms .flow-choice:last-child { grid-column: span 2; }
+@media (max-width: 1350px) {
+  .flow-q .flow-choices { flex-wrap: wrap; }
+  .flow-q .flow-choices-rooms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .flow-q .flow-choices-rooms .flow-choice:last-child { grid-column: span 1; }
+}
+
+/* Titles never break mid-word: a wider text column, a slightly narrower photo */
+.flow-page.flow-q { grid-template-columns: 224px minmax(260px, 0.66fr) minmax(0, 1.8fr); }
+.flow-q .flow-row { grid-template-columns: 54px minmax(205px, 0.62fr) minmax(0, 1.9fr); }
+.flow-q .flow-row-text h2 { overflow-wrap: normal; word-break: normal; hyphens: manual; }
+
+/* Tall screens: rows grow with the height, so the cards fill the column instead of floating in empty space */
+.flow-q .flow-row { padding-block: clamp(14px, 2.1vh, 30px); }
+@media (min-height: 980px) and (min-width: 1500px) {
+  .flow-q .flow-rows { gap: 16px; }
+  .flow-q .flow-row-icon { width: 60px; height: 60px; }
+  .flow-q .flow-row-text h2 { font-size: 25px; }
+  .flow-q .flow-row-text p { font-size: 16px; }
+  .flow-q .flow-choice { min-height: 58px; font-size: 16px; }
+  .flow-q .flow-row-control select { min-height: 58px; font-size: 17px; }
+  .flow-q .flow-value strong { font-size: 34px; }
+  .flow-q .flow-next, .flow-q .flow-back { min-height: 58px; font-size: 17px; }
+}
+
+/* Padlock sits at the right edge without squeezing the step's label */
+.flow-q .flow-step span:not(.flow-step-lock) { white-space: nowrap; }
+.flow-q .flow-step.is-locked { padding-right: 44px; }
+.flow-q .flow-step-lock { position: absolute; right: 12px; top: 50%; margin: 0; transform: translateY(-50%); }
+
+/* Laptop widths: narrower photo, full-width "Student accommodation", travel modes kept on one line */
+@media (max-width: 1350px) and (min-width: 1101px) {
+  .flow-page.flow-q { grid-template-columns: 208px minmax(220px, 0.55fr) minmax(0, 1.9fr); }
+  .flow-q .flow-row { grid-template-columns: 50px minmax(180px, 0.6fr) minmax(0, 1.9fr); gap: 16px; padding-inline: 18px; }
+  .flow-q .flow-choices { flex-wrap: nowrap; }
+  .flow-q .flow-choice { padding: 6px 10px; font-size: 14px; gap: 6px; }
+  .flow-q .flow-choices-rooms .flow-choice:last-child { grid-column: span 2; }
+}
+@media (max-width: 1350px) and (min-width: 1101px) {
+  .flow-q .flow-step { gap: 10px; padding-inline: 12px; font-size: 15px; }
+  .flow-q .flow-step.is-locked { padding-right: 36px; }
+  .flow-q .flow-step-lock { right: 8px; width: 24px; height: 24px; }
+}
+
+/* Step 2: "Lower" / "Higher" under each end of the priority sliders */
+.flow-q .flow-row .range-labels {
+  display: flex; justify-content: space-between; margin-top: 6px;
+  color: #7a877f; font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.flow-q .flow-row .range-labels span:first-child::before { content: "\2193  "; }
+.flow-q .flow-row .range-labels span:last-child::after { content: "  \2191"; }
+
+/* Padlock exactly in the middle of its circle (the step-label span rule must not apply to it) */
+.flow-step span.flow-step-lock { display: grid; place-items: center; flex-direction: initial; line-height: 0; }
+.flow-step span.flow-step-lock .flow-icon { display: block; width: 15px; height: 15px; margin: 0; }
+
+/* ================================================================== results page: interactive trip map */
+.route-card {
+  display: grid; gap: 10px; padding: 14px 16px; border: 1px solid #e6dfd0; border-radius: 16px;
+  background: linear-gradient(160deg, #fbfaf4, #f3f1e8);
+}
+.route-ends { display: grid; gap: 6px; }
+.route-end { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 14px; font-weight: 700; color: #173f32; }
+.route-end > span { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.route-end > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.route-end small { color: #7a877f; font-size: 10.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.route-dot { display: grid; flex: 0 0 26px; height: 26px; place-items: center; border: 2px solid #fff; border-radius: 50%; color: #fff; font-size: 12px; font-style: normal; font-weight: 800; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+.route-dot-from { background: #a8753f; }
+.route-dot-to { background: #173f32; }
+.route-numbers { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding-top: 8px; border-top: 1px dashed #ddd5c5; color: #4d5e53; font-size: 14px; }
+.route-numbers strong { color: #173f32; font-family: Georgia, serif; font-size: 30px; line-height: 1.1; }
+.route-loading { color: #7a877f; font-style: italic; }
+.route-reset { justify-self: start; padding: 7px 12px; border: 1px solid #c9d9cc; border-radius: 999px; background: #fff; color: #1f5a45; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.route-reset:hover { background: #eef5ef; }
+.route-map-box { position: relative; }
+.flow-page-results .route-map { height: 320px; border: 1px solid #dbe4d4; border-radius: 16px; overflow: hidden; cursor: crosshair; box-shadow: 0 8px 22px rgba(23, 63, 50, 0.08); }
+.route-map-hint { position: absolute; z-index: 500; top: 10px; left: 50%; padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.92); color: #173f32; font-size: 12px; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 12px rgba(16, 47, 42, 0.15); transform: translateX(-50%); pointer-events: none; }
+.flow-page-results .route-map .leaflet-bar { overflow: hidden; border: 0; border-radius: 12px; box-shadow: 0 6px 16px rgba(16, 47, 42, 0.18); }
+.flow-page-results .route-map .leaflet-bar a { width: 34px; height: 34px; line-height: 34px; color: #173f32; }
+.flow-page-results .route-map .leaflet-control-attribution { border-top-left-radius: 8px; font-size: 9px; }
+.route-pin { width: 32px; height: 32px; font-size: 13px; cursor: grab; }
+.route-pin-from { background: #a8753f; box-shadow: 0 0 0 5px rgba(168, 117, 63, 0.22), 0 3px 8px rgba(0, 0, 0, 0.3); }
+.route-pin-to { box-shadow: 0 0 0 5px rgba(23, 63, 50, 0.2), 0 3px 8px rgba(0, 0, 0, 0.3); }
+.route-map-note { font-size: 12px; }
+
+/* ================================================================== results page polish */
+.flow-page.flow-page-results { gap: 20px; background: radial-gradient(900px 500px at 100% 0%, rgba(217, 241, 126, 0.12), transparent 70%), #f3f0e7; }
+.flow-page-results .flow-sidebar { gap: 8px; padding: 18px 12px; border-radius: 20px; box-shadow: 0 18px 40px rgba(23, 63, 50, 0.18); }
+.flow-page-results .flow-step { gap: 14px; padding: 14px; border-radius: 14px; font-size: 16px; }
+.flow-page-results .flow-step small { font-size: 11px; }
+.flow-page-results .flow-step.is-current { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18); }
+
+.flow-page-results .flow-panel { gap: 6px; padding: 24px 22px; border-color: #e6dfd0; border-radius: 20px; background: #fffdf8; box-shadow: 0 12px 30px rgba(23, 63, 50, 0.06); }
+.flow-page-results .flow-panel h1 { font-size: clamp(28px, 2.4vw, 38px); }
+.flow-page-results .flow-summary { font-size: 14.5px; }
+.flow-page-results .flow-panel-group { gap: 10px; padding-top: 18px; margin-top: 12px; }
+.flow-page-results .flow-panel-group h2 { font-size: 21px; }
+.flow-page-results .flow-panel .flow-choices { gap: 8px; }
+.flow-page-results .flow-panel .flow-choice { min-height: 46px; border-radius: 12px; font-size: 14px; font-weight: 600; transition: background .15s ease, border-color .15s ease; }
+.flow-page-results .flow-panel .flow-choice:hover { border-color: #9cbfa6; }
+.flow-page-results .flow-panel .flow-choice.selected { border: 1.5px solid #173f32; background: #173f32; color: #fffdf7; }
+
+/* match cards */
+.flow-page-results .flow-matches { gap: 14px; }
+.flow-page-results .flow-match {
+  gap: 8px; padding: 16px 18px; border: 1px solid #e6dfd0; border-radius: 18px; background: #fffdf8;
+  box-shadow: 0 6px 18px rgba(23, 63, 50, 0.05); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.flow-page-results .flow-match:hover { transform: translateY(-3px); border-color: #c9d9cc; box-shadow: 0 14px 30px rgba(23, 63, 50, 0.1); }
+.flow-page-results .flow-match.selected {
+  padding: 15px 17px; border: 2px solid #173f32; background: linear-gradient(165deg, #f1f7f1, #fffdf8 60%);
+  box-shadow: 0 16px 34px rgba(23, 63, 50, 0.16);
+}
+.flow-page-results .flow-match-score { padding: 5px 12px; border-radius: 999px; font-size: 18px; box-shadow: 0 4px 10px rgba(23, 63, 50, 0.2); }
+.flow-page-results .flow-match-name { font-size: 24px; }
+.flow-page-results .flow-match-name span { font-size: 18px; }
+.flow-page-results .flow-match-line { font-size: 15px; }
+.flow-page-results .flow-match-line .flow-icon { width: 18px; height: 18px; }
+
+/* the selected match's details */
+.flow-page-results .flow-detail { padding: 22px 24px 0; border-radius: 20px; box-shadow: 0 12px 30px rgba(23, 63, 50, 0.06); }
+.flow-page-results .flow-detail-head h2 { font-size: 28px; }
+.flow-page-results .flow-detail-head p { font-size: 14.5px; }
+.flow-page-results .flow-tabs { gap: 6px; margin-top: 16px; padding-bottom: 12px; border-bottom: 1px solid #ece6d8; }
+.flow-page-results .flow-tab { padding: 9px 16px; border: 1px solid transparent; border-radius: 999px; font-size: 14.5px; font-weight: 700; transition: background .15s ease, color .15s ease; }
+.flow-page-results .flow-tab:hover { background: #f1f5ec; color: #173f32; }
+.flow-page-results .flow-tab.selected { border-color: transparent; background: #173f32; color: #fffdf7; box-shadow: 0 6px 14px rgba(23, 63, 50, 0.2); }
+.flow-page-results .why-row { border-radius: 16px; transition: box-shadow .18s ease; }
+.flow-page-results .why-row:hover { box-shadow: 0 8px 20px rgba(23, 63, 50, 0.08); }
+
+/* Transport on the results map */
+.route-stop-wrap { background: transparent; border: 0; }
+.route-stop { display: block; width: 12px; height: 12px; border: 3px solid var(--c); border-radius: 50%; background: #fff; box-shadow: 0 0 0 1.5px #fff, 0 1px 4px rgba(0, 0, 0, 0.3); }
+.route-stop.is-rail { border-radius: 3px; }
+.route-bike { display: grid; width: 22px; height: 22px; place-items: center; border: 2px solid #1f6fb2; border-radius: 50%; background: #fff; font-size: 11px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
+.leaflet-tooltip.route-stop-tip { padding: 6px 9px; border: 0; border-radius: 9px; color: #173f32; box-shadow: 0 6px 16px rgba(16, 47, 42, 0.2); font: 600 12px/1.4 "DM Sans", sans-serif; }
+.route-near { display: grid; gap: 6px; padding-top: 8px; border-top: 1px dashed #ddd5c5; }
+.route-near p { display: grid; gap: 3px; margin: 0; font-size: 13px; color: #4d5e53; }
+.route-near b { color: #173f32; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.route-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.route-chips i { padding: 2px 7px; border-radius: 6px; background: #f5b400; color: #2b2200; font-size: 12px; font-style: normal; font-weight: 800; }
+.route-chips em { color: #7a877f; font-size: 12px; font-style: normal; align-self: center; }
+.route-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 0; color: #5f6f67; font-size: 12px; }
+.route-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.route-legend i { width: 16px; height: 4px; border-radius: 2px; }
+.route-legend i.is-dot { width: 9px; height: 9px; border: 1.5px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px #d9a000; }
+.route-bike { width: 16px; height: 16px; border-width: 1.5px; font-size: 8px; }
+
+/* photographer credit for the photo on screen, just above the dots */
+.flow-photo-credit {
+  position: absolute;
+  left: 50%;
+  bottom: 50px;
+  z-index: 2;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 11px;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+.flow-photo-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Results map: animated route like the District Profile journey planner */
+@keyframes route-draw { to { stroke-dashoffset: 0; } }
+@keyframes route-fade { to { opacity: .95; } }
+.route-stop-dot { display: block; width: 16px; height: 16px; box-sizing: border-box; border: 4px solid var(--c); border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); animation: route-stop-pop .4s cubic-bezier(.3,1.6,.5,1) var(--d, 0ms) both; }
+@keyframes route-stop-pop { from { transform: scale(0); } to { transform: scale(1); } }
+.route-traveller { position: relative; display: block; width: 18px; height: 18px; box-sizing: border-box; border: 3px solid #fff; border-radius: 50%; background: var(--c, #173f32); box-shadow: 0 2px 8px rgba(0,0,0,.35); transition: background .3s; }
+.route-traveller i { position: absolute; inset: -9px; border-radius: 50%; background: var(--c, #173f32); opacity: .25; animation: route-traveller-pulse 1.4s ease-out infinite; }
+@keyframes route-traveller-pulse { from { transform: scale(.5); opacity: .45; } to { transform: scale(1.4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .route-stop-dot, .route-traveller i { animation: none; } }
+
+/* Results panel header: bigger labels, a visible progress bar, even spacing */
+.flow-page-results .flow-panel > * { flex-shrink: 0; } /* the panel scrolls, so nothing should get squashed */
+.flow-page-results .flow-panel .flow-eyebrow { margin: 0 0 10px; font-size: 13.5px; letter-spacing: 1.8px; }
+.flow-page-results .flow-panel .flow-progress-info { font-size: 12.5px; letter-spacing: 1.2px; }
+.flow-page-results .flow-panel .flow-progress { height: 6px; margin: 10px 0 18px; }
+.flow-page-results .flow-panel h1 { margin-bottom: 4px; }
+.flow-page-results .flow-summary { margin: 6px 0 10px; }

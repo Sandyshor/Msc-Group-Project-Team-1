@@ -1,0 +1,241 @@
+/* Generated from public/journey-planner/route.css: every class is prefixed jp- so it
+   cannot clash with the District Profile styles. Tokens come from journey-planner/styles.css. */
+.jp-scope {
+  --forest: #173f37; --forest-deep: #102f2a; --forest-soft: #24594d; --mint: #dcebe2;
+  --lime: #d9f17e; --ink: #202d29; --muted: #74817a; --line: #e4eae4;
+  font-family: "DM Sans", sans-serif;
+}
+/* Journey planner page (route.html), namespaced for the District Profile page. */
+
+/* ---------------------------------------------------------------- map */
+.jp-route-map { position: absolute; inset: 0; background: #eef1ec; cursor: crosshair; }
+/* OpenStreetMap fallback: soften its busy colours to match the Stadia style. */
+.jp-route-map .jp-tiles-osm { filter: saturate(.6) brightness(1.04) contrast(.94); }
+
+.jp-map-vignette { position: absolute; z-index: 400; inset: 0; pointer-events: none; box-shadow: inset 0 0 70px rgba(16,47,42,.16); background: linear-gradient(180deg, rgba(16,47,42,.10), transparent 90px); }
+
+.jp-map-hint { position: absolute; z-index: 600; top: 16px; left: 50%; display: flex; align-items: center; gap: 9px; transform: translateX(-50%); padding: 10px 16px; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; color: var(--ink); background: rgba(255,255,255,.82); -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4); box-shadow: 0 10px 30px rgba(16,47,42,.16); font-size: 12px; font-weight: 600; white-space: nowrap; pointer-events: none; }
+.jp-map-hint strong { color: var(--forest); }
+.jp-map-hint.jp-hint-swap { animation: jp-hint-in .35s cubic-bezier(.2,.9,.3,1.2); }
+.jp-map-hint.jp-is-loading { color: #fff; border-color: transparent; background: rgba(23,63,55,.92); }
+.jp-map-hint .jp-spinner { border-color: rgba(255,255,255,.35); border-top-color: var(--lime); }
+@keyframes jp-hint-in { from { opacity: 0; transform: translate(-50%, -8px) scale(.96); } }
+
+.jp-amenity-status { position: absolute; z-index: 600; top: 62px; left: 14px; max-width: min(330px, calc(100% - 28px)); padding: 9px 12px; border: 1px solid rgba(255,255,255,.72); border-radius: 11px; color: #43524a; background: rgba(255,255,255,.9); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 8px 22px rgba(16,47,42,.12); font-size: 10px; font-weight: 600; line-height: 1.5; }
+.jp-amenity-status.jp-is-error { color: #8c302b; background: rgba(255,248,245,.95); }
+
+.jp-map-legend { position: absolute; z-index: 600; left: 14px; bottom: 26px; display: flex; flex-wrap: wrap; gap: 6px 12px; max-width: calc(100% - 90px); padding: 9px 12px; border-radius: 12px; color: #43524a; background: rgba(255,255,255,.88); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 8px 22px rgba(16,47,42,.12); font-size: 10.5px; font-weight: 600; animation: jp-rise-in .4s ease both; }
+.jp-map-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.jp-map-legend i { width: 18px; height: 5px; border-radius: 3px; background: var(--c); }
+.jp-map-legend .jp-legend-walk { height: 4px; background: radial-gradient(circle, #5f6f67 1.6px, transparent 2px) 0 50% / 6px 4px repeat-x; }
+.jp-map-legend .jp-legend-alt { background: #8d9a93; opacity: .75; }
+
+/* Zoom control and attribution */
+.jp-route-map .leaflet-bar { overflow: hidden; border: 0; border-radius: 12px; box-shadow: 0 8px 22px rgba(16,47,42,.16); }
+.jp-route-map .leaflet-bar a { width: 36px; height: 36px; line-height: 36px; color: var(--forest); border-bottom-color: var(--line); font-size: 18px; }
+.jp-route-map .leaflet-bar a:hover { background: var(--mint); }
+.jp-route-map .leaflet-control-attribution { border-top-left-radius: 8px; background: rgba(255,255,255,.75); font-size: 9.5px; }
+
+/* Pins */
+.jp-route-pin { position: relative; width: 34px; height: 42px; transform-origin: 50% 100%; animation: jp-pin-drop .55s cubic-bezier(.3,1.5,.5,1) both; }
+.jp-route-pin span { position: absolute; z-index: 1; top: 0; left: 0; width: 34px; height: 34px; border: 3px solid #fff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 6px 14px rgba(0,0,0,.28); transition: transform .2s; }
+.jp-route-pin.jp-pin-start span { background: linear-gradient(135deg, var(--forest-soft), var(--forest-deep)); }
+.jp-route-pin.jp-pin-end span { background: linear-gradient(135deg, #e5533f, #b02a20); }
+.jp-route-pin b { position: absolute; z-index: 2; top: 7px; left: 0; width: 34px; color: #fff; font: 800 13px/20px "Manrope", sans-serif; text-align: center; }
+.jp-route-pin.jp-pin-start b { color: var(--lime); }
+.jp-pin-pulse { position: absolute; left: 7px; bottom: -6px; width: 20px; height: 10px; border-radius: 50%; background: rgba(16,47,42,.28); }
+.jp-pin-pulse::after { content: ""; position: absolute; inset: -6px -9px; border: 2px solid currentColor; border-radius: 50%; opacity: 0; animation: jp-pin-ring 2.2s ease-out .6s infinite; }
+.jp-pin-start .jp-pin-pulse { color: var(--forest); }
+.jp-pin-end .jp-pin-pulse { color: #c8352b; }
+.jp-is-dragging .jp-route-pin { animation: none; transform: translateY(-10px) scale(1.08); }
+.jp-is-dragging .jp-route-pin span { box-shadow: 0 16px 22px rgba(0,0,0,.25); }
+.leaflet-marker-icon:hover .jp-route-pin span { transform: rotate(-45deg) scale(1.06); }
+@keyframes jp-pin-drop { 0% { opacity: 0; transform: translateY(-46px) scale(.8); } 60% { opacity: 1; transform: translateY(3px) scale(1.04, .94); } 100% { transform: none; } }
+@keyframes jp-pin-ring { 0% { opacity: .7; transform: scale(.4); } 100% { opacity: 0; transform: scale(1.6); } }
+
+.jp-click-ripple { position: absolute; left: -22px; top: -22px; width: 44px; height: 44px; border: 3px solid var(--forest-soft); border-radius: 50%; animation: jp-ripple .65s ease-out forwards; pointer-events: none; }
+@keyframes jp-ripple { from { opacity: .8; transform: scale(.2); } to { opacity: 0; transform: scale(1.5); } }
+
+/* Route lines */
+@keyframes jp-route-draw { to { stroke-dashoffset: 0; } }
+@keyframes jp-route-fade { to { opacity: .95; } }
+.jp-route-map path.jp-route-alt { cursor: pointer; transition: stroke .2s, stroke-opacity .2s; animation: jp-route-fade-alt .5s ease both; }
+.jp-route-map path.jp-route-alt:hover { stroke: #4f5e56; stroke-opacity: .95; }
+@keyframes jp-route-fade-alt { from { opacity: 0; } to { opacity: 1; } }
+
+.jp-stop-dot { display: block; width: 16px; height: 16px; border: 4px solid var(--c); border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); animation: jp-stop-pop .4s cubic-bezier(.3,1.6,.5,1) var(--d, 0ms) both; }
+@keyframes jp-stop-pop { from { opacity: 0; transform: scale(0); } }
+
+.jp-traveller { position: relative; display: block; width: 18px; height: 18px; border: 3px solid #fff; border-radius: 50%; background: var(--c, var(--forest)); box-shadow: 0 2px 8px rgba(0,0,0,.35); transition: background .3s; }
+.jp-traveller i { position: absolute; inset: -9px; border-radius: 50%; background: var(--c, var(--forest)); opacity: .25; animation: jp-traveller-pulse 1.4s ease-out infinite; }
+@keyframes jp-traveller-pulse { from { transform: scale(.5); opacity: .45; } to { transform: scale(1.4); opacity: 0; } }
+
+.leaflet-tooltip.jp-route-tooltip { padding: 6px 10px; border: 0; border-radius: 9px; color: #fff; background: rgba(16,47,42,.94); box-shadow: 0 6px 16px rgba(0,0,0,.2); font: 600 11px "DM Sans", sans-serif; }
+.leaflet-tooltip.jp-route-tooltip::before { display: none; }
+
+/* ---------------------------------------------------------------- panel */
+.jp-route-controls { display: grid; gap: 10px; margin-bottom: 18px; }
+.jp-segmented { position: relative; display: grid; grid-template-columns: 1.5fr 1fr 1fr; padding: 4px; border-radius: 13px; background: #eef2ea; }
+.jp-segmented label { position: relative; }
+.jp-segmented input { position: absolute; opacity: 0; pointer-events: none; }
+.jp-segmented span { display: block; padding: 9px 6px; border-radius: 10px; color: #5b6a61; font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; transition: background .25s, color .25s, box-shadow .25s, transform .15s; }
+.jp-segmented span:hover { color: var(--forest); }
+.jp-segmented label:active span { transform: scale(.97); }
+.jp-segmented input:checked + span { color: #fff; background: linear-gradient(135deg, var(--forest-soft), var(--forest)); box-shadow: 0 4px 12px rgba(23,63,55,.25); }
+.jp-segmented input:focus-visible + span { outline: 2px solid var(--forest-soft); outline-offset: 2px; }
+.jp-time-row { display: flex; gap: 8px; }
+.jp-time-row select, .jp-time-row input { min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: #fff; font: 600 12px "DM Sans", sans-serif; transition: border-color .2s, box-shadow .2s; }
+.jp-time-row select:focus, .jp-time-row input:focus { outline: 0; border-color: var(--forest-soft); box-shadow: 0 0 0 3px rgba(36,89,77,.12); }
+.jp-time-row select { flex: 0 0 auto; }
+.jp-time-row input { flex: 1; animation: jp-rise-in .25s ease both; }
+
+.jp-spinner { width: 15px; height: 15px; flex: 0 0 auto; border: 2px solid #c9d6cc; border-top-color: var(--forest); border-radius: 50%; animation: jp-spin .8s linear infinite; }
+@keyframes jp-spin { to { transform: rotate(360deg); } }
+
+/* Loading skeleton */
+.jp-route-status { display: grid; gap: 10px; }
+.jp-route-status span, .jp-skeleton-line { display: block; border-radius: 10px; background: linear-gradient(90deg, #eef2ec 25%, #f8faf6 50%, #eef2ec 75%) 0 0 / 300% 100%; animation: jp-shimmer 1.3s ease-in-out infinite; }
+.jp-skeleton-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.jp-skeleton-tabs span { height: 62px; }
+.jp-skeleton-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.jp-skeleton-grid span { height: 44px; }
+.jp-skeleton-line { height: 14px; }
+.jp-skeleton-line.jp-short { width: 60%; }
+@keyframes jp-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* Empty state */
+.jp-route-empty { padding: 18px 18px 20px; border: 1px dashed #cfdacf; border-radius: 16px; color: var(--muted); background: #fafbf8; text-align: center; animation: jp-rise-in .4s ease both; }
+.jp-route-empty strong { color: var(--ink); font: 800 15px "Manrope", sans-serif; }
+.jp-route-empty p { margin: 6px auto 0; max-width: 280px; font-size: 12px; line-height: 1.6; }
+.jp-empty-art { display: block; width: 100%; max-width: 250px; height: auto; margin: 0 auto 8px; overflow: visible; }
+.jp-empty-road { fill: none; stroke: #e1e8e0; stroke-width: 10; stroke-linecap: round; }
+.jp-empty-route { fill: none; stroke: var(--forest-soft); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: jp-empty-draw 3.2s ease-in-out .3s infinite; }
+.jp-empty-stop { fill: #fff; stroke: #2f8f46; stroke-width: 3; }
+.jp-empty-pin path { stroke: #fff; stroke-width: 2; }
+.jp-empty-pin-a path { fill: var(--forest); }
+.jp-empty-pin-b path { fill: #c8352b; }
+.jp-empty-pin text { fill: #fff; font: 800 10px "Manrope", sans-serif; text-anchor: middle; }
+.jp-empty-pin-a text { fill: var(--lime); }
+.jp-empty-pin-b { animation: jp-bob 3.2s ease-in-out infinite; }
+@keyframes jp-empty-draw { 0% { stroke-dashoffset: 1; } 55%, 80% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
+@keyframes jp-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+
+/* Results */
+.jp-route-result { animation: jp-rise-in .35s ease both; }
+.jp-route-tabs { display: flex; gap: 6px; margin-bottom: 14px; padding-bottom: 2px; overflow-x: auto; }
+.jp-route-tab { position: relative; flex: 1 1 0; min-width: 104px; display: grid; gap: 5px; padding: 10px 11px; border: 1px solid var(--line); border-radius: 13px; color: #526158; background: #fff; text-align: left; transition: border-color .2s, background .2s, transform .2s, box-shadow .2s; animation: jp-rise-in .35s ease calc(var(--i) * 70ms) both; }
+.jp-route-tab:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(23,63,55,.08); }
+.jp-route-tab strong { color: var(--ink); font: 800 15px "Manrope", sans-serif; }
+.jp-route-tab .jp-tab-chips { display: flex; flex-wrap: wrap; gap: 3px; }
+.jp-route-tab .jp-tab-label { overflow: hidden; color: var(--muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.jp-route-tab[aria-selected="true"] { border-color: var(--forest); background: linear-gradient(160deg, #eaf4ec, var(--mint)); box-shadow: 0 8px 20px rgba(23,63,55,.12); }
+.jp-route-tab[aria-selected="true"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--forest); }
+.jp-chip { display: inline-block; padding: 2px 6px; border-radius: 6px; color: #fff; background: var(--c); font-size: 9.5px; font-style: normal; font-weight: 800; line-height: 1.4; }
+.jp-chip-walk { color: #43524a; background: #e4ebe5; }
+
+.jp-route-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0 0 18px; }
+.jp-route-summary div { padding: 10px 11px; border-radius: 12px; background: #f4f7f2; animation: jp-rise-in .35s ease calc(var(--i) * 45ms + 80ms) both; }
+.jp-route-summary div:first-child { color: #fff; background: linear-gradient(135deg, var(--forest-soft), var(--forest-deep)); }
+.jp-route-summary div:first-child dt { color: #b9d2c5; }
+.jp-route-summary div:first-child dd { color: var(--lime); }
+.jp-route-summary dt { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+.jp-route-summary dd { margin: 3px 0 0; color: var(--ink); font: 800 15px "Manrope", sans-serif; }
+
+.jp-route-steps { margin: 0; padding: 0; list-style: none; }
+.jp-route-step { position: relative; display: grid; grid-template-columns: 15px minmax(0, 1fr) auto; gap: 11px; padding: 0 0 15px; animation: jp-slide-in .4s ease calc(var(--i) * 90ms + 200ms) both; }
+.jp-route-step::before { content: ""; position: absolute; top: 15px; bottom: 0; left: 6px; width: 3px; border-radius: 2px; background: var(--leg-color); }
+.jp-route-step.jp-is-walk::before { background: radial-gradient(circle, var(--leg-color) 1.5px, transparent 2px) 50% 0 / 3px 7px repeat-y; }
+.jp-route-step:last-child::before { display: none; }
+.jp-step-dot { width: 15px; height: 15px; margin-top: 1px; border: 3px solid var(--leg-color); border-radius: 50%; background: #fff; }
+.jp-route-step p { margin: 0; color: var(--ink); font-size: 12px; line-height: 1.45; }
+.jp-route-step small { display: block; margin-top: 2px; color: var(--muted); font-size: 10.5px; line-height: 1.45; }
+.jp-route-step time { color: #55645b; font-size: 11px; font-weight: 700; }
+
+
+@keyframes jp-rise-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes jp-slide-in { from { opacity: 0; transform: translateX(-10px); } }
+
+
+/* University and famous-place markers */
+.jp-landmark { display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid var(--forest-deep); border-radius: 50%; background: #fff; box-shadow: 0 4px 12px rgba(16,47,42,.28); font-size: 15px; line-height: 1; cursor: pointer; transition: transform .15s; }
+.jp-landmark:hover { transform: scale(1.15); }
+.jp-landmark-place { border-color: #b8862f; background: #fffaf0; }
+.jp-landmark-landmark { border-color: #a65c3b; background: #fff4e8; }
+.jp-landmark-airport { width: 38px; height: 38px; margin: -4px 0 0 -4px; border-width: 3px; font-size: 19px; }
+.jp-landmark-tooltip { padding: 6px 9px; border: 0; border-radius: 8px; color: var(--forest-deep); box-shadow: 0 6px 16px rgba(16,47,42,.18); font: 700 12px/1.4 "DM Sans", sans-serif; }
+.jp-landmark-category { color: #7a877f; font-weight: 500; }
+.jp-amenity-marker-icon { border: 0; background: transparent; }
+.jp-amenity-marker { display: grid; place-items: center; width: 32px; height: 32px; border: 2px solid #fff; border-radius: 50%; color: #fff; background: var(--amenity-color); box-shadow: 0 3px 10px rgba(16,47,42,.3); font-size: 16px; line-height: 1; transition: transform .16s ease; }
+.jp-amenity-marker:hover { transform: scale(1.13); }
+.jp-amenity-marker.jp-amenity-tesco,
+.jp-amenity-marker.jp-amenity-spar,
+.jp-amenity-marker.jp-amenity-dunnes,
+.jp-amenity-marker.jp-amenity-aldi,
+.jp-amenity-marker.jp-amenity-centra,
+.jp-amenity-marker.jp-amenity-lidl,
+.jp-amenity-marker.jp-amenity-supervalu,
+.jp-amenity-marker.jp-amenity-circlek,
+.jp-amenity-marker.jp-amenity-mace,
+.jp-amenity-marker.jp-amenity-daybreak,
+.jp-amenity-marker.jp-amenity-londis,
+.jp-amenity-marker.jp-amenity-eurospar,
+.jp-amenity-marker.jp-amenity-polonez,
+.jp-amenity-marker.jp-amenity-gala,
+.jp-amenity-marker.jp-amenity-costcutter,
+.jp-amenity-marker.jp-amenity-daytoday { width: 46px; height: 46px; border: 0; color: inherit; background: #fff; }
+.jp-brand-logo { position: relative; display: inline-grid; place-items: center; width: 34px; height: 24px; overflow: hidden; border: 2px solid currentColor; border-radius: 5px; color: #244b80; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.12); font: 900 7px/1 "Manrope", sans-serif; letter-spacing: -.35px; text-align: center; }
+.jp-amenity-marker .jp-brand-logo { width: 37px; height: 27px; font-size: 8px; }
+.jp-brand-logo-tesco { border-color: #e31b34; color: #e31b34; background: linear-gradient(180deg,#fff 0 72%,#fce5e8 72%); font-size: 9px; font-style: italic; }
+.jp-brand-logo-spar { border-color: #168441; color: #168441; background: linear-gradient(135deg,#fff 0 65%,#e7f4e9 65%); font-size: 9px; }
+.jp-brand-logo-spar::before { position: absolute; top: 2px; left: 3px; width: 5px; height: 5px; border-radius: 50% 50% 50% 0; background: #e3322c; content: ""; transform: rotate(-45deg); }
+.jp-brand-logo-dunnes { border-color: #244b80; color: #244b80; background: linear-gradient(180deg,#fff 0 70%,#e8eef6 70%); font-size: 7px; letter-spacing: -.5px; }
+.jp-brand-logo-aldi { border-color: #064e9b; color: #064e9b; background: linear-gradient(135deg,#fff 0 42%,#e6f0fb 42%); font-size: 9px; font-style: italic; }
+.jp-brand-logo-aldi::before { position: absolute; top: 2px; left: 3px; width: 4px; height: 3px; border-top: 2px solid #e53235; border-bottom: 1px solid #e53235; content: ""; }
+.jp-brand-logo-centra { border-color: #d5232f; color: #fff; background: linear-gradient(180deg,#e82b38 0 68%,#ffcf24 68%); font-size: 8px; }
+.jp-brand-logo-lidl { border: 3px solid #134f9b; border-radius: 50%; color: #064e9b; background: #ffdf00; font-size: 9px; font-style: italic; }
+.jp-brand-logo-lidl::after { position: absolute; top: 3px; right: 5px; width: 5px; height: 5px; border-radius: 50%; background: #e5322b; content: ""; }
+.jp-brand-logo-supervalu { border: 0; color: #bd1934; background: linear-gradient(135deg,#fff 0 55%,#e8f4eb 55%); font-size: 7px; font-style: italic; }
+.jp-brand-logo-supervalu::after { position: absolute; right: 3px; bottom: 3px; width: 7px; height: 4px; border-radius: 7px 0; background: #318b4c; content: ""; transform: rotate(-25deg); }
+.jp-brand-logo-circlek { border: 2px solid #e5222a; border-radius: 50%; color: #e5222a; background: #fff; font-size: 10px; }
+.jp-brand-logo-mace { border-color: #d3272f; color: #fff; background: linear-gradient(135deg,#d3272f 0 48%,#fff 48%); font-size: 9px; text-shadow: 0 1px 1px #8f1720; }
+.jp-brand-logo-daybreak { border-color: #e17a20; color: #99500e; background: linear-gradient(180deg,#fff 0 55%,#ffd777 55%); font-size: 6px; }
+.jp-brand-logo-daybreak::before { position: absolute; top: 2px; width: 7px; height: 7px; border-radius: 50%; background: #f3a322; content: ""; }
+.jp-brand-logo-londis { border-color: #14539a; color: #14539a; background: linear-gradient(135deg,#fff 0 70%,#5ca45e 70%); font-size: 8px; font-style: italic; }
+.jp-brand-logo-eurospar { border-color: #16783e; color: #16783e; background: linear-gradient(135deg,#fff 0 73%,#e53235 73%); font-size: 7px; }
+.jp-brand-logo-polonez { border-color: #315d9c; color: #315d9c; background: linear-gradient(90deg,#fff 0 50%,#f6e8e8 50%); font-size: 7px; }
+.jp-brand-logo-gala { border-color: #c52535; color: #c52535; background: linear-gradient(180deg,#fff 0 70%,#ffd444 70%); font-size: 9px; font-style: italic; }
+.jp-brand-logo-costcutter { border-color: #258545; color: #258545; background: linear-gradient(135deg,#fff 0 55%,#f4d84c 55%); font-size: 6px; }
+.jp-brand-logo-daytoday { border-color: #d5252d; color: #fff; background: linear-gradient(135deg,#d5252d 0 50%,#245a9a 50%); font-size: 6px; }
+.jp-layer-subcategory { display: inline-flex; align-items: center; gap: 7px; margin-left: 18px; }
+.jp-amenity-supermarkets { --amenity-color: #2f7b50; }
+.jp-amenity-tesco { --amenity-color: #e31b34; }
+.jp-amenity-spar { --amenity-color: #168441; }
+.jp-amenity-dunnes { --amenity-color: #244b80; }
+.jp-amenity-aldi { --amenity-color: #064e9b; }
+.jp-amenity-centra { --amenity-color: #d5232f; }
+.jp-amenity-lidl { --amenity-color: #064e9b; }
+.jp-amenity-supervalu { --amenity-color: #d21e38; }
+.jp-amenity-circlek { --amenity-color: #e5222a; }
+.jp-amenity-mace { --amenity-color: #d3272f; }
+.jp-amenity-daybreak { --amenity-color: #e17a20; }
+.jp-amenity-londis { --amenity-color: #14539a; }
+.jp-amenity-eurospar { --amenity-color: #16783e; }
+.jp-amenity-polonez { --amenity-color: #315d9c; }
+.jp-amenity-gala { --amenity-color: #c52535; }
+.jp-amenity-costcutter { --amenity-color: #258545; }
+.jp-amenity-daytoday { --amenity-color: #d5252d; }
+.jp-amenity-groceries { --amenity-color: #58835a; }
+.jp-amenity-pharmacies { --amenity-color: #7054a0; }
+.jp-amenity-hospitals { --amenity-color: #bd4138; }
+.jp-amenity-shopping { --amenity-color: #bd7627; }
+.jp-amenity-parks { --amenity-color: #4b8550; }
+.jp-amenity-landmarks { --amenity-color: #a65c3b; }
+.jp-amenity-tooltip small { display: block; margin-top: 2px; color: #a9beb0; font-size: 9px; font-weight: 600; }
+.jp-route-map .leaflet-control-layers { max-width: min(270px, calc(100vw - 30px)); border: 0; border-radius: 10px; box-shadow: 0 8px 22px rgba(16,47,42,.12); font: 600 12px "DM Sans", sans-serif; color: #43524a; }
+.jp-route-map .leaflet-control-layers-list { max-height: min(52vh, 360px); overflow-y: auto; }
+.jp-route-map .leaflet-control-layers label { padding: 3px 1px; }
+.jp-route-map .leaflet-control-layers-separator { margin: 7px 0; }
+
+@media (max-width: 650px) {
+  .jp-amenity-status { top: 12px; left: 12px; max-width: min(250px, calc(100% - 72px)); }
+}

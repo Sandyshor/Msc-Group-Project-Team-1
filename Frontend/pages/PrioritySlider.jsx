@@ -11,7 +11,7 @@ export function importanceLabel(value) {
   return 'Very important'
 }
 
-function PrioritySlider({ name, value, onChange, showName = false }) {
+function PrioritySlider({ name, value, onChange, showName = false, lowLabel = 'Not important', highLabel = 'Very important' }) {
   const words = importanceLabel(value)
 
   return (
@@ -29,13 +29,14 @@ function PrioritySlider({ name, value, onChange, showName = false }) {
         max="10"
         step="1"
         value={value}
+        style={{ '--fill': `${value * 10}%` }}
         aria-label={`How important is ${name}?`}
         aria-valuetext={`${value} out of 10, ${words}`}
         onChange={(event) => onChange(Number(event.target.value))}
       />
       <div className="range-labels">
-        <span>Not important</span>
-        <span>Very important</span>
+        <span>{lowLabel}</span>
+        <span>{highLabel}</span>
       </div>
     </div>
   )

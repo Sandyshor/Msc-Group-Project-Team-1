@@ -1,0 +1,100 @@
+/* District tour: a slim bar across the top of the map, so the map stays visible */
+.map-stage { position: relative; }
+.map-stage.is-touring .jp-map-hint { opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+@media (min-width: 1101px) {
+  .map-card .map-stage { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 360px; }
+}
+
+.dt-bar {
+  position: absolute;
+  z-index: 900;
+  top: 12px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(760px, calc(100% - 140px));
+  padding: 10px 12px 14px 12px;
+  overflow: hidden;
+  border: 1px solid rgba(23, 63, 50, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.96);
+  color: #1f2a24;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 14px 34px rgba(16, 47, 42, 0.22);
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+  animation: dt-drop .45s cubic-bezier(.2, .9, .3, 1.15) both;
+}
+@keyframes dt-drop { from { opacity: 0; transform: translate(-50%, -16px); } to { opacity: 1; transform: translateX(-50%); } }
+
+.dt-row { display: flex; flex: 1; align-items: center; gap: 12px; min-width: 0; animation: dt-swap .35s ease both; }
+@keyframes dt-swap { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
+.dt-badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 46px;
+  height: 46px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 14px;
+  background: #173f32;
+  color: #dff27f;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 19px;
+  font-weight: 700;
+  animation: dt-pop .5s cubic-bezier(.3, 1.6, .5, 1) both;
+}
+.dt-badge.is-south { background: #8a5a17; color: #fff3dc; }
+@keyframes dt-pop { from { transform: scale(.5) rotate(-12deg); } to { transform: none; } }
+.dt-copy { min-width: 0; }
+.dt-label { color: #a8753f; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.dt-label b.is-north { color: #1e4f8a; }
+.dt-label b.is-south { color: #8a5a17; }
+.dt-copy p { margin: 2px 0 0; color: #1f2a24; font-size: 14px; line-height: 1.4; }
+.dt-copy p b { color: #173f32; }
+.dt-copy p a { color: #245b48; font-weight: 700; }
+
+.dt-actions { display: flex; flex: none; align-items: center; gap: 6px; }
+.dt-actions button { border: 1.5px solid #d9d2c1; border-radius: 999px; background: #fff; color: #173f32; font: inherit; font-weight: 700; cursor: pointer; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
+.dt-actions button:hover:not(:disabled) { border-color: #245b48; transform: translateY(-1px); }
+.dt-actions button:disabled { opacity: .35; cursor: default; }
+.dt-icon { width: 32px; height: 32px; padding: 0; font-size: 13px !important; }
+.dt-next { padding: 7px 14px; border-color: #173f32 !important; background: #173f32 !important; color: #fff !important; font-size: 13px; white-space: nowrap; }
+.dt-skip { padding: 7px 12px; border-color: transparent !important; background: transparent !important; color: #6b766e !important; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.dt-skip:hover { color: #173f32 !important; }
+.dt-actions button:focus-visible { outline: 2px solid #245b48; outline-offset: 2px; }
+
+.dt-progress { position: absolute; right: 0; bottom: 0; left: 0; height: 4px; background: #ece6d8; }
+.dt-progress > span { position: absolute; inset: 0 auto 0 0; background: #245b48; transition: width .4s ease; }
+.dt-progress > i { position: absolute; inset: 0 auto 0 0; width: 100%; background: rgba(36, 91, 72, 0.35); transform-origin: left; animation: dt-timer linear both; }
+@keyframes dt-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Northside / Southside filter: that side's district buttons turn dark green */
+.district-chips.is-filtered button:not(.is-dim):not([aria-pressed="true"]):not(.county-toggle) {
+  border-color: #173f32;
+  background: #173f32;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(23, 63, 50, 0.18);
+  animation: chip-on .3s ease both;
+}
+@keyframes chip-on { from { transform: scale(.92); } to { transform: none; } }
+
+/* the permanent hint under the district buttons */
+.district-hint { display: flex; align-items: center; gap: 8px; margin: 2px 2px 0; color: #5f6f67; font-size: 12.5px; line-height: 1.4; }
+.district-hint b { color: #173f32; }
+.district-hint .dh-n, .district-hint .dh-s { padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+.district-hint .dh-n { background: #dbe7f7; color: #1e4f8a; }
+.district-hint .dh-s { background: #f6e6cf; color: #8a5a17; }
+
+
+@media (max-width: 760px) {
+  .dt-bar { flex-direction: column; align-items: stretch; width: calc(100% - 20px); gap: 10px; }
+  .dt-actions { justify-content: flex-end; }
+}
+@media (prefers-reduced-motion: reduce) { .dt-bar, .dt-row, .dt-badge, .dt-progress > i, .district-chips.is-filtered button { animation: none; } }
+/* anchored left so it never covers the map's Layers button on the right */
+.dt-bar { left: 12px; width: min(720px, calc(100% - 150px)); transform: none; animation-name: dt-drop-left; }
+@keyframes dt-drop-left { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
+@media (max-width: 760px) { .dt-bar { left: 10px; width: calc(100% - 20px); } }
