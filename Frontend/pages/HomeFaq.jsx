@@ -14,7 +14,7 @@ const FAQS = [
   },
   {
     q: 'How do I get around the city?',
-    a: <>Dublin Bus, the Luas tram, the DART and commuter trains cover the city. Pay with a Student Leap Card for cheaper fares. With the TFI 90-minute fare, you can change between them for one price. Dublin Bikes and walking work well in the centre.</>,
+    a: <>Dublin Bus, the Luas tram, the DART and commuter trains cover the city. Pay with a Student or Young Adult Leap Card for cheaper fares. With the TFI 90-minute fare, you can change between them for one price. Dublin Bikes and walking work well in the centre.</>,
   },
   {
     q: 'What do I need to do when I first arrive?',
@@ -22,7 +22,7 @@ const FAQS = [
   },
   {
     q: 'Can I work while I study?',
-    a: <>Students with a Stamp 2 permission can work up to 20 hours a week during term and up to 40 hours a week in the holidays (June to September, and 15 December to 15 January). You’ll need a PPS number, and you should register your job with Revenue.</>,
+    a: <>Students with a Stamp 2 permission can work up to 40 hours a week in June, July, August and September and from 15 December to 15 January, and up to 20 hours a week at all other times. You’ll need a PPS number, and you should register your job with Revenue.</>,
   },
   {
     q: 'Is Dublin safe?',
