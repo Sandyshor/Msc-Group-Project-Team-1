@@ -14,7 +14,11 @@ Run from the Backend folder, with OTP running:
 Add --neighbourhoods to do the same for the safety data's neighbourhoods (data/safety/neighbourhoods.csv)
 instead, saved to Data/commute_otp_neighbourhoods.csv. Until that file exists, the recommender gives each
 neighbourhood the times of the nearest landmark in its district.
+
+Add --county to do it for the County Dublin areas' places (A and K Eircodes, from the District Profile's
+county-dublin-profiles.json), saved to Data/commute_otp_county.csv with each place's coordinates.
 """
+import json
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -32,6 +36,9 @@ OUTPUT = os.path.join(DATA_FOLDER, "commute_otp.csv")
 NEIGHBOURHOODS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "safety",
                                    "neighbourhoods.csv")
 NEIGHBOURHOODS_OUTPUT = os.path.join(DATA_FOLDER, "commute_otp_neighbourhoods.csv")
+COUNTY_PROFILES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "Frontend", "public", "data",
+                               "county-dublin-profiles.json")
+COUNTY_OUTPUT = os.path.join(DATA_FOLDER, "commute_otp_county.csv")
 
 ARRIVE_BY = "09:00"
 # recommender travel mode -> routing.py mode
@@ -60,6 +67,8 @@ def best_journey(job):
     best = min(result["itineraries"], key=lambda itinerary: itinerary["total_minutes"])
     return {
         "Area": row.District, "Direction": row.Direction, "Landmark": row.Landmark,
+        "Origin_Latitude": row.Origin_Latitude, "Origin_Longitude": row.Origin_Longitude,
+        "Destination_Latitude": row.Destination_Latitude, "Destination_Longitude": row.Destination_Longitude,
         "University": row.University, "Mode": mode,
         "Minutes": best["total_minutes"], "Distance_km": best["total_distance_km"],
         "Transfers": best["transfers"],
@@ -75,14 +84,28 @@ def neighbourhood_points(commutes):
     return hoods[["District", "Direction", "Landmark", "Origin_Latitude", "Origin_Longitude"]].merge(universities, how="cross")
 
 
+def county_points(commutes):
+    """Every County Dublin place paired with every university, in the same columns as the landmark file."""
+    universities = commutes.drop_duplicates("University")[["University", "Destination_Latitude", "Destination_Longitude"]]
+    with open(COUNTY_PROFILES, encoding="utf-8") as f:
+        profiles = json.load(f)["profiles"]
+    places = pd.DataFrame([{"District": code, "Direction": "County", "Landmark": name,
+                            "Origin_Latitude": lat, "Origin_Longitude": lon}
+                           for code, profile in profiles.items() for name, lat, lon in profile.get("areas", [])])
+    return places.merge(universities, how="cross")
+
+
 def main():
     for_neighbourhoods = "--neighbourhoods" in sys.argv
+    for_county = "--county" in sys.argv
     points = pd.read_csv(POINTS_FILE)[[
         "District", "Direction", "Landmark", "Origin_Latitude", "Origin_Longitude",
         "University", "Destination_Latitude", "Destination_Longitude",
     ]]
     if for_neighbourhoods:
         points = neighbourhood_points(points)
+    elif for_county:
+        points = county_points(points)
     points = points.drop_duplicates(["District", "Landmark", "University"])
     when = f"{next_weekday().isoformat()}T{ARRIVE_BY}"
     jobs = [(row, mode, when) for row in points.itertuples(index=False) for mode in MODES]
@@ -104,6 +127,11 @@ def main():
     matrix["Calculated_At"] = datetime.now(routing.DUBLIN_TZ).isoformat(timespec="seconds")
     matrix["Source"] = routing.SOURCE_LABEL
     output = OUTPUT
+    if not for_county:  # coordinates are only needed for county places (the other files already have them)
+        matrix = matrix.drop(columns=["Origin_Latitude", "Origin_Longitude",
+                                      "Destination_Latitude", "Destination_Longitude"])
+    else:
+        output = COUNTY_OUTPUT
     if for_neighbourhoods:
         matrix = matrix.rename(columns={"Landmark": "Neighbourhood"}).drop(columns="Direction")
         output = NEIGHBOURHOODS_OUTPUT
