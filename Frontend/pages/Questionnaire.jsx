@@ -25,12 +25,21 @@ const UNIVERSITIES = [
 ]
 
 // label, backend accommodation key (null = no rent data yet)
+// Room types inside student residences: [value, label, what it is, typical monthly starting price]
+const STUDENT_ROOMS = [
+  ['any', 'Any room', 'Show every residence, cheapest room first', 'from about €820'],
+  ['shared', 'Shared (twin) room', 'Share a bedroom with one other student', 'about €680–€1,190'],
+  ['private', 'Private en-suite room', 'Your own room and bathroom, shared kitchen', 'about €820–€1,400'],
+  ['studio', 'Studio', 'Your own room, bathroom and kitchenette', 'about €1,080–€1,980'],
+]
+const STUDENT_KEYS = { any: 'student_accommodation', shared: 'student_shared', private: 'student_private', studio: 'student_studio' }
+
 const ROOM_TYPES = [
   ['1 BHK apartment', 'one_bed'],
   ['2 BHK apartment', 'two_bed'],
   ['Private room', 'private_room'],
   ['Double sharing', 'shared_room'],
-  ['Student accommodation', null],
+  ['Student accommodation', 'student_accommodation'],
 ]
 
 const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
@@ -59,7 +68,9 @@ function Questionnaire() {
   const [step, setStep] = useState(state?.step === 2 ? 2 : 1)
   const [budget, setBudget] = useState(earlier?.budget ?? 1000)
   const [destination, setDestination] = useState(earlier?.university ?? '')
-  const [roomType, setRoomType] = useState(earlier?.accommodationLabel ?? 'Private room')
+  const [roomType, setRoomType] = useState(
+    ROOM_TYPES.some(([label]) => label === earlier?.accommodationLabel) ? earlier.accommodationLabel : 'Private room')
+  const [studentRoom, setStudentRoom] = useState(earlier?.studentRoom ?? 'any')
   const [commute, setCommute] = useState({
     travelMode: earlier?.travelMode ?? 'public_transport',
     maxCommute: earlier?.maxCommute ?? null,
@@ -75,7 +86,8 @@ function Questionnaire() {
   )
   const navigate = useNavigate()
 
-  const accommodation = ROOM_TYPES.find(([label]) => label === roomType)[1]
+  const isStudent = roomType === 'Student accommodation'
+  const accommodation = isStudent ? STUDENT_KEYS[studentRoom] : ROOM_TYPES.find(([label]) => label === roomType)[1]
   const situationDone = Boolean(destination && accommodation)
   // A category rated "separately" is replaced by its items, as in the backend.
   const activeImportance = Object.fromEntries(
@@ -122,6 +134,7 @@ function Questionnaire() {
         budget,
         accommodation,
         accommodationLabel: roomType,
+        studentRoom: isStudent ? studentRoom : undefined,
         importance: activeImportance,
         travelMode: commute.travelMode,
         maxCommute: commute.maxCommute,
@@ -205,8 +218,21 @@ function Questionnaire() {
                 value={roomType}
                 onChange={setRoomType}
               />
-              {!accommodation && (
-                <p className="flow-note">We don't have rent data for student accommodation yet - please choose another option.</p>
+              {isStudent && (
+                <div className="student-rooms" role="group" aria-label="Student room type">
+                  <p className="student-rooms-q">Which kind of student room?</p>
+                  <div className="student-rooms-grid">
+                    {STUDENT_ROOMS.map(([value, label, what, price]) => (
+                      <button key={value} type="button" aria-pressed={studentRoom === value}
+                        className={`student-room${studentRoom === value ? ' is-on' : ''}`} onClick={() => setStudentRoom(value)}>
+                        <strong>{label}</strong>
+                        <span>{what}</span>
+                        <em>{price} a month</em>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="flow-note">Prices are the published 2026/27 starting prices of Dublin’s purpose-built student residences. We’ll rank the districts that have this kind of room.</p>
+                </div>
               )}
             </FlowRow>
 

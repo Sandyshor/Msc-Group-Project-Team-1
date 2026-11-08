@@ -42,8 +42,14 @@ const PHASES = [
       {
         id: 'sim', icon: '📱', title: 'Get an Irish phone number',
         why: 'Banks, employers, landlords and doctors will all ask for an Irish number.',
-        how: ['Prepaid (pay-as-you-go) SIMs from the main networks need no credit check.', 'eSIMs let you set one up before you land.'],
-        link: ['Citizens Information: phones', 'https://www.citizensinformation.ie/en/consumer/phone-internet-tv-and-postal-services/'],
+        how: ['No-contract SIMs need no credit check and you can cancel any time.', 'Most offer an eSIM, so you can set one up before you land.'],
+        // Popular low-cost, no-contract plans. Prices as published, checked 8 Nov 2026; we're not affiliated with any.
+        options: [
+          { name: 'Lyca Mobile', plan: 'Lyca Unlimited', price: '€8.99', per: 'per 28 days', detail: 'Unlimited 5G data, calls and texts; 100 international minutes to 42 countries', url: 'https://www.lycamobile.ie/en/bundles/' },
+          { name: 'Lidl Connect', plan: 'Lidl Connect', price: '€12.99', per: 'a month', detail: 'Unlimited 5G data, calls and texts; sign up in the Lidl Plus app or with a SIM from any Lidl store', url: 'https://www.lidl.ie/c/lidl-connect' },
+          { name: '48', plan: '48 plan', price: '€9.99', per: 'a month for 6 months, then €12.99', detail: 'Unlimited 5G data, 5,000 minutes and texts; €9.99 activation fee', url: 'https://48.ie/', indicative: true },
+        ],
+        optionsNote: 'Prices checked 8 November 2026 on each provider’s website (48’s via SmartSaver.ie). Offers change often, so check before you sign up. We’re not affiliated with any provider.',
       },
       {
         id: 'bank', icon: '💳', title: 'Open a bank account',
@@ -177,7 +183,21 @@ export default function ThingsToKnow() {
                     </div>
                     <p className="ttk-why">{item.why}</p>
                     <ul className="ttk-how">{item.how.map((h) => <li key={h}>{h}</li>)}</ul>
-                    <a className="ttk-link" href={item.link[1]} target="_blank" rel="noreferrer">{item.link[0]} <span aria-hidden="true">↗</span></a>
+                    {item.options && (
+                      <div className="ttk-options">
+                        {item.options.map((o) => (
+                          <a key={o.name} className="ttk-option" href={o.url} target="_blank" rel="noopener noreferrer">
+                            <span className="ttk-option-head"><strong>{o.name}</strong><span aria-hidden="true">↗</span></span>
+                            <span className="ttk-option-price"><b>{o.price}</b> {o.per}{o.indicative && <em> · indicative</em>}</span>
+                            <span className="ttk-option-detail">{o.detail}</span>
+                          </a>
+                        ))}
+                        <p className="ttk-options-note">{item.optionsNote}</p>
+                      </div>
+                    )}
+                    {item.link && (
+                      <a className="ttk-link" href={item.link[1]} target="_blank" rel="noreferrer">{item.link[0]} <span aria-hidden="true">↗</span></a>
+                    )}
                   </article>
                 )
               })}

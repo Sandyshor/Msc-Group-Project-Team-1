@@ -46,7 +46,8 @@ from build_station_map import order, read_districts
 
 WHERE = "building = 'dormitory' OR other_tags LIKE '%student%' OR other_tags LIKE '%dormitory%'"
 # OSM objects tagged as student housing that aren't: name -> why.
-NOT_STUDENT = {"Liberties House": "co-living development for adults, not student housing (libertieshouse.com)"}
+NOT_STUDENT = {"Liberties House": "co-living development for adults, not student housing (libertieshouse.com)",
+               "Libra Living": "general rental community (Spencer Place), not student housing (libraliving.ie)"}
 NOT_HOUSING = re.compile(r"cinema|sport|fitness|student centre|students' union|library|bar\b", re.I)
 
 # Operator brand -> words that identify it in a name or website.

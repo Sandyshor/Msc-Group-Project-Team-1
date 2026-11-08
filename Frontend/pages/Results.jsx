@@ -118,18 +118,121 @@ function SafetyScores({ area, safety }) {
 }
 
 const RESIDENCES_SHOWN = 4
+const STUDENT_ROOM_NAMES = { shared: 'Shared room', private: 'Private room', studio: 'Studio' }
 
 // Student residences in the district (OpenStreetMap) and rental searches for it (Daft.ie, Rent.ie).
-function PlacesToLive({ area, places }) {
+// A residence's published price: monthly range, the weekly price it's quoted in, and whether it fits the budget
+function ResidencePrice({ price, budget, missing }) {
+  if (!price) return <span className="res-price res-price-none">{missing || 'Contact the residence for prices'}</span>
+  const month = price.monthly_to && price.monthly_to !== price.monthly_from
+    ? `${euro(price.monthly_from)}–${euro(price.monthly_to)}` : `from ${euro(price.monthly_from)}`
+  const week = price.weekly_from
+    ? (price.weekly_to && price.weekly_to !== price.weekly_from ? `${euro(price.weekly_from)}–${euro(price.weekly_to)}` : `from ${euro(price.weekly_from)}`)
+    : null
+  const fits = budget && price.monthly_from <= budget
+  return (
+    <span className="res-price">
+      <b>{month}<small> a month</small></b>
+      {week && <span className="result-muted">{week} a week</span>}
+      {budget && <span className={`res-fit ${fits ? 'is-in' : 'is-out'}`}>{fits ? 'Within your budget' : `From ${euro(price.monthly_from - budget)} over budget`}</span>}
+    </span>
+  )
+}
+
+function PlacesToLive({ area, places, budget, student, room }) {
   const [showAll, setShowAll] = useState(false)
   if (!places) return null
-  const { residences = [], search_links: links = [] } = places
-  const shown = showAll ? residences : residences.slice(0, RESIDENCES_SHOWN)
+  const { search_links: links = [] } = places
+  // with a chosen student room type, show that room's price and list residences that have it first, cheapest first
+  const priceOf = (r) => (room ? r.rooms?.[room] : r.price)
+  const residences = [...(places.residences || [])].sort((a, b) => {
+    const pa = priceOf(a), pb = priceOf(b)
+    if (student) {
+      return (pa ? 0 : 1) - (pb ? 0 : 1) || (b.in_matched_part ? 1 : 0) - (a.in_matched_part ? 1 : 0)
+        || (a.walk_minutes ?? 999) - (b.walk_minutes ?? 999)
+    }
+    return (pa ? 0 : 1) - (pb ? 0 : 1) || (pa?.monthly_from ?? 0) - (pb?.monthly_from ?? 0)
+  })
+  const perPage = student ? 6 : RESIDENCES_SHOWN
+  const shown = showAll ? residences : residences.slice(0, perPage)
+  const priced = residences.filter((r) => r.price)
+  const roomName = { shared: 'shared rooms', private: 'private rooms', studio: 'studios' }[room]
 
   return (
     <section className="result-homes" aria-label={`Places to live in ${area}`}>
       <h3>Places to live in {area}</h3>
+      {student ? (<>      <h4>Student residences {residences.length > 0 && <span>{residences.length} in {area}</span>}</h4>
+        {residences.length === 0 ? (
+          <p className="result-muted">
+            No purpose-built student residences in {area} on OpenStreetMap. Most students here rent a room in a
+            shared house or apartment - try the searches above.
+          </p>
+        ) : (
+          <>
+            <ul className="home-list">
+              {shown.map((r) => {
+                return (
+                  <li key={r.name} className="home-card">
+                    <span className="home-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z" fill="currentColor" /></svg>
+                    </span>
+                    <span className="home-body">
+                      <strong>{r.name}</strong>
+                      <span className="result-muted">
+                        {[r.operator || 'Student residence', r.address].filter(Boolean).join(' · ')}
+                      </span>
+                      {(r.walk_minutes != null || r.in_matched_part) && (
+                      <span className="res-tags">
+                        {r.walk_minutes != null && <span className="res-walk">🚶 ≈ {r.walk_minutes} min walk to campus</span>}
+                        {r.in_matched_part && <span className="res-here">In this neighbourhood</span>}
+                      </span>
+                    )}
+                    {room && r.rooms?.[room]?.note ? <span className="res-rooms">{r.rooms[room].note}</span>
+                      : r.price?.room_types && <span className="res-rooms">{r.price.room_types}</span>}
+                      {r.price?.notes && <span className="res-notes">{r.price.notes}</span>}
+                    {r.price?.source && (
+                      <a className={`res-source ${r.price.source_type === 'listing' ? 'is-listing' : ''}`} href={r.price.source} target="_blank" rel="noopener noreferrer">
+                        {r.price.source_type === 'listing' ? 'Indicative price from listing sites, check before booking' : 'Price from the operator’s website'} ↗
+                      </a>
+                    )}
+                    </span>
+                    <ResidencePrice price={priceOf(r)} budget={budget} missing={room && r.price ? `No ${roomName} listed` : null} />
+                    {r.website ? (
+                      <a className="home-link" href={r.website} target="_blank" rel="noopener noreferrer">Website ↗</a>
+                    ) : (
+                      <span className="home-link muted">No website listed</span>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+            {residences.length > perPage && (
+              <button type="button" className="home-more" onClick={() => setShowAll((v) => !v)}>
+                {showAll ? 'Show fewer' : `Show all ${residences.length} residences`}
+              </button>
+            )}
+            <p className="home-note">
+              {priced.length > 0
+                ? `Prices are each residence's published starting prices (2026/27), checked ${new Date(priced[0].price.checked).toLocaleDateString('en-IE', { month: 'long', year: 'numeric' })}. Weekly prices are shown as monthly (× 52 ÷ 12). Availability changes fast, so check rooms and who can apply on each website.`
+                : 'Check rooms, prices and who can apply on each website.'}
+            </p>
+          </>
+        )}
+  
+        {links.length > 0 && <h4 className="home-or">Or rent a room in a shared home</h4>}
       <p className="result-muted">Live listings open on Daft.ie and Rent.ie, filtered to {area}, your room type and budget.</p>
+        <div className="home-search">
+          {links.map((l) => (
+            <a key={l.site} className="home-search-link" href={l.url} target="_blank" rel="noopener noreferrer">
+              <strong>{l.site}</strong>
+              <span>{l.label}</span>
+              <span aria-hidden="true" className="home-search-arrow">↗</span>
+            </a>
+          ))}
+        </div>
+  
+  
+      </>) : (<>      <p className="result-muted">Live listings open on Daft.ie and Rent.ie, filtered to {area}, your room type and budget.</p>
       <div className="home-search">
         {links.map((l) => (
           <a key={l.site} className="home-search-link" href={l.url} target="_blank" rel="noopener noreferrer">
@@ -160,7 +263,10 @@ function PlacesToLive({ area, places }) {
                     <span className="result-muted">
                       {[r.operator || 'Student residence', r.address].filter(Boolean).join(' · ')}
                     </span>
+                    {r.price?.room_types && <span className="res-rooms">{r.price.room_types}</span>}
+                    {r.price?.notes && <span className="res-notes">{r.price.notes}</span>}
                   </span>
+                  <ResidencePrice price={r.price} budget={budget} />
                   {r.website ? (
                     <a className="home-link" href={r.website} target="_blank" rel="noopener noreferrer">Website ↗</a>
                   ) : (
@@ -170,14 +276,19 @@ function PlacesToLive({ area, places }) {
               )
             })}
           </ul>
-          {residences.length > RESIDENCES_SHOWN && (
+          {residences.length > perPage && (
             <button type="button" className="home-more" onClick={() => setShowAll((v) => !v)}>
               {showAll ? 'Show fewer' : `Show all ${residences.length} residences`}
             </button>
           )}
-          <p className="home-note">Check rooms, prices and who can apply on each website.</p>
+          <p className="home-note">
+            {priced.length > 0
+              ? `Prices are each residence's published starting prices (2026/27), checked ${new Date(priced[0].price.checked).toLocaleDateString('en-IE', { month: 'long', year: 'numeric' })}. Weekly prices are shown as monthly (× 52 ÷ 12). Availability changes fast, so check rooms and who can apply on each website.`
+              : 'Check rooms, prices and who can apply on each website.'}
+          </p>
         </>
       )}
+      </>)}
       <p className="home-credits">
         Residences: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap
         contributors</a> (ODbL), the official websites of the operators and universities, and Amber Student, checked October 2026.
@@ -416,7 +527,12 @@ function AboutArea({ result }) {
   )
 }
 
-function RentNote({ result }) {
+function RentNote({ result, student }) {
+  if (student) {
+    const n = result.rent_listings ?? 0
+    const where = result.neighbourhood?.name || result.area
+    return <span className="rent-note">Cheapest starting price at {n} student residence{n === 1 ? '' : 's'} around {where}</span>
+  }
   const ownRent = result.rent_is_for === 'neighbourhood' && result.neighbourhood
   // A place with enough room listings of its own shows their average; otherwise its district's
   return (
@@ -511,7 +627,7 @@ function MatchCard({ result, modeWords, selected, onSelect }) {
 
 const DETAIL_TABS = ['Why it fits', 'About the area', 'Safety', 'Places to live', 'Compare', 'Letting agents']
 
-function MatchDetail({ result, results, budget, tab, onTab }) {
+function MatchDetail({ result, results, budget, tab, onTab, student, room }) {
   const navigate = useNavigate()
   const hasProfile = districts.some((d) => d.id === result.area)
   const place = result.neighbourhood ? `${result.neighbourhood.name}, ${result.area}` : result.area
@@ -522,7 +638,7 @@ function MatchDetail({ result, results, budget, tab, onTab }) {
         <div>
           <h2>{place}</h2>
           <p className="result-muted">
-            {euro(result.rent)}/month · <RentNote result={result} />
+            {euro(result.rent)}/month · <RentNote result={result} student={student} />
           </p>
         </div>
         {hasProfile && (
@@ -559,7 +675,7 @@ function MatchDetail({ result, results, budget, tab, onTab }) {
             ? <SafetyScores area={result.area} safety={result.safety} />
             : <p className="result-muted">No safety data for {result.area} yet.</p>
         )}
-        {tab === 'Places to live' && <PlacesToLive area={result.area} places={result.places_to_live} />}
+        {tab === 'Places to live' && <PlacesToLive area={result.area} places={result.places_to_live} budget={budget} student={student} room={room} />}
         {tab === 'Compare' && <CompareAreas results={results} budget={budget} />}
         {tab === 'Letting agents' && <LettingAgents />}
       </div>
@@ -856,7 +972,7 @@ function Results() {
   const [loading, setLoading] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const [selected, setSelected] = useState(0) 
-  const [tab, setTab] = useState(DETAIL_TABS[0]) 
+  const [tab, setTab] = useState(() => (String(answers?.accommodation).startsWith('student') ? 'Places to live' : DETAIL_TABS[0]))
   
   useEffect(() => {
     if (answers) navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}`, { replace: true })
@@ -902,7 +1018,9 @@ function Results() {
           setData(null)
           setError(err.message === 'Failed to fetch'
             ? "We couldn't reach the recommendation service. Please try again."
-            : err.message)
+            : /Unknown accommodation/i.test(err.message)
+              ? 'Student accommodation matching isn’t available on the server yet. Please choose another room type for now, or try again later.'
+              : err.message)
         }
       })
       .finally(() => setLoading(false)), 300)
@@ -967,7 +1085,7 @@ function Results() {
         <div className="flow-progress" aria-hidden="true"><span style={{ width: '100%' }} /></div>
         <h1>Your top Dublin <em>neighbourhoods.</em></h1>
         <p className="flow-summary">
-          {answers.accommodationLabel} · {euro(answers.budget)}/month · {answers.university}
+          {answers.accommodationLabel}{answers.studentRoom && answers.studentRoom !== 'any' ? ` · ${STUDENT_ROOM_NAMES[answers.studentRoom]}` : ''} · {euro(answers.budget)}/month · {answers.university}
           {data && <> · compared {data.areas_compared} areas</>}
         </p>
         
@@ -998,9 +1116,14 @@ function Results() {
         {error && (
           <div className="results-status results-error" role="alert">
             <p>{error}</p>
-            <button type="button" className="flow-next" onClick={() => setAttempt(attempt + 1)}>
-              Try again <span>↻</span>
-            </button>
+            <div className="results-error-actions">
+              <button type="button" className="flow-next" onClick={() => setAttempt(attempt + 1)}>
+                Try again <span>↻</span>
+              </button>
+              <button type="button" className="flow-back-link" onClick={() => navigate('/questionnaire', { state: { answers, step: 1 } })}>
+                Change my answers
+              </button>
+            </div>
           </div>
         )}
 
@@ -1024,6 +1147,8 @@ function Results() {
               budget={data.budget}
               tab={tab}
               onTab={setTab}
+              student={String(answers.accommodation).startsWith('student')}
+              room={answers.studentRoom && answers.studentRoom !== 'any' ? answers.studentRoom : null}
             />
           </>
         )}
