@@ -35,6 +35,7 @@ neighbourhoods for them, with rent, commute time, a safety section, census facts
 safety, amenities, supermarkets and a journey planner to any campus.
 - "Universities" and "Famous attractions" pages, and "How it works", which explains how matches are calculated.
 - "Things to know": an arrival checklist (medical insurance, IRP registration and renewal, PPS number, Student Leap Card, SIM, bank account, Revenue, work rules, GP, renting safely) with links to the official sites. The home page also has an FAQ.
+- IRP (Stamp 2) first-time registration: book online at Burgh Quay only after arriving in Ireland, using the date on the passport landing stamp; booking is free, the €300 fee is paid by card at the appointment, and students must register before the date on their landing stamp.
 - The site's figures come from public sources such as RTB rents, Garda crime statistics, NTA transport data, the \
 Census and OpenStreetMap. They are estimates, not live listings.
 

@@ -21,17 +21,17 @@ const PHASES = [
         link: ['Irish Immigration Service', 'https://www.irishimmigration.ie/my-situation-has-changed-since-i-arrived-in-ireland/study-in-ireland/'],
       },
       {
-        id: 'irp-book', icon: '📅', title: 'Book your IRP appointment early',
-        why: 'First-time registrations in Dublin are in person, and appointments can be hard to get at busy times of year.',
-        how: ['Book online as soon as you know your arrival date.', 'Your appointment should fall within 90 days of arriving.'],
-        link: ['Book a registration appointment', 'https://www.irishimmigration.ie/registering-your-immigration-permission/'],
+        id: 'arrival-docs', icon: '🛂', title: 'Carry your arrival documents',
+        why: 'An immigration officer checks your papers when you land and stamps your passport. That landing stamp is what lets you book your IRP appointment.',
+        how: ['Carry your passport, college acceptance letter, proof of fees paid, proof of funds and medical insurance certificate.', 'Say you’re coming to study. The officer writes on the stamp the date you must register by.'],
+        link: ['Coming to study in Ireland', 'https://www.irishimmigration.ie/my-situation-has-changed-since-i-arrived-in-ireland/study-in-ireland/'],
       },
     ],
   },
   {
     id: 'week',
     title: 'Your first week',
-    note: 'The everyday essentials for getting around and staying connected.',
+    note: 'Get connected, and book your IRP appointment as soon as you land.',
     items: [
       {
         id: 'leap', icon: '🚋', title: 'Get a Student Leap Card',
@@ -57,6 +57,12 @@ const PHASES = [
         how: ['App-based banks can often open an account within a day.', 'High-street banks usually ask for proof of address, so a letter from your college can help.'],
         link: ['Citizens Information: bank accounts', 'https://www.citizensinformation.ie/en/money-and-tax/personal-finance/banking/opening-a-bank-account/'],
       },
+      {
+        id: 'irp-book', icon: '📅', title: 'Book your IRP appointment',
+        why: 'You can only book once you’re in Ireland: the booking asks for the date on your passport’s landing stamp.',
+        how: ['Book online in the Immigration Service portal. Booking is free.', 'Get an appointment before the date written on your landing stamp. It is often up to 90 days, but can be shorter.', 'Slots go fast at the start of term, so book in your first days and check back for cancellations.'],
+        link: ['Book at Burgh Quay', 'https://www.irishimmigration.ie/burgh-quay-appointments/'],
+      },
     ],
   },
   {
@@ -65,9 +71,9 @@ const PHASES = [
     note: 'The official paperwork. Do these as soon as you can.',
     items: [
       {
-        id: 'irp', icon: '🪪', title: 'Register for your IRP',
-        why: 'Non-EU/EEA students staying more than 90 days must register and get an Irish Residence Permit (IRP) card.',
-        how: ['Bring your passport, a letter from your college, proof of fees paid, your medical insurance and proof of funds.', 'There is a registration fee (€300 at the time of writing).', 'Your IRP card arrives by post a few weeks later.'],
+        id: 'irp', icon: '🪪', title: 'Go to your IRP appointment',
+        why: 'Non-EU/EEA students staying more than 90 days register in person at Burgh Quay, Dublin 2, and get an Irish Residence Permit (IRP) card with Stamp 2.',
+        how: ['Bring your passport, appointment confirmation, college letter, proof of fees paid, medical insurance, proof of funds and proof of your Irish address.', 'The €300 fee is paid by card at the appointment. Cash isn’t accepted.', 'Your IRP card is posted to you, usually within about 15 working days.'],
         link: ['Registering your permission', 'https://www.irishimmigration.ie/registering-your-immigration-permission/'],
       },
       {
