@@ -158,6 +158,7 @@ export default function App() {
         .catch(() => null)
         .then((county) => {
           if (county) ['profiles', 'labels', 'census', 'safety', 'rtb'].forEach((k) => { d[k] = { ...(d[k] || {}), ...(county[k] || {}) }; });
+          if (county?.roomReport) d.roomReport = county.roomReport; // Daft report room rents for County Dublin
           setData(d);
         }))
       .catch((e) => setError(e.message));

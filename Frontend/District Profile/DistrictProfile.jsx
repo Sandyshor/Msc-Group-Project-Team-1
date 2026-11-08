@@ -130,11 +130,14 @@ function RentSection({ code, data, rentMode, setRentMode }) {
   const listing = rentMode === 'rooms' ? r.rooms : r.homes;
   const keys = rentMode === 'rooms' ? ['single', 'double'] : ['studio', '1 bed', '2 bed', '3 bed', '4+ bed'];
   const have = keys.filter((k) => listing?.[k]);
+  // County Dublin areas have no room listings of their own: show the Daft report average for their part of Dublin
+  const report = data.roomReport;
+  const reportRooms = rentMode === 'rooms' && !have.length ? report?.areas?.[code] : null;
   const areas = Object.entries(rtb?.areas || {}).filter(([, v]) => v.all).sort((a, b) => a[1].all - b[1].all);
   return (
     <>
       <section className="profile-section">
-        <SectionTitle eyebrow="DAFT LISTINGS" title="Monthly rent" icon="village" />
+        <SectionTitle eyebrow={reportRooms ? 'DAFT REPORT 2026 Q1' : 'DAFT LISTINGS'} title="Monthly rent" icon="village" />
         <div className="seg-toggle" role="group" aria-label="Rent type">
           <button type="button" aria-pressed={rentMode === 'rooms'} onClick={() => setRentMode('rooms')}>Rooms</button>
           <button type="button" aria-pressed={rentMode === 'homes'} onClick={() => setRentMode('homes')}>Whole homes</button>
@@ -152,6 +155,19 @@ function RentSection({ code, data, rentMode, setRentMode }) {
               );
             })}
           </div>
+        ) : reportRooms ? (
+          <>
+            <div className="rent-grid">
+              <div className="rent-tile"><span>Single sharing</span><strong>{eur(reportRooms.single)}</strong><small>single room · per month</small></div>
+              <div className="rent-tile"><span>Double room</span><strong>{eur(reportRooms.double)}</strong><small>one person · per month</small></div>
+              <div className="rent-tile"><span>Double sharing · est.</span><strong>{eur(reportRooms.sharing)}</strong><small>per person · twin room</small></div>
+            </div>
+            <p className="section-description top-gap">
+              No room listings collected here yet, so these are the {report.source} averages for {reportRooms.region}. {report.basis}{' '}
+              Double sharing: {report.sharingNote}{' '}
+              <a href={report.url} target="_blank" rel="noopener noreferrer">Read the report ↗</a>
+            </p>
+          </>
         ) : <EmptyNote>{rentMode === 'rooms' ? 'room' : 'whole-property'} listings for {code}</EmptyNote>}
       </section>
       <section className="profile-section">
@@ -411,8 +427,9 @@ export default function DistrictProfile({
   const rooms = data.rent?.[selectedId]?.rooms || {};
   const roomMedians = [rooms.single?.median, rooms.double?.median].filter(Boolean);
   const rtbAll = data.rtb?.[selectedId]?.district?.all;
+  const reportRoom = data.roomReport?.areas?.[selectedId]?.single;
   const rentStat = roomMedians.length ? [eur(Math.min(...roomMedians)), 'room, per month']
-    : rtbAll ? [eur(rtbAll), 'home, per month'] : ['—', 'not collected yet'];
+    : reportRoom ? [eur(reportRoom), 'room, per month'] : rtbAll ? [eur(rtbAll), 'home, per month'] : ['—', 'not collected yet'];
   const prev = ACTIVE_DISTRICTS[(index - 1 + ACTIVE_DISTRICTS.length) % ACTIVE_DISTRICTS.length];
   const next = ACTIVE_DISTRICTS[(index + 1) % ACTIVE_DISTRICTS.length];
 
