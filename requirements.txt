@@ -7,3 +7,5 @@ openpyxl==3.1.5
 requests==2.32.3
 tzdata==2025.2
 anthropic>=1.0,<2
+SQLAlchemy==2.0.36
+psycopg2-binary==2.9.10

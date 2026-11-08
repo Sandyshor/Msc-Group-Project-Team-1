@@ -19,6 +19,23 @@ App Service settings: Python **3.12** (not the 3.15 preview), startup command
 `gunicorn --bind=0.0.0.0:8000 --timeout 600 --chdir Backend -k uvicorn.workers.UvicornWorker app:app`,
 `SCM_DO_BUILD_DURING_DEPLOYMENT=true`, Always On.
 
+## Database (Azure Database for PostgreSQL)
+
+The API reads its data from PostgreSQL (`Backend/datastore.py`). Each data file the website uses is one table
+(`FILE_TABLES` in datastore.py), and the `data_files` table lists every table with its source file, SHA-256
+and when it was loaded. The files in the repository stay the source: on every start the API copies any file
+that changed into its table, so a data refresh reaches the database with the next deploy.
+
+- Server: `findmydublin-db` (Azure Database for PostgreSQL flexible server, PostgreSQL 18, Burstable B1ms,
+  France Central, same resource group as the App Service), database `findmydublin`.
+- App Service setting `DATABASE_URL` =
+  `postgresql://ADMIN_USER:PASSWORD@findmydublin-db.postgres.database.azure.com:5432/findmydublin?sslmode=require`
+  (kept in Azure only, never in GitHub).
+- Without `DATABASE_URL`, or if the database can't be reached, the API reads the files as before.
+  `GET /health` shows `"data_source": "postgresql"` or `"files"`.
+- Load or check the database from a laptop: `cd Backend && DATABASE_URL=... python datastore.py`
+  (the server's firewall must allow your IP address).
+
 ## District Profile (Vercel)
 
 1. Vercel → **Add New → Project** → import this repo again (one repo can back several Vercel projects).
