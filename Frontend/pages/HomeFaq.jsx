@@ -33,7 +33,7 @@ const FAQS = [
 export default function HomeFaq() {
   const [open, setOpen] = useState(0)
   return (
-    <section className="faq" aria-labelledby="faq-title">
+    <section className="faq" aria-labelledby="faq-title" data-site-tour="faq">
       <div className="faq-inner">
         <div className="faq-intro">
           <p className="faq-kicker">GOOD TO KNOW</p>
