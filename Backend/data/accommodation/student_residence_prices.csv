@@ -1,31 +1,48 @@
-Name,Weekly_From,Weekly_To,Monthly_From,Monthly_To,Room_Types,Notes,Source,Checked
-Beckett House,289,326,,,"Ensuite (Bronze, Silver, Gold, Platinum)",,https://apartostudent.com/locations/dublin/beckett-house,2026-11-08
-Dorset Point,250,307,,,"Twin ensuite, Copper/Bronze/Silver/Gold ensuite",,https://apartostudent.com/locations/dublin/dorset-point,2026-11-08
-Kavanagh Court,342,454,,,"En suite, Studio",Some studios sold out,https://yugo.com/en-gb/global/ireland/dublin/kavanagh-court,2026-11-08
-Mayor Square,319,,,,Ensuite,Starting price from the Canvas Dublin page,https://www.canvas-world.com/en/locations/ireland/dublin,2026-11-08
-Point Campus,311,,,,Ensuite,Starting price from the Canvas Dublin page,https://www.canvas-world.com/en/locations/ireland/dublin,2026-11-08
-The Artisan,331.5,530.4,,,En suite studio,2026/27 prices,https://www.mezzino.com/property/the-artisan/,2026-11-08
-Millin House and Mercer Court,220,332,,,"Twin (two sharing), Single","For RCSI students. 41-week lease, 11 Sep 2026 to 25 Jun 2027",https://rcsi.com/dublin/student-life/undergraduate-essentials/accommodation,2026-11-08
-Glenomena Student Residences,,,1161.41,,Ensuite apartment,"For UCD students. 2026/27, includes €62.02 monthly utilities; €775 deposit",https://www.ucd.ie/residences/t4media/2026_27AccommodationPrices.pdf,2026-11-08
-Montrose,275,,,,Ensuite,Starting price from the Aparto Dublin page,https://apartostudent.com/locations/dublin,2026-11-08
-Roebuck Hall Residence,,,1161.41,,Ensuite apartment,"For UCD students. 2026/27, includes €62.02 monthly utilities; €775 deposit",https://www.ucd.ie/residences/t4media/2026_27AccommodationPrices.pdf,2026-11-08
-UCD Village,,,1270.38,1407.94,"Village halls, Village 1-3 ensuite","For UCD students. 2026/27, includes €62.02 monthly utilities; €775 deposit",https://www.ucd.ie/residences/t4media/2026_27AccommodationPrices.pdf,2026-11-08
-Ardcairn House,325,476,,,"En suite, Studio",Some rooms sold out,https://yugo.com/en-gb/global/ireland/dublin/ardcairn-house,2026-11-08
-Broadstone Hall,274,339,,,"Twin, En suite",Some rooms sold out,https://yugo.com/en-gb/global/ireland/dublin/broadstone-hall,2026-11-08
-Dominick Place,273,361,,,"Twin en suite, En suite",Studios sold out,https://yugo.com/en-gb/global/ireland/dublin/dominick-place,2026-11-08
-Grangegorman House,272.4,295,,,En suite,2026/27 prices,https://www.mezzino.com/property/grangegorman-house/,2026-11-08
-Highfield House,251.94,676.26,,,Apartment en suite,2026/27 prices,https://www.mezzino.com/property/highfield-house/,2026-11-08
-Highfield Park,303,462,,,"Townhouse rooms, En suite, Twin studio, Gatehouse",Some rooms sold out,https://yugo.com/en-gb/global/ireland/dublin/highfield-park,2026-11-08
-Smithfield Foundry,253,,,,Ensuite,Starting price from the Canvas Dublin page,https://www.canvas-world.com/en/locations/ireland/dublin,2026-11-08
-Stoneybatter Place,302.94,381.48,,,En suite studio,2026/27 prices,https://www.mezzino.com/property/stoneybatter-place/,2026-11-08
-Árasáin P&V,270,466,,,"Shared, Twin en suite, En suite, Studio",,https://herestudents.com/location/dublin/the-pv/,2026-11-08
-Binary Hub,291,,,,Ensuite,Starting price from the Aparto Dublin page,https://apartostudent.com/locations/dublin,2026-11-08
-Brewers Close,355,371,,,En suite,Studios and apartments sold out,https://yugo.com/en-gb/global/ireland/dublin/brewers-close,2026-11-08
-Brickworks,225.42,309,,,En suite,2026/27 prices,https://www.mezzino.com/property/brickworks/,2026-11-08
-Here! Cork Street,303,349.5,,,"En suite, Studio",41- or 51-week contracts (Trinity partner residence),https://www.tcd.ie/accommodation/continuing-students/,2026-11-08
-The Loom,300,,,,Ensuite,Starting price from the Aparto Dublin page,https://apartostudent.com/locations/dublin,2026-11-08
-The Tannery,342,358,,,En suite,Deluxe sold out,https://yugo.com/en-gb/global/ireland/dublin/the-tannery,2026-11-08
-Hampstead Residences,,,817,828,"Single, Double","For DCU students. 2026/27: €6,666–€6,748 for 30 Aug 2026 to 5 May 2027; service charges extra",https://www.dcuaccommodation.ie/accommodation/current-students,2026-11-08
-College Park Residences,,,860,913,"Single, Double, Superior","For DCU students. 2026/27: €7,006–€7,442 for 30 Aug 2026 to 5 May 2027; service charges extra",https://www.dcuaccommodation.ie/accommodation/current-students,2026-11-08
-Larkfield Residences,,,770,,Single,"For DCU students. 2026/27: €6,277 for the academic year; service charges extra",https://www.dcuaccommodation.ie/accommodation/first-year-accommodation,2026-11-08
-Aspen,250,545,,,"Dual-occupancy en suite, Studio",2026/27 prices,https://www.mezzino.com/property/aspen/,2026-11-08
+Name,Weekly_From,Weekly_To,Monthly_From,Monthly_To,Room_Types,Notes,Source,Checked,Source_Type
+Beckett House,289,326,,,"Ensuite (Bronze, Silver, Gold, Platinum)",,https://apartostudent.com/locations/dublin/beckett-house,2026-11-08,operator
+Dorset Point,250,307,,,"Twin ensuite, Copper/Bronze/Silver/Gold ensuite",,https://apartostudent.com/locations/dublin/dorset-point,2026-11-08,operator
+Kavanagh Court,342,454,,,"En suite, Studio",Some studios sold out,https://yugo.com/en-gb/global/ireland/dublin/kavanagh-court,2026-11-08,operator
+Mayor Square,319,,,,Ensuite,Starting price from the Canvas Dublin page,https://www.canvas-world.com/en/locations/ireland/dublin,2026-11-08,operator
+Point Campus,311,,,,Ensuite,Starting price from the Canvas Dublin page,https://www.canvas-world.com/en/locations/ireland/dublin,2026-11-08,operator
+The Artisan,331.5,530.4,,,En suite studio,2026/27 prices,https://www.mezzino.com/property/the-artisan/,2026-11-08,operator
+Millin House and Mercer Court,220,332,,,"Twin (two sharing), Single","For RCSI students. 41-week lease, 11 Sep 2026 to 25 Jun 2027",https://rcsi.com/dublin/student-life/undergraduate-essentials/accommodation,2026-11-08,operator
+Glenomena Student Residences,,,1161.41,,Ensuite apartment,"For UCD students. 2026/27, includes €62.02 monthly utilities; €775 deposit",https://www.ucd.ie/residences/t4media/2026_27AccommodationPrices.pdf,2026-11-08,operator
+Montrose,275,,,,Ensuite,Starting price from the Aparto Dublin page,https://apartostudent.com/locations/dublin,2026-11-08,operator
+Roebuck Hall Residence,,,1161.41,,Ensuite apartment,"For UCD students. 2026/27, includes €62.02 monthly utilities; €775 deposit",https://www.ucd.ie/residences/t4media/2026_27AccommodationPrices.pdf,2026-11-08,operator
+UCD Village,,,1270.38,1407.94,"Village halls, Village 1-3 ensuite","For UCD students. 2026/27, includes €62.02 monthly utilities; €775 deposit",https://www.ucd.ie/residences/t4media/2026_27AccommodationPrices.pdf,2026-11-08,operator
+Ardcairn House,325,476,,,"En suite, Studio",Some rooms sold out,https://yugo.com/en-gb/global/ireland/dublin/ardcairn-house,2026-11-08,operator
+Broadstone Hall,274,339,,,"Twin, En suite",Some rooms sold out,https://yugo.com/en-gb/global/ireland/dublin/broadstone-hall,2026-11-08,operator
+Dominick Place,273,361,,,"Twin en suite, En suite",Studios sold out,https://yugo.com/en-gb/global/ireland/dublin/dominick-place,2026-11-08,operator
+Grangegorman House,272.4,295,,,En suite,2026/27 prices,https://www.mezzino.com/property/grangegorman-house/,2026-11-08,operator
+Highfield House,251.94,676.26,,,Apartment en suite,2026/27 prices,https://www.mezzino.com/property/highfield-house/,2026-11-08,operator
+Highfield Park,303,462,,,"Townhouse rooms, En suite, Twin studio, Gatehouse",Some rooms sold out,https://yugo.com/en-gb/global/ireland/dublin/highfield-park,2026-11-08,operator
+Smithfield Foundry,253,,,,Ensuite,Starting price from the Canvas Dublin page,https://www.canvas-world.com/en/locations/ireland/dublin,2026-11-08,operator
+Stoneybatter Place,302.94,381.48,,,En suite studio,2026/27 prices,https://www.mezzino.com/property/stoneybatter-place/,2026-11-08,operator
+Árasáin P&V,270,466,,,"Shared, Twin en suite, En suite, Studio",,https://herestudents.com/location/dublin/the-pv/,2026-11-08,operator
+Binary Hub,291,,,,Ensuite,Starting price from the Aparto Dublin page,https://apartostudent.com/locations/dublin,2026-11-08,operator
+Brewers Close,355,371,,,En suite,Studios and apartments sold out,https://yugo.com/en-gb/global/ireland/dublin/brewers-close,2026-11-08,operator
+Brickworks,225.42,309,,,En suite,2026/27 prices,https://www.mezzino.com/property/brickworks/,2026-11-08,operator
+Here! Cork Street,303,349.5,,,"En suite, Studio",41- or 51-week contracts (Trinity partner residence),https://www.tcd.ie/accommodation/continuing-students/,2026-11-08,operator
+The Loom,300,,,,Ensuite,Starting price from the Aparto Dublin page,https://apartostudent.com/locations/dublin,2026-11-08,operator
+The Tannery,342,358,,,En suite,Deluxe sold out,https://yugo.com/en-gb/global/ireland/dublin/the-tannery,2026-11-08,operator
+Hampstead Residences,,,817,828,"Single, Double","For DCU students. 2026/27: €6,666–€6,748 for 30 Aug 2026 to 5 May 2027; service charges extra",https://www.dcuaccommodation.ie/accommodation/current-students,2026-11-08,operator
+College Park Residences,,,860,913,"Single, Double, Superior","For DCU students. 2026/27: €7,006–€7,442 for 30 Aug 2026 to 5 May 2027; service charges extra",https://www.dcuaccommodation.ie/accommodation/current-students,2026-11-08,operator
+Larkfield Residences,,,770,,Single,"For DCU students. 2026/27: €6,277 for the academic year; service charges extra",https://www.dcuaccommodation.ie/accommodation/first-year-accommodation,2026-11-08,operator
+Aspen,250,545,,,"Dual-occupancy en suite, Studio",2026/27 prices,https://www.mezzino.com/property/aspen/,2026-11-08,operator
+Trinity Hall,178,,,,"Ensuite twin, Ensuite single",For Trinity first-year students. Rates start at €178 a week; 11 Sep 2026 to 5 May 2027,https://www.tcd.ie/accommodation/1st-year-students/,2026-11-08,operator
+Goldsmith Hall,185,,,,Apartment single,For Trinity students. Trinity campus rooms start at €185 a week; 9 Sep 2026 to 7 May 2027,https://www.tcd.ie/accommodation/postgraduate-students/,2026-11-08,operator
+Printing House Square,185,,,,Ensuite bedroom,For Trinity students. Trinity campus rooms start at €185 a week; 9 Sep 2026 to 7 May 2027,https://www.tcd.ie/accommodation/postgraduate-students/,2026-11-08,operator
+The Residence Stoneybatter,285,382,,,"Twin ensuite, Classic, Standard Plus, Premium, Deluxe ensuite","Bills included; 51 weeks, 29 Aug 2026 to 21 Aug 2027",https://www.residencestoneybatter.com/pick-a-room,2026-11-08,operator
+Bangor,,,755,,"Single room, shared bathrooms","For DCU students. Worked out from DCU's 2026/27 St Patrick's single: €3,102.50 for 125 nights; service charges extra",https://www.dcuaccommodation.ie/accommodation/first-year-accommodation,2026-11-08,operator
+Clonmacnoise,,,755,,"Single room, shared bathrooms","For DCU students. Worked out from DCU's 2026/27 St Patrick's single: €3,102.50 for 125 nights; service charges extra",https://www.dcuaccommodation.ie/accommodation/first-year-accommodation,2026-11-08,operator
+Glendalough,,,755,,"Single room, shared bathrooms","For DCU students. Worked out from DCU's 2026/27 St Patrick's single: €3,102.50 for 125 nights; service charges extra",https://www.dcuaccommodation.ie/accommodation/first-year-accommodation,2026-11-08,operator
+Lismore,,,755,,"Single room, shared bathrooms","For DCU students. Worked out from DCU's 2026/27 St Patrick's single: €3,102.50 for 125 nights; service charges extra",https://www.dcuaccommodation.ie/accommodation/first-year-accommodation,2026-11-08,operator
+Moville,,,755,,"Single room, shared bathrooms","For DCU students. Worked out from DCU's 2026/27 St Patrick's single: €3,102.50 for 125 nights; service charges extra",https://www.dcuaccommodation.ie/accommodation/first-year-accommodation,2026-11-08,operator
+Highlight Thomas Street,264,353,,,Non en suite to Platinum Plus en suite,"41-week contracts, 2026/27; some rooms sold out",https://www.thisisfresh.com/dublin/highlight-thomas-street/rooms,2026-11-08,listing
+Ardee Point,309,428,,,En suite,"39 weeks, 2026/27; several rooms sold out",https://www.beststudenthalls.com/ie/dublin/ardee-point-dublin/,2026-11-08,listing
+New Mill,342,358,,,"Standard, Classic, Premium en suite",2026/27,https://www.studentcrowd.com/hall-l1054971-s1055028-new-mill-dublin,2026-11-08,listing
+Stephen's Quarter,225,354,,,"Ensuite, Twin","2026/27, depends on tenancy length",https://www.studentcrowd.com/student-accommodation-l1054971-dublin,2026-11-08,listing
+Parkgate,269,,,,Studio,Listed as Highlight Parkgate at 43 Montpelier Hill,https://www.universityliving.com/ireland/dublin/property/highlight-parkgate,2026-11-08,listing
+Griffith Halls of Residence,209,,,,Student rooms,2026/27; all-inclusive fee,https://www.riam.ie/student-life/accommodation,2026-11-08,listing
+Postgraduate Residences,238.64,,,,Postgraduate room,"For DCU postgraduates. 50-week option from €11,932 (2026/27)",https://www.dcuaccommodation.ie/accommodation/postgraduate-students,2026-11-08,listing
+Gateway Student Village,171,,,,Room in a 5-person apartment,Older listing (2024/25) - check the current price,https://ezilet.net/listing/gateway-student-village/,2026-11-08,listing

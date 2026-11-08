@@ -1472,3 +1472,9 @@
 .results-error-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
 .flow-back-link { padding: 12px 18px; border: 1.5px solid #cfd9c9; border-radius: 12px; background: #fff; color: #173f32; font: inherit; font-weight: 700; cursor: pointer; }
 .flow-back-link:hover { border-color: #245b48; background: #f1f7ec; }
+.res-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 3px 0 1px; }
+.res-walk, .res-here { padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+.res-walk { background: #e8f0fb; color: #1e4f8a; }
+.res-here { background: #dcebd6; color: #1f5641; }
+.res-source { justify-self: start; margin-top: 2px; color: #4d6b5c; font-size: 11.5px; text-decoration: underline; text-underline-offset: 2px; }
+.res-source.is-listing { color: #8a5a17; }

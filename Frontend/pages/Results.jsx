@@ -123,7 +123,7 @@ const STUDENT_ROOM_NAMES = { shared: 'Shared room', private: 'Private room', stu
 // Student residences in the district (OpenStreetMap) and rental searches for it (Daft.ie, Rent.ie).
 // A residence's published price: monthly range, the weekly price it's quoted in, and whether it fits the budget
 function ResidencePrice({ price, budget, missing }) {
-  if (!price) return <span className="res-price res-price-none">{missing || 'Price on the website'}</span>
+  if (!price) return <span className="res-price res-price-none">{missing || 'Contact the residence for prices'}</span>
   const month = price.monthly_to && price.monthly_to !== price.monthly_from
     ? `${euro(price.monthly_from)}–${euro(price.monthly_to)}` : `from ${euro(price.monthly_from)}`
   const week = price.weekly_from
@@ -147,6 +147,10 @@ function PlacesToLive({ area, places, budget, student, room }) {
   const priceOf = (r) => (room ? r.rooms?.[room] : r.price)
   const residences = [...(places.residences || [])].sort((a, b) => {
     const pa = priceOf(a), pb = priceOf(b)
+    if (student) {
+      return (pa ? 0 : 1) - (pb ? 0 : 1) || (b.in_matched_part ? 1 : 0) - (a.in_matched_part ? 1 : 0)
+        || (a.walk_minutes ?? 999) - (b.walk_minutes ?? 999)
+    }
     return (pa ? 0 : 1) - (pb ? 0 : 1) || (pa?.monthly_from ?? 0) - (pb?.monthly_from ?? 0)
   })
   const perPage = student ? 6 : RESIDENCES_SHOWN
@@ -177,9 +181,20 @@ function PlacesToLive({ area, places, budget, student, room }) {
                       <span className="result-muted">
                         {[r.operator || 'Student residence', r.address].filter(Boolean).join(' · ')}
                       </span>
-                      {room && r.rooms?.[room]?.note ? <span className="res-rooms">{r.rooms[room].note}</span>
+                      {(r.walk_minutes != null || r.in_matched_part) && (
+                      <span className="res-tags">
+                        {r.walk_minutes != null && <span className="res-walk">🚶 ≈ {r.walk_minutes} min walk to campus</span>}
+                        {r.in_matched_part && <span className="res-here">In this neighbourhood</span>}
+                      </span>
+                    )}
+                    {room && r.rooms?.[room]?.note ? <span className="res-rooms">{r.rooms[room].note}</span>
                       : r.price?.room_types && <span className="res-rooms">{r.price.room_types}</span>}
                       {r.price?.notes && <span className="res-notes">{r.price.notes}</span>}
+                    {r.price?.source && (
+                      <a className={`res-source ${r.price.source_type === 'listing' ? 'is-listing' : ''}`} href={r.price.source} target="_blank" rel="noopener noreferrer">
+                        {r.price.source_type === 'listing' ? 'Indicative price from listing sites, check before booking' : 'Price from the operator’s website'} ↗
+                      </a>
+                    )}
                     </span>
                     <ResidencePrice price={priceOf(r)} budget={budget} missing={room && r.price ? `No ${roomName} listed` : null} />
                     {r.website ? (
@@ -515,7 +530,8 @@ function AboutArea({ result }) {
 function RentNote({ result, student }) {
   if (student) {
     const n = result.rent_listings ?? 0
-    return <span className="rent-note">Typical starting price of {n} student residence{n === 1 ? '' : 's'} in {result.area}</span>
+    const where = result.neighbourhood?.name || result.area
+    return <span className="rent-note">Cheapest starting price at {n} student residence{n === 1 ? '' : 's'} around {where}</span>
   }
   const ownRent = result.rent_is_for === 'neighbourhood' && result.neighbourhood
   // A place with enough room listings of its own shows their average; otherwise its district's
@@ -956,7 +972,7 @@ function Results() {
   const [loading, setLoading] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const [selected, setSelected] = useState(0) 
-  const [tab, setTab] = useState(DETAIL_TABS[0]) 
+  const [tab, setTab] = useState(() => (String(answers?.accommodation).startsWith('student') ? 'Places to live' : DETAIL_TABS[0]))
   
   useEffect(() => {
     if (answers) navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}`, { replace: true })

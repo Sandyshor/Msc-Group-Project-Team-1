@@ -102,3 +102,15 @@
 }
 .ttk-page .cg-hero h1 { font-size: clamp(40px, 4.4vw, 64px); }
 .ttk-link { white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+/* SIM comparison inside the phone card */
+.ttk-options { display: grid; gap: 8px; margin-top: auto; }
+.ttk-option { display: grid; gap: 2px; padding: 10px 12px; border: 1.5px solid #e2dccd; border-radius: 14px; background: #fff; color: #1f2a24; text-decoration: none; transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease; }
+.ttk-option:hover { border-color: #245b48; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(23, 63, 50, 0.08); }
+.ttk-option:focus-visible { outline: 3px solid #dff27f; outline-offset: 2px; }
+.ttk-option-head { display: flex; justify-content: space-between; color: #173f32; font-size: 15px; }
+.ttk-option-price { color: #4d5a52; font-size: 13px; }
+.ttk-option-price b { color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: 18px; }
+.ttk-option-price em { color: #8a5a17; font-style: normal; font-size: 11.5px; font-weight: 700; }
+.ttk-option-detail { color: #66736b; font-size: 12.5px; line-height: 1.4; }
+.ttk-options-note { margin: 2px 0 0; color: #7a857c; font-size: 11.5px; line-height: 1.45; }

@@ -349,6 +349,8 @@ def load_residence_prices(path=RESIDENCE_PRICES_CSV):
             "weekly_from": float(wf) if wf is not None else None, "weekly_to": float(wt) if wt is not None else None,
             "room_types": _none_if_nan(r["Room_Types"]), "notes": _none_if_nan(r["Notes"]),
             "source": _none_if_nan(r["Source"]), "checked": _none_if_nan(r["Checked"]),
+            # "operator": the operator's or university's own site; "listing": student-housing listing sites
+            "source_type": _none_if_nan(r.get("Source_Type")) or "operator",
         }
     return prices
 
@@ -391,6 +393,39 @@ def load_residences(path=RESIDENCES_CSV, prices=None):
         items.sort(key=lambda x: (x["price"] is None, x["price"]["monthly_from"] if x["price"] else 0))
         out[area] = items
     return out
+
+
+def _assign_residence_parts(residences, parts):
+    """Give each residence the neighbourhood (part) of its district nearest to it, so student accommodation can be
+    scored where the residences actually are rather than across the whole district."""
+    for area, items in residences.items():
+        own = parts[(parts["Area"] == area) & parts["Origin_Latitude"].notna()]
+        for x in items:
+            x["part"] = None
+            if own.empty or x.get("lat") is None or x.get("lon") is None:
+                continue
+            dist = _km(float(x["lat"]), float(x["lon"]), own["Origin_Latitude"], own["Origin_Longitude"])
+            x["part"] = own["Part"].iloc[int(np.argmin(dist))]
+
+
+def student_room_kind(accommodation):
+    """'shared' | 'private' | 'studio' for a student room type, None for any student room (or not student)."""
+    return next((kind for kind, (key, _, _) in STUDENT_ROOM_TYPES.items() if key == accommodation), None)
+
+
+def student_part_prices(residences, kind=None):
+    """{(area, part): (cheapest starting monthly price, number of residences)} for the residences in each
+    neighbourhood that publish a price for this room type (any room when kind is None)."""
+    found = {}
+    for area, items in residences.items():
+        for x in items:
+            price = x.get("rooms", {}).get(kind) if kind else x.get("price")
+            if not price or not x.get("part"):
+                continue
+            key = (area, x["part"])
+            low, n = found.get(key, (np.inf, 0))
+            found[key] = (min(low, price["monthly_from"]), n + 1)
+    return found
 
 
 def student_accommodation_rent(residences, room_type=None):
@@ -526,6 +561,7 @@ def load_data():
     else:
         agencies = pd.DataFrame(columns=["Name", "Areas", "Address", "Website", "PSRA_Licence"])
     residences = load_residences()
+    _assign_residence_parts(residences, parts)
     student_rent, student_counts = student_accommodation_rent(residences)
     student_by_type = {key: (label, *student_accommodation_rent(residences, kind))
                        for kind, (key, label, _) in STUDENT_ROOM_TYPES.items()}
@@ -924,6 +960,18 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
         candidates.loc[found, "Rent"] = own_rent[found]
         candidates.loc[found, "Rent Listings"] = own["count"].reindex(key).to_numpy(dtype=float)[found]
         candidates.loc[found, "Rent Is For"] = "neighbourhood"
+    if accommodation.startswith("student"):
+        # Student residences are scored where they are: each neighbourhood gets the cheapest starting price of
+        # its own residences (for the chosen room type), and neighbourhoods without one are left out. So
+        # residences right next to a campus are matched with that neighbourhood's short commute.
+        prices = student_part_prices(data.get("residences", {}), student_room_kind(accommodation))
+        keys = list(zip(candidates["Area"], candidates["Part"]))
+        candidates["Rent"] = [prices.get(k, (np.nan, 0))[0] for k in keys]
+        candidates["Rent Listings"] = [prices.get(k, (np.nan, np.nan))[1] for k in keys]
+        candidates["Rent Is For"] = "neighbourhood"
+        candidates = candidates[candidates["Rent"].notna()].copy()
+        if candidates.empty:
+            raise RecommendationError("No student residences publish prices for this room type yet.")
     candidates["Budget Difference"] = candidates["Rent"] - budget
     candidates["Budget Status"] = np.where(candidates["Rent"] <= budget, "Within budget", "Above budget")
     if candidates.empty:
@@ -1221,6 +1269,23 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             "parts_within_limit": int(in_area["Within Limit"].sum()) if max_commute else None,
         }
 
+    uni = _university_location(data, university)
+
+    def residences_for(row):
+        """The district's residences with their straight-line distance to the campus, a rough walking time, and
+        whether they're in the matched neighbourhood (those first, then nearest to campus)."""
+        items = []
+        for x in data.get("residences", {}).get(row["Area"], []):
+            item = {k: v for k, v in x.items()}
+            if x.get("lat") is not None and x.get("lon") is not None:
+                km = float(_km(uni["lat"], uni["lon"], [x["lat"]], [x["lon"]])[0])
+                item["km_to_university"] = round(km, 2)
+                item["walk_minutes"] = int(round(km * 1.3 / 4.8 * 60))  # roads are ~1.3x the straight line, 4.8 km/h
+            item["in_matched_part"] = bool(x.get("part")) and x.get("part") == row["Part"]
+            items.append(item)
+        items.sort(key=lambda i: (not i["in_matched_part"], i.get("km_to_university", 99)))
+        return items
+
     def neighbourhood_info(row):
         """The recommended part of the district, and the district's other good parts."""
         shown = set(zip(top["Area"], top["Part"]))
@@ -1263,7 +1328,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             "match_score": round(float(row["Match Score"]), 1),
             "walking": walking_info(row["Area"]),
             "safety": data.get("safety", {}).get(row["Area"]),
-            "places_to_live": {"residences": data.get("residences", {}).get(row["Area"], []),
+            "places_to_live": {"residences": residences_for(row),
                                "search_links": search_links(row["Area"], accommodation, budget)},
             "why": " ".join(explain(position, row)),
             "profile": " ".join(area_profile(row)),

@@ -83,7 +83,14 @@ def test_every_recommendation_has_places_to_live(data):
     out = recommender.recommend(data, UNIVERSITY, 900, "private_room", RATINGS)
     for r in out["recommendations"]:
         places = r["places_to_live"]
-        assert places["residences"] == data["residences"].get(r["area"], [])
+        # every residence of the district, each with its distance to campus; the matched neighbourhood's come first
+        names = [x["name"] for x in places["residences"]]
+        assert sorted(names) == sorted(x["name"] for x in data["residences"].get(r["area"], []))
+        for x in places["residences"]:
+            if x.get("lat") is not None:
+                assert x["km_to_university"] >= 0 and x["walk_minutes"] >= 0
+        flags = [x["in_matched_part"] for x in places["residences"]]
+        assert flags == sorted(flags, reverse=True)
         assert [l["site"] for l in places["search_links"]] == ["Daft.ie", "Rent.ie"]
 
 
@@ -93,3 +100,18 @@ def test_duplicates_and_non_student_buildings_are_left_out():
     assert not names & {"Aungier Street Student Accommodation", "Scape Aungier Street", "Sweeney's Corner",
                         "Swuite Dublin", "Liberties House"}
     assert {"Stephen's Quarter", "Brewers Close", "Grangegorman House"} <= names
+
+
+def test_student_accommodation_is_scored_where_the_residences_are(data):
+    """Residences next to a campus are matched with that neighbourhood's own price and commute (TU Dublin
+    Grangegorman: the Grangegorman neighbourhood, with Highfield House and Highfield Park)."""
+    importance = {"Rent": 9, "Safety": 5, "Commute": 9, "Shopping & Groceries": 5, "Restaurants": 3,
+                  "Healthcare": 4, "Recreation & Wellness": 5}
+    out = recommender.recommend(data, "TU Dublin - Grangegorman", 1300, "student_private", importance=importance)
+    top = out["recommendations"][0]
+    assert top["area"] == "D7" and top["rent_is_for"] == "neighbourhood"
+    here = [x["name"] for x in top["places_to_live"]["residences"] if x["in_matched_part"]]
+    assert "Highfield House" in here
+    # the price is the cheapest private room among that neighbourhood's own residences
+    assert top["rent"] == min(x["rooms"]["private"]["monthly_from"] for x in top["places_to_live"]["residences"]
+                              if x["in_matched_part"] and "private" in x["rooms"])
