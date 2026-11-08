@@ -1,0 +1,89 @@
+/* Header logo: wordmark with an animated graduation cap on the D */
+.brand-word { position: relative; display: inline-block; flex: none; line-height: 0; }
+.brand-word .brand-wordmark { display: block; }
+
+.brand-cap {
+  position: absolute;
+  /* the cap's box within the wordmark image (x 1700-2170, y 100-530 of 3230 x 768) */
+  left: 52.63%;
+  top: 13.02%;
+  width: 14.55%;
+  height: 55.99%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* colours: navy cap on the light home bar, cream cap on the dark bar */
+.cap-board { fill: #1b2668; stroke: #a9cde6; stroke-width: 16; stroke-linejoin: round; paint-order: stroke; }
+.cap-skull { fill: #10153a; }
+.cap-button { fill: #f2c75c; }
+.cap-cord { fill: none; stroke: #f2c75c; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; }
+.cap-knot { fill: #f2c75c; }
+.cap-fringe { fill: #e8a92c; }
+.cap-strands { fill: none; stroke: #c98a17; stroke-width: 3; opacity: .7; }
+.brand.is-light .cap-board { fill: #f5efe2; stroke: none; }
+.brand.is-light .cap-skull { fill: #ddd5c3; }
+
+/* pivot points, in the SVG's own units */
+.cap-hat { transform-box: view-box; transform-origin: 1950px 300px; animation: cap-drop .9s cubic-bezier(.3, 1.5, .5, 1) .35s both; }
+.cap-tassel { transform-box: view-box; transform-origin: 1776px 262px; animation: tassel-idle 7s ease-in-out 2s infinite; }
+
+/* on load: the cap drops onto the D and settles */
+@keyframes cap-drop {
+  0% { opacity: 0; transform: translateY(-90px) rotate(-24deg); }
+  60% { opacity: 1; transform: translateY(6px) rotate(4deg); }
+  80% { transform: translateY(-3px) rotate(-1.5deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* now and then: the tassel swings, like a little nod */
+@keyframes tassel-idle {
+  0%, 12%, 100% { transform: none; }
+  3% { transform: rotate(14deg); }
+  6% { transform: rotate(-9deg); }
+  9% { transform: rotate(4deg); }
+}
+
+/* hover (or keyboard focus): the cap is tossed in the air, spins and lands back on the D */
+.brand-cap.toss-a .cap-hat { animation: cap-toss-a 1s cubic-bezier(.35, .1, .3, 1) both; }
+.brand-cap.toss-b .cap-hat { animation: cap-toss-b 1s cubic-bezier(.35, .1, .3, 1) both; }
+.brand-cap.toss-a .cap-tassel, .brand-cap.toss-b .cap-tassel { animation: tassel-flap 1s ease-in-out both; }
+@keyframes cap-toss-a {
+  0% { transform: none; }
+  15% { transform: translateY(14px) scaleY(.9); }
+  50% { transform: translateY(-150px) rotate(-200deg); }
+  80% { transform: translateY(6px) rotate(-360deg); }
+  90% { transform: translateY(-4px) rotate(-360deg); }
+  100% { transform: rotate(-360deg); }
+}
+@keyframes cap-toss-b {
+  0% { transform: none; }
+  15% { transform: translateY(14px) scaleY(.9); }
+  50% { transform: translateY(-150px) rotate(-200deg); }
+  80% { transform: translateY(6px) rotate(-360deg); }
+  90% { transform: translateY(-4px) rotate(-360deg); }
+  100% { transform: rotate(-360deg); }
+}
+@keyframes tassel-flap {
+  0%, 100% { transform: none; }
+  20% { transform: rotate(-30deg); }
+  45% { transform: rotate(35deg); }
+  70% { transform: rotate(-18deg); }
+  85% { transform: rotate(8deg); }
+}
+
+/* the door gives a little knock-knock wobble on hover */
+.brand .brand-logo { transform-origin: 50% 90%; }
+.brand:hover .brand-logo { animation: door-knock .6s ease both; }
+@keyframes door-knock {
+  0%, 100% { transform: none; }
+  20% { transform: rotate(-6deg) scale(1.04); }
+  40% { transform: rotate(5deg) scale(1.04); }
+  60% { transform: rotate(-3deg) scale(1.02); }
+  80% { transform: rotate(1.5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cap-hat, .cap-tassel, .brand-cap.toss-a .cap-hat, .brand-cap.toss-b .cap-hat,
+  .brand-cap.toss-a .cap-tassel, .brand-cap.toss-b .cap-tassel, .brand:hover .brand-logo { animation: none; }
+}

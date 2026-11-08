@@ -4,7 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import proj4 from 'proj4';
 import profilesUrl from './district-profiles.json?url';
 import crimeAreasUrl from './crime-heatmap.geojson?url';
-import { ALL_DISTRICTS, HEAT_STOPS, ICONS, iconFor, safetyLabel, strongColor } from './DistrictMap';
+import { ALL_DISTRICTS, HEAT_STOPS, ICONS, iconFor, safetyLabel, strongColor } from './mapShared';
 import './DistrictMiniMap.css';
 
 const CODE_RE = /(?:^|[^A-Za-z0-9])D(\d{1,2})(W?)(?![0-9A-Za-z])/i;

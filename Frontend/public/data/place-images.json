@@ -1,0 +1,467 @@
+{
+ "note": "Checked photo for each \"Places to know\" entry (Wikipedia lead image of the place's own article, location-checked, or a hand-picked Wikimedia Commons photo). null = no trustworthy photo, the page shows an icon.",
+ "images": {
+  "Croke Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Croke_Park_from_the_Hill_-_2004_All-Ireland_Football_Championship_Final.jpg/960px-Croke_Park_from_the_Hill_-_2004_All-Ireland_Football_Championship_Final.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Croke_Park",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "The Spire": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/E4324-Spire-of-Dublin.jpg/960px-E4324-Spire-of-Dublin.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Spire_of_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "GPO": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/01_General_Post_Office%2C_Dublin.png/960px-01_General_Post_Office%2C_Dublin.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/General_Post_Office,_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Custom House": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/DublinTheCustomHouse-2014-10.jpg/960px-DublinTheCustomHouse-2014-10.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/The_Custom_House,_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Moore Street Market": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/Moore_Street_market%2C_Dublin.jpg/960px-Moore_Street_market%2C_Dublin.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Moore_Street",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Garden of Remembrance": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/2009-09-27_Dublin_Garden_of_Remembrance_054.JPG/960px-2009-09-27_Dublin_Garden_of_Remembrance_054.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Garden_of_Remembrance_(Dublin)",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Trinity College": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/The_entrance_of_the_historic_Trinity_College_%28Unsplash%29.jpg/960px-The_entrance_of_the_historic_Trinity_College_%28Unsplash%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Trinity_College_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "St Stephen's Green": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Dublin_Stephen%27s_Green-44_edit.jpg/960px-Dublin_Stephen%27s_Green-44_edit.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/St_Stephen's_Green",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Grafton Street": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Grafton_St%2C_Dublin.jpg/960px-Grafton_St%2C_Dublin.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Grafton_Street",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "National Gallery": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/National_Gallery_of_Ireland%2C_Nov_2017.jpg/960px-National_Gallery_of_Ireland%2C_Nov_2017.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/National_Gallery_of_Ireland",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Merrion Square": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/MerrionWM-1.jpg/960px-MerrionWM-1.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Merrion_Square",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Casino at Marino": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Casino_marino.JPG/960px-Casino_marino.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Casino_at_Marino",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Clontarf Promenade": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/ClontarfWM.jpg/960px-ClontarfWM.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Clontarf,_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Bull Island": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/IMGDollymountStrand_3649w.JPG/960px-IMGDollymountStrand_3649w.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Bull_Island",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Fairview Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/View_across_Fairview_Park_towards_St_Joseph%27s_CBS_School_-_geograph.org.uk_-_2216830.jpg/960px-View_across_Fairview_Park_towards_St_Joseph%27s_CBS_School_-_geograph.org.uk_-_2216830.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:View_across_Fairview_Park_towards_St_Joseph%27s_CBS_School_-_geograph.org.uk_-_2216830.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Herbert Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Herbert_Park.JPG/960px-Herbert_Park.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Herbert_Park",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Aviva Stadium": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Aviva_Stadium%2C_Dublin_Feb_2010.jpg/960px-Aviva_Stadium%2C_Dublin_Feb_2010.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Aviva_Stadium,_Dublin_Feb_2010.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "St Anne's Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Clocktower2_St_Annes_Park_Dublin.JPG/960px-Clocktower2_St_Annes_Park_Dublin.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Saint_Anne's_Park",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "North Bull Island": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/IMGDollymountStrand_3649w.JPG/960px-IMGDollymountStrand_3649w.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Bull_Island",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Rathmines Town Hall": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/The_scholars_of_Rathmines_College_cannot_keep_time%2C_or_so_it_seems_while_waiting_for_a_0620_No._15_bus_%2820220720_060909_381c%29.jpg/960px-The_scholars_of_Rathmines_College_cannot_keep_time%2C_or_so_it_seems_while_waiting_for_a_0620_No._15_bus_%2820220720_060909_381c%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Rathmines_Town_Hall",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Ranelagh": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Ranelagh%2C_Dublin.jpg/960px-Ranelagh%2C_Dublin.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Ranelagh",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Bushy Park": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Playing_Fields_in_Bushy_Park%2C_Terenure_-_geograph.org.uk_-_402740.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+   "page": "https://commons.wikimedia.org/wiki/File:Playing_Fields_in_Bushy_Park,_Terenure_-_geograph.org.uk_-_402740.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Terenure Village": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Terenure_-_aerial_-_2025-07-12_01.jpg/960px-Terenure_-_aerial_-_2025-07-12_01.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Terenure",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Harold's Cross Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Harold%27s_Cross_Park_%28Dublin%29.jpg/960px-Harold%27s_Cross_Park_%28Dublin%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Harold%27s_Cross_Park_(Dublin).jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Kimmage Cross": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/KimmageWilliamMurphy2.jpg/960px-KimmageWilliamMurphy2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Kimmage",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Phoenix Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/PhoenixParkWMurphy.jpg/960px-PhoenixParkWMurphy.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Phoenix_Park",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "National Museum at Collins Barracks": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Collins_Barracks_Museum_courtyard_west.jpg/960px-Collins_Barracks_Museum_courtyard_west.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Collins_Barracks,_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Kilmainham Gaol": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Kilmainham_Gaol_Main_Hall_2016-06-03.jpg/960px-Kilmainham_Gaol_Main_Hall_2016-06-03.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Kilmainham_Gaol",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Guinness Storehouse": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Guinness_Storehouse_exterior_3.jpg/960px-Guinness_Storehouse_exterior_3.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Guinness_Storehouse",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "National Botanic Gardens": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/National_Botanic_Gardens_In_Glasnevin_%28Dublin%29_-_panoramio_%2810%29.jpg/960px-National_Botanic_Gardens_In_Glasnevin_%28Dublin%29_-_panoramio_%2810%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:National_Botanic_Gardens_In_Glasnevin_(Dublin)_-_panoramio_(10).jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Ballyfermot": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Ballyfermot%2C_with_the_Church_of_Our_Lady_of_the_Assumption_in_the_background.jpg/960px-Ballyfermot%2C_with_the_Church_of_Our_Lady_of_the_Assumption_in_the_background.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Ballyfermot",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Cherry Orchard": null,
+  "Tolka Valley Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/River_Tolka_%28tidal%29_near_mouth%2C_with_trees_of_Fairview_Park_%28geograph_3545481%29.jpg/960px-River_Tolka_%28tidal%29_near_mouth%2C_with_trees_of_Fairview_Park_%28geograph_3545481%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/River_Tolka",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Finglas Village": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Nethercross%2C_Finglas%2C_Dublin.jpg/960px-Nethercross%2C_Finglas%2C_Dublin.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Nethercross,_Finglas,_Dublin.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Drimnagh Castle": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Drimnagh_Castle_May_2025.jpg/960px-Drimnagh_Castle_May_2025.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Drimnagh_Castle_May_2025.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "CHI at Crumlin": null,
+  "Crumlin Village": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/3/3d/The_Submarine_Bar%2C_Crumlin_-_geograph.org.uk_-_447187.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Crumlin,_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Grand Canal Way": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/2/24/Grand_Canal_Dublin_2006.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Grand_Canal_(Ireland)",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Howth Harbour": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Howth_-_aerial_-_2025-08-02_12.jpg/960px-Howth_-_aerial_-_2025-08-02_12.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Howth",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Howth Castle": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Howth_Castle_and_Environs.jpg/960px-Howth_Castle_and_Environs.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Howth_Castle",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Sutton Strand": null,
+  "Howth Cliff Path": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Ceann_Binn_Eadair.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Howth_Head",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Rathfarnham Castle": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Rathfarnham_Castle.jpg/960px-Rathfarnham_Castle.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Rathfarnham_Castle",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Dodder Linear Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/River_Dodder_%28Milltown%29.jpg/960px-River_Dodder_%28Milltown%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:River_Dodder_(Milltown).jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Churchtown Village": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Churchtown%2C_Dublin_14.jpg/960px-Churchtown%2C_Dublin_14.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Churchtown,_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Blanchardstown Centre": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/The_Blanchardstown_Centre.jpg/960px-The_Blanchardstown_Centre.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Blanchardstown_Centre",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "National Aquatic Centre": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/2/25/National_Aquatic_Centre_-_geograph.org.uk_-_535842_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/National_Aquatic_Centre_(Ireland)",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Castleknock Village": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/7/74/Castleknock_Village_-_geograph.org.uk_-_493593.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Castleknock",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "TU Dublin Blanchardstown": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/a/a5/TU_Dublin_Blanchardstown.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Institute_of_Technology,_Blanchardstown",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Dunsink Observatory": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Dunsink_Observatory_-_geograph.org.uk_-_510911.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Dunsink_Observatory",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Marlay Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Waterfall_in_Marlay_Park.jpg/960px-Waterfall_in_Marlay_Park.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Marlay_Park",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Dundrum Town Centre": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/DundrumTownCentre.JPG/960px-DundrumTownCentre.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Dundrum_Town_Centre",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Northside Shopping Centre": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Northside_Shopping_Centre%2C_Coolock%2C_Dublin%2C_Ireland_-_geograph.org.uk_-_338171.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Northside_Shopping_Centre",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Darndale Park": null,
+  "Clarehall Shopping Centre": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/The_Clarehall_Shopping_Centre.jpg/960px-The_Clarehall_Shopping_Centre.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Clarehall_Shopping_Centre",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Leopardstown Racecourse": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/LepRacecourse.JPG/960px-LepRacecourse.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Leopardstown_Racecourse",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Cabinteely Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Cabinteely_Park.jpg/960px-Cabinteely_Park.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Cabinteely_Park.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Sandyford Business District": null,
+  "Ticknock Forest": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/DublinBay_from_Ticknock_july04_2019.jpg/960px-DublinBay_from_Ticknock_july04_2019.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:DublinBay_from_Ticknock_july04_2019.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Chapelizod Village": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Chapelizod_Village.jpg/960px-Chapelizod_Village.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Chapelizod",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Waterstown Park": null,
+  "Palmerstown Village": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Palmerstown_Village.JPG/960px-Palmerstown_Village.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Palmerstown",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Liffey Valley Centre": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Shops_Liffey_Valley_Dublin_-_geograph.org.uk_-_553524.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+   "page": "https://commons.wikimedia.org/wiki/File:Shops_Liffey_Valley_Dublin_-_geograph.org.uk_-_553524.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Clondalkin Round Tower": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Round_Tower_-_Clondalkin_-_geograph.org.uk_-_108911.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Clondalkin_Round_Tower",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Corkagh Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Corkagh_Park_Rose_Garden.jpg/960px-Corkagh_Park_Rose_Garden.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Corkagh_Park_Rose_Garden.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "The Square Tallaght": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Tallaght_-_aerial_-_2025-07-12_06.jpg/960px-Tallaght_-_aerial_-_2025-07-12_06.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/The_Square_Tallaght",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Tallaght University Hospital": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/Tallaght_Hospital.jpg/960px-Tallaght_Hospital.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Tallaght_University_Hospital",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Tallaght Stadium": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Tallaght_Stadium_%282014%29.jpg/960px-Tallaght_Stadium_%282014%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Tallaght_Stadium",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Sean Walsh Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Sean_Walsh_Memorial_Park_-_2025-02-22.jpg/960px-Sean_Walsh_Memorial_Park_-_2025-02-22.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Sean_Walsh_Memorial_Park_-_2025-02-22.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "TU Dublin Tallaght": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/TUD_Tallaght_-_aerial_-_2025-07-12_01.jpg/960px-TUD_Tallaght_-_aerial_-_2025-07-12_01.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Institute_of_Technology,_Tallaght",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Blackrock Park": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/Blackrock_Park_view_to_Howth.JPG/960px-Blackrock_Park_view_to_Howth.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Blackrock_Park_view_to_Howth.JPG",
+   "credit": "Wikimedia Commons"
+  },
+  "Booterstown Marsh": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Booterstown_Marsh_1473.jpg/960px-Booterstown_Marsh_1473.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Booterstown_Marsh_1473.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Grange Church (ruins)": null,
+  "Blackrock Village Centre": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Cross_at_Blackrock%2C_Co._Dublin._%2820459469930%29.jpg/960px-Cross_at_Blackrock%2C_Co._Dublin._%2820459469930%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Cross_at_Blackrock,_Co._Dublin._(20459469930).jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Frascati Shopping Centre": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/9/90/New_Building_at_Frascati_Shopping_Centre_-_geograph.org.uk_-_6012062.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+   "page": "https://commons.wikimedia.org/wiki/File:New_Building_at_Frascati_Shopping_Centre_-_geograph.org.uk_-_6012062.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Archbold's Castle": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Archibolds_Castle_Dalkey.JPG/960px-Archibolds_Castle_Dalkey.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Archbold's_Castle",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Ayesha Castle": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Enya_House.jpg/960px-Enya_House.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Manderley_Castle",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Monkstown Castle": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/County_Dublin_-_Monkstown_Castle_-_20190914183920.jpg/960px-County_Dublin_-_Monkstown_Castle_-_20190914183920.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:County_Dublin_-_Monkstown_Castle_-_20190914183920.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "James Joyce Tower and Museum": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/James_Joyce_Tower_01.JPG/960px-James_Joyce_Tower_01.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/James_Joyce_Tower_and_Museum",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "National Maritime Museum of Ireland": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Mariners-church-dun-laoghaire-restored.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/National_Maritime_Museum_of_Ireland",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Balrothery Tower": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Balrothery_Church_2_Sep2015.jpg/960px-Balrothery_Church_2_Sep2015.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Balrothery_Tower",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Castlemill Shopping Centre": null,
+  "Millfield Shopping Centre": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Tesco_Extra%2C_Millfield_Shopping_Centre%2C_Clonard_Road%2C_Balbriggan_-_geograph.org.uk_-_4020284.jpg/960px-Tesco_Extra%2C_Millfield_Shopping_Centre%2C_Clonard_Road%2C_Balbriggan_-_geograph.org.uk_-_4020284.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Tesco_Extra,_Millfield_Shopping_Centre,_Clonard_Road,_Balbriggan_-_geograph.org.uk_-_4020284.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Homepatrick Shopping Centre": null,
+  "Skerries Point": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/SkerriesDublin.jpg/960px-SkerriesDublin.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Skerries,_County_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Baldongan Church": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Baldunngan.jpg/960px-Baldunngan.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Baldongan_Church",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Drumanagh Promontory Fort": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Loughshinny_Headland.jpg/960px-Loughshinny_Headland.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Drumanagh",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Casino Model Railway Museum": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Fry_Collection_and_Model_Railway_To_Be_Located_Here_%287119020857%29.jpg/960px-Fry_Collection_and_Model_Railway_To_Be_Located_Here_%287119020857%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Casino_Model_Railway_Museum",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Donabate Beach": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Donabate_Strand%2C_County_Dublin%2C_Ireland_-_geograph.org.uk_-_337455.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+   "page": "https://commons.wikimedia.org/wiki/File:Donabate_Strand,_County_Dublin,_Ireland_-_geograph.org.uk_-_337455.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Malahide Beach": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Beach_at_Malahide_%2849141190443%29.jpg/960px-Beach_at_Malahide_%2849141190443%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Beach_at_Malahide_(49141190443).jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Newbridge House and Demesne": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/a/a6/794749-Newbridge_House-Dublin.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Newbridge_Demesne",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Ballalease Mall": null,
+  "Lusk Town Centre": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Lusk_Round_Tower_-_geograph.org.uk_-_6406130.jpg/960px-Lusk_Round_Tower_-_geograph.org.uk_-_6406130.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:Lusk_Round_Tower_-_geograph.org.uk_-_6406130.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Rush South Beach": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/5/50/Millbank.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+   "page": "https://en.wikipedia.org/wiki/Rush,_County_Dublin",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Swords Castle": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Swords_Castle_wall_with_Constable%27s_Tower.jpg/960px-Swords_Castle_wall_with_Constable%27s_Tower.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Swords_Castle",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "River Valley Shopping Centre": null,
+  "Swords Pavilions Shopping Centre": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Pavilions_Shopping_Centre%2C_Swords%2C_County_Dublin_-_geograph.org.uk_-_333114.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+   "page": "https://commons.wikimedia.org/wiki/File:Pavilions_Shopping_Centre,_Swords,_County_Dublin_-_geograph.org.uk_-_333114.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Swords Shopping Centre": null,
+  "The Plaza": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/ThePlazaSwords.jpg/960px-ThePlazaSwords.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+   "page": "https://commons.wikimedia.org/wiki/File:ThePlazaSwords.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Luttrellstown Castle": {
+   "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Luttrellstown_Castle_2.jpg/960px-Luttrellstown_Castle_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+   "page": "https://en.wikipedia.org/wiki/Luttrellstown_Castle",
+   "credit": "Wikipedia / Wikimedia Commons"
+  },
+  "Fonthill Retail Park": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/5/52/Retail_Park%2C_Fonthill_Rd_-_geograph.org.uk_-_709333.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+   "page": "https://commons.wikimedia.org/wiki/File:Retail_Park,_Fonthill_Rd_-_geograph.org.uk_-_709333.jpg",
+   "credit": "Wikimedia Commons"
+  },
+  "Lucan Shopping Centre": {
+   "src": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Lucan_Shopping_Centre_-_geograph.org.uk_-_553631.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+   "page": "https://commons.wikimedia.org/wiki/File:Lucan_Shopping_Centre_-_geograph.org.uk_-_553631.jpg",
+   "credit": "Wikimedia Commons"
+  }
+ }
+}

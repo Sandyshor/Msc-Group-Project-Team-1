@@ -1360,3 +1360,92 @@
   margin: 8px 0 0;
   font-size: 12px;
 }
+
+/* ---------- Why this place: summary chips + a card per factor ---------- */
+.why-summary { display: grid; gap: 8px; margin: 10px 0 4px; }
+.why-summary p { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
+.why-summary-label { margin-right: 4px; font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.why-summary-label.better { color: #245b48; }
+.why-summary-label.worse { color: #9a4330; }
+.why-chip { padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.why-chip.better { background: #dcebd6; color: #1f5641; }
+.why-chip.worse { background: #f8e3d9; color: #8a3b2b; }
+.why-intro { margin: 10px 0 0; }
+
+.why-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 14px 0 0; padding: 0; list-style: none; }
+.why-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 16px 14px;
+  overflow: hidden;
+  border: 1px solid #e6dfcf;
+  border-radius: 16px;
+  background: #fffdf8;
+  transition: box-shadow .18s ease, transform .18s ease;
+}
+.why-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: #c9c1ae; }
+.why-card.better::before { background: #2f7a5a; }
+.why-card.worse::before { background: #c4664b; }
+.why-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(23, 63, 50, 0.09); }
+
+.why-card-head { display: flex; align-items: center; gap: 10px; }
+.why-card-head strong { flex: 1; min-width: 0; color: #173f32; font-size: 15px; line-height: 1.25; }
+.why-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 10px; background: #ece6d8; color: #5f6f67; }
+.why-card.better .why-icon { background: #dcebd6; color: #1f5641; }
+.why-card.worse .why-icon { background: #f8e3d9; color: #8a3b2b; }
+.why-icon .flow-icon { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.why-importance { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 3px; color: #7a857c; font-size: 10.5px; font-weight: 600; white-space: nowrap; }
+.why-dots { display: inline-flex; gap: 3px; }
+.why-dots i { width: 7px; height: 7px; border-radius: 50%; background: #e2d9c6; }
+.why-dots i.on { background: #173f32; }
+
+.why-card-value { margin: 4px 0 0; color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-weight: 700; line-height: 1.15; font-variation-settings: 'opsz' 36; }
+.why-card-compare { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13.5px; font-weight: 700; }
+.why-card-compare.better { color: #245b48; }
+.why-card-compare.worse { color: #9a4330; }
+.why-card-compare.average { color: #6b766e; }
+.why-card-compare span { font-size: 10px; }
+
+.why-meter { display: grid; gap: 5px; margin-top: 4px; }
+.why-meter-label { display: flex; justify-content: space-between; color: #7a857c; font-size: 11.5px; font-weight: 600; }
+.why-meter-label b { color: #173f32; }
+.why-meter-bar { display: block; height: 6px; overflow: hidden; border-radius: 999px; background: #ece6d8; }
+.why-meter-bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #4f8f6f, #245b48); }
+.result-why .why-card .why-card-value { color: #173f32; }
+
+/* ---------- About this area: what each census figure means ---------- */
+.about-intro { margin: 6px 0 0; }
+.about-intro strong { color: #173f32; font-weight: 700; }
+.result-about .about-tiles { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 14px; }
+.result-about .about-tile {
+  gap: 10px;
+  padding: 16px 16px 14px;
+  border: 1px solid #e6dfcf;
+  border-radius: 16px;
+  background: #fffdf8;
+  transition: box-shadow .18s ease, transform .18s ease;
+}
+.result-about .about-tile:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(23, 63, 50, 0.09); }
+.result-about .about-label { display: flex; align-items: center; gap: 8px; color: #5f6f67; font-size: 11.5px; letter-spacing: 1.2px; }
+.result-about .about-label .flow-icon { width: 26px; height: 26px; padding: 5px; border-radius: 8px; background: #ece6d8; color: #173f32; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; box-sizing: border-box; }
+.about-figure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+.result-about .about-figure strong { color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: 32px; font-weight: 700; line-height: 1; font-variation-settings: 'opsz' 48; }
+.about-figure span { color: #5f6f67; font-size: 13.5px; font-weight: 600; }
+.about-picto { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px 3px; max-width: 220px; }
+.about-picto svg { width: 100%; aspect-ratio: 1; fill: #e2d9c6; }
+.about-picto svg.on { fill: #2f7a5a; }
+.about-compare { align-self: flex-start; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.about-compare.up { background: #dcebd6; color: #1f5641; }
+.about-compare.down { background: #f8e3d9; color: #8a3b2b; }
+.about-compare.same { background: #ece6d8; color: #5f6f67; }
+.about-meaning { margin: 0; padding-top: 10px; border-top: 1px dashed #e2d9c6; color: #173f32; font-size: 14px; font-weight: 600; line-height: 1.45; }
+.about-groups { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.about-groups small { width: 100%; color: #7a857c; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.about-group { padding: 3px 9px; border-radius: 999px; background: #f1ece0; color: #4d5e53; font-size: 12.5px; }
+.about-group b { color: #173f32; }
+.result-about .about-tiles { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.about-picto { display: flex; flex-wrap: wrap; gap: 3px; max-width: 230px; grid-template-columns: none; }
+.about-picto svg { width: 20px; height: 20px; aspect-ratio: auto; }

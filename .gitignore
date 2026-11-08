@@ -7,3 +7,5 @@ Backend/data/raw/
 # Python virtual environments
 .venv/
 venv/
+.DS_Store
+journey-planner-files/

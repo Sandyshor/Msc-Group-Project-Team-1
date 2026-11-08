@@ -11,6 +11,10 @@ import Results from './pages/Results'
 import { AttractionsPage, UniversitiesPage } from './pages/CityGuide'
 import LanguageSwitcher from './LanguageSwitcher'
 import SiteTour from './SiteTour'
+import SiteFooter from './SiteFooter'
+import ChatWidget from './ChatWidget'
+import BrandLogo from './BrandLogo'
+import InfoPage from './pages/InfoPages'
 
 function App() {
   const location = useLocation()
@@ -20,19 +24,7 @@ function App() {
     <div className="site-shell">
       <header className={`navbar ${location.pathname === '/' ? 'navbar-home' : ''}`}>
         
-<Link className="brand" to="/">
-  <img
-    className="brand-logo"
-    src="/images/find-your-dublin-logo.png"
-    alt=""
-  />
-  <img
-    className="brand-wordmark"
-    // Dark letters on the light homepage bar, light letters on the dark green bar of the other pages
-    src={location.pathname === '/' ? '/images/find-my-dublin-wordmark-4k.png' : '/images/find-my-dublin-wordmark-light.png'}
-    alt="Find My Dublin"
-  />
-</Link>
+<BrandLogo light={location.pathname !== '/'} />
 
 
         
@@ -61,10 +53,12 @@ function App() {
     aria-expanded={tourOpen}
     aria-controls={tourOpen ? 'site-tour-panel' : undefined}
   >
+    <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2 5-5 2 2-5z" /></svg>
     Take a tour
   </button>
 
   <Link className="login-link" to="/login">
+    <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" /></svg>
     Log in
   </Link>
 </div>
@@ -83,6 +77,9 @@ function App() {
           <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/terms" element={<InfoPage page="terms" />} />
+          <Route path="/privacy" element={<InfoPage page="privacy" />} />
+          <Route path="/contact" element={<InfoPage page="contact" />} />
           <Route
             path="*"
             element={<h1>Page not found</h1>}
@@ -90,7 +87,11 @@ function App() {
         </Routes>
       </main>
 
+      {/* the questionnaire and results fill the screen exactly, so they go without a footer */}
+      {!['/questionnaire', '/results'].includes(location.pathname) && <SiteFooter />}
+
       {tourOpen && <SiteTour onClose={() => setTourOpen(false)} />}
+      <ChatWidget />
     </div>
   )
 }

@@ -1,0 +1,60 @@
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  padding: 20px 6%;
+  border-top: 1px solid #e6e8e6;
+  background: #fff;
+  color: #4b5563;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+}
+.site-footer-copy { margin: 0; }
+.site-footer-links { display: flex; flex-wrap: wrap; gap: 8px 36px; }
+.site-footer-links a {
+  color: #4b5563;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.site-footer-links a:hover { color: #0d3b26; text-decoration: underline; text-underline-offset: 4px; }
+.site-footer-links a:focus-visible { outline: 2px solid #0d3b26; outline-offset: 3px; border-radius: 2px; }
+
+@media (max-width: 640px) {
+  .site-footer { flex-direction: column-reverse; align-items: flex-start; padding: 18px 20px; font-size: 15px; gap: 10px; }
+  .site-footer-links { gap: 8px 24px; }
+}
+
+.info-page {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 64px 24px 96px;
+  font-family: 'DM Sans', sans-serif;
+  color: #1f2a24;
+}
+.info-page h1 {
+  margin: 0 0 28px;
+  color: #0f3d2a;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(40px, 5vw, 60px);
+  font-weight: 700;
+  line-height: 1.05;
+}
+.info-page section { margin-top: 34px; }
+.info-page h2 {
+  margin: 0 0 10px;
+  color: #0f3d2a;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(24px, 2.2vw, 30px);
+  font-weight: 700;
+}
+.info-page p { margin: 0; color: #2f3a33; font-size: 19px; line-height: 1.75; }
+.info-page .info-intro { margin-bottom: 8px; }
+.info-back { display: inline-block; margin-top: 48px; color: #0f3d2a; font-weight: 700; text-decoration: none; }
+.info-back:hover { text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 640px) { .info-page { padding: 40px 20px 64px; } .info-page p { font-size: 17px; } }
+
+/* keep the footer at the bottom of short pages */
+.site-shell { display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; }
+.site-shell > main { flex: 1 0 auto; }

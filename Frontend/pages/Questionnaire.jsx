@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import './Questionnaire.css'
 import { NO_LIMIT, TRAVEL_MODES } from './CommuteFields'
-import { FlowChoices, FlowPhoto, FlowRow, FlowSidebar } from './FlowLayout'
+import { FlowChoices, FlowDialog, FlowIcon, FlowPhoto, FlowRow, FlowSidebar } from './FlowLayout'
 import PrioritySlider, { DEFAULT_IMPORTANCE } from './PrioritySlider'
 
 // Values match the university names in the backend's commute data.
@@ -39,13 +39,13 @@ const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
 // name, icon, hint, items that can be rated separately instead (as in the backend)
 const FACTORS = [
   ['Rent', 'euro', 'Cheaper rent'],
+  ['Safety', 'shield', 'Less recorded crime in the area'],
   ['Commute', 'clock', 'A short commute to your university'],
   ['Shopping & Groceries', 'basket', 'Supermarkets, grocery shops and shopping centres',
     ['Supermarkets', 'Grocery Shops', 'Shopping Malls']],
   ['Restaurants', 'fork', 'Places to eat out'],
   ['Healthcare', 'heart', 'Hospitals and pharmacies', ['Hospitals', 'Pharmacies']],
   ['Recreation & Wellness', 'tree', 'Gyms and parks', ['Gyms', 'Parks']],
-  ['Safety', 'shield', 'Less recorded crime in the area'],
 ]
 
 function joinWords(items) {
@@ -90,22 +90,24 @@ function Questionnaire() {
   }
 
   const [needUniversity, setNeedUniversity] = useState(false)
+  // Step 3 (the matches) opens once step 1 is complete and step 2 has been seen with at least one priority set
+  const [seenPriorities, setSeenPriorities] = useState(state?.step === 2 || Boolean(earlier))
+  useEffect(() => { if (step === 2) setSeenPriorities(true) }, [step])
+  const prioritiesDone = seenPriorities && !allNotImportant
+  const matchesReady = situationDone && prioritiesDone
+  const [lockedOpen, setLockedOpen] = useState(false)
 
   function handleContinue(event) {
     event.preventDefault()
     if (situationDone) setStep(2)
+    else setNeedUniversity(true)
   }
 
-  // Every step in the sidebar can be clicked; the matches need a university and an accommodation type first
+  // Steps 1 and 2 can always be opened; step 3 shows a message until steps 1 and 2 are done
   function goToStep(number) {
-    if (number < 3) {
-      setStep(number)
-    } else if (situationDone) {
-      showMatches()
-    } else {
-      setNeedUniversity(true)
-      setStep(1)
-    }
+    if (number < 3) setStep(number)
+    else if (matchesReady) showMatches()
+    else setLockedOpen(true)
   }
 
   function handleSubmit(event) {
@@ -128,8 +130,35 @@ function Questionnaire() {
   }
 
   return (
-    <section className="flow-page" data-site-tour="questionnaire">
-      <FlowSidebar step={step} onStep={goToStep} />
+    <section className="flow-page flow-q" data-site-tour="questionnaire">
+      <FlowSidebar step={step} onStep={goToStep} locked={matchesReady ? [] : [3]} />
+
+      {lockedOpen && (
+        <FlowDialog
+          title="Your matches are almost ready"
+          onClose={() => setLockedOpen(false)}
+          actions={(
+            <>
+              <button type="button" className="flow-next" onClick={() => { setLockedOpen(false); setNeedUniversity(!situationDone); setStep(situationDone ? 2 : 1) }}>
+                {situationDone ? 'Go to Step 2' : 'Go to Step 1'} <span>→</span>
+              </button>
+              <button type="button" className="flow-back" onClick={() => setLockedOpen(false)}>Not now</button>
+            </>
+          )}
+        >
+          <p className="flow-dialog-text">Complete <b>Step 1</b> and <b>Step 2</b> first, then Step 3 will show the Dublin neighbourhoods that suit you best.</p>
+          <ul className="flow-checklist">
+            <li className={situationDone ? 'is-done' : ''}>
+              <span aria-hidden="true">{situationDone ? <FlowIcon name="check" /> : '1'}</span>
+              <div><b>Step 1 · About you</b><small>{situationDone ? 'Done' : !destination ? 'Choose your university' : 'Choose an accommodation type we have rent data for'}</small></div>
+            </li>
+            <li className={prioritiesDone ? 'is-done' : ''}>
+              <span aria-hidden="true">{prioritiesDone ? <FlowIcon name="check" /> : '2'}</span>
+              <div><b>Step 2 · Your priorities</b><small>{prioritiesDone ? 'Done' : allNotImportant ? 'Move at least one slider above 0' : 'Set how much each thing matters to you'}</small></div>
+            </li>
+          </ul>
+        </FlowDialog>
+      )}
 
       {step === 1 ? (
         <>
@@ -154,6 +183,7 @@ function Questionnaire() {
                 max="2500"
                 step="50"
                 value={budget}
+                style={{ '--fill': `${((budget - 400) / (2500 - 400)) * 100}%` }}
                 onChange={(event) => setBudget(Number(event.target.value))}
               />
             </FlowRow>
@@ -201,6 +231,7 @@ function Questionnaire() {
                 max={NO_LIMIT}
                 step="5"
                 value={commute.maxCommute ?? NO_LIMIT}
+                style={{ '--fill': `${(((commute.maxCommute ?? NO_LIMIT) - 10) / (NO_LIMIT - 10)) * 100}%` }}
                 onChange={(event) => {
                   const value = Number(event.target.value)
                   setCommute({ ...commute, maxCommute: value === NO_LIMIT ? null : value })
@@ -214,7 +245,7 @@ function Questionnaire() {
                   Choose your university to continue.
                 </p>
               )}
-              <button className="flow-next" type="submit" disabled={!situationDone}>
+              <button className="flow-next" type="submit" aria-disabled={!situationDone}>
                 Continue <span>→</span>
               </button>
             </div>
@@ -248,6 +279,8 @@ function Questionnaire() {
                         value={importance[item]}
                         showName
                         onChange={(value) => setFactorImportance(item, value)}
+                        lowLabel="Lower"
+                        highLabel="Higher"
                       />
                     ))}
                   </div>
@@ -256,6 +289,8 @@ function Questionnaire() {
                     name={name}
                     value={importance[name]}
                     onChange={(value) => setFactorImportance(name, value)}
+                    lowLabel="Lower"
+                    highLabel="Higher"
                   />
                 )}
                 {items && (

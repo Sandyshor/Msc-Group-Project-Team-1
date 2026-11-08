@@ -12,3 +12,5 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
+      - key: ANTHROPIC_API_KEY   # for POST /chat (the AI assistant); set the value in the Render dashboard
+        sync: false

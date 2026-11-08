@@ -1,7 +1,8 @@
-// The Universities and Famous attractions pages: photo cards the student scrolls sideways.
-// The maps now live in the district profiles, so these pages have no map of their own.
-import { useRef } from 'react'
-import './HomePage.css'
+// The Universities and Famous attractions pages: a photo banner, filter chips and a grid of photo cards.
+// The maps live in the district profiles; each campus card links to its district there.
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import './CityGuide.css'
 
 // Photographs are from the institutions' sites or published campus-photo pages.
 // Each campus has its own official information link instead of sharing one generic URL.
@@ -492,107 +493,167 @@ function PhotoCredit({ credit, className }) {
   )
 }
 
-function UniversityCard({ school }) {
-  return (
-    <article className="fd-university-card">
-      <a className="fd-university-card-link" href={school.url} target="_blank" rel="noreferrer">
-        <div className="fd-university-photo" style={{ backgroundImage: `url("${school.image}")` }}>
-          <div className="fd-university-photo-shade" />
-          <div className="fd-university-logo-wrap">
-            {school.logo && (
-              <img className="fd-university-logo" src={school.logo} alt={`${school.name} logo`} loading="lazy" onError={(event) => { event.currentTarget.style.display = 'none' }} />
-            )}
-          </div>
-          <span className="fd-card-category">{school.type || 'UNIVERSITY / CAMPUS'}</span>
-          <strong className="fd-university-name">{school.name}</strong>
-        </div>
-        <div className="fd-university-details">
-          <span className="fd-card-location">{school.location}</span>
-          <span className="fd-card-link">Official website <b>↗</b></span>
-        </div>
-      </a>
-      <PhotoCredit credit={school.imageCredit} className="fd-university-photo-credit" />
-    </article>
-  )
+// "Technological University Dublin — Aungier Street Campus" -> title "Aungier Street Campus", over-line "TU Dublin"
+const SHORT_NAMES = {
+  'Technological University Dublin': 'TU Dublin', 'University College Dublin': 'UCD', 'Dublin City University': 'DCU',
+  'National College of Ireland': 'NCI', IADT: 'IADT',
+}
+// multi-campus universities show the campus as the title; single-site colleges keep their name as the title
+const MULTI_CAMPUS = new Set(['Technological University Dublin', 'University College Dublin', 'Dublin City University'])
+const FULL_NAMES = { IADT: 'Institute of Art, Design + Technology' }
+function splitName(name) {
+  const [head, tail] = name.split(' — ')
+  if (!tail) return { over: null, title: name }
+  if (MULTI_CAMPUS.has(head)) return { over: SHORT_NAMES[head] ?? head, title: tail }
+  return { over: head === 'IADT' ? `IADT · ${tail}` : tail, title: FULL_NAMES[head] ?? head }
+}
+const districtOf = (location) => { const m = location.match(/Dublin (\d{1,2})\b/); return m ? `D${m[1]}` : null }
+
+// filter groups
+function campusGroup(school) {
+  if (school.name.startsWith('Technological University Dublin')) return 'TU Dublin'
+  if (/University|Trinity College|Royal College of Surgeons/.test(school.name)) return 'Universities'
+  return 'Colleges'
+}
+function attractionGroup(place) {
+  const c = place.category
+  if (/GREEN|GARDEN|COAST|NATURE/.test(c)) return 'Parks & nature'
+  if (/HISTORY|ART/.test(c)) return 'History & culture'
+  return 'City life'
 }
 
-function AttractionCard({ place }) {
+const Pin = () => (
+  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" /><circle cx="12" cy="10" r="2.3" />
+  </svg>
+)
+
+function UniversityCard({ school, index }) {
+  const navigate = useNavigate()
+  const { over, title } = splitName(school.name)
+  const district = districtOf(school.location)
   return (
-    <article className="fd-attraction-card">
-      <a className="fd-attraction-card-link" href={place.url} target="_blank" rel="noreferrer">
-        <div className="fd-attraction-image-wrap">
-          <img src={place.image} alt={place.name} loading="lazy" />
-          <span className="fd-attraction-icon"><MapIcon name={place.icon} /></span>
-        </div>
-        <div className="fd-attraction-info">
-          <span className="fd-card-category">{place.category}</span>
-          <strong>{place.name}</strong>
-          <p>{place.detail}</p>
-          <span className="fd-card-link">Explore more <b>↗</b></span>
-        </div>
+    <article className="cg-card cg-campus" style={{ '--i': index }}>
+      <a className="cg-photo" href={school.url} target="_blank" rel="noreferrer" tabIndex={-1} aria-hidden="true">
+        <img src={school.image} alt="" loading="lazy" />
+        <span className="cg-tag">{CAMPUS_TAGS[campusGroup(school)]}</span>
       </a>
-      <PhotoCredit credit={place.imageCredit} className="fd-attraction-photo-credit" />
-    </article>
-  )
-}
-
-function CardRail({ title, label, children }) {
-  const rowRef = useRef(null)
-
-  function scroll(direction) {
-    const row = rowRef.current
-    row?.scrollBy({ left: direction * row.clientWidth * 0.8, behavior: 'smooth' })
-  }
-
-  return (
-    <div className="fd-hero-rail">
-      <div className="fd-hero-rail-top">
-        <p className="fd-hero-rail-title">{title}</p>
-        <div className="fd-hero-rail-arrows">
-          <button type="button" onClick={() => scroll(-1)} aria-label={`Scroll ${title} left`}>←</button>
-          <button type="button" onClick={() => scroll(1)} aria-label={`Scroll ${title} right`}>→</button>
+      {school.logo && (
+        <span className="cg-logo">
+          <img src={school.logo} alt={`${school.name} logo`} loading="lazy" onError={(e) => { e.currentTarget.parentElement.style.display = 'none' }} />
+        </span>
+      )}
+      <div className="cg-body">
+        {over && <span className="cg-over">{over}</span>}
+        <h3>{title}</h3>
+        <p className="cg-where"><Pin /> {school.location}{district && <b className="cg-district">{district}</b>}</p>
+        <div className="cg-actions">
+          <a className="cg-btn cg-btn-solid" href={school.url} target="_blank" rel="noreferrer">Website <span aria-hidden="true">↗</span></a>
+          {district && (
+            <button type="button" className="cg-btn" onClick={() => navigate('/districts', { state: { district } })}>
+              See the area <span aria-hidden="true">→</span>
+            </button>
+          )}
         </div>
       </div>
-      <div className="fd-hero-rail-row" ref={rowRef} role="region" aria-label={label} tabIndex={0}>
-        {children}
+      <PhotoCredit credit={school.imageCredit} className="cg-credit" />
+    </article>
+  )
+}
+
+function AttractionCard({ place, index }) {
+  return (
+    <article className="cg-card cg-place" style={{ '--i': index }}>
+      <a className="cg-photo" href={place.url} target="_blank" rel="noreferrer" tabIndex={-1} aria-hidden="true">
+        <img src={place.image} alt="" loading="lazy" />
+        <span className="cg-tag"><MapIcon name={place.icon} />{place.category.toLowerCase()}</span>
+      </a>
+      <div className="cg-body">
+        <h3>{place.name}</h3>
+        <p className="cg-detail">{place.detail}</p>
+        <p className="cg-where"><Pin /> {place.location}</p>
+        <div className="cg-actions">
+          <a className="cg-btn cg-btn-solid" href={place.url} target="_blank" rel="noreferrer">Explore more <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <PhotoCredit credit={place.imageCredit} className="cg-credit" />
+    </article>
+  )
+}
+
+// cards fade up as they scroll into view
+function useReveal(deps) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const root = ref.current
+    if (!root) return undefined
+    const cards = [...root.querySelectorAll('.cg-card')]
+    if (!('IntersectionObserver' in window)) { cards.forEach((c) => c.classList.add('is-in')); return undefined }
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target) }
+    }), { rootMargin: '0px 0px -40px 0px' })
+    cards.forEach((c) => io.observe(c))
+    return () => io.disconnect()
+  }, deps) // eslint-disable-line react-hooks/exhaustive-deps
+  return ref
+}
+
+// One page: photo banner, filter chips and the card grid
+function GuidePage({ kicker, title, accent, description, banner, stats, groups, groupOf, items, renderCard, tourTarget, gridLabel }) {
+  const [group, setGroup] = useState('All')
+  const counts = useMemo(() => Object.fromEntries(groups.map((g) => [g, items.filter((x) => groupOf(x) === g).length])), [groups, items, groupOf])
+  const shown = group === 'All' ? items : items.filter((x) => groupOf(x) === group)
+  const gridRef = useReveal([group])
+  return (
+    <div className="cg-page" data-site-tour={tourTarget}>
+      <header className="cg-hero">
+        <img className="cg-hero-img" src={banner.src} alt="" />
+        <div className="cg-hero-text">
+          <p className="cg-kicker">{kicker}</p>
+          <h1>{title} <em>{accent}</em></h1>
+          <p className="cg-lead">{description}</p>
+          <ul className="cg-stats">
+            {stats.map(([n, label]) => <li key={label}><strong>{n}</strong>{label}</li>)}
+          </ul>
+        </div>
+        <p className="cg-hero-credit">{banner.caption} · Photo: <a href={banner.page} target="_blank" rel="noreferrer">{banner.author}</a>, {banner.license}</p>
+      </header>
+
+      <div className="cg-toolbar" role="group" aria-label="Filter">
+        {['All', ...groups].map((g) => (
+          <button key={g} type="button" className={`cg-chip${g === group ? ' is-on' : ''}`} aria-pressed={g === group} onClick={() => setGroup(g)}>
+            {g}<span>{g === 'All' ? items.length : counts[g]}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="cg-grid" ref={gridRef} role="list" aria-label={gridLabel}>
+        {shown.map((item, i) => <div role="listitem" key={item.id} className="cg-cell">{renderCard(item, i)}</div>)}
       </div>
     </div>
   )
 }
 
-// One page: heading and the cards
-function GuidePage({ kicker, title, accent, description, railTitle, label, items, renderCard, variant, tourTarget }) {
-  return (
-    <div className="fd-home fd-guide-page">
-      <section className={`fd-moving-section fd-guide-section fd-guide-${variant}`} data-site-tour={tourTarget}>
-        <div className="fd-moving-heading">
-          <div>
-            <p className="fd-section-kicker">{kicker}</p>
-            <h1>{title} <em>{accent}</em></h1>
-          </div>
-          <p>{description}</p>
-        </div>
-        <div className="fd-section-rail">
-          <CardRail title={railTitle} label={label}>{items.map(renderCard)}</CardRail>
-        </div>
-      </section>
-    </div>
-  )
-}
+const CAMPUS_GROUPS = ['Universities', 'TU Dublin', 'Colleges']
+const CAMPUS_TAGS = { Universities: 'University', 'TU Dublin': 'TU Dublin campus', Colleges: 'College' }
+const PLACE_GROUPS = ['History & culture', 'Parks & nature', 'City life']
 
 export function UniversitiesPage() {
+  const institutions = new Set(universities.map((u) => u.name.split(' — ')[0])).size
   return (
     <GuidePage
       kicker="CAMPUS LIFE"
       title="Find your"
       accent="campus."
-      description="Explore universities and colleges across the city and nearby coast. Check your course location before deciding how you'll travel each day."
-      railTitle="Universities and colleges"
-      label="Universities and campuses"
+      description="Universities and colleges across the city and the coast. Check where your course is taught, then see what living nearby is like."
+      banner={{ src: '/images/flow/trinity-long-room.jpg', caption: 'The Long Room, Trinity College', author: 'Diliff', license: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:Long_Room_Interior,_Trinity_College_Dublin,_Ireland_-_Diliff.jpg' }}
+      stats={[[universities.length, 'campuses'], [institutions, 'institutions'], [new Set(universities.map((u) => districtOf(u.location)).filter(Boolean)).size, 'Dublin districts']]}
+      groups={CAMPUS_GROUPS}
+      groupOf={campusGroup}
       items={universities}
-      renderCard={(school) => <UniversityCard school={school} key={school.id} />}
-      variant="campuses"
+      renderCard={(school, i) => <UniversityCard school={school} index={i} />}
       tourTarget="universities"
+      gridLabel="Universities and campuses"
     />
   )
 }
@@ -604,12 +665,14 @@ export function AttractionsPage() {
       title="Famous attractions"
       accent="across Dublin."
       description="Landmarks, history and green spaces for the days when you close your laptop and go exploring."
-      railTitle="Places to explore"
-      label="Places to explore in Dublin"
+      banner={{ src: '/images/flow/liffey-sunset.jpg', caption: 'The River Liffey at sunset', author: '瑞丽江的河水', license: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:Liffey_River_sunset_-_2025-11-11.jpg' }}
+      stats={[[attractions.length, 'places to explore'], [attractions.filter((p) => attractionGroup(p) === 'Parks & nature').length, 'parks & nature spots'], [attractions.filter((p) => attractionGroup(p) === 'History & culture').length, 'history & culture']]}
+      groups={PLACE_GROUPS}
+      groupOf={attractionGroup}
       items={attractions}
-      renderCard={(place) => <AttractionCard place={place} key={place.id} />}
-      variant="attractions"
+      renderCard={(place, i) => <AttractionCard place={place} index={i} />}
       tourTarget="attractions"
+      gridLabel="Places to explore in Dublin"
     />
   )
 }
