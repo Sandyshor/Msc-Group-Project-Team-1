@@ -71,7 +71,7 @@ function PlaceImage({ place }) {
   const [src, setSrc] = useState(place.image || null);
   const [triedWiki, setTriedWiki] = useState(false);
 
-  const useWikipedia = () => {
+  const loadWikipediaPhoto = () => {
     if (triedWiki) { setSrc(null); return; }
     setTriedWiki(true);
     const titles = [WIKI_TITLES[place.name], place.name].filter(Boolean);
@@ -85,13 +85,13 @@ function PlaceImage({ place }) {
   };
 
   // Checked photos (place-images.json) are used as they are; only unchecked places fall back to a Wikipedia lookup
-  useEffect(() => { if (!place.image && !place.photoChecked) useWikipedia(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!place.image && !place.photoChecked) loadWikipediaPhoto(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!src) return <div className="place-image place-image-fallback"><Icon name={place.cat} /></div>;
   return (
     <img className="place-image" src={src} alt={place.name} loading="lazy" referrerPolicy="no-referrer"
       title={place.imageCredit ? `Photo: ${place.imageCredit}` : undefined}
-      onError={place.photoChecked ? () => setSrc(null) : useWikipedia} />
+      onError={place.photoChecked ? () => setSrc(null) : loadWikipediaPhoto} />
   );
 }
 

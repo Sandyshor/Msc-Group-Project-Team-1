@@ -425,7 +425,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     // ---------------- universities (on at start), famous places, landmarks
     const universityLayer = L.layerGroup().addTo(map);
     const cityLandmarkLayer = L.layerGroup();
-    const useLandmark = (latlng, label) => latest.current.onLandmarkPoint?.({ lat: latlng.lat, lng: latlng.lng, label });
+    const pickLandmark = (latlng, label) => latest.current.onLandmarkPoint?.({ lat: latlng.lat, lng: latlng.lng, label });
 
     const addLandmarks = (list, layer, kind) => {
       const groups = [];
@@ -442,7 +442,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         const label = items.length > 1 ? `${shortName(items[0].name)} +${items.length - 1}` : shortName(items[0].name);
         L.marker(latlng, { icon: pinIcon({ emoji: items[0].icon || '🎓', ring: RING[kind], kind, label }), title: items.map((i) => i.name).join(' / '), riseOnHover: true })
           .bindTooltip(tooltip, { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip' })
-          .on('click', () => useLandmark(latlng, items.map((i) => i.name).join(' / ')))
+          .on('click', () => pickLandmark(latlng, items.map((i) => i.name).join(' / ')))
           .addTo(layer);
       });
     };
@@ -494,7 +494,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         riseOnHover: true,
       })
         .bindTooltip(`${escapeHtml(name)}<small>${escapeHtml(typeLabel)} · ${escapeHtml(record.area)}</small>`, { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-        .on('click', () => useLandmark(latlng, name));
+        .on('click', () => pickLandmark(latlng, name));
     };
 
     const activeAmenityKeys = () => Object.keys(AMENITY_CATEGORIES).filter((k) => map.hasLayer(amenityLayers[k]));
@@ -538,7 +538,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
           title: `${name} · ${style[1]} · ${record.area}`,
         })
           .bindTooltip(`${escapeHtml(name)}<small>${escapeHtml(style[1])} · ${escapeHtml(record.area)}</small>`, { direction: 'top', offset: [0, -8], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-          .on('click', () => useLandmark(latlng, name))
+          .on('click', () => pickLandmark(latlng, name))
           .addTo(st.pois);
       });
     };
@@ -587,7 +587,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         const p = f.properties;
         L.circleMarker([lat, lng], { renderer: busRenderer, radius: z >= 17 ? 6.5 : 5, color: '#ffffff', weight: 2, fillColor: BUS_YELLOW, fillOpacity: 1, bubblingMouseEvents: false })
           .bindTooltip(`🚌 ${escapeHtml(p.name)}${p.ref ? ` · stop ${escapeHtml(p.ref)}` : ''}${p.routes ? `<small>Routes ${escapeHtml(p.routes.replaceAll(';', ', '))}</small>` : ''}`, { direction: 'top', offset: [0, -6], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-          .on('click', () => useLandmark(L.latLng(lat, lng), `${p.name} (bus stop)`))
+          .on('click', () => pickLandmark(L.latLng(lat, lng), `${p.name} (bus stop)`))
           .addTo(st.bus);
       });
       updateStatus();
@@ -646,7 +646,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         const { name, dart } = f.properties;
         L.marker([lat, lng], { icon: stopIcon(dart ? DART_GREEN : RAIL_PURPLE, name, 'rail'), riseOnHover: true })
           .bindTooltip(`🚆 ${escapeHtml(name)}<small>${dart ? 'DART and rail station' : 'Rail station'}</small>`, { direction: 'top', offset: [0, -10], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-          .on('click', () => useLandmark(L.latLng(lat, lng), `${name} station`))
+          .on('click', () => pickLandmark(L.latLng(lat, lng), `${name} station`))
           .addTo(st.railStations);
         st.named.stations.push({ name: `${name} station`, lat, lng });
       });
