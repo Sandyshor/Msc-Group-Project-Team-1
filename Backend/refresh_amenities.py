@@ -7,7 +7,11 @@ which is much faster and kinder to the free Overpass servers than one request pe
 
 Run from the repo root:  python Backend/refresh_amenities.py
 Writes Data/amenities_osm.csv (one row per place) and Data/amenity_counts_osm.csv.
+
+Add --county to download only the County Dublin areas (A and K Eircodes, from the District Profile's
+county-dublin-areas.geojson) and add them to Data/amenities_osm.csv, leaving the D1-D24 places as they are.
 """
+import sys
 import json
 import os
 import re
@@ -22,6 +26,7 @@ from shapely.geometry import shape
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 BOUNDARIES = os.path.join(ROOT, "Frontend", "public", "data", "dublin_postcode_boundaries.geojson")
+COUNTY_BOUNDARIES = os.path.join(ROOT, "Frontend", "public", "data", "county-dublin-areas.geojson")
 DATA_FOLDER = os.path.join(ROOT, "Data")
 
 # Main Overpass server first, then public mirrors if it is busy or refuses the request
@@ -72,6 +77,36 @@ def district_polygons():
         if match:
             districts.append(("D" + match.group(1).upper(), to_wgs84(shape(feature["geometry"]))))
     return districts
+
+
+def county_polygons():
+    """County Dublin areas (A/K Eircode keys); this file is already in longitude/latitude."""
+    with open(COUNTY_BOUNDARIES, encoding="utf-8") as f:
+        return [(feature["properties"]["key"], shape(feature["geometry"])) for feature in json.load(f)["features"]]
+
+
+def add_county():
+    """Download County Dublin's amenities and put them in amenities_osm.csv in place of any older county rows."""
+    areas = county_polygons()
+    print(f"Downloading amenities for {len(areas)} County Dublin areas...")
+    places = fetch_places(shapely.union_all([polygon for _, polygon in areas]).bounds)
+    places.insert(0, "Area", None)
+    for area, polygon in areas:
+        inside = shapely.contains_xy(polygon, places["longitude"].to_numpy(), places["latitude"].to_numpy())
+        places.loc[inside & places["Area"].isna(), "Area"] = area
+    places = places.dropna(subset=["Area"])
+    path = os.path.join(DATA_FOLDER, "amenities_osm.csv")
+    existing = pd.read_csv(path)
+    existing = existing[existing["Area"].astype(str).str.match(r"^D\d")]  # keep the districts, replace county rows
+    # a place inside a county area that is also in a district file (boundaries can touch) is kept once
+    key = lambda df: df["category"] + df["latitude"].round(5).astype(str) + df["longitude"].round(5).astype(str)
+    places = places[~key(places).isin(set(key(existing)))]
+    merged = pd.concat([existing, places], ignore_index=True).sort_values(["Area", "category", "name"])
+    merged.to_csv(path, index=False)
+    unique = places[places["category"] != "Asian_Restaurants"]
+    for area, total in unique.groupby("Area").size().items():
+        print(f"{area}: {total} places")
+    print(f"Added {len(unique)} County Dublin places to {path}")
 
 
 def run_query(query):
@@ -145,4 +180,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    add_county() if "--county" in sys.argv else main()

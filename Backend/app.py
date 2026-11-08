@@ -43,7 +43,8 @@ class RecommendRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "areas": recommender.AREAS}
+    county = sorted(set(DATA["commute_points"]["Area"]) - set(recommender.AREAS))
+    return {"status": "ok", "areas": recommender.AREAS + county}
 
 
 @app.get("/options")

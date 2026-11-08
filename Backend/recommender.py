@@ -66,6 +66,17 @@ OTP_COMMUTE_FILE = "commute_otp.csv"
 # The same for the safety data's neighbourhoods (build_commute_matrix.py --neighbourhoods). Until it
 # exists, a neighbourhood uses the times of the nearest commute point in its district.
 NEIGHBOURHOOD_COMMUTE_FILE = "commute_otp_neighbourhoods.csv"
+# County Dublin areas (A and K Eircodes): OTP times from each of their places (build_commute_matrix.py --county)
+# and their census, rent and safety figures (build_county_areas.py). An area is recommended once it has both.
+COUNTY_COMMUTE_FILE = "commute_otp_county.csv"
+COUNTY_AREAS_FILE = "county_dublin_areas.csv"
+COUNTY_CENSUS = ["LEA", "Population", "Age_20_29", "Students", "Non_Irish_%", "Apartments_%", "Internet_Access_%"]
+# Daft.ie / Rent.ie place names used in their search addresses, for the County Dublin areas
+COUNTY_SEARCH_PLACES = {
+    "A41": "ballyboughal", "A42": "garristown", "A45": "oldtown", "A94": "blackrock", "A96": "dun-laoghaire",
+    "K32": "balbriggan", "K34": "skerries", "K36": "malahide", "K45": "lusk", "K56": "rush", "K67": "swords",
+    "K78": "lucan",
+}
 
 AREA_CODES_ROOMS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14",
                     "D15", "D16", "D17", "D18", "D20", "D22", "D24"]
@@ -443,10 +454,66 @@ def student_accommodation_rent(residences, room_type=None):
     return pd.Series(rent, dtype=float), pd.Series(count, dtype=int)
 
 
+def load_county(university_points):
+    """County Dublin areas that have commute times: (commute points in the same columns as the districts',
+    area figures). Both are empty when the files aren't there, so the recommender still works without them."""
+    commute_path, areas_path = _path(COUNTY_COMMUTE_FILE), _path(COUNTY_AREAS_FILE)
+    if not (os.path.exists(commute_path) and os.path.exists(areas_path)):
+        return pd.DataFrame(), pd.DataFrame()
+    areas = pd.read_csv(areas_path)
+    otp = pd.read_csv(commute_path)
+    otp = otp[otp["Area"].isin(areas["Area"])]
+    keys = ["Area", "Direction", "Landmark", "University"]
+    coords = otp.groupby(keys)[["Origin_Latitude", "Origin_Longitude"]].first()
+    minutes = otp.pivot_table(index=keys, columns="Mode", values="Minutes")
+    km = otp.pivot_table(index=keys, columns="Mode", values="Distance_km")
+    points = coords.join(minutes)
+    for mode, km_column in MODE_DISTANCE.items():
+        if mode not in points:
+            points[mode] = np.nan
+        points[km_column] = km[mode] if mode in km else np.nan
+    points = points.reset_index().merge(university_points, on="University", how="left")
+    points["Travel_Time_Min"] = points["public_transport"]
+    points["Walking Minutes"] = points["walk"]
+    # only places with a public transport or walking time count (some rural places have no route in OTP's map)
+    points = points[points["public_transport"].notna() | points["walk"].notna()]
+    return points, areas[areas["Area"].isin(points["Area"])].reset_index(drop=True)
+
+
+def county_safety(county):
+    """{area: safety figures} for the County Dublin areas, shaped like load_safety()'s."""
+    out = {}
+    for _, row in county.iterrows():
+        out[row["Area"]] = {
+            "index": _round_or_none(row.get("Safety_Score"), 1), "tier": None,
+            "main_station": _none_if_nan(row.get("Main_Station")),
+            "main_station_pct": _percent(row.get("Main_Station_Share")),
+            "station_areas": [], "check_street_pct": None, "areas_to_check": [],
+            "crime_per_1k": _crime(row), "ireland_crime_per_1k": _crime(row, "ireland_"),
+            "crime_period": None, "garda_nearest_km": _round_or_none(row.get("Garda_Nearest_km"), 1),
+            "lit_streets_pct": None, "night_transit_pct": None, "neighbourhoods": [],
+        }
+    return out
+
+
 def search_links(area, accommodation, budget):
     """Rental searches for the district on Daft.ie and Rent.ie, both filtered to the budget and room type."""
     n = area[1:].lower()  # "D6W" -> "6w"
     budget = int(budget)
+    town = COUNTY_SEARCH_PLACES.get(area)
+    if town:  # County Dublin areas are searched by their main town
+        if accommodation in ("shared_room", "private_room") or accommodation.startswith("student"):
+            daft = f"https://www.daft.ie/sharing/{town}-dublin?rentalPrice_to={budget}"
+            rent_ie = f"https://www.rent.ie/rooms-to-rent/renting_dublin/{town}/rent_0-{budget}/"
+            what = "Rooms"
+        else:
+            beds = 1 if accommodation == "one_bed" else 2
+            daft = (f"https://www.daft.ie/property-for-rent/{town}-dublin?rentalPrice_to={budget}"
+                    f"&numBeds_from={beds}&numBeds_to={beds}")
+            rent_ie = f"https://www.rent.ie/houses-to-let/renting_dublin/{town}/{beds}_beds/rent_0-{budget}/"
+            what = f"{beds}-bed homes"
+        label = f"{what} in {town.replace('-', ' ').title()} up to €{budget:,}"
+        return [{"site": "Daft.ie", "label": label, "url": daft}, {"site": "Rent.ie", "label": label, "url": rent_ie}]
     if accommodation in ("shared_room", "private_room") or accommodation.startswith("student"):
         daft = f"https://www.daft.ie/sharing/dublin-{n}-dublin?rentalPrice_to={budget}"
         rent_ie = f"https://www.rent.ie/rooms-to-rent/renting_dublin/dublin-{n}/rent_0-{budget}/"
@@ -520,6 +587,14 @@ def load_data():
         commute_source = (f"OpenTripPlanner (TFI timetables), public transport arriving by "
                           f"{otp['Arrive_By'].iloc[0][-5:]} on a weekday; calculated {otp['Calculated_At'].iloc[0][:10]}")
 
+    # County Dublin areas with commute times are compared alongside the districts
+    university_points = commute_points.drop_duplicates("University")[
+        ["University", "Destination_Latitude", "Destination_Longitude"]]
+    county_points, county = load_county(university_points)
+    if not county_points.empty:
+        commute_points = pd.concat([commute_points, county_points], ignore_index=True)
+        census = pd.concat([census, county[["Area"] + COUNTY_CENSUS]], ignore_index=True)
+
     # Amenities near where students would live: the average number within AMENITY_RADIUS_KM of each
     # district's 5 points (the same points the commute is measured from)
     landmarks = commute_points.drop_duplicates(["Area", "Landmark"])[["Area", "Origin_Latitude", "Origin_Longitude"]]
@@ -543,6 +618,20 @@ def load_data():
     bedrooms = rtb["Number of Bedrooms"].astype(str).str.strip().str.lower()
     one_bed_rent = rtb[bedrooms == "one bed"].groupby("Area")["VALUE"].mean()
     two_bed_rent = rtb[bedrooms == "two bed"].groupby("Area")["VALUE"].mean()
+    # where each area's rent comes from, when it isn't the districts' usual sources (shown on the results page)
+    rent_sources = {}
+    if not county.empty:
+        c = county.set_index("Area")
+        shared_room_rent = pd.concat([shared_room_rent, c["Shared_Room_Rent"].dropna()])
+        private_room_rent = pd.concat([private_room_rent, c["Private_Room_Rent"].dropna()])
+        one_bed_rent = pd.concat([one_bed_rent, c["One_Bed_Rent"].dropna()])
+        two_bed_rent = pd.concat([two_bed_rent, c["Two_Bed_Rent"].dropna()])
+        for area, row in c.iterrows():
+            region = row.get("Room_Rent_Region")
+            rent_sources[area] = {
+                "private_room": f"Daft.ie report average for {region}",
+                "shared_room": f"estimate from the Daft.ie report for {region}",
+                "one_bed": "RTB average rent, all homes", "two_bed": "RTB average rent, all homes"}
 
     area_data = (
         census
@@ -560,6 +649,12 @@ def load_data():
         agencies["PSRA_Licence"] = agencies["PSRA_Licence"].apply(lambda x: x.zfill(6) if x else "")
     else:
         agencies = pd.DataFrame(columns=["Name", "Areas", "Address", "Website", "PSRA_Licence"])
+    safety = load_safety()
+    if not county.empty:
+        scores = county.set_index("Area")["Safety_Score"]
+        is_county = parts["Area"].isin(scores.index)
+        parts.loc[is_county, "Safety Score"] = parts.loc[is_county, "Area"].map(scores)
+        safety.update(county_safety(county))
     residences = load_residences()
     _assign_residence_parts(residences, parts)
     student_rent, student_counts = student_accommodation_rent(residences)
@@ -587,7 +682,8 @@ def load_data():
         "part_rent": {"shared_room": _part_room_rent(room_data[is_shared]),
                       "private_room": _part_room_rent(room_data[is_private])},
         "universities": sorted(commute_by_university["University"].unique()),
-        "safety": load_safety(),
+        "safety": safety,
+        "rent_sources": rent_sources,
         "safety_maps": load_safety_maps(),
         "residences": residences,
         "rent_tables": {
@@ -1162,7 +1258,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             largest = sorted(groups, key=lambda c: row[c], reverse=True)[:2]
             stats["non_irish_pct"] = round(float(row["Non_Irish_%"]), 1)
             stats["largest_groups"] = [{"name": c.replace(" (%)", ""), "pct": round(float(row[c]), 1)}
-                                       for c in largest]
+                                       for c in largest]  # empty for County Dublin areas (no breakdown)
         if pd.notna(row.get("Apartments_%")):
             stats["apartments_pct"] = round(float(row["Apartments_%"]), 1)
         return stats
@@ -1180,7 +1276,8 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
                          f"the Dublin average ({stats['dublin_young_pct']:.0f}%).")
         if "non_irish_pct" in stats:
             group_text = " and ".join(f"{g['name']} ({g['pct']:.1f}%)" for g in stats["largest_groups"])
-            lines.append(f"{stats['non_irish_pct']:.0f}% of people are not Irish. The biggest groups are {group_text}.")
+            lines.append(f"{stats['non_irish_pct']:.0f}% of people are not Irish."
+                         + (f" The biggest groups are {group_text}." if group_text else ""))
         if "apartments_pct" in stats:
             lines.append(f"{stats['apartments_pct']:.0f}% of homes are apartments.")
         return lines
@@ -1316,6 +1413,8 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             "rent_listings": None if pd.isna(row["Rent Listings"]) else int(row["Rent Listings"]),
             # "neighbourhood": the place's own listings; "district": the district's average
             "rent_is_for": row["Rent Is For"],
+            # set for County Dublin areas, whose rent comes from the Daft.ie report or RTB (not listings)
+            "rent_source": data.get("rent_sources", {}).get(row["Area"], {}).get(accommodation),
             "budget_status": row["Budget Status"],
             "budget_difference": round(float(row["Budget Difference"]), 2),
             "commute_minutes": None if pd.isna(row["Commute Minutes"]) else round(float(row["Commute Minutes"])),

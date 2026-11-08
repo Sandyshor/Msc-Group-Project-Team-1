@@ -22,9 +22,15 @@ def data():
     return recommender.load_data()
 
 
+def districts(data):
+    """The D1-D24 districts' safety figures (the full pipeline output). County Dublin areas have a lighter set,
+    checked in test_county_dublin_areas_have_their_safety_score."""
+    return {area: figures for area, figures in data["safety"].items() if area.startswith("D")}
+
+
 def test_every_district_has_safety_figures(data):
     assert set(data["safety"]) >= set(recommender.AREAS)
-    for figures in data["safety"].values():
+    for figures in districts(data).values():
         assert set(figures) == FIELDS
         assert 0 <= figures["index"] <= 100
         assert 0 <= figures["lit_streets_pct"] <= 100 and 0 <= figures["night_transit_pct"] <= 100
@@ -57,7 +63,7 @@ def test_d7_scores(data):
 def test_every_district_score_is_reproducible_from_its_station_areas(data):
     overridden = set(pd.read_csv(recommender.os.path.join(recommender.os.path.dirname(recommender.SAFETY_CSV),
                                                           "manual_overrides.csv")).query("kind == 'district'")["id"])
-    for area, figures in data["safety"].items():
+    for area, figures in districts(data).items():
         if area in overridden:
             continue
         parts = figures["station_areas"]
@@ -120,7 +126,7 @@ def test_glasnevin_is_listed_in_d7_and_d9(data):
 
 def test_every_district_lists_its_neighbourhoods_safest_first(data):
     csv = pd.read_csv(recommender.SAFETY_NEIGHBOURHOODS_CSV)
-    for area, figures in data["safety"].items():
+    for area, figures in districts(data).items():
         names = [n["name"] for n in figures["neighbourhoods"]]
         assert names and set(names) == set(csv.loc[csv["District"] == area, "Label"])
         scores = [n["score"] for n in figures["neighbourhoods"]]
@@ -175,7 +181,7 @@ def test_recommend_endpoint_returns_safety():
 
 def test_every_district_has_a_heat_map_of_scored_areas(data):
     eds = pd.read_csv(recommender.SAFETY_EDS_CSV).set_index("ED_GUID")
-    assert set(data["safety_maps"]) == set(data["safety"])
+    assert set(data["safety_maps"]) == set(districts(data))
     for area, heat in data["safety_maps"].items():
         features = heat["areas"]["features"]
         assert features and all(0 <= f["properties"]["score"] <= 100 for f in features)
@@ -194,3 +200,16 @@ def test_safety_map_endpoint():
     r = client.get("/safety-map/d7")
     assert r.status_code == 200 and r.json()["areas"]["type"] == "FeatureCollection"
     assert client.get("/safety-map/D99").status_code == 404
+
+
+def test_county_dublin_areas_have_their_safety_score(data):
+    county = pd.read_csv(recommender._path(recommender.COUNTY_AREAS_FILE)).set_index("Area")
+    shown = {area: figures for area, figures in data["safety"].items() if not area.startswith("D")}
+    assert shown, "no County Dublin areas loaded"
+    for area, figures in shown.items():
+        assert set(figures) == FIELDS
+        assert figures["index"] == round(county.loc[area, "Safety_Score"], 1)
+        assert set(figures["crime_per_1k"]) == set(recommender.CRIME_GROUPS)
+        # every part of the area is scored with the area's safety score
+        parts = data["parts"][data["parts"]["Area"] == area]
+        assert len(parts) and (parts["Safety Score"] == county.loc[area, "Safety_Score"]).all()

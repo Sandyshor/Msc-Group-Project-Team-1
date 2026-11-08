@@ -220,7 +220,7 @@ function PlacesToLive({ area, places, budget, student, room }) {
         )}
   
         {links.length > 0 && <h4 className="home-or">Or rent a room in a shared home</h4>}
-      <p className="result-muted">Live listings open on Daft.ie and Rent.ie, filtered to {area}, your room type and budget.</p>
+      <p className="result-muted">Live listings open on Daft.ie and Rent.ie, filtered to {/^[AK]\d{2}$/.test(area) && links[0]?.label ? links[0].label.replace(/^.* in (.*) up to .*$/, '$1') : area}, your room type and budget.</p>
         <div className="home-search">
           {links.map((l) => (
             <a key={l.site} className="home-search-link" href={l.url} target="_blank" rel="noopener noreferrer">
@@ -232,7 +232,7 @@ function PlacesToLive({ area, places, budget, student, room }) {
         </div>
   
   
-      </>) : (<>      <p className="result-muted">Live listings open on Daft.ie and Rent.ie, filtered to {area}, your room type and budget.</p>
+      </>) : (<>      <p className="result-muted">Live listings open on Daft.ie and Rent.ie, filtered to {/^[AK]\d{2}$/.test(area) && links[0]?.label ? links[0].label.replace(/^.* in (.*) up to .*$/, '$1') : area}, your room type and budget.</p>
       <div className="home-search">
         {links.map((l) => (
           <a key={l.site} className="home-search-link" href={l.url} target="_blank" rel="noopener noreferrer">
@@ -534,6 +534,8 @@ function RentNote({ result, student }) {
     return <span className="rent-note">Cheapest starting price at {n} student residence{n === 1 ? '' : 's'} around {where}</span>
   }
   const ownRent = result.rent_is_for === 'neighbourhood' && result.neighbourhood
+  // County Dublin areas: the rent is a Daft.ie report average (rooms) or an RTB average (homes)
+  if (result.rent_source) return <span className="rent-note">For all of {result.area} · {result.rent_source}</span>
   // A place with enough room listings of its own shows their average; otherwise its district's
   return (
     <span className="rent-note">
@@ -629,7 +631,8 @@ const DETAIL_TABS = ['Why it fits', 'About the area', 'Safety', 'Places to live'
 
 function MatchDetail({ result, results, budget, tab, onTab, student, room }) {
   const navigate = useNavigate()
-  const hasProfile = districts.some((d) => d.id === result.area)
+  const isCounty = /^[AK]\d{2}$/.test(result.area) // County Dublin areas have profiles on the same page
+  const hasProfile = isCounty || districts.some((d) => d.id === result.area)
   const place = result.neighbourhood ? `${result.neighbourhood.name}, ${result.area}` : result.area
 
   return (
@@ -647,7 +650,7 @@ function MatchDetail({ result, results, budget, tab, onTab, student, room }) {
             className="result-profile-link"
             onClick={() => navigate('/districts', { state: { district: result.area } })}
           >
-            {result.area} district profile <span>→</span>
+            {result.area} {isCounty ? 'area' : 'district'} profile <span>→</span>
           </button>
         )}
       </header>
