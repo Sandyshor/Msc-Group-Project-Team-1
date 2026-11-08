@@ -1,0 +1,25 @@
+Region,Room,Setting,Ensuite,Monthly_Rent,Change_YoY_Pct
+North Dublin County,Double,House,Yes,936,4.3
+North Dublin County,Double,House,No,843,6.2
+North Dublin County,Double,Apartment,Yes,1026,2.3
+North Dublin County,Double,Apartment,No,928,11.7
+North Dublin County,Single,House,Yes,865,14.6
+North Dublin County,Single,House,No,718,2.5
+North Dublin County,Single,Apartment,Yes,,
+North Dublin County,Single,Apartment,No,785,-0.6
+South Dublin County,Double,House,Yes,1054,2.2
+South Dublin County,Double,House,No,946,6.7
+South Dublin County,Double,Apartment,Yes,1170,1.9
+South Dublin County,Double,Apartment,No,1092,7.5
+South Dublin County,Single,House,Yes,1000,7.6
+South Dublin County,Single,House,No,827,5.6
+South Dublin County,Single,Apartment,Yes,1068,-1.9
+South Dublin County,Single,Apartment,No,908,-0.8
+West Dublin,Double,House,Yes,980,2.7
+West Dublin,Double,House,No,842,5.3
+West Dublin,Double,Apartment,Yes,1038,3.2
+West Dublin,Double,Apartment,No,890,4.8
+West Dublin,Single,House,Yes,941,12.1
+West Dublin,Single,House,No,737,6.3
+West Dublin,Single,Apartment,Yes,,
+West Dublin,Single,Apartment,No,785,4.0
