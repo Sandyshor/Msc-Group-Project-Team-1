@@ -17,14 +17,14 @@ const PHASES = [
       {
         id: 'insurance', icon: '🩺', title: 'Private medical insurance',
         why: 'Students from outside the EU/EEA need private medical insurance to register for their IRP.',
-        how: ['Check what your college offers or recommends.', 'Make sure the policy covers you for the whole time you’re studying.', 'Keep the certificate: you’ll show it at your IRP appointment.'],
-        link: ['Irish Immigration Service', 'https://www.irishimmigration.ie/my-situation-has-changed-since-i-arrived-in-ireland/study-in-ireland/'],
+        how: ['Check what your college offers or recommends.', 'Make sure the policy covers you for the whole time you’re studying.', 'Keep a printed certificate in English. You’ll show it at the airport and at your IRP appointment.'],
+        link: ['Irish Immigration Service', 'https://www.irishimmigration.ie/coming-to-study-in-ireland/'],
       },
       {
         id: 'arrival-docs', icon: '🛂', title: 'Carry your arrival documents',
         why: 'An immigration officer checks your papers when you land and stamps your passport. That landing stamp is what lets you book your IRP appointment.',
         how: ['Carry your passport, college acceptance letter, proof of fees paid, proof of funds and medical insurance certificate.', 'Say you’re coming to study. The officer writes on the stamp the date you must register by.'],
-        link: ['Coming to study in Ireland', 'https://www.irishimmigration.ie/my-situation-has-changed-since-i-arrived-in-ireland/study-in-ireland/'],
+        link: ['Coming to study in Ireland', 'https://www.irishimmigration.ie/coming-to-study-in-ireland/'],
       },
     ],
   },
@@ -35,14 +35,14 @@ const PHASES = [
     items: [
       {
         id: 'leap', icon: '🚋', title: 'Get a Student Leap Card',
-        why: 'It gives you cheaper fares on Dublin Bus, the Luas, DART and commuter rail than paying cash.',
-        how: ['Apply online with your college details (or at your college’s student services).', 'Top up in shops, at Luas stops or in the TFI Leap Top-Up app.', 'With the TFI 90-minute fare you can change between bus, Luas and DART for one fare.'],
+        why: 'Student and Young Adult Leap Cards cut your fares on Dublin Bus, the Luas, DART and commuter rail.',
+        how: ['Aged 19 to 25? The TFI Young Adult Leap Card gives the same discount and needs no college check.', 'Otherwise, apply online for a Student Leap Card with your student ID. Your college confirms you’re a full-time student.', 'Top up online, in shops, at Luas ticket machines or in the TFI Leap Top-Up app.', 'With the TFI 90-minute fare you can change between bus, Luas and DART for one fare.'],
         link: ['Student Leap Card', 'https://www.studentleapcard.ie/'],
       },
       {
         id: 'sim', icon: '📱', title: 'Get an Irish phone number',
         why: 'Banks, employers, landlords and doctors will all ask for an Irish number.',
-        how: ['No-contract SIMs need no credit check and you can cancel any time.', 'Most offer an eSIM, so you can set one up before you land.'],
+        how: ['No-contract SIMs need no credit check and you can cancel any time.', 'Some offer an eSIM you can set up before you land.'],
         // Popular low-cost, no-contract plans. Prices as published, checked 8 Nov 2026; we're not affiliated with any.
         options: [
           { name: 'Lyca Mobile', plan: 'Lyca Unlimited', price: '€8.99', per: 'per 28 days', detail: 'Unlimited 5G data, calls and texts; 100 international minutes to 42 countries', url: 'https://www.lycamobile.ie/en/bundles/' },
@@ -54,8 +54,8 @@ const PHASES = [
       {
         id: 'bank', icon: '💳', title: 'Open a bank account',
         why: 'Your rent, salary and Leap Card top-ups are much easier with an Irish IBAN.',
-        how: ['App-based banks can often open an account within a day.', 'High-street banks usually ask for proof of address, so a letter from your college can help.'],
-        link: ['Citizens Information: bank accounts', 'https://www.citizensinformation.ie/en/money-and-tax/personal-finance/banking/opening-a-bank-account/'],
+        how: ['App-based banks can often open an account within a day.', 'High-street banks ask for photo ID and proof of an Irish address (not a hostel or hotel). Many accept a letter from your college.'],
+        link: ['Education in Ireland: banking', 'https://www.educationinireland.com/en/living-in-ireland/on-arrival/banking'],
       },
       {
         id: 'irp-book', icon: '📅', title: 'Book your IRP appointment',
@@ -73,20 +73,20 @@ const PHASES = [
       {
         id: 'irp', icon: '🪪', title: 'Go to your IRP appointment',
         why: 'Non-EU/EEA students staying more than 90 days register in person at Burgh Quay, Dublin 2, and get an Irish Residence Permit (IRP) card with Stamp 2.',
-        how: ['Bring your passport, appointment confirmation, college letter, proof of fees paid, medical insurance, proof of funds and proof of your Irish address.', 'The €300 fee is paid by card at the appointment. Cash isn’t accepted.', 'Your IRP card is posted to you, usually within about 15 working days.'],
+        how: ['Bring printed copies of everything listed in your confirmation email (electronic copies aren’t accepted), usually your passport, college letter, proof of fees paid, medical insurance and proof of funds.', 'The €300 fee is paid by card at the appointment. Cash isn’t accepted.', 'Your IRP card is posted to your home, usually within 15 days of approval.'],
         link: ['Registering your permission', 'https://www.irishimmigration.ie/registering-your-immigration-permission/'],
       },
       {
         id: 'pps', icon: '🔢', title: 'Apply for a PPS number',
-        why: 'Your Personal Public Service Number (PPSN) is needed to work, pay tax and use public services.',
-        how: ['Apply online on MyWelfare.ie once you have an address in Ireland.', 'You’ll need your passport (and IRP if you have it) and proof of address.'],
+        why: 'You need a Personal Public Service Number (PPSN) to work and pay the right tax.',
+        how: ['Once you live in Ireland, apply on MyWelfare.ie with a basic MyGovID account.', 'Then go to an Intreo appointment with your passport, proof of your Irish address and a reason, such as a job offer or college letter.'],
         link: ['MyWelfare: PPS number', 'https://www.mywelfare.ie/'],
       },
       {
         id: 'revenue', icon: '🧾', title: 'Set up Revenue myAccount',
         why: 'When you start a job, registering it with Revenue stops you being charged emergency tax.',
-        how: ['Create a myAccount on revenue.ie with your PPSN.', 'Add your job under “Jobs and Pensions” when you start work.'],
-        link: ['Revenue myAccount', 'https://www.revenue.ie/en/online-services/services/manage-your-record/myaccount.aspx'],
+        how: ['Register for myAccount on revenue.ie with your PPSN. First-time users get their password by post.', 'When you start a job, use “Add Job or Pension Details” under PAYE Services, with your employer’s tax number and start date.'],
+        link: ['Revenue: starting your first job', 'https://www.revenue.ie/en/jobs-and-pensions/starting-your-first-job/index.aspx'],
       },
     ],
   },
@@ -98,14 +98,14 @@ const PHASES = [
       {
         id: 'work', icon: '💼', title: 'Know your work rules',
         why: 'Students with a Stamp 2 permission can work part-time, within set limits.',
-        how: ['Up to 20 hours a week during term.', 'Up to 40 hours a week in the holidays: June to September, and 15 December to 15 January.'],
-        link: ['Working while studying', 'https://www.irishimmigration.ie/my-situation-has-changed-since-i-arrived-in-ireland/study-in-ireland/'],
+        how: ['Up to 20 hours a week at all other times, across all your jobs.', 'Up to 40 hours a week only in June, July, August and September, and from 15 December to 15 January. Easter and mid-term breaks don’t count.'],
+        link: ['Stamp 2 work rules', 'https://workplacerelations.ie/en/news-media/workplace_relations_notices/changes_to_employment_entitlements_of_non-eea_students_holding_immigration_stamp_2.html'],
       },
       {
         id: 'irp-renew', icon: '🔁', title: 'Renew your IRP on time',
         why: 'Your permission must stay valid for your whole course. Don’t let your IRP expire.',
-        how: ['Dublin residents usually renew online.', 'Apply well before your card’s expiry date, with your new college letter and proof of fees.'],
-        link: ['Renew your permission', 'https://www.irishimmigration.ie/registering-your-immigration-permission/'],
+        how: ['Renew online in the Immigration Service portal. You must be in Ireland when you apply.', 'Apply before your IRP card expires, with your new college letter and proof of fees.'],
+        link: ['Renew your permission', 'https://www.irishimmigration.ie/registering-your-immigration-permission/how-to-renew-your-current-permission/renewing-your-registration-permission-if-you-live-in-the-republic-of-ireland/'],
       },
       {
         id: 'health', icon: '🏥', title: 'Find a GP, and know the emergency number',
