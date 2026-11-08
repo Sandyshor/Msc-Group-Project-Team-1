@@ -259,6 +259,11 @@ export default function ChatWidget() {
     else { clearTimeout(closeTimer.current); setClosing(false); setOpen(true) }
   }
   useEffect(() => () => clearTimeout(closeTimer.current), [])
+  useEffect(() => {
+    const onOpen = () => { clearTimeout(closeTimer.current); setClosing(false); setOpen(true) }
+    window.addEventListener('chatw-open', onOpen)
+    return () => window.removeEventListener('chatw-open', onOpen)
+  }, [])
 
   function reset() {
     abortRef.current?.abort()

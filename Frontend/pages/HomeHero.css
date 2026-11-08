@@ -558,3 +558,37 @@
   .hx-copy { top: clamp(130px, 15.5vh, 165px); }
   .hx-pill { margin-bottom: 4px; }
 }
+
+/* zoomed-in browsers / smaller laptops: keep the card clear of the header and the buttons on one line */
+@media (min-width: 1101px) {
+  .hx-card { top: max(140px, 14vh); }
+  .hx-btn { white-space: nowrap; }
+}
+@media (min-width: 1101px) and (max-width: 1500px) {
+  .hx-copy { width: clamp(470px, 45vw, 640px); }
+  .hx-lead { max-width: clamp(420px, 38vw, 560px); }
+  .hx-copy h1 { font-size: clamp(46px, 5.4vw, 76px); }
+}
+/* phones: the header is now a single short row */
+@media (max-width: 700px) { .hx-copy { padding-top: 118px; } }
+
+/* "Things to know" link at the bottom of the New to Dublin? card */
+.hx-card-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 11px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1f5641, #173f32);
+  color: #fff;
+  font-size: 14.5px;
+  text-decoration: none;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.hx-card-link b { color: #dff27f; }
+.hx-card-link:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(23, 63, 50, 0.3); }
+.hx-card-arrow { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #dff27f; color: #173f32; font-weight: 800; transition: transform .2s ease; }
+.hx-card-link:hover .hx-card-arrow { transform: translateX(3px); }
+.hx-card-link span:first-child { white-space: nowrap; }
