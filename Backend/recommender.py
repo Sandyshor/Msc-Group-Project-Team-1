@@ -43,6 +43,19 @@ NEIGHBOURHOOD_PLACES_CSV = os.path.join(os.path.dirname(SAFETY_CSV), "neighbourh
 # each result links to Daft.ie / Rent.ie searches for its district instead.
 RESIDENCES_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "accommodation",
                               "student_residences.csv")
+# Published prices for the residences (operators' and universities' own pages, checked by hand; see the Source and
+# Checked columns). Weekly prices are turned into monthly ones (x 52 / 12). Residences without published prices
+# (Trinity's own halls, some DCU blocks, operators that only quote on request) are listed without one.
+RESIDENCE_PRICES_CSV = os.path.join(os.path.dirname(RESIDENCES_CSV), "student_residence_prices.csv")
+# The same prices split by room type (shared/twin room, private room, studio), where the residence shows them separately.
+RESIDENCE_ROOMS_CSV = os.path.join(os.path.dirname(RESIDENCES_CSV), "student_residence_rooms.csv")
+# Student room type -> (accommodation key, label, how to say it in a sentence)
+STUDENT_ROOM_TYPES = {
+    "shared": ("student_shared", "Student Accommodation · Shared Room", "a shared room in student accommodation"),
+    "private": ("student_private", "Student Accommodation · Private Room", "a private room in student accommodation"),
+    "studio": ("student_studio", "Student Accommodation · Studio", "a studio in student accommodation"),
+}
+WEEKS_PER_MONTH = 52 / 12
 
 # Same commute file as "Recommendation system.py" (all universities). Until it's
 # uploaded to Data/, fall back to the TU Dublin Grangegorman-only file.
@@ -316,23 +329,90 @@ def load_safety_maps(shapes_path=SAFETY_MAP_GEOJSON, eds_path=SAFETY_EDS_CSV,
             for area, features in maps.items()}
 
 
-def load_residences(path=RESIDENCES_CSV):
-    """{area: [student residences]} (name, operator, website, address, lon/lat); {} if the file isn't there."""
+def load_residence_prices(path=RESIDENCE_PRICES_CSV):
+    """{residence name: price info}: monthly from/to (euro), weekly from/to when quoted weekly, room types, notes,
+    source page and date checked. {} if the file isn't there."""
     if not os.path.exists(path):
         return {}
+    prices = {}
+    for _, r in pd.read_csv(path).iterrows():
+        wf, wt = _none_if_nan(r["Weekly_From"]), _none_if_nan(r["Weekly_To"])
+        mf, mt = _none_if_nan(r["Monthly_From"]), _none_if_nan(r["Monthly_To"])
+        if mf is None and wf is not None:
+            mf = float(wf) * WEEKS_PER_MONTH
+        if mt is None and wt is not None:
+            mt = float(wt) * WEEKS_PER_MONTH
+        if mf is None:
+            continue
+        prices[r["Name"]] = {
+            "monthly_from": round(float(mf)), "monthly_to": round(float(mt)) if mt is not None else None,
+            "weekly_from": float(wf) if wf is not None else None, "weekly_to": float(wt) if wt is not None else None,
+            "room_types": _none_if_nan(r["Room_Types"]), "notes": _none_if_nan(r["Notes"]),
+            "source": _none_if_nan(r["Source"]), "checked": _none_if_nan(r["Checked"]),
+        }
+    return prices
+
+
+def load_residence_rooms(path=RESIDENCE_ROOMS_CSV):
+    """{residence name: {"shared"|"private"|"studio": price}}, monthly from/to (euro) and weekly when quoted weekly."""
+    if not os.path.exists(path):
+        return {}
+    rooms = {}
+    for _, r in pd.read_csv(path).iterrows():
+        wf, wt = _none_if_nan(r["Weekly_From"]), _none_if_nan(r["Weekly_To"])
+        mf, mt = _none_if_nan(r["Monthly_From"]), _none_if_nan(r["Monthly_To"])
+        mf = float(mf) if mf is not None else (float(wf) * WEEKS_PER_MONTH if wf is not None else None)
+        mt = float(mt) if mt is not None else (float(wt) * WEEKS_PER_MONTH if wt is not None else None)
+        if mf is None:
+            continue
+        rooms.setdefault(r["Name"], {})[r["Category"]] = {
+            "monthly_from": round(mf), "monthly_to": round(mt) if mt is not None else None,
+            "weekly_from": float(wf) if wf is not None else None, "weekly_to": float(wt) if wt is not None else None,
+            "note": _none_if_nan(r["Note"]),
+        }
+    return rooms
+
+
+def load_residences(path=RESIDENCES_CSV, prices=None):
+    """{area: [student residences]} (name, operator, website, address, lon/lat, price); {} if the file isn't there.
+    Residences with a published price come first, cheapest first."""
+    if not os.path.exists(path):
+        return {}
+    prices = load_residence_prices() if prices is None else prices
+    rooms = load_residence_rooms()
     res = pd.read_csv(path)
-    return {area: [{"name": r["Name"], "operator": _none_if_nan(r["Operator"]), "website": _none_if_nan(r["Website"]),
-                    "address": _none_if_nan(r.get("Address")), "lon": _none_if_nan(r["lon"]), "lat": _none_if_nan(r["lat"]),
-                    "approximate_position": str(r.get("Position", "")).startswith("street")}
-                   for _, r in group.iterrows()]
-            for area, group in res.groupby("District")}
+    out = {}
+    for area, group in res.groupby("District"):
+        items = [{"name": r["Name"], "operator": _none_if_nan(r["Operator"]), "website": _none_if_nan(r["Website"]),
+                  "address": _none_if_nan(r.get("Address")), "lon": _none_if_nan(r["lon"]), "lat": _none_if_nan(r["lat"]),
+                  "approximate_position": str(r.get("Position", "")).startswith("street"),
+                  "price": prices.get(r["Name"]), "rooms": rooms.get(r["Name"], {})}
+                 for _, r in group.iterrows()]
+        items.sort(key=lambda x: (x["price"] is None, x["price"]["monthly_from"] if x["price"] else 0))
+        out[area] = items
+    return out
+
+
+def student_accommodation_rent(residences, room_type=None):
+    """Typical student-residence rent per district: the median starting monthly price of its residences that
+    publish one (for one room type when given), and how many residences that is based on."""
+    rent, count = {}, {}
+    for area, items in residences.items():
+        if room_type:
+            starts = [x["rooms"][room_type]["monthly_from"] for x in items if room_type in x.get("rooms", {})]
+        else:
+            starts = [x["price"]["monthly_from"] for x in items if x.get("price")]
+        if starts:
+            rent[area] = float(np.median(starts))
+            count[area] = len(starts)
+    return pd.Series(rent, dtype=float), pd.Series(count, dtype=int)
 
 
 def search_links(area, accommodation, budget):
     """Rental searches for the district on Daft.ie and Rent.ie, both filtered to the budget and room type."""
     n = area[1:].lower()  # "D6W" -> "6w"
     budget = int(budget)
-    if accommodation in ("shared_room", "private_room"):
+    if accommodation in ("shared_room", "private_room") or accommodation.startswith("student"):
         daft = f"https://www.daft.ie/sharing/dublin-{n}-dublin?rentalPrice_to={budget}"
         rent_ie = f"https://www.rent.ie/rooms-to-rent/renting_dublin/dublin-{n}/rent_0-{budget}/"
         what = "Rooms"
@@ -445,6 +525,10 @@ def load_data():
         agencies["PSRA_Licence"] = agencies["PSRA_Licence"].apply(lambda x: x.zfill(6) if x else "")
     else:
         agencies = pd.DataFrame(columns=["Name", "Areas", "Address", "Website", "PSRA_Licence"])
+    residences = load_residences()
+    student_rent, student_counts = student_accommodation_rent(residences)
+    student_by_type = {key: (label, *student_accommodation_rent(residences, kind))
+                       for kind, (key, label, _) in STUDENT_ROOM_TYPES.items()}
     return {
         "area_data": area_data,
         "agencies": agencies,
@@ -459,19 +543,25 @@ def load_data():
         # Parts of each district (neighbourhoods and commute points) that are scored individually
         "parts": parts,
         "neighbourhood_commute": neighbourhood_commute,
-        "rent_listings": {"shared_room": shared_listings, "private_room": private_listings},
+        # for student accommodation: how many residences with a published price are behind the district's figure
+        "rent_listings": {"shared_room": shared_listings, "private_room": private_listings,
+                          "student_accommodation": student_counts,
+                          **{key: counts for key, (_, _, counts) in student_by_type.items()}},
         # room rent of the parts with enough listings of their own: (Area, Part) -> mean, count
         "part_rent": {"shared_room": _part_room_rent(room_data[is_shared]),
                       "private_room": _part_room_rent(room_data[is_private])},
         "universities": sorted(commute_by_university["University"].unique()),
         "safety": load_safety(),
         "safety_maps": load_safety_maps(),
-        "residences": load_residences(),
+        "residences": residences,
         "rent_tables": {
             "shared_room": ("Shared Room", shared_room_rent),
             "private_room": ("Private Room", private_room_rent),
             "one_bed": ("One Bedroom Apartment", one_bed_rent),
             "two_bed": ("Two Bedroom Apartment", two_bed_rent),
+            # purpose-built student residences: typical starting price in each district that has them
+            "student_accommodation": ("Student Accommodation", student_rent),
+            **{key: (label, rent) for key, (label, rent, _) in student_by_type.items()},
         },
     }
 
@@ -713,7 +803,8 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
     """
     university:    one of data["universities"], e.g. "TU Dublin - Grangegorman"
     budget:        max monthly budget in euro
-    accommodation: shared_room | private_room | one_bed | two_bed
+    accommodation: shared_room | private_room | one_bed | two_bed | student_accommodation (any room) |
+                   student_shared | student_private | student_studio
     importance:    {factor name: 0-10} for every factor (the website's sliders), or instead
     ratings:       {factor name: 1-4} for every factor, as in "Recommendation system.py"
     travel_mode:   public_transport | walk | cycle
@@ -761,6 +852,10 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
         raise RecommendationError(f"Please rate every factor. Missing: {', '.join(missing)}")
 
     accommodation_name, selected_rent = data["rent_tables"][accommodation]
+    # how to say it in a sentence ("a private room", "a room in student accommodation")
+    student_phrases = {key: phrase for key, _, phrase in STUDENT_ROOM_TYPES.values()}
+    accommodation_phrase = ("a room in student accommodation" if accommodation == "student_accommodation"
+                            else student_phrases.get(accommodation, f"a {accommodation_name.lower()}"))
     weights = importance
     active_factors = [name for name, w in weights.items() if w > 0]
     if not active_factors:
@@ -905,7 +1000,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             return f"has a shorter commute to {university} than most areas (about {value:.0f} minutes {mode_words})"
         if factor["kind"] == "rent":
             if value == ranked[col].min():
-                return f"is the cheapest area for a {accommodation_name.lower()} (€{value:,.0f} a month)"
+                return f"is the cheapest area for {accommodation_phrase} (€{value:,.0f} a month)"
             return f"has lower rent than most areas (€{value:,.0f} a month)"
         if factor["kind"] == "safety":
             if value == ranked[col].max():
@@ -1103,7 +1198,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
     top = ranked.head(top_n)
     if (top["Budget Status"] == "Above budget").all():
         affordable = ranked[ranked["Budget Status"] == "Within budget"]
-        warning = f"None of the top {len(top)} areas fit your €{budget:,.0f} budget for a {accommodation_name.lower()}."
+        warning = f"None of the top {len(top)} areas fit your €{budget:,.0f} budget for {accommodation_phrase}."
         if not affordable.empty:
             best = affordable.loc[affordable["Match Score"].idxmax()]
             warning += (f" {best['Label']} does fit your budget (€{best['Rent']:,.0f}/month), but ranked lower "

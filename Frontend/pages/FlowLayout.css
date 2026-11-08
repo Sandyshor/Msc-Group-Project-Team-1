@@ -1224,3 +1224,31 @@
 .flow-page-results .flow-panel .flow-progress { height: 6px; margin: 10px 0 18px; }
 .flow-page-results .flow-panel h1 { margin-bottom: 4px; }
 .flow-page-results .flow-summary { margin: 6px 0 10px; }
+
+/* student room types, shown under Accommodation when "Student accommodation" is picked */
+.student-rooms { margin-top: 12px; animation: student-in .3s ease both; }
+@keyframes student-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.student-rooms-q { margin: 0 0 8px; color: #173f32; font-size: 14px; font-weight: 700; }
+.student-rooms-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.student-room {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1.5px solid #ddd6c6;
+  border-radius: 14px;
+  background: #fff;
+  color: #173f32;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.student-room:hover { border-color: #9cbfa6; transform: translateY(-1px); }
+.student-room strong { font-size: 14.5px; }
+.student-room span { color: #5f6f67; font-size: 12.5px; line-height: 1.35; }
+.student-room em { color: #a8753f; font-size: 12px; font-style: normal; font-weight: 700; }
+.student-room.is-on { border-color: #173f32; background: #173f32; color: #fff; }
+.student-room.is-on span { color: rgba(255, 255, 255, 0.8); }
+.student-room.is-on em { color: #dff27f; }
+.student-room:focus-visible { outline: 3px solid #dff27f; outline-offset: 2px; }
+@media (max-width: 520px) { .student-rooms-grid { grid-template-columns: 1fr; } }

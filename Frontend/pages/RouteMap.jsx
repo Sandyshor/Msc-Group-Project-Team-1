@@ -294,7 +294,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, mode, defa
         const routes = new Set()
         ;(bus?.features || []).forEach((f) => {
           const [lng, lat] = f.geometry.coordinates
-          if (f.properties.routes && metres(from, [lat, lng]) <= 400) f.properties.routes.split(';').forEach((r) => r.trim() && routes.add(r.trim()))
+          if (f.properties.routes && metres(from, [lat, lng]) <= 400) f.properties.routes.split(';').forEach((r) => { const v = r.trim(); if (v && !/^(none|n\/a|unknown)$/i.test(v)) routes.add(v) })
         })
         const nearest = stations.map((st) => ({ ...st, m: metres(from, [st.lat, st.lng]) })).sort((a, b) => a.m - b.m)[0]
         setNear({ kind: 'transit', busRoutes: [...routes].sort(naturalSort), station: nearest })
