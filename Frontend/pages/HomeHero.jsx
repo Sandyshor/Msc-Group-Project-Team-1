@@ -86,6 +86,10 @@ export default function HomeHero() {
           <li><span className="hx-tick green"><Icon name="check" /></span>Check commute to your university</li>
           <li><span className="hx-tick green"><Icon name="check" /></span>Explore amenities &amp; student life</li>
         </ul>
+        <Link className="hx-card-link" to="/things-to-know">
+          <span>New here? <b>Things to know</b></span>
+          <span className="hx-card-arrow" aria-hidden="true">→</span>
+        </Link>
       </aside>
 
       <p className="hx-place">

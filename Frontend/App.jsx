@@ -1,5 +1,6 @@
 import './App.css'
-import { useState } from 'react'
+import './HeaderMenu.css'
+import { useEffect, useRef, useState } from 'react'
 import { Routes, Route, Link, NavLink, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import HowItWorks from './pages/Howitworks'
@@ -15,14 +16,27 @@ import SiteFooter from './SiteFooter'
 import ChatWidget from './ChatWidget'
 import BrandLogo from './BrandLogo'
 import InfoPage from './pages/InfoPages'
+import ThingsToKnow from './pages/ThingsToKnow'
 
 function App() {
   const location = useLocation()
   const [tourOpen, setTourOpen] = useState(false)
+  // The menu button appears when the header runs out of room (narrow windows or a zoomed-in browser)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const headerRef = useRef(null)
+  useEffect(() => { setMenuOpen(false) }, [location.pathname])
+  useEffect(() => {
+    if (!menuOpen) return undefined
+    const onKey = (e) => { if (e.key === 'Escape') setMenuOpen(false) }
+    const onClick = (e) => { if (!headerRef.current?.contains(e.target)) setMenuOpen(false) }
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('mousedown', onClick)
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('mousedown', onClick) }
+  }, [menuOpen])
 
   return (
     <div className="site-shell">
-      <header className={`navbar ${location.pathname === '/' ? 'navbar-home' : ''}`}>
+      <header ref={headerRef} className={`navbar ${location.pathname === '/' ? 'navbar-home' : ''}${menuOpen ? ' menu-open' : ''}`}>
         
 <BrandLogo light={location.pathname !== '/'} />
 
@@ -61,7 +75,27 @@ function App() {
     <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" /></svg>
     Log in
   </Link>
+
+  <button type="button" className="menu-toggle" aria-label="Menu" aria-expanded={menuOpen} aria-controls="site-menu" onClick={() => setMenuOpen((v) => !v)}>
+    <span className="menu-bars" aria-hidden="true"><i /><i /><i /></span>
+    <span className="menu-label">Menu</span>
+  </button>
 </div>
+
+{menuOpen && (
+  <nav id="site-menu" className="site-menu" aria-label="Menu">
+    <NavLink to="/" end>Home</NavLink>
+    <NavLink to="/districts">Explore districts</NavLink>
+    <NavLink to="/campuses">Universities</NavLink>
+    <NavLink to="/attractions">Famous attractions</NavLink>
+    <NavLink to="/things-to-know">Things to know</NavLink>
+    <NavLink to="/how-it-works">How it works</NavLink>
+    <div className="site-menu-row">
+      <button type="button" onClick={() => { setMenuOpen(false); setTourOpen(true) }}>Take a tour</button>
+      <Link to="/login">Log in</Link>
+    </div>
+  </nav>
+)}
 
       </header>
 
@@ -77,6 +111,7 @@ function App() {
           <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/things-to-know" element={<ThingsToKnow />} />
           <Route path="/terms" element={<InfoPage page="terms" />} />
           <Route path="/privacy" element={<InfoPage page="privacy" />} />
           <Route path="/contact" element={<InfoPage page="contact" />} />

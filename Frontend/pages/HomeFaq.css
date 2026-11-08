@@ -1,0 +1,72 @@
+/* Home FAQ: follows on from the green film section */
+.faq {
+  padding: 84px 7% 90px;
+  background:
+    radial-gradient(60% 50% at 0% 0%, rgba(223, 242, 127, 0.18), transparent 60%),
+    #f4f1e8;
+  color: #1f2a24;
+  font-family: 'DM Sans', sans-serif;
+}
+.faq-inner { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.3fr); gap: clamp(30px, 5vw, 80px); align-items: start; max-width: 1400px; margin: 0 auto; }
+.faq-intro { position: sticky; top: 110px; }
+.faq-kicker { margin: 0 0 12px; color: #a8753f; font-size: 13px; font-weight: 800; letter-spacing: .18em; }
+.faq h2 {
+  margin: 0;
+  color: #173f32;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(36px, 3.6vw, 56px);
+  font-weight: 700;
+  font-variation-settings: 'opsz' 72, 'WONK' 0;
+  line-height: 1.05;
+}
+.faq h2 em { display: block; color: #2f7a5a; font-style: italic; }
+.faq-lead { margin: 16px 0 0; color: #4d5a52; font-size: 17px; line-height: 1.6; }
+.faq-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.faq-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border: 1.5px solid #cfd9c9; border-radius: 999px; background: #fff; color: #173f32; font: inherit; font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.faq-btn:hover { transform: translateY(-2px); border-color: #245b48; }
+.faq-btn-solid { border-color: #173f32; background: #173f32; color: #fff; box-shadow: 0 10px 24px rgba(23, 63, 50, 0.22); }
+.faq-btn:focus-visible { outline: 3px solid #dff27f; outline-offset: 2px; }
+
+.faq-list { display: grid; gap: 12px; }
+.faq-item { border: 1px solid #e6dfcf; border-radius: 20px; background: #fffdf8; box-shadow: 0 4px 14px rgba(23, 63, 50, 0.05); transition: box-shadow .25s ease, border-color .25s ease; }
+.faq-item:hover { border-color: #cfdcc8; }
+.faq-item.is-open { border-color: #b9d6b0; box-shadow: 0 16px 34px rgba(23, 63, 50, 0.1); }
+.faq-item h3 { margin: 0; }
+.faq-item button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 20px 22px;
+  border: 0;
+  background: transparent;
+  color: #173f32;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.faq-item button:focus-visible { outline: 3px solid #dff27f; outline-offset: -3px; border-radius: 20px; }
+.faq-n { color: #b0a58e; font-family: 'Fraunces', Georgia, serif; font-size: 18px; font-weight: 700; transition: color .2s ease; }
+.faq-item.is-open .faq-n { color: #2f7a5a; }
+.faq-q { flex: 1; font-size: clamp(17px, 1.25vw, 19.5px); font-weight: 700; line-height: 1.35; }
+.faq-plus { position: relative; flex: none; width: 34px; height: 34px; border-radius: 50%; background: #f1ece0; transition: background .25s ease, transform .35s cubic-bezier(.3, 1.4, .5, 1); }
+.faq-plus::before, .faq-plus::after { content: ""; position: absolute; top: 50%; left: 50%; width: 14px; height: 2px; border-radius: 2px; background: #173f32; transform: translate(-50%, -50%); transition: transform .3s ease, background .25s ease; }
+.faq-plus::after { transform: translate(-50%, -50%) rotate(90deg); }
+.faq-item.is-open .faq-plus { background: #173f32; transform: rotate(180deg); }
+.faq-item.is-open .faq-plus::before, .faq-item.is-open .faq-plus::after { background: #dff27f; }
+.faq-item.is-open .faq-plus::after { transform: translate(-50%, -50%) rotate(0deg); }
+
+/* smooth open/close with a grid-rows trick */
+.faq-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+.faq-item.is-open .faq-a { grid-template-rows: 1fr; }
+.faq-a > div { overflow: hidden; }
+.faq-a p { margin: 0; padding: 0 22px 22px 72px; color: #3e4b43; font-size: 16px; line-height: 1.65; }
+.faq-a a { color: #245b48; font-weight: 700; }
+
+@media (max-width: 900px) {
+  .faq { padding: 64px 6% 70px; }
+  .faq-inner { grid-template-columns: 1fr; }
+  .faq-intro { position: static; }
+  .faq-a p { padding-left: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .faq-a, .faq-plus, .faq-plus::before, .faq-plus::after { transition: none; } }
