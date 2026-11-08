@@ -1,9 +1,10 @@
-/* Menu button + dropdown for when the header runs out of room (narrow windows, or a zoomed-in browser) */
+/* Menu button + dropdown for when the header runs out of room */
 .menu-toggle { display: none; }
-@media (max-width: 1250px) {
-  .navbar .nav-links, .navbar .tour-trigger, .navbar .login-link { display: none; }
-  .navbar { flex-wrap: nowrap; }
-  .menu-toggle {
+/* Shown when the header has set .nav-compact on itself because the full row of links doesn't fit
+   (narrow or zoomed windows, Windows display scaling, longer translations). See useCompactHeader in App.jsx. */
+  .navbar.nav-compact .nav-links, .navbar.nav-compact .tour-trigger, .navbar.nav-compact .login-link { display: none; }
+  .navbar.nav-compact { flex-wrap: nowrap; }
+  .nav-compact .menu-toggle {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -18,17 +19,17 @@
     font-weight: 700;
     cursor: pointer;
   }
-  .navbar-home .menu-toggle { border-color: rgba(18, 61, 49, 0.35); color: #123d31; }
-  .menu-toggle:hover { background: rgba(255, 255, 255, 0.1); }
-  .navbar-home .menu-toggle:hover { background: rgba(18, 61, 49, 0.06); }
-  .menu-toggle:focus-visible { outline: 2px solid #e6cda0; outline-offset: 2px; }
-  .menu-bars { position: relative; display: inline-grid; gap: 3.5px; width: 16px; }
-  .menu-bars i { display: block; height: 2px; border-radius: 2px; background: currentColor; transition: transform .25s ease, opacity .2s ease; }
-  .menu-open .menu-bars i:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
-  .menu-open .menu-bars i:nth-child(2) { opacity: 0; }
-  .menu-open .menu-bars i:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+  .navbar-home.nav-compact .menu-toggle { border-color: rgba(18, 61, 49, 0.35); color: #123d31; }
+  .nav-compact .menu-toggle:hover { background: rgba(255, 255, 255, 0.1); }
+  .navbar-home.nav-compact .menu-toggle:hover { background: rgba(18, 61, 49, 0.06); }
+  .nav-compact .menu-toggle:focus-visible { outline: 2px solid #e6cda0; outline-offset: 2px; }
+  .nav-compact .menu-bars { position: relative; display: inline-grid; gap: 3.5px; width: 16px; }
+  .nav-compact .menu-bars i { display: block; height: 2px; border-radius: 2px; background: currentColor; transition: transform .25s ease, opacity .2s ease; }
+  .nav-compact.menu-open .menu-bars i:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  .nav-compact.menu-open .menu-bars i:nth-child(2) { opacity: 0; }
+  .nav-compact.menu-open .menu-bars i:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
 
-  .site-menu {
+  .nav-compact .site-menu {
     position: absolute;
     z-index: 1200;
     top: calc(100% + 10px);
@@ -46,7 +47,7 @@
     transform-origin: top right;
   }
   @keyframes menu-in { from { opacity: 0; transform: translateY(-6px) scale(.97); } to { opacity: 1; transform: none; } }
-  .site-menu a, .site-menu button {
+  .nav-compact .site-menu a, .nav-compact .site-menu button {
     display: block;
     padding: 11px 14px;
     border: 0;
@@ -60,11 +61,11 @@
     text-decoration: none;
     cursor: pointer;
   }
-  .site-menu a:hover, .site-menu button:hover { background: #f1ece0; }
-  .site-menu a.active { background: #dff3d4; font-weight: 800; }
-  .site-menu-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; padding-top: 8px; border-top: 1px solid #efe9db; }
-  .site-menu-row a, .site-menu-row button { border: 1.5px solid #d9d2c1; border-radius: 999px; font-size: 14.5px; font-weight: 700; text-align: center; }
-}
+  .nav-compact .site-menu a:hover, .nav-compact .site-menu button:hover { background: #f1ece0; }
+  .nav-compact .site-menu a.active { background: #dff3d4; font-weight: 800; }
+  .nav-compact .site-menu-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; padding-top: 8px; border-top: 1px solid #efe9db; }
+  .nav-compact .site-menu-row a, .nav-compact .site-menu-row button { border: 1.5px solid #d9d2c1; border-radius: 999px; font-size: 14.5px; font-weight: 700; text-align: center; }
+
 /* phones: one tidy row instead of the stacked header */
 @media (max-width: 700px) {
   .navbar, .navbar-home { flex-wrap: nowrap !important; gap: 8px !important; }
@@ -87,3 +88,32 @@
   .nav-actions { gap: 6px; }
   .menu-toggle { width: 38px; height: 38px; }
 }
+
+/* Used for one synchronous measurement: lay the full header out on one line without shrinking anything */
+.navbar.nav-measure { flex-wrap: nowrap !important; }
+.navbar.nav-measure { justify-content: flex-start !important; }
+.navbar.nav-measure > * { flex: 0 0 auto !important; width: auto !important; max-width: none !important; margin-inline: 0 !important; }
+.navbar.nav-measure > *, .navbar.nav-measure .nav-links > *, .navbar.nav-measure .nav-actions > * { flex-shrink: 0 !important; white-space: nowrap !important; }
+
+/* Tighter header levels, tried (in order) before falling back to the Menu button */
+.navbar.nav-tight-1 { gap: 14px; }
+.navbar.nav-tight-1 .nav-links { gap: 2px; }
+.navbar.nav-tight-1 .nav-links a { font-size: 15.5px; padding-inline: 9px; }
+.navbar.nav-tight-1 .nav-links a.active { padding-inline: 12px; }
+.navbar.nav-tight-1 .nav-actions { gap: 8px; }
+.navbar.nav-tight-1 .brand-wordmark { width: 180px; height: 38px; }
+.navbar.nav-tight-1 .brand-logo { width: 42px; height: 50px; }
+.navbar.nav-tight-1 .nav-cta { padding-inline: 18px; }
+.navbar.nav-tight-1 .tour-trigger, .navbar.nav-tight-1 .login-link { padding-inline: 12px; }
+
+.navbar.nav-tight-2 { gap: 10px; }
+.navbar.nav-tight-2 .nav-links { gap: 0; }
+.navbar.nav-tight-2 .nav-links a { font-size: 14px; padding-inline: 7px; }
+.navbar.nav-tight-2 .nav-links a.active { padding-inline: 10px; }
+.navbar.nav-tight-2 .nav-actions { gap: 6px; }
+.navbar.nav-tight-2 .brand-wordmark { width: 150px; height: 32px; }
+.navbar.nav-tight-2 .brand-logo { width: 38px; height: 46px; }
+.navbar.nav-tight-2 .nav-cta { padding: 10px 14px; font-size: 14px; }
+.navbar.nav-tight-2 .tour-trigger, .navbar.nav-tight-2 .login-link { padding: 9px 10px; font-size: 14px; }
+.navbar.nav-tight-2 .tour-trigger .nav-icon, .navbar.nav-tight-2 .login-link .nav-icon { display: none; }
+.navbar.nav-tight-2 .lang-switch-button { padding-inline: 10px; }

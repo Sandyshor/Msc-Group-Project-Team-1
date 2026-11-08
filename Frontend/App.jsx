@@ -1,6 +1,6 @@
 import './App.css'
 import './HeaderMenu.css'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Routes, Route, Link, NavLink, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import HowItWorks from './pages/Howitworks'
@@ -18,13 +18,62 @@ import BrandLogo from './BrandLogo'
 import InfoPage from './pages/InfoPages'
 import ThingsToKnow from './pages/ThingsToKnow'
 
+// Fits the header to whatever room it has - window size, browser zoom, Windows display scaling, scrollbars,
+// fonts loading late or longer translations. It tries the full header, then two tighter versions, and only
+// shows the Menu button when none of them fits. Measured before the browser paints, so nothing flickers.
+const HEADER_LEVELS = ['', 'nav-tight-1', 'nav-tight-2', 'nav-compact']
+function useHeaderFit(headerRef, deps) {
+  const [level, setLevel] = useState('')
+  useLayoutEffect(() => {
+    const header = headerRef.current
+    if (!header) return undefined
+    let frame = 0
+    const fitsNow = () => {
+      // every part at its natural width, packed from the left: the last one must end inside the padding
+      const limit = header.getBoundingClientRect().right - parseFloat(getComputedStyle(header).paddingRight)
+      const parts = [...header.children].filter((el) => el.id !== 'site-menu' && getComputedStyle(el).position !== 'absolute' && el.getBoundingClientRect().width > 0)
+      return Math.max(...parts.map((el) => el.getBoundingClientRect().right)) <= limit - 12
+    }
+    const measure = () => {
+      cancelAnimationFrame(frame)
+      const before = HEADER_LEVELS.filter((c) => c && header.classList.contains(c))
+      header.classList.remove(...before)
+      header.classList.add('nav-measure')
+      let chosen = 'nav-compact'
+      for (const c of HEADER_LEVELS.slice(0, -1)) {
+        if (c) header.classList.add(c)
+        const ok = fitsNow()
+        if (c) header.classList.remove(c)
+        if (ok) { chosen = c; break }
+      }
+      header.classList.remove('nav-measure')
+      header.classList.add(...before)
+      setLevel(chosen)
+    }
+    const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(measure) }
+    measure()
+    const ro = new ResizeObserver(schedule)
+    ro.observe(header)
+    window.addEventListener('resize', schedule) // zooming changes the CSS width of the window
+    document.fonts?.ready.then(schedule)
+    // the language switcher rewrites the link text, which can make it longer
+    const mo = new MutationObserver(schedule)
+    header.querySelectorAll('.nav-links, .nav-actions').forEach((el) => mo.observe(el, { subtree: true, childList: true, characterData: true }))
+    return () => { cancelAnimationFrame(frame); ro.disconnect(); mo.disconnect(); window.removeEventListener('resize', schedule) }
+  }, deps) // eslint-disable-line react-hooks/exhaustive-deps
+  return level
+}
+
 function App() {
   const location = useLocation()
   const [tourOpen, setTourOpen] = useState(false)
   // The menu button appears when the header runs out of room (narrow windows or a zoomed-in browser)
   const [menuOpen, setMenuOpen] = useState(false)
   const headerRef = useRef(null)
+  const headerLevel = useHeaderFit(headerRef, [location.pathname])
+  const compact = headerLevel === 'nav-compact'
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
+  useEffect(() => { if (!compact) setMenuOpen(false) }, [compact])
   useEffect(() => {
     if (!menuOpen) return undefined
     const onKey = (e) => { if (e.key === 'Escape') setMenuOpen(false) }
@@ -36,7 +85,7 @@ function App() {
 
   return (
     <div className="site-shell">
-      <header ref={headerRef} className={`navbar ${location.pathname === '/' ? 'navbar-home' : ''}${menuOpen ? ' menu-open' : ''}`}>
+      <header ref={headerRef} className={`navbar ${location.pathname === '/' ? 'navbar-home' : ''}${headerLevel ? ` ${headerLevel}` : ''}${menuOpen ? ' menu-open' : ''}`}>
         
 <BrandLogo light={location.pathname !== '/'} />
 
