@@ -6,12 +6,13 @@ Same data, factors, scoring and explanations as the notebook/terminal script, bu
   * there are no input() prompts - the student's answers are passed to recommend(),
   * results are returned as JSON-friendly dicts instead of printed.
 """
-import json
 import os
 import re
 
 import numpy as np
 import pandas as pd
+
+import datastore  # PostgreSQL when DATABASE_URL is set, otherwise the data files
 
 DATA_FOLDER = os.environ.get(
     "DATA_FOLDER",
@@ -219,9 +220,9 @@ def _crime(row, prefix=""):
 
 def load_neighbourhoods(path=SAFETY_NEIGHBOURHOODS_CSV):
     """{area: [neighbourhood safety figures, safest first]}; {} if the file isn't there."""
-    if not os.path.exists(path):
+    if not datastore.exists(path):
         return {}
-    nb = pd.read_csv(path).sort_values(["safety_index_0_100", "Neighbourhood"], ascending=[False, True])
+    nb = datastore.read_csv(path).sort_values(["safety_index_0_100", "Neighbourhood"], ascending=[False, True])
     return {
         area: [{"name": row.get("Label", row["Neighbourhood"]),
                 "score": _round_or_none(row["safety_index_0_100"], 1),
@@ -237,17 +238,17 @@ def load_neighbourhoods(path=SAFETY_NEIGHBOURHOODS_CSV):
 
 def load_safety(path=SAFETY_CSV, context_path=SAFETY_CONTEXT_CSV, neighbourhoods_path=SAFETY_NEIGHBOURHOODS_CSV):
     """{area: safety figures} from safety_indicators.csv (+ context and neighbourhoods if present); {} without the first."""
-    if not os.path.exists(path):
+    if not datastore.exists(path):
         return {}
     neighbourhoods = load_neighbourhoods(neighbourhoods_path)
     parts = {}
-    if os.path.exists(DISTRICT_STATIONS_CSV):
-        for area, group in pd.read_csv(DISTRICT_STATIONS_CSV).groupby("District"):
+    if datastore.exists(DISTRICT_STATIONS_CSV):
+        for area, group in datastore.read_csv(DISTRICT_STATIONS_CSV).groupby("District"):
             parts[area] = [{"station": r["Station"].title(), "share_pct": _percent(r["share"]),
                             "score": _round_or_none(r["station_score"], 1)} for _, r in group.iterrows()]
-    safety = pd.read_csv(path)
-    if os.path.exists(context_path):
-        context = pd.read_csv(context_path)[["District", "lit_share_tagged", "night_transit_coverage"]]
+    safety = datastore.read_csv(path)
+    if datastore.exists(context_path):
+        context = datastore.read_csv(context_path)[["District", "lit_share_tagged", "night_transit_coverage"]]
         safety = safety.merge(context, on="District", how="left")
     out = {}
     for _, row in safety.iterrows():
@@ -290,24 +291,23 @@ def load_safety_maps(shapes_path=SAFETY_MAP_GEOJSON, eds_path=SAFETY_EDS_CSV,
                      outlines_path=SAFETY_MAP_DISTRICTS_GEOJSON):
     """{area: heat map} - the district's ED areas with their safety scores, its outline (or None), and its named
     neighbourhoods (name, score, lon/lat) for labels. {} if the shapes or ED scores aren't there."""
-    if not (os.path.exists(shapes_path) and os.path.exists(eds_path)):
+    if not (datastore.exists(shapes_path) and datastore.exists(eds_path)):
         return {}
-    with open(shapes_path) as f:
-        shapes = json.load(f)["features"]
-    eds = pd.read_csv(eds_path).set_index("ED_GUID")
+    shapes = datastore.read_geojson(shapes_path)["features"]
+    eds = datastore.read_csv(eds_path).set_index("ED_GUID")
     places = {}
-    if os.path.exists(places_path) and os.path.exists(neighbourhoods_path):
-        nb = pd.read_csv(neighbourhoods_path).merge(
-            pd.read_csv(places_path)[["District", "Neighbourhood", "lon", "lat"]], on=["District", "Neighbourhood"])
+    if datastore.exists(places_path) and datastore.exists(neighbourhoods_path):
+        nb = datastore.read_csv(neighbourhoods_path).merge(
+            datastore.read_csv(places_path)[["District", "Neighbourhood", "lon", "lat"]], on=["District", "Neighbourhood"])
         for area, group in nb.groupby("District"):
             places[area] = [{"name": r.get("Label", r["Neighbourhood"]), "score": _round_or_none(r["safety_index_0_100"], 1),
                              "tier": _none_if_nan(r.get("tier")),
                              "check_street": bool(r.get("check_street", False)),
                              "lon": r["lon"], "lat": r["lat"]} for _, r in group.iterrows()]
     outlines = {}
-    if os.path.exists(outlines_path):
-        with open(outlines_path) as f:
-            outlines = {o["properties"]["District"]: o["geometry"] for o in json.load(f)["features"]}
+    if datastore.exists(outlines_path):
+        outlines = {o["properties"]["District"]: o["geometry"]
+                    for o in datastore.read_geojson(outlines_path)["features"]}
     maps = {}
     for f in shapes:
         guid = f["properties"]["ED_GUID"]
@@ -332,10 +332,10 @@ def load_safety_maps(shapes_path=SAFETY_MAP_GEOJSON, eds_path=SAFETY_EDS_CSV,
 def load_residence_prices(path=RESIDENCE_PRICES_CSV):
     """{residence name: price info}: monthly from/to (euro), weekly from/to when quoted weekly, room types, notes,
     source page and date checked. {} if the file isn't there."""
-    if not os.path.exists(path):
+    if not datastore.exists(path):
         return {}
     prices = {}
-    for _, r in pd.read_csv(path).iterrows():
+    for _, r in datastore.read_csv(path).iterrows():
         wf, wt = _none_if_nan(r["Weekly_From"]), _none_if_nan(r["Weekly_To"])
         mf, mt = _none_if_nan(r["Monthly_From"]), _none_if_nan(r["Monthly_To"])
         if mf is None and wf is not None:
@@ -357,10 +357,10 @@ def load_residence_prices(path=RESIDENCE_PRICES_CSV):
 
 def load_residence_rooms(path=RESIDENCE_ROOMS_CSV):
     """{residence name: {"shared"|"private"|"studio": price}}, monthly from/to (euro) and weekly when quoted weekly."""
-    if not os.path.exists(path):
+    if not datastore.exists(path):
         return {}
     rooms = {}
-    for _, r in pd.read_csv(path).iterrows():
+    for _, r in datastore.read_csv(path).iterrows():
         wf, wt = _none_if_nan(r["Weekly_From"]), _none_if_nan(r["Weekly_To"])
         mf, mt = _none_if_nan(r["Monthly_From"]), _none_if_nan(r["Monthly_To"])
         mf = float(mf) if mf is not None else (float(wf) * WEEKS_PER_MONTH if wf is not None else None)
@@ -378,11 +378,11 @@ def load_residence_rooms(path=RESIDENCE_ROOMS_CSV):
 def load_residences(path=RESIDENCES_CSV, prices=None):
     """{area: [student residences]} (name, operator, website, address, lon/lat, price); {} if the file isn't there.
     Residences with a published price come first, cheapest first."""
-    if not os.path.exists(path):
+    if not datastore.exists(path):
         return {}
     prices = load_residence_prices() if prices is None else prices
     rooms = load_residence_rooms()
-    res = pd.read_csv(path)
+    res = datastore.read_csv(path)
     out = {}
     for area, group in res.groupby("District"):
         items = [{"name": r["Name"], "operator": _none_if_nan(r["Operator"]), "website": _none_if_nan(r["Website"]),
@@ -463,25 +463,25 @@ def search_links(area, accommodation, budget):
 
 def load_data():
     # Refreshed weekly from OpenStreetMap by refresh_amenities.py
-    places = _clean_columns(pd.read_csv(_path("amenities_osm.csv")))
-    room_files = [file for file in ROOM_FILES if os.path.exists(_path(file))]
+    places = _clean_columns(datastore.read_csv(_path("amenities_osm.csv")))
+    room_files = [file for file in ROOM_FILES if datastore.exists(_path(file))]
     missing = sorted(set(ROOM_FILES) - set(room_files))
     if missing:
         # a renamed or deleted upload shouldn't take the whole website down - those districts have no room rent
         print(f"WARNING: rent files not found in Data/, skipping: {', '.join(missing)}")
     room_data = pd.concat(
-        [_clean_columns(pd.read_excel(_path(file))).rename(columns={"Room Type": "Room type"}) for file in room_files],
+        [_clean_columns(datastore.read_excel(_path(file))).rename(columns={"Room Type": "Room type"}) for file in room_files],
         ignore_index=True,
     )
     room_data["Room type"] = room_data["Room type"].astype(str).str.strip().str.lower()
 
     # Refreshed from the CSO (table RIA02) by refresh_rents.py
-    rtb = _clean_columns(pd.read_csv(_path("RTB_latest.csv"), low_memory=False))
-    census = _clean_columns(pd.read_excel(_path("Dublin_Census_Filled.xlsx")))
-    ethnicity = _clean_columns(pd.read_excel(_path("Dublin_Ethnicity_D1_D24.xlsx")))
+    rtb = _clean_columns(datastore.read_csv(_path("RTB_latest.csv")))
+    census = _clean_columns(datastore.read_excel(_path("Dublin_Census_Filled.xlsx")))
+    ethnicity = _clean_columns(datastore.read_excel(_path("Dublin_Ethnicity_D1_D24.xlsx")))
 
-    commute_file = next(f for f in COMMUTE_FILES if os.path.exists(_path(f)))
-    commutes = _clean_columns(pd.read_csv(_path(commute_file))).rename(columns={"District": "Area"})
+    commute_file = next(f for f in COMMUTE_FILES if datastore.exists(_path(f)))
+    commutes = _clean_columns(datastore.read_csv(_path(commute_file))).rename(columns={"District": "Area"})
     # Several landmark rows per area/university pair - average them into one typical commute.
     commute_by_university = (
         commutes.groupby(["Area", "University"], as_index=False)
@@ -489,7 +489,7 @@ def load_data():
     )
     commute_by_university["Distance"] = commute_by_university["Distance_km"].round(1).astype(str) + " km"
 
-    walking = _clean_columns(pd.read_excel(_path("Dublin_D1_D24_Walking_Distance_and_Time_to_University.xlsx")))
+    walking = _clean_columns(datastore.read_excel(_path("Dublin_D1_D24_Walking_Distance_and_Time_to_University.xlsx")))
     walking = walking.rename(columns={
         "District": "Area",
         "Walking_Distance_to_University_km": "Walking km",
@@ -505,8 +505,8 @@ def load_data():
     commute_points["Cycle km"] = commute_points["Walking km"]
     commute_source = "TFI Journey Planner export (public transport) and walking routes; cycling estimated"
 
-    if os.path.exists(_path(OTP_COMMUTE_FILE)):
-        otp = _clean_columns(pd.read_csv(_path(OTP_COMMUTE_FILE)))
+    if datastore.exists(_path(OTP_COMMUTE_FILE)):
+        otp = _clean_columns(datastore.read_csv(_path(OTP_COMMUTE_FILE)))
         keys = ["Area", "Direction", "Landmark", "University"]
         minutes = otp.pivot_table(index=keys, columns="Mode", values="Minutes")
         km = otp.pivot_table(index=keys, columns="Mode", values="Distance_km")
@@ -554,8 +554,8 @@ def load_data():
             area_data[factor["column"]] = area_data[factor["columns"]].sum(axis=1, skipna=False)
 
     agencies_file = _path("letting_agencies.csv")
-    if os.path.exists(agencies_file):
-        agencies = _clean_columns(pd.read_csv(agencies_file, dtype=str)).fillna("")
+    if datastore.exists(agencies_file):
+        agencies = _clean_columns(datastore.read_csv(agencies_file)).fillna("")
         agencies = agencies.apply(lambda col: col.str.strip())
         agencies["PSRA_Licence"] = agencies["PSRA_Licence"].apply(lambda x: x.zfill(6) if x else "")
     else:
@@ -696,14 +696,14 @@ def _district_parts(commute_points, places, prefer_neighbourhoods=False):
     landmarks["Commute Point"] = landmarks["Part"]
     landmarks["Safety Score"] = np.nan
     columns = ["Area", "Part", "Origin_Latitude", "Origin_Longitude"]
-    if os.path.exists(NEIGHBOURHOOD_PLACES_CSV):
-        hoods = (pd.read_csv(NEIGHBOURHOOD_PLACES_CSV)
+    if datastore.exists(NEIGHBOURHOOD_PLACES_CSV):
+        hoods = (datastore.read_csv(NEIGHBOURHOOD_PLACES_CSV)
                  .rename(columns={"District": "Area", "Neighbourhood": "Part",
                                   "lat": "Origin_Latitude", "lon": "Origin_Longitude"})[columns]
                  .drop_duplicates(["Area", "Part"]).assign(Kind="neighbourhood").reset_index(drop=True))
     else:
         hoods = pd.DataFrame(columns=columns + ["Kind"])
-    safety = pd.read_csv(SAFETY_NEIGHBOURHOODS_CSV) if os.path.exists(SAFETY_NEIGHBOURHOODS_CSV) else None
+    safety = datastore.read_csv(SAFETY_NEIGHBOURHOODS_CSV) if datastore.exists(SAFETY_NEIGHBOURHOODS_CSV) else None
     scores = {} if safety is None else dict(zip(zip(safety["District"], safety["Neighbourhood"]),
                                                 safety["safety_index_0_100"]))
     hoods["Safety Score"] = [scores.get(key, np.nan) for key in zip(hoods["Area"], hoods["Part"])]
@@ -754,9 +754,9 @@ def _district_parts(commute_points, places, prefer_neighbourhoods=False):
 def _load_neighbourhood_commute():
     """OTP times for neighbourhoods, if build_commute_matrix.py --neighbourhoods has been run."""
     columns = ["Area", "Part", "University", "Mode", "Minutes", "Distance_km"]
-    if not os.path.exists(_path(NEIGHBOURHOOD_COMMUTE_FILE)):
+    if not datastore.exists(_path(NEIGHBOURHOOD_COMMUTE_FILE)):
         return pd.DataFrame(columns=columns)
-    return _clean_columns(pd.read_csv(_path(NEIGHBOURHOOD_COMMUTE_FILE))).rename(
+    return _clean_columns(datastore.read_csv(_path(NEIGHBOURHOOD_COMMUTE_FILE))).rename(
         columns={"Neighbourhood": "Part"})[columns]
 
 

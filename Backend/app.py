@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
+import datastore
 import recommender
 import routing
 import chat
@@ -15,7 +16,8 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 app.include_router(routing.router)  # GET /route - journey planner (OpenTripPlanner)
 app.include_router(chat.router)  # POST /chat - the site's AI assistant (Claude)
 
-DATA = recommender.load_data() 
+datastore.connect()  # PostgreSQL if DATABASE_URL is set (copies changed data files first), else the files
+DATA = recommender.load_data()
 
 
 class RecommendRequest(BaseModel):
@@ -43,7 +45,7 @@ class RecommendRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "areas": recommender.AREAS}
+    return {"status": "ok", "areas": recommender.AREAS, "data_source": datastore.source}
 
 
 @app.get("/options")
