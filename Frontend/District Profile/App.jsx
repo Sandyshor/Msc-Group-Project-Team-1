@@ -258,6 +258,11 @@ export default function App() {
   const tourCodes = useMemo(() => (data ? DUBLIN_DISTRICTS.filter((c) => data.profiles[c] && isVisible(c)) : []), [data, isVisible]);
   const showTourStop = useCallback((code) => selectDistrict(code, true), [selectDistrict]);
   const endTour = useCallback(() => setTouring(false), []);
+  // "How to use this page" steps: open the tab on the district shown (D7 as the example if none is)
+  const showTourFeature = (f) => {
+    if (!selectedId) selectDistrict('D7', true);
+    if (f.tab) setTab(f.tab);
+  };
 
   // A start typed into the planner: bring it into view (with both ends set, the route is fitted instead)
   useEffect(() => {
@@ -431,7 +436,7 @@ export default function App() {
               onClose={() => setComparing(false)}
             />
           )}
-          {touring && <DistrictTour data={data} codes={tourCodes} onShow={showTourStop} onEnd={endTour} />}
+          {touring && <DistrictTour data={data} codes={tourCodes} onShow={showTourStop} onFeature={showTourFeature} onEnd={endTour} />}
           </div>
 
           <div className="map-legend">

@@ -1,12 +1,31 @@
-// Guided tour of Dublin's postal districts for newcomers: a slim bar over the top of the map with how the numbers
-// work, then one simple sentence per district from D1 (where it is, which side of the Liffey, a couple of
-// neighbourhoods), then a wrap-up. The page shows each district on the map and its full profile on the right.
+// Guided tour of the district page for newcomers: a slim bar over the top of the map with how the numbers work,
+// then how to use the page (compare, journey, amenities, safety, rent, search: each one highlighted), then one
+// simple sentence per district from D1 (where it is, which side of the Liffey, a couple of neighbourhoods), then a
+// wrap-up. The page shows each district on the map and its full profile on the right.
 import { useEffect, useRef, useState } from 'react';
 import { districtProfiles } from './districtProfiles';
 import './DistrictTour.css';
 
 const INTRO_MS = 8000;
 const STOP_MS = 6000;
+const FEATURE_MS = 8000;
+
+// How to use the page. tab: the profile tab it opens (on an example district); spot: what gets highlighted.
+const FEATURES = [
+  { key: 'compare', icon: '⇄', title: 'Compare districts', spot: '.compare-button',
+    text: <>Put any two districts <b>side by side</b>: rent, safety, amenities and distance to your campus. Tick what matters to you and it tells you which fits you better.</> },
+  { key: 'journey', icon: '🚌', title: 'Journey', tab: 'journey', spot: '.profile-tabs [data-tab="journey"]',
+    text: <>Type a <b>start and destination</b> (or click the map) to see bus, Luas, train, walking and cycling routes with times.</> },
+  { key: 'amen', icon: '🛒', title: 'Amenities', tab: 'amen', spot: '.profile-tabs [data-tab="amen"]',
+    text: <><b>Supermarkets, cafés, gyms, parks, pharmacies</b> and more in the district. Pick a supermarket chain to see its shops on the map.</> },
+  { key: 'safety', icon: '🛡️', title: 'Safety', tab: 'safety', spot: '.profile-tabs [data-tab="safety"]',
+    text: <>The district’s <b>safety score</b> and recorded crime by type. Switch on <b>Safety map</b> above the map to see it street by street.</> },
+  { key: 'rent', icon: '€', title: 'Rent', tab: 'rent', spot: '.profile-tabs [data-tab="rent"]',
+    text: <>Typical <b>monthly rents</b> for single and double rooms, studios and 1–3 bed homes.</> },
+  { key: 'search', icon: '🔎', title: 'Search the map', spot: '.map-search .ps',
+    text: <>Find a <b>university, place, street or district</b> (try “UCD” or “Temple Bar”) and get directions from or to it.</> },
+];
+const F = FEATURES.length;
 
 const parse = (v) => { if (Array.isArray(v)) return v; try { return JSON.parse(v); } catch { return []; } };
 
@@ -33,29 +52,49 @@ function outline(code, data) {
   };
 }
 
-export default function DistrictTour({ data, codes, onShow, onEnd }) {
-  // step -1 = intro, 0..n-1 = districts, n = wrap-up
+export default function DistrictTour({ data, codes, onShow, onFeature, onEnd }) {
+  // step -1 = intro, 0..F-1 = how to use the page, F..F+n-1 = districts, F+n = wrap-up
   const [step, setStep] = useState(-1);
   const [paused, setPaused] = useState(false);
   const [hover, setHover] = useState(false);
   const n = codes.length;
-  const ms = step < 0 ? INTRO_MS : STOP_MS;
-  const running = !paused && !hover && step < n;
+  const last = F + n; // the wrap-up
+  const feature = step >= 0 && step < F ? FEATURES[step] : null;
+  const district = step >= F && step < last ? step - F : -1;
+  const ms = step < 0 ? INTRO_MS : feature ? FEATURE_MS : STOP_MS;
+  const running = !paused && !hover && step < last;
   const showRef = useRef(onShow);
   showRef.current = onShow;
+  const featureRef = useRef(onFeature);
+  featureRef.current = onFeature;
 
-  useEffect(() => { if (step >= 0 && step < n) showRef.current(codes[step]); }, [step, n, codes]);
+  useEffect(() => { if (district >= 0) showRef.current(codes[district]); }, [district, codes]);
+
+  // a feature step: open its tab on the example district, then highlight the button it's about
+  useEffect(() => {
+    if (!feature) return undefined;
+    featureRef.current?.(feature);
+    let spot = null;
+    const timer = setTimeout(() => {
+      spot = document.querySelector(feature.spot);
+      if (!spot) return;
+      spot.classList.add('dt-spot');
+      // laptops: bring it into view (on phones the profile is below the map and the tour bar would scroll away)
+      if (window.innerWidth > 1100) spot.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }, 150);
+    return () => { clearTimeout(timer); spot?.classList.remove('dt-spot'); };
+  }, [feature]);
 
   useEffect(() => {
     if (!running) return undefined;
-    const id = setTimeout(() => setStep((s) => Math.min(s + 1, n)), ms);
+    const id = setTimeout(() => setStep((s) => Math.min(s + 1, last)), ms);
     return () => clearTimeout(id);
-  }, [running, step, ms, n]);
+  }, [running, step, ms, last]);
 
   useEffect(() => {
     const onKey = (e) => {
       if (e.target.closest?.('input, textarea, select')) return;
-      if (e.key === 'ArrowRight') setStep((s) => Math.min(s + 1, n));
+      if (e.key === 'ArrowRight') setStep((s) => Math.min(s + 1, last));
       else if (e.key === 'ArrowLeft') setStep((s) => Math.max(s - 1, -1));
       else if (e.key === 'Escape') onEnd();
       else return;
@@ -63,39 +102,44 @@ export default function DistrictTour({ data, codes, onShow, onEnd }) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [n, onEnd]);
+  }, [last, onEnd]);
 
-  const stop = step >= 0 && step < n ? outline(codes[step], data) : null;
+  const stop = district >= 0 ? outline(codes[district], data) : null;
 
   return (
     <aside className="dt-bar" role="region" aria-label="District tour" aria-live="polite"
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div className="dt-row" key={step}>
-        <span className={`dt-badge${stop ? (stop.north ? ' is-north' : ' is-south') : ''}`} aria-hidden="true">
-          {stop ? codes[step] : step < 0 ? '💡' : '🎉'}
+        <span className={`dt-badge${stop ? (stop.north ? ' is-north' : ' is-south') : ''}${feature ? ' is-feature' : ''}`} aria-hidden="true">
+          {stop ? codes[district] : feature ? feature.icon : step < 0 ? '💡' : '🎉'}
         </span>
         <div className="dt-copy">
           <span className="dt-label">
             {step < 0 && 'How Dublin’s districts work'}
-            {stop && <>Stop {step + 1} of {n} · <b className={stop.north ? 'is-north' : 'is-south'}>{stop.north ? 'Northside' : 'Southside'}</b></>}
-            {step >= n && 'Tour complete'}
+            {feature && <><b className="is-feature">{feature.title}</b> · {step + 1} of {F}</>}
+            {stop && <>Stop {district + 1} of {n} · <b className={stop.north ? 'is-north' : 'is-south'}>{stop.north ? 'Northside' : 'Southside'}</b></>}
+            {step >= last && 'Tour complete'}
           </span>
           <p>
             {step < 0 && <><b>Odd numbers</b> are north of the River Liffey, <b>even numbers</b> south. <b>D1 &amp; D2</b> are the city centre – the higher the number, the further out.</>}
+            {feature && feature.text}
             {stop && stop.text}
-            {step >= n && <>That’s all {n} districts. Click any district to see its rent, amenities and safety, or try <a href="/questionnaire">Find my match</a>.</>}
+            {step >= last && <>That’s all {n} districts. Click any district to see its rent, amenities and safety, compare two districts, or try <a href="/questionnaire">Find my match</a>.</>}
           </p>
         </div>
       </div>
 
       <div className="dt-actions">
-        {step < n ? (
+        {step < last ? (
           <>
             <button type="button" className="dt-icon" onClick={() => setStep((s) => Math.max(s - 1, -1))} disabled={step < 0} aria-label="Previous stop">‹</button>
             <button type="button" className="dt-icon" onClick={() => setPaused((v) => !v)} aria-label={paused ? 'Resume the tour' : 'Pause the tour'}>{paused ? '▶' : '❚❚'}</button>
-            <button type="button" className="dt-next" onClick={() => setStep((s) => Math.min(s + 1, n))}>
-              {step < 0 ? 'Start with D1' : step === n - 1 ? 'Finish' : 'Next'} <span aria-hidden="true">›</span>
+            <button type="button" className="dt-next" onClick={() => setStep((s) => Math.min(s + 1, last))}>
+              {step < 0 ? 'Next' : step === F - 1 ? 'Start with D1' : step === last - 1 ? 'Finish' : 'Next'} <span aria-hidden="true">›</span>
             </button>
+            {(step < 0 || feature) && (
+              <button type="button" className="dt-jump" onClick={() => setStep(F)} title="Skip to the district stops">Districts ›</button>
+            )}
             <button type="button" className="dt-skip" onClick={onEnd}>Skip tour</button>
           </>
         ) : (
@@ -104,7 +148,7 @@ export default function DistrictTour({ data, codes, onShow, onEnd }) {
       </div>
 
       <div className="dt-progress" aria-hidden="true">
-        <span style={{ width: `${((Math.min(step, n - 1) + 1) / n) * 100}%` }} />
+        <span style={{ width: `${((Math.min(step, last - 1) + 1) / last) * 100}%` }} />
         {running && <i key={step} style={{ animationDuration: `${ms}ms` }} />}
       </div>
     </aside>

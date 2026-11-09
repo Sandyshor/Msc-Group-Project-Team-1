@@ -501,7 +501,7 @@ export default function DistrictProfile({
       <div className="profile-body">
         <div className="profile-tabs" role="tablist">
           {TABS.map(([k, l]) => (
-            <button type="button" role="tab" key={k} aria-selected={tab === k} onClick={() => setTab(k)}>{l}</button>
+            <button type="button" role="tab" key={k} data-tab={k} aria-selected={tab === k} onClick={() => setTab(k)}>{l}</button>
           ))}
         </div>
 
