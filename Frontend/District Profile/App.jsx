@@ -344,6 +344,7 @@ export default function App() {
                 label="Search the map"
                 placeholder="Search a university, place, street or district, e.g. UCD, Temple Bar, D8"
                 onPick={onSearchPick}
+                onClear={() => mapApi.current?.clearSearchPin()}
               />
             </div>
             <div className="district-controls">

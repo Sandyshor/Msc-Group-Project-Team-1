@@ -93,8 +93,9 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
         onChange={(e) => { setText(e.target.value); setOpen(true); setActive(-1); setAddresses(null); }}
         onKeyDown={onKeyDown}
       />
-      {value && onClear && (
-        <button type="button" className="ps-clear" aria-label={`Clear ${label}`} onClick={() => { setText(''); onClear(); input.current?.focus(); }}>×</button>
+      {(text || value) && (
+        <button type="button" className="ps-clear" aria-label={`Clear ${label}`} title="Clear"
+          onClick={() => { setText(''); setAddresses(null); setActive(-1); onClear?.(); input.current?.focus(); }}>×</button>
       )}
       {showList && (
         <ul id={listId} role="listbox" className="ps-list" aria-label={`${label} suggestions`}>
