@@ -1,9 +1,9 @@
 // Homepage hero: "Are you new to Dublin?" - green panel on the left, the Ha'penny Bridge at dusk on the
-// right, a "New to Dublin?" card, glowing waves and a line-art skyline of Dublin with a Luas tram.
+// right, a "New to Dublin?" card, glowing waves and a line-art skyline of Dublin.
 import { Link } from 'react-router-dom'
 import './HomeHero.css'
 
-// Full-bleed artwork: green panel, Liffey and Ha'penny Bridge at sunset, glowing skyline with a Luas
+// Full-bleed artwork: green panel, Liffey and Ha'penny Bridge at sunset, glowing line-art skyline
 const BG = '/images/hero-dublin-bg.jpg'
 
 const ICONS = {

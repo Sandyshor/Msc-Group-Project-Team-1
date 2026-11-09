@@ -80,8 +80,15 @@ export function chainShops(records, profileAmenities) {
 // (public/data, see "source" and "fetched" inside each file).
 let verifiedShops = null;
 let verifiedCounts = null;
+// OpenStreetMap sometimes maps one shop twice (a point and the building outline), so the same chain
+// within ~40 m counts as one shop: one pin on the map and one in the Amenities tab totals.
+const oneEach = (shops) => shops.reduce((out, shop) => {
+  if (!out.some((x) => x.chain === shop.chain && near(x, shop))) out.push(shop);
+  return out;
+}, []);
+
 export function loadVerifiedChainShops() {
-  if (!verifiedShops) verifiedShops = fetch('/data/dublin-chain-shops.json').then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); }).then((d) => d.shops).catch((e) => { verifiedShops = null; throw e; });
+  if (!verifiedShops) verifiedShops = fetch('/data/dublin-chain-shops.json').then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); }).then((d) => oneEach(d.shops)).catch((e) => { verifiedShops = null; throw e; });
   return verifiedShops;
 }
 export function loadVerifiedAmenityCounts() {

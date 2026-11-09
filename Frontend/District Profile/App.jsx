@@ -275,8 +275,11 @@ export default function App() {
       setTrip((t) => (t[which] && t[which].lat === p.lat && t[which].lng === p.lng ? { ...t, [which]: { ...t[which], label } } : t));
     });
   };
+  // Map clicks only set A and B while the journey planner is on screen (the Journey tab, or the
+  // "Plan a journey" panel before a district is picked). On Places, Rent, Amenities etc. they do nothing.
+  const planning = !selectedId || tab === 'journey';
   const onMapPoint = (p) => {
-    if (trip.from && trip.to) return;
+    if (!planning || (trip.from && trip.to)) return;
     const which = trip.from ? 'to' : 'from';
     setTouring(false);
     setTrip((t) => ({ ...t, [which]: p }));
@@ -288,6 +291,7 @@ export default function App() {
     nameExactly(which, p);
   };
   const onLandmarkPoint = (p) => {
+    if (!planning) return;
     if (trip.from && trip.to) { setTrip((t) => ({ ...t, to: p })); if (tab !== 'journey') setTab('journey'); return; }
     onMapPoint(p);
   };
@@ -373,6 +377,7 @@ export default function App() {
             onHoverPlace={setHoverPlace}
             onPlaceClick={onPlaceClick}
             trip={trip}
+            planning={planning}
             onMapPoint={onMapPoint}
             onLandmarkPoint={onLandmarkPoint}
             onDragPoint={onDragPoint}
