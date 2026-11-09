@@ -105,3 +105,6 @@
   .pc .place-image { width: 90px; }
   .pc .district-navigation { grid-template-columns: 1fr; }
 }
+.pc-hoods li.pc-hoods-more { padding: 0; border: 0; background: none; }
+.pc-hoods-more button { padding: 4px 10px; border: 1px dashed rgba(255, 255, 255, 0.45); border-radius: 999px; background: transparent; color: #fffdf3; font: inherit; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
+.pc-hoods-more button:hover { background: rgba(255, 255, 255, 0.14); }

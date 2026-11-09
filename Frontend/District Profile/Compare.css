@@ -1,0 +1,256 @@
+/* Compare two districts: a dialog over the page */
+.cmp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: rgba(14, 38, 31, .55);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  animation: cmp-fade .2s ease both;
+}
+@keyframes cmp-fade { from { opacity: 0; } }
+.cmp {
+  display: flex;
+  flex-direction: column;
+  width: min(980px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow: hidden;
+  border-radius: 22px;
+  background: #fffdf7;
+  color: #202d29;
+  box-shadow: 0 30px 80px rgba(10, 30, 24, .4);
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  animation: cmp-rise .3s cubic-bezier(.2, .8, .2, 1) both;
+}
+@keyframes cmp-rise { from { opacity: 0; transform: translateY(16px) scale(.98); } }
+
+.cmp-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px 14px;
+  background: linear-gradient(135deg, #123d31, #1d5443);
+  color: #f6f1e6;
+}
+.cmp-eyebrow { margin: 0 0 2px; color: #e9cf9a; font-size: 11px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
+.cmp-head h2 { margin: 0; color: #fff; font: 700 24px/1.2 'Playfair Display', Georgia, serif; }
+.cmp-close {
+  display: grid;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #ffffff33;
+  border-radius: 50%;
+  background: #ffffff14;
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.cmp-close:hover { background: #ffffff2b; }
+
+/* the two district pickers */
+.cmp-pickers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+  padding: 16px 22px 6px;
+}
+.cmp-pick { display: grid; gap: 4px; min-width: 0; }
+.cmp-pick small { color: #74817a; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.cmp-pick select {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+  border: 2px solid var(--c, #214b39);
+  border-radius: 12px;
+  background: #fff;
+  color: #202d29;
+  font: 700 14px 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+.cmp-swap {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 2px;
+  border: 1px solid #dfe8da;
+  border-radius: 50%;
+  background: #fff;
+  color: #214b39;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform .25s, background .2s;
+}
+.cmp-swap:hover { background: #f0f5ec; transform: rotate(180deg); }
+
+/* priorities and the answer */
+.cmp-prefs { padding: 8px 22px 12px; }
+.cmp-prefs > p { margin: 0 0 8px; color: #4f5f55; font-size: 13.5px; }
+.cmp-prefs > p b { color: #202d29; }
+.cmp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cmp-chips button {
+  padding: 7px 13px;
+  border: 1px solid #dfe8da;
+  border-radius: 99px;
+  background: #fff;
+  color: #34463d;
+  font: 700 12.5px 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.cmp-chips button[aria-pressed="true"] { border-color: #173f37; background: #173f37; color: #d9f17e; }
+.cmp-uni {
+  margin-top: 10px;
+  max-width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #dfe8da;
+  border-radius: 10px;
+  background: #fff;
+  font: 600 13px 'DM Sans', sans-serif;
+}
+.cmp-verdict {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f3efe4;
+}
+.cmp-verdict.has-best { background: #eef6d6; box-shadow: inset 0 0 0 1px #c9e07a; }
+.cmp-verdict span { font-size: 22px; line-height: 1.2; }
+.cmp-verdict p { margin: 0; color: #202d29; font-size: 14.5px; font-weight: 600; line-height: 1.5; }
+.cmp-note { margin: 6px 0 0; color: #8a6d3b; font-size: 12px; }
+
+/* the table */
+.cmp-table-wrap { flex: 1; min-height: 0; overflow: auto; border-top: 1px solid #ece6d8; }
+.cmp-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.cmp-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 12px 14px 10px;
+  border-bottom: 3px solid var(--c, #ece6d8);
+  background: #fffdf7;
+  color: #123d31;
+  font: 800 18px Manrope, sans-serif;
+  text-align: left;
+  vertical-align: bottom;
+}
+.cmp-table thead th small { display: block; overflow: hidden; color: #74817a; font: 600 12px 'DM Sans', sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.cmp-table thead th em { display: inline-block; margin-top: 4px; padding: 1px 8px; border-radius: 99px; background: #eef6d6; color: #3c5a10; font: 700 11px 'DM Sans', sans-serif; font-style: normal; }
+.cmp-table thead th:first-child { width: 34%; border-bottom-color: #ece6d8; }
+.cmp-group th {
+  padding: 14px 14px 6px;
+  color: #9a7445;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.cmp-table tbody th[scope="row"] { padding: 9px 14px; color: #34463d; font-weight: 600; text-align: left; }
+.cmp-table td { position: relative; padding: 9px 14px; }
+.cmp-table tbody tr:not(.cmp-group) { border-top: 1px solid #f0ebdf; }
+.cmp-table tr.is-priority th[scope="row"] { box-shadow: inset 3px 0 0 #c29450; color: #123d31; }
+.cmp-table td b { font-weight: 800; }
+.cmp-table td small { display: block; color: #8a968f; font-size: 11.5px; }
+.cmp-table td.is-win { background: #f1f8e3; }
+.cmp-table td.is-win b { color: #24602f; }
+.cmp-table td i {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  place-items: center;
+  border-radius: 50%;
+  background: #2d7a3a;
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+  vertical-align: 1px;
+}
+.cmp-score { display: inline-grid; min-width: 30px; height: 24px; padding: 0 6px; place-items: center; border-radius: 8px; }
+.cmp-none { color: #a3ada7; font-size: 12.5px; }
+.cmp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.cmp-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 22px 16px;
+  border-top: 1px solid #ece6d8;
+}
+.cmp-foot p { flex: 1 1 320px; margin: 0; color: #74817a; font-size: 12px; line-height: 1.5; }
+.cmp-foot div { display: flex; flex-wrap: wrap; gap: 8px; }
+.cmp-foot button {
+  padding: 9px 14px;
+  border: 1px solid #173f37;
+  border-radius: 99px;
+  background: #fff;
+  color: #173f37;
+  font: 700 13px 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+.cmp-foot button:hover { background: #173f37; color: #d9f17e; }
+
+/* buttons that open it */
+.compare-button { white-space: nowrap; }
+.pc-compare {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 1px solid #ffffff55;
+  border-radius: 12px;
+  background: #ffffff22;
+  color: inherit;
+  font: 700 13.5px 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background .15s;
+}
+.pc-compare:hover { background: #ffffff38; }
+
+/* the toolbar buttons wrap onto a second line instead of running off the card */
+.map-toolbar .district-controls { flex-wrap: wrap; }
+
+@media (max-width: 640px) {
+  .cmp-backdrop { padding: 0; place-items: stretch; }
+  /* phones: the whole window scrolls, so the table gets the full height */
+  .cmp { display: block; max-height: 100dvh; overflow-y: auto; border-radius: 0; }
+  .cmp-head { position: sticky; top: 0; z-index: 2; }
+  .cmp-table-wrap { overflow: visible; }
+  .cmp-table { table-layout: fixed; }
+  .cmp-table thead th { top: 62px; }
+  .cmp-table thead th small { white-space: normal; }
+  .cmp-head { padding: 14px 16px 12px; }
+  .cmp-head h2 { font-size: 20px; }
+  .cmp-pickers { grid-template-columns: 1fr; padding: 12px 16px 4px; }
+  .cmp-swap { justify-self: center; margin: 0; transform: rotate(90deg); }
+  .cmp-swap:hover { transform: rotate(270deg); }
+  .cmp-prefs { padding: 8px 16px 10px; }
+  .cmp-table { font-size: 13px; }
+  .cmp-table thead th { padding: 10px 8px 8px; font-size: 15px; }
+  .cmp-table thead th:first-child { width: 36%; }
+  .cmp-table tbody th[scope="row"], .cmp-table td { padding: 8px; }
+  .cmp-table td i { width: 16px; height: 16px; margin-left: 3px; }
+  .cmp-foot { padding: 10px 16px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .cmp, .cmp-backdrop { animation: none; } }
+.map-toolbar .tour-button.compare-button { background: #173f37; color: #d9f17e; }
+.map-toolbar .tour-button.compare-button:hover { background: #245b48; }

@@ -11,6 +11,25 @@ const Icon = ({ name, html, ...rest }) => <span {...rest} dangerouslySetInnerHTM
 
 /* ---------------- profile card sections ---------------- */
 
+// The district's neighbourhoods: the first six, and the rest behind "+N more"
+function Hoods({ areas }) {
+  const [all, setAll] = useState(false);
+  const FIRST = 6;
+  const shown = all ? areas : areas.slice(0, FIRST);
+  return (
+    <ul className="pc-hoods" aria-label="Neighbourhoods">
+      {shown.map((a) => <li key={a[0]}>{a[0]}</li>)}
+      {areas.length > FIRST && (
+        <li className="pc-hoods-more">
+          <button type="button" onClick={() => setAll((v) => !v)} aria-expanded={all}>
+            {all ? 'Show less' : `+${areas.length - FIRST} more`}
+          </button>
+        </li>
+      )}
+    </ul>
+  );
+}
+
 function EmptyNote({ children }) {
   return <p className="empty-note">Not collected yet: {children}</p>;
 }
@@ -423,7 +442,7 @@ const campusDistrict = (u) => {
 export default function DistrictProfile({
   selectedId, data, team, places, tab, setTab, rentMode, setRentMode, chain = null, setChain = () => {},
   hoverPlace, setHoverPlace, onPlaceClick, onSelect,
-  trip, setTrip, onTripReset = () => {}, journeyQuickStarts = [], chainShops = [], amenityCounts = null,
+  trip, setTrip, onTripReset = () => {}, journeyQuickStarts = [], chainShops = [], amenityCounts = null, onCompare,
 }) {
   const profile = data.profiles[selectedId];
   const index = ACTIVE_DISTRICTS.indexOf(selectedId);
@@ -450,7 +469,7 @@ export default function DistrictProfile({
         <h2>{team?.name || profile.name}</h2>
         {team?.description
           ? <p>{team.description}</p>
-          : <ul className="pc-hoods" aria-label="Neighbourhoods">{profile.areas.map((a) => <li key={a[0]}>{a[0]}</li>)}</ul>}
+          : <Hoods areas={profile.areas} />}
 
         <div className="pc-stats">
           {typeof sc === 'number' && (
@@ -471,6 +490,11 @@ export default function DistrictProfile({
             <span>to explore</span>
           </button>
         </div>
+        {onCompare && (
+          <button type="button" className="pc-compare" onClick={onCompare}>
+            <span aria-hidden="true">⇄</span> Compare {selectedId} with another district
+          </button>
+        )}
         <span className="banner-decoration">{selectedId.replace('D', '')}</span>
       </div>
 
