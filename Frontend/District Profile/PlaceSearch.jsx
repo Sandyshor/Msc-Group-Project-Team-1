@@ -18,6 +18,11 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
   const [looking, setLooking] = useState(false);
   const [failed, setFailed] = useState(false);
 
+  const query = useRef(value); // what is in the box right now, for the address search that answers later
+  query.current = text;
+  // A/B boxes go back to the chosen place when you leave them half-typed; the map search keeps your text
+  const leave = () => { setOpen(false); if (value) setText(value); };
+
   // show the chosen place's name when the box isn't being typed in
   useEffect(() => { if (document.activeElement !== input.current) setText(value); }, [value]);
 
@@ -25,7 +30,7 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
 
   useEffect(() => {
     if (!open) return undefined;
-    const close = (e) => { if (!box.current?.contains(e.target)) { setOpen(false); setText(value); } };
+    const close = (e) => { if (!box.current?.contains(e.target)) leave(); };
     document.addEventListener('pointerdown', close);
     return () => document.removeEventListener('pointerdown', close);
   }, [open, value]);
@@ -37,9 +42,11 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
   const total = options.length + (canLookUp ? 1 : 0);
 
   async function lookUp() {
+    const asked = typed;
     setLooking(true);
-    const found = await searchAddresses(typed);
+    const found = await searchAddresses(asked);
     setLooking(false);
+    if (query.current.trim() !== asked) return; // typed something else meanwhile: these results are stale
     setAddresses(found);
     setActive(local.length);
   }
@@ -65,14 +72,15 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
       if (active >= 0 && active < total) choose(active);
       else if (local.length) pick(local[0]);
       else if (canLookUp) lookUp();
-    } else if (e.key === 'Escape') { setOpen(false); setText(value); input.current?.blur(); }
+    } else if (e.key === 'Escape') { leave(); input.current?.blur(); }
   }
 
   const listId = `${id}-list`;
   const showList = open && typed && typed !== value;
 
   return (
-    <div ref={box} className={`ps ${className}${showList ? ' is-open' : ''}`}>
+    <div ref={box} className={`ps ${className}${showList ? ' is-open' : ''}`}
+      onBlur={(e) => { if (!box.current?.contains(e.relatedTarget)) leave(); }}>
       {badge ? <b className="ps-badge" aria-hidden="true">{badge}</b> : (
         <svg className="ps-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
       )}

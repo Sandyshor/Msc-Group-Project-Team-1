@@ -12,12 +12,17 @@ if (typeof window !== 'undefined' && !window.__districtExploreClicks) {
   window.__districtExploreClicks = true;
   document.addEventListener('click', (e) => {
     const target = e.target.closest?.('a, button');
-    if (!target || target.closest('.mini-map')) return;
+    // menus, the footer and the tour only link to the explorer itself, never to a particular district
+    if (!target || target.closest('.mini-map') || target.closest('header, nav, footer, .navbar, .site-tour, .cmp')) return;
     if (!/district|profile|explore/i.test(target.textContent || '')) return;
     // District code on the button itself, or else on the card around it
     let m = (target.textContent || '').match(CODE_RE);
+    // look in the card around the button only: stop once the text is bigger than a card (a whole page
+    // section mentions many districts, e.g. the FAQ's "D1, D2")
     for (let node = target.parentElement, level = 0; !m && node && level < 8; node = node.parentElement, level += 1) {
-      m = (node.innerText || node.textContent || '').match(CODE_RE);
+      const text = node.innerText || node.textContent || '';
+      if (text.length > 600) break;
+      m = text.match(CODE_RE);
     }
     if (!m) return;
     try { localStorage.setItem('explore-district', JSON.stringify({ id: `D${Number(m[1])}${m[2].toUpperCase()}`, t: Date.now() })); } catch { /* ignore */ }

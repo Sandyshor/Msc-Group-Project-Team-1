@@ -78,12 +78,17 @@ if (typeof window !== 'undefined' && !window.__districtExploreClicks) {
   const CODE_RE = /(?:^|[^A-Za-z0-9])D(\d{1,2})(W?)(?![0-9A-Za-z])/i;
   document.addEventListener('click', (e) => {
     const target = e.target.closest?.('a, button');
-    if (!target || target.closest('.mini-map, .district-page')) return;
+    // menus, the footer and the tour only link to the explorer itself, never to a particular district
+    if (!target || target.closest('.mini-map, .district-page') || target.closest('header, nav, footer, .navbar, .site-tour, .cmp')) return;
     if (!/district|profile|explore/i.test(target.textContent || '')) return;
     
     let m = (target.textContent || '').match(CODE_RE);
+    // look in the card around the button only: stop once the text is bigger than a card (a whole page
+    // section mentions many districts, e.g. the FAQ's "D1, D2")
     for (let node = target.parentElement, level = 0; !m && node && level < 8; node = node.parentElement, level += 1) {
-      m = (node.innerText || node.textContent || '').match(CODE_RE);
+      const text = node.innerText || node.textContent || '';
+      if (text.length > 600) break;
+      m = text.match(CODE_RE);
     }
     if (!m) return;
     const id = `D${Number(m[1])}${m[2].toUpperCase()}`;
