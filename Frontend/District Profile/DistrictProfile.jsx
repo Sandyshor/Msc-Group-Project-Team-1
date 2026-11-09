@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import JourneyPlannerPanel from './JourneyPlannerPanel';
 import { CHAINS, chainInfo } from './shopChains';
 import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, SAFETY_BANDS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './mapShared';
@@ -456,6 +456,22 @@ export default function DistrictProfile({
   const reportRoom = data.roomReport?.areas?.[selectedId]?.single;
   const rentStat = roomMedians.length ? [eur(Math.min(...roomMedians)), 'room, per month']
     : reportRoom ? [eur(reportRoom), 'room, per month'] : rtbAll ? [eur(rtbAll), 'home, per month'] : ['—', 'not collected yet'];
+  // Switching tab while scrolled down: bring the new tab's start up to just under the tab bar, instead of
+  // leaving it half-way down (the card scrolls on laptops, the page on phones)
+  const tabsRef = useRef(null);
+  const firstTab = useRef(true);
+  useLayoutEffect(() => {
+    if (firstTab.current) { firstTab.current = false; return; }
+    const tabs = tabsRef.current;
+    const panel = tabs?.nextElementSibling;
+    if (!panel) return;
+    const gap = parseFloat(getComputedStyle(tabs).marginBottom) || 0;
+    const behind = panel.getBoundingClientRect().top - (tabs.getBoundingClientRect().bottom + gap);
+    if (behind >= -1) return; // already showing from its start
+    let box = tabs.parentElement;
+    while (box && !(/(auto|scroll)/.test(getComputedStyle(box).overflowY) && box.scrollHeight > box.clientHeight)) box = box.parentElement;
+    if (box) box.scrollTop += behind; else window.scrollBy(0, behind);
+  }, [tab]);
   const prev = ACTIVE_DISTRICTS[(index - 1 + ACTIVE_DISTRICTS.length) % ACTIVE_DISTRICTS.length];
   const next = ACTIVE_DISTRICTS[(index + 1) % ACTIVE_DISTRICTS.length];
 
@@ -499,7 +515,7 @@ export default function DistrictProfile({
       </div>
 
       <div className="profile-body">
-        <div className="profile-tabs" role="tablist">
+        <div className="profile-tabs" role="tablist" ref={tabsRef}>
           {TABS.map(([k, l]) => (
             <button type="button" role="tab" key={k} data-tab={k} aria-selected={tab === k} onClick={() => setTab(k)}>{l}</button>
           ))}
