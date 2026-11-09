@@ -4,7 +4,9 @@ Area figures the recommender needs for the County Dublin areas (A and K Eircodes
 Everything comes from data the District Profile already shows for these areas
 (Frontend/public/data/county-dublin-profiles.json) plus the room rents from build_county_room_rents.py:
   - census: CSO Census 2022 small-area figures by electoral division
-  - one/two-bed rent: RTB 2025 average rent (CSO RIA02, all property types - the districts use apartments)
+  - one/two-bed rent: RTB 2025 average rent (CSO RIA02, all property types - the districts use apartments);
+      where RTB lacks either figure for the area, both come from the Daft.ie Rental Report 2026 Q1 apartment
+      averages for its region
   - room rent: Daft.ie Rental Report 2026 Q1 averages for the area's part of Dublin
       private room = mean of the single and double room in a house; shared room = the twin-room estimate
   - safety: the project's safety score and crime rates
@@ -36,9 +38,14 @@ def main():
         safety = county.get("safety", {}).get(code, {})
         row = {"Area": code, "Name": profile["name"], "Side": profile.get("side")}
         row.update({c: census.get(c) for c in CENSUS})
-        row["One_Bed_Rent"], row["Two_Bed_Rent"] = rtb.get("1 bed"), rtb.get("2 bed")
-        if code in rooms.index:
-            r = rooms.loc[code]
+        r = rooms.loc[code] if code in rooms.index else None
+        # one source for both sizes, so the 1-bed and 2-bed figures are comparable
+        if rtb.get("1 bed") and rtb.get("2 bed"):
+            row.update(One_Bed_Rent=rtb["1 bed"], Two_Bed_Rent=rtb["2 bed"], One_Bed_Source="rtb", Two_Bed_Source="rtb")
+        elif r is not None:
+            row.update(One_Bed_Rent=int(r["One_Bed_Apartment"]), Two_Bed_Rent=int(r["Two_Bed_Apartment"]),
+                       One_Bed_Source="daft", Two_Bed_Source="daft")
+        if r is not None:
             row["Private_Room_Rent"] = round((r["Single_Sharing"] + r["Double_Room"]) / 2)
             row["Shared_Room_Rent"] = int(r["Double_Sharing_Est"])
             row["Room_Rent_Region"] = r["Daft_Region"]
