@@ -98,3 +98,27 @@
 .dt-bar { left: 12px; width: min(720px, calc(100% - 150px)); transform: none; animation-name: dt-drop-left; }
 @keyframes dt-drop-left { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
 @media (max-width: 760px) { .dt-bar { left: 10px; width: calc(100% - 20px); } }
+
+/* "How to use this page" steps */
+.dt-badge.is-feature { background: #c29450; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 20px; }
+.dt-label b.is-feature { color: #173f32; }
+.dt-actions .dt-jump { padding: 7px 10px; border-style: dashed; color: #536459; font-size: 12px; }
+.dt-actions .dt-jump:hover { border-color: #173f32; color: #173f32; }
+/* the button or tab a step is about */
+.dt-spot {
+  position: relative;
+  z-index: 5;
+  border-radius: 12px;
+  box-shadow: 0 0 0 3px #c29450, 0 0 0 9px rgba(194, 148, 80, .28);
+  animation: dt-spot 1.6s ease-in-out infinite;
+}
+@keyframes dt-spot { 50% { box-shadow: 0 0 0 3px #c29450, 0 0 0 14px rgba(194, 148, 80, .1); } }
+.profile-tabs [role="tab"].dt-spot { background: #fff4df; }
+@media (prefers-reduced-motion: reduce) { .dt-spot { animation: none; } }
+/* the round back / pause buttons keep their size, and "Districts ›" stays on one line */
+.dt-icon { flex: none; }
+.dt-actions .dt-jump { white-space: nowrap; }
+@media (max-width: 760px) {
+  .dt-actions { flex-wrap: wrap; gap: 6px; }
+  .dt-actions .dt-next { margin-left: auto; }
+}
