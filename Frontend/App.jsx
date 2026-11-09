@@ -67,6 +67,13 @@ function useHeaderFit(headerRef, deps) {
 function App() {
   const location = useLocation()
   const [tourOpen, setTourOpen] = useState(false)
+  // The tour opens by itself every time someone opens (or reloads) the website on the home page.
+  // Pages opened from a link (a district, the results...) are left alone so the tour doesn't pull people away.
+  useEffect(() => {
+    if (location.pathname !== '/') return undefined
+    const timer = setTimeout(() => setTourOpen(true), 1200)
+    return () => clearTimeout(timer)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   // The menu button appears when the header runs out of room (narrow windows or a zoomed-in browser)
   const [menuOpen, setMenuOpen] = useState(false)
   const headerRef = useRef(null)
