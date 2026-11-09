@@ -17,9 +17,10 @@
   box-shadow: 0 24px 70px #0f2e2566, 0 2px 8px #0f2e2522;
   font-family: 'DM Sans', sans-serif;
   animation: st-arrive 0.45s cubic-bezier(.2, .8, .2, 1) both;
+  /* glides between the bottom-left and bottom-right corners */
+  transition: left 0.6s cubic-bezier(.65, .05, .36, 1), box-shadow 0.3s;
 }
 /* the tour moves the card to whichever corner keeps the highlighted part of the page in view */
-.site-tour.at-left { right: auto; left: max(20px, env(safe-area-inset-left)); }
 .site-tour.at-top { bottom: auto; top: max(16px, env(safe-area-inset-top)); }
 
 @keyframes st-arrive {
@@ -257,6 +258,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .site-tour, .site-tour-body, .site-tour-icon, .site-tour-highlight { animation: none; }
+  .site-tour { transition: none; }
 }
 
 @media (max-width: 480px) {

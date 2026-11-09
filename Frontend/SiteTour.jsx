@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
 import './SiteTour.css'
@@ -130,16 +130,42 @@ function busyness(card, spot) {
 function SiteTour({ onClose }) {
   const [stepIndex, setStepIndex] = useState(0)
   // which corner of the screen the card sits in, so it never hides the part of the page being shown
-  const [corner, setCorner] = useState({ v: 'bottom', h: 'right' })
+  const [corner, setCorner] = useState({ v: 'bottom', h: steps[0].corner || 'right' })
+  const [vw, setVw] = useState(() => document.documentElement.clientWidth)
   const cardRef = useRef(null)
   const location = useLocation()
   const navigate = useNavigate()
   const step = steps[stepIndex]
   const onPage = !step.path || location.pathname === step.path
+  const phone = vw <= 480
+
+  // The tour opens each step's page. `expected` is the page the tour wants to be on; `moving` is true
+  // while the tour itself is changing page.
+  const expected = useRef(null)
+  const moving = useRef(false)
+  useEffect(() => {
+    expected.current = step.path || location.pathname
+    if (step.path && location.pathname !== step.path) { moving.current = true; navigate(step.path) }
+  }, [stepIndex]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // The user went to another page themselves (a menu link, "Start the questionnaire"...): the tour closes
+  // and lets them go, instead of pulling them back.
+  useEffect(() => {
+    if (location.pathname === expected.current) { moving.current = false; return }
+    if (!moving.current) onClose()
+  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (step.path && location.pathname !== step.path) navigate(step.path)
-  }, [location.pathname, navigate, step.path])
+    const onResize = () => setVw(document.documentElement.clientWidth)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  // Steps with a set corner start gliding there the moment Next is pressed, while the page scrolls,
+  // instead of waiting for the scroll to finish and then jumping.
+  useLayoutEffect(() => {
+    if (step.corner && !phone) setCorner((c) => (c.h === step.corner && c.v === 'bottom' ? c : { ...c, v: 'bottom', h: step.corner }))
+  }, [stepIndex]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Where the card sits. Steps can name a corner (home: bottom right; film and FAQ: bottom left, next to the
   // video and the questions). Other steps take the bottom corner that hides the least text, buttons and
@@ -244,7 +270,10 @@ function SiteTour({ onClose }) {
       id="site-tour-panel"
       ref={cardRef}
       className={`site-tour at-${corner.v} at-${corner.h}`}
-      style={corner.v === 'top' ? { top: corner.top } : undefined}
+      style={phone
+        ? (corner.v === 'top' ? { top: corner.top } : undefined)
+        // laptops and tablets: a pixel `left` (not left/right) so the card slides smoothly between corners
+        : { left: corner.h === 'left' ? 20 : vw - Math.min(400, vw - 32) - 20, right: 'auto' }}
       role="dialog"
       aria-modal="false"
       aria-label="Website tour"
