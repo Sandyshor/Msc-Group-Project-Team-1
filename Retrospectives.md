@@ -243,6 +243,33 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Santhosh was gathering ideas for layout designs.
 - At last, we talked about the user evaluation and the different ways we can make it work. Shreyas agreed to create a survey.
 
-  
+**week 8 lead shreyash**
+**meeting 1 friday (1:00 to 1:30 pm)**
+- attendees: Shreyash, sowmya, vignesh, catherine, santosh
+- discussed on the feedback received on fridays presentation
+- everyone was confused by the contrading feedback from brendon and andrea
+- we all decided on what perticular tasks we will work on
 
-  
+**meeting 2 saturday (11:00 to 11:30 pm)**
+- attendees: Shreyash, sowmya, vignesh, santosh
+- santosh asked to get the tasks replaced
+- santosh will be working on postgresql instead
+- we all decided to split santosh tasks
+- vignesh was working on minor improvements on website 
+- sowmya was working on login
+- i was working on making the texts bigger
+
+**meeting 3 sunday (9:00 to 9:47 pm)**
+- attendees: Shreyash, sowmya, vignesh, santosh
+- vignesh fixed the feedback
+- we set a plan for the week
+- we will each be focused on doing individual user evaluation
+- distributed the sections of user evaluation report
+- decided to contact our fellow groups for evaluation
+
+**meeting 4 monday (9:00 to 9:35 pm)**
+- attendees: Shreyash, sowmya, vignesh, catherine, santosh
+- we each made efforts to collect users feedback
+- vignesh came up with interesting questionaries
+- santosh worked on the feedback received
+- postgresql has been deployed 
