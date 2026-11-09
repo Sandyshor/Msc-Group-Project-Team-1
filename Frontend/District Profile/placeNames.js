@@ -8,7 +8,7 @@ let lastRequest = 0;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function format(result) {
+export function format(result) {
   const a = result?.address || {};
   const road = a.road || a.pedestrian || a.footway || a.path || a.square;
   // Electoral divisions come back as e.g. "Kilmainham C ED", "Blanchardstown-Coolmine DED 1986" or "Arran Quay D Ward 1986": keep the name
@@ -20,12 +20,22 @@ function format(result) {
   return result?.display_name ? result.display_name.split(',').slice(0, 2).join(',').trim() : null;
 }
 
+// Nominatim allows one request a second: every lookup (street names and the place search) waits its turn
+let queue = Promise.resolve();
+export function nominatimTurn() {
+  const turn = queue.then(async () => {
+    const gap = Date.now() - lastRequest;
+    if (gap < 1100) await wait(1100 - gap);
+    lastRequest = Date.now();
+  });
+  queue = turn;
+  return turn;
+}
+
 export async function streetName(lat, lng) {
   const key = `${lat.toFixed(4)},${lng.toFixed(4)}`; // ~10 m
   if (cache.has(key)) return cache.get(key);
-  const gap = Date.now() - lastRequest;
-  if (gap < 1100) await wait(1100 - gap);
-  lastRequest = Date.now();
+  await nominatimTurn();
   try {
     const params = new URLSearchParams({ format: 'jsonv2', lat: lat.toFixed(6), lon: lng.toFixed(6), zoom: '18', addressdetails: '1', 'accept-language': 'en' });
     const response = await fetch(`${ENDPOINT}?${params}`, { headers: { Accept: 'application/json' } });

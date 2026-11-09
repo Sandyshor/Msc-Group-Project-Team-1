@@ -1182,6 +1182,41 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       st.map.setView(marker.getLatLng(), 15.5, { animate: !REDUCED_MOTION });
       st.map.once('moveend', () => marker.openPopup());
     },
+    // A place picked in the search box: a pin with its name and "Directions from / to here"
+    showSearchResult(place) {
+      const st = s.current;
+      if (!st) return;
+      st.searchPin?.remove();
+      const ll = L.latLng(place.lat, place.lng);
+      const html = `<div class="jp-search-pop"><strong>${escapeHtml(place.label)}</strong>${place.sub ? `<small>${escapeHtml(place.sub)}</small>` : ''}`
+        + '<div class="jp-search-actions"><button type="button" data-end="from">Directions from here</button><button type="button" data-end="to">Directions to here</button></div></div>';
+      const marker = L.marker(ll, {
+        icon: L.divIcon({ className: 'jp-search-pin', html: '<span></span>', iconSize: [30, 40], iconAnchor: [15, 38] }),
+        zIndexOffset: 1000,
+        title: place.label,
+      }).bindPopup(html, { offset: [0, -32], className: 'jp-search-popup', maxWidth: 280 }).addTo(st.map);
+      marker.on('popupclose', () => boxRef.current?.classList.remove('has-search-pop'));
+      marker.on('popupopen', (e) => {
+        boxRef.current?.classList.add('has-search-pop'); // the "click the map" hint would cover it
+        e.popup.getElement()?.querySelectorAll('[data-end]').forEach((btn) => L.DomEvent.on(btn, 'click', (ev) => {
+          L.DomEvent.stop(ev);
+          marker.closePopup();
+          latest.current.onSearchDirections?.(btn.dataset.end, place);
+        }));
+      });
+      st.searchPin = marker;
+      let opened = false;
+      const open = () => { if (!opened && st.searchPin === marker) { opened = true; marker.openPopup(); } };
+      st.map.once('moveend', open);
+      setTimeout(open, 700); // the map may already be there, so no move happens
+      st.map.setView(ll, Math.max(st.map.getZoom(), 16), { animate: !REDUCED_MOTION });
+    },
+    // A typed A or B: bring it into view if it's off the map
+    reveal(lat, lng) {
+      const st = s.current;
+      if (st && !st.map.getBounds().pad(-0.1).contains([lat, lng])) st.map.setView([lat, lng], Math.max(st.map.getZoom(), 14), { animate: !REDUCED_MOTION });
+    },
+    clearSearchPin() { s.current?.searchPin?.remove(); if (s.current) s.current.searchPin = null; },
     focusCampus(id) {
       const st = s.current;
       const campus = campusList.find((u) => u.id === id);
