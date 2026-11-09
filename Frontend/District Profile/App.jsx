@@ -10,6 +10,7 @@ import PlaceSearch from './PlaceSearch';
 import { addDistrictPlaces } from './placeIndex';
 import { districtProfiles } from './districtProfiles';
 import DistrictTour from './DistrictTour';
+import CompareDistricts from './CompareDistricts';
 import './App.css';
 import './Safety.css';
 import './Chains.css';
@@ -127,6 +128,7 @@ const EMPTY_TRIP = { from: null, to: null, mode: 'transit', timeType: 'now', tim
 
 export default function App() {
   const [data, setData] = useState(null);
+  const [comparing, setComparing] = useState(false); // the "Compare two districts" window
   const [placePhotos, setPlacePhotos] = useState(null);
   const [error, setError] = useState('');
   const [selectedId, setSelectedId] = useState(districtFromUrl);
@@ -331,7 +333,7 @@ export default function App() {
       <header className="page-header page-header-compact">
         <div>
           <h1>Dublin district profiles</h1>
-          <p className="page-description">Pick a Dublin district (D1–D24) or a County Dublin area to see its rent, amenities, safety and famous places, or click the map to plan a journey.</p>
+          <p className="page-description">Pick a Dublin district (D1–D24) or a County Dublin area to see its rent, amenities, safety and famous places, use <b>Compare districts</b> to put two side by side, or click the map to plan a journey.</p>
         </div>
       </header>
 
@@ -356,6 +358,7 @@ export default function App() {
               <button type="button" className="tour-button" aria-pressed={touring} onClick={() => setTouring((t) => !t)}>
                 {touring ? '■ Stop tour' : '▶ Take the tour'}
               </button>
+              <button type="button" className="tour-button compare-button" onClick={() => setComparing(true)}>⇄ Compare districts</button>
               <span className="toolbar-divider" aria-hidden="true" />
               <button type="button" className="luas-toggle tr-toggle" aria-pressed={showLuas} onClick={() => setShowLuas((v) => !v)}><i className="tr-luas" /> Luas lines</button>
               <button type="button" className="luas-toggle tr-toggle" aria-pressed={showBus} onClick={() => setShowBus((v) => !v)}><i className="tr-bus" /> Bus stops</button>
@@ -414,6 +417,15 @@ export default function App() {
             onSelectItinerary={(i) => setTrip((t) => ({ ...t, selected: i }))}
             routeTabLabel={(it) => routeTabLabel(it, trip.queryMode)}
           />
+          {comparing && (
+            <CompareDistricts
+              data={data}
+              amenityCounts={amenityCounts}
+              first={selectedId}
+              onOpen={(c) => { setComparing(false); selectDistrict(c); }}
+              onClose={() => setComparing(false)}
+            />
+          )}
           {touring && <DistrictTour data={data} codes={tourCodes} onShow={showTourStop} onEnd={endTour} />}
           </div>
 
@@ -462,6 +474,7 @@ export default function App() {
           journeyQuickStarts={journeyQuickStarts}
           chainShops={chainShops}
           amenityCounts={amenityCounts}
+          onCompare={() => setComparing(true)}
         />}
       </div>
     </div>
