@@ -81,8 +81,8 @@ export default function HomeHero() {
           <h2>New to Dublin?</h2>
         </div>
         <ul>
-          <li><span className="hx-tick amber"><Icon name="check" /></span>Find the right area to live</li>
-          <li><span className="hx-tick amber"><Icon name="check" /></span>Compare rent and living costs</li>
+          <li><span className="hx-tick green"><Icon name="check" /></span>Find the right area to live</li>
+          <li><span className="hx-tick green"><Icon name="check" /></span>Compare rent and living costs</li>
           <li><span className="hx-tick green"><Icon name="check" /></span>Check commute to your university</li>
           <li><span className="hx-tick green"><Icon name="check" /></span>Explore amenities &amp; student life</li>
         </ul>

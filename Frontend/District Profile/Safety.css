@@ -58,3 +58,36 @@
   .profile-card .profile-banner { flex: 0 0 auto; }
   .profile-card .profile-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c9d6c2 transparent; }
 }
+
+/* Score bar under "How safe is it?" (own class names: Results.css also has a .safety-meter) */
+.safety-scale { position: relative; height: 10px; margin: 14px 0 6px; border-radius: 5px; }
+.safety-scale-fill { position: absolute; inset: 0; border-radius: 5px; }
+.safety-scale-avg { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: #173f32; }
+.safety-scale-dot { position: absolute; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border: 3px solid #fffefa; border-radius: 50%; box-shadow: 0 1px 4px rgba(23, 63, 50, 0.35); }
+.safety-scale-labels { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; color: #6c7d6c; font-size: 0.66rem; font-weight: 700; }
+.safety-scale-labels span:nth-child(2) { text-align: center; }
+.safety-scale-labels span:last-child { text-align: right; }
+
+/* "Safety across Dx": one line down the middle at 50; more crime reaches left, less crime right */
+.safety-diverge { --name-col: minmax(0, 10.5rem); display: flex; flex-direction: column; }
+.safety-diverge-head,
+.safety-diverge-row { display: grid; grid-template-columns: var(--name-col) minmax(0, 1fr) 2.2rem; align-items: center; column-gap: 10px; }
+.safety-diverge-head { padding-bottom: 6px; color: #8a9685; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.safety-diverge-ends { display: grid; grid-template-columns: 1fr auto 1fr; gap: 4px; }
+.safety-diverge-ends span:nth-child(2) { color: #173f32; text-align: center; }
+.safety-diverge-ends span:last-child { text-align: right; }
+.safety-diverge-row { min-height: 30px; border-top: 1px dotted #e3e8dc; }
+.safety-diverge-name { display: flex; align-items: center; gap: 5px; min-width: 0; color: #214b39; font-size: 0.74rem; font-weight: 700; }
+.safety-diverge-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.safety-diverge-name em { flex: none; color: #9a4a12; font-style: normal; font-size: 0.72rem; }
+.safety-diverge-track { position: relative; align-self: stretch; }
+.safety-diverge-track::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: #173f32; }
+.safety-diverge-head .safety-diverge-ends { position: relative; }
+.safety-diverge-track i { position: absolute; top: 50%; height: 12px; min-width: 3px; margin-top: -6px; border-radius: 3px; }
+.safety-diverge-row b { color: #214b39; font-size: 0.78rem; text-align: right; font-variant-numeric: tabular-nums; }
+.safety-diverge-note { margin: 10px 0 0; color: #9a4a12; font-size: 0.68rem; font-weight: 700; }
+.safety-diverge-ends span { white-space: nowrap; }
+@media (max-width: 650px) {
+  .safety-diverge { --name-col: minmax(0, 7rem); }
+  .safety-diverge-head { font-size: 0.52rem; letter-spacing: 0; }
+}
