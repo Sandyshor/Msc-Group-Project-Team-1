@@ -256,3 +256,4 @@ button.amenity-tile:disabled { cursor: default; }
 .stop-open { width: 100%; margin-top: 10px; padding: 7px 10px; border: 0; border-radius: 9px; color: #fff; font-size: 12px; font-weight: 800; }
 .amenity-hover .maplibregl-popup-content { padding: 6px 10px; font-size: 12px; font-weight: 700; }
 .district-map .heat-legend { display: none; }
+.legend-dot.legend-bus { width: 11px; height: 11px; box-sizing: border-box; border: 2px solid #173f37; background: #f5b400; }

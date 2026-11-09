@@ -424,7 +424,7 @@ export default function App() {
             {showLuas && <span><i className="legend-line" style={{ background: '#00a651' }} />Luas Green</span>}
             {showRail && <span><i className="legend-line" style={{ background: '#7ac143' }} />DART</span>}
             {showRail && <span><i className="legend-line" style={{ background: '#6f3f98' }} />Commuter rail</span>}
-            {showBus && <span><i className="legend-dot" style={{ background: '#f5b400' }} />Bus stops (zoom in)</span>}
+            {showBus && <span><i className="legend-dot legend-bus" />Bus stops (zoom in)</span>}
             {showSafety && <span className="legend-safety">More crime <i /> Less crime</span>}
             {showBikes && <span><i className="legend-dot" style={{ background: '#1f6fb2' }} />Dublin Bikes (live)</span>}
             <span className="legend-more">Zoom in to see names and nearby shops. More layers (famous places, supermarkets…) are in the layers button on the map.</span>

@@ -45,7 +45,8 @@ const TRAVEL_MS = 6500;
 // Zoom levels where more detail appears (Google Maps style)
 const Z_MID = 12; // full-size pins; chosen amenity layers load
 const Z_NEAR = 14.5; // bigger pins + names of universities, famous places, stations
-const Z_BUS = 15; // bus stops appear (when the Bus stops button is on)
+const Z_BUS = 14; // bus stops appear as dots (when the Bus stops button is on)
+const Z_BUS_ICON = 15.5; // ...and as bus-stop badges with a bus icon
 const Z_POI = 15.5; // nearby shops, cafés, restaurants... appear by themselves
 const Z_STREET = 16.5; // names under every shop and place
 const Z_STOPS = 12.5; // Luas stops and rail stations appear
@@ -55,6 +56,8 @@ const LUAS_GREEN = '#00a651';
 const DART_GREEN = '#7ac143';
 const RAIL_PURPLE = '#6f3f98';
 const BUS_YELLOW = '#f5b400';
+// small bus (front view) for the bus-stop badges
+const BUS_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h12a2 2 0 0 1 2 2V16a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16V5.5a2 2 0 0 1 2-2Z" fill="#173f37"/><path d="M6 6h12v5.5H6z" fill="#fff"/><circle cx="8" cy="14.5" r="1.3" fill="#ffd34d"/><circle cx="16" cy="14.5" r="1.3" fill="#ffd34d"/><path d="M6.5 17.5v2M17.5 17.5v2" stroke="#173f37" stroke-width="2.2" stroke-linecap="round"/></svg>';
 const BIKES_BLUE = '#1f6fb2';
 
 // Basemap: identical to the journey planner (Stadia, OpenStreetMap if Stadia refuses the tiles).
@@ -581,13 +584,56 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       }
       const bounds = map.getBounds().pad(0.1);
       const z = map.getZoom();
-      st.busStops.forEach((f) => {
+      const badge = z >= Z_BUS_ICON;
+      const big = z >= 17;
+      const tip = (stops) => {
+        const names = [...new Set(stops.map((f) => f.properties.name))].map(escapeHtml).join(' / ');
+        const refs = stops.map((f) => f.properties.ref).filter(Boolean);
+        const routes = [...new Set(stops.flatMap((f) => (f.properties.routes || '').split(';').map((r) => r.trim()).filter(Boolean)))]
+          .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+        return `🚌 ${names}${refs.length ? ` · stop${refs.length > 1 ? 's' : ''} ${refs.map(escapeHtml).join(', ')}` : ''}`
+          + `${routes.length ? `<small>Routes ${escapeHtml(routes.join(', '))}</small>` : ''}`;
+      };
+      const inView = st.busStops.filter((f) => bounds.contains([f.geometry.coordinates[1], f.geometry.coordinates[0]]));
+
+      if (!badge) {
+        // zoomed out: yellow dots with a dark ring, which stand out on the pale map
+        inView.forEach((f) => {
+          const [lng, lat] = f.geometry.coordinates;
+          L.circleMarker([lat, lng], { renderer: busRenderer, radius: 6, color: '#173f37', weight: 2.5, fillColor: BUS_YELLOW, fillOpacity: 1, bubblingMouseEvents: false })
+            .bindTooltip(tip([f]), { direction: 'top', offset: [0, -6], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
+            .on('click', () => pickLandmark(L.latLng(lat, lng), `${f.properties.name} (bus stop)`))
+            .addTo(st.bus);
+        });
+        updateStatus();
+        return;
+      }
+
+      // closer: Dublin Bus style yellow badges with a bus. Poles that would sit on top of each other on
+      // screen (both sides of a street, a row of poles at one stop) share one badge listing all their stops.
+      const size = big ? 30 : 24;
+      const groups = [];
+      inView.forEach((f) => {
         const [lng, lat] = f.geometry.coordinates;
-        if (!bounds.contains([lat, lng])) return;
-        const p = f.properties;
-        L.circleMarker([lat, lng], { renderer: busRenderer, radius: z >= 17 ? 6.5 : 5, color: '#ffffff', weight: 2, fillColor: BUS_YELLOW, fillOpacity: 1, bubblingMouseEvents: false })
-          .bindTooltip(`🚌 ${escapeHtml(p.name)}${p.ref ? ` · stop ${escapeHtml(p.ref)}` : ''}${p.routes ? `<small>Routes ${escapeHtml(p.routes.replaceAll(';', ', '))}</small>` : ''}`, { direction: 'top', offset: [0, -6], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-          .on('click', () => pickLandmark(L.latLng(lat, lng), `${p.name} (bus stop)`))
+        const pt = map.latLngToContainerPoint([lat, lng]);
+        const g = groups.find((x) => x.pt.distanceTo(pt) < size * 0.9);
+        if (g) g.stops.push(f); else groups.push({ pt, lat, lng, stops: [f] });
+      });
+      groups.forEach(({ lat, lng, stops }) => {
+        const refs = stops.map((f) => f.properties.ref).filter(Boolean);
+        const label = big && refs.length ? (refs.length > 2 ? `${refs[0]} +${refs.length - 1}` : refs.join(' · ')) : '';
+        L.marker([lat, lng], {
+          icon: L.divIcon({
+            className: 'jp-bus-stop',
+            html: `<span class="jp-bus-badge${big ? ' is-big' : ''}">${BUS_ICON}${stops.length > 1 ? `<i>${stops.length}</i>` : ''}</span>${label ? `<small>${escapeHtml(label)}</small>` : ''}`,
+            iconSize: [size, size],
+            iconAnchor: [size / 2, size / 2],
+          }),
+          title: `${stops[0].properties.name} bus stop`,
+          keyboard: false,
+        })
+          .bindTooltip(tip(stops), { direction: 'top', offset: [0, -size / 2], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
+          .on('click', () => pickLandmark(L.latLng(lat, lng), `${stops[0].properties.name} (bus stop)`))
           .addTo(st.bus);
       });
       updateStatus();
@@ -1157,6 +1203,9 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     const st = s.current;
     if (!st) return;
     if (props.showBus) st.bus.addTo(st.map); else st.bus.remove();
+    // turned on while zoomed out: zoom in so the stops appear straight away (not on the first load)
+    if (props.showBus && st.busReady && st.map.getZoom() < Z_BUS) st.map.setZoom(Z_BUS_ICON, { animate: !REDUCED_MOTION });
+    st.busReady = true;
     st.renderBusStops();
   }, [props.showBus]);
 
