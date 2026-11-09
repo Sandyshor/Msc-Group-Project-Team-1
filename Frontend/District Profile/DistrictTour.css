@@ -122,3 +122,21 @@
   .dt-actions { flex-wrap: wrap; gap: 6px; }
   .dt-actions .dt-next { margin-left: auto; }
 }
+
+/* phones and tablets, while the tour shows a profile tab: the bar sits at the bottom of the screen */
+.dt-bar.is-docked {
+  position: fixed;
+  z-index: 2100;
+  top: auto;
+  right: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  left: 10px;
+  width: auto;
+  max-width: 720px;
+  margin: 0 auto;
+  animation: dt-dock .35s cubic-bezier(.2, .9, .3, 1.1) both;
+}
+@keyframes dt-dock { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dt-bar.is-docked { animation: none; } }
+/* when a highlighted button is scrolled into view, leave room for its glow */
+.dt-spot { scroll-margin: 80px 0; }
