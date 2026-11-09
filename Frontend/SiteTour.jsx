@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
 import './SiteTour.css'
@@ -26,7 +26,7 @@ const steps = [
     tip: 'Take the tour any time from “Take a tour” in the header.',
   },
   {
-    path: '/', target: 'home-film', icon: 'film', place: 'Home',
+    path: '/', target: 'home-film', keepClear: '.hf-frame', icon: 'film', place: 'Home',
     title: 'Watch the Dublin introduction',
     description: 'A short film that shows the city and its everyday atmosphere before you arrive.',
   },
@@ -88,8 +88,20 @@ function TourIcon({ name }) {
   )
 }
 
+const GAP = 16
+
+// how much of rectangle a the card would cover if it sat at rectangle b
+function overlap(a, b) {
+  const w = Math.min(a.right, b.right) - Math.max(a.left, b.left)
+  const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)
+  return w > 0 && h > 0 ? w * h : 0
+}
+
 function SiteTour({ onClose }) {
   const [stepIndex, setStepIndex] = useState(0)
+  // which corner of the screen the card sits in, so it never hides the part of the page being shown
+  const [corner, setCorner] = useState({ v: 'bottom', h: window.innerWidth <= 480 ? 'right' : 'left' })
+  const cardRef = useRef(null)
   const location = useLocation()
   const navigate = useNavigate()
   const step = steps[stepIndex]
@@ -99,19 +111,66 @@ function SiteTour({ onClose }) {
     if (step.path && location.pathname !== step.path) navigate(step.path)
   }, [location.pathname, navigate, step.path])
 
+  // The card sits bottom left (phones: bottom or top, whichever covers less). If it still covers the
+  // highlighted part and that part is small enough, scroll the page so it sits fully above or below the card.
+  const place = useCallback((allowScroll) => {
+    const card = cardRef.current
+    const target = document.querySelector(step.selector || `[data-site-tour="${step.target}"]`)
+    if (!card || !target) return
+    const clear = (step.keepClear && target.querySelector(step.keepClear)) || target
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const top = Math.max(GAP, document.querySelector('.navbar')?.getBoundingClientRect().bottom + GAP || GAP)
+    const cw = card.offsetWidth
+    const ch = card.offsetHeight
+    const r = clear.getBoundingClientRect()
+    const seen = { left: r.left, right: r.right, top: Math.max(r.top, 0), bottom: Math.min(r.bottom, vh) }
+    const phone = vw <= 480
+    const spots = []
+    // laptops and tablets: always bottom left. Phones (card spans the width): bottom, or top when that hides less.
+    for (const v of phone ? ['bottom', 'top'] : ['bottom']) {
+      for (const h of phone ? ['right'] : ['left']) {
+        const y = v === 'bottom' ? vh - GAP - ch : top
+        const x = phone || h === 'left' ? GAP : vw - GAP - cw
+        spots.push({ v, h, cover: overlap(seen, { left: x, right: x + cw, top: y, bottom: y + ch }) })
+      }
+    }
+    spots.sort((a, b) => a.cover - b.cover)
+    let best = spots[0]
+    if (best.cover > 0 && allowScroll) {
+      // the card still covers it: scroll so the part ends above the card, or starts below it, whichever is the smaller move
+      const room = vh - top - ch - GAP * 2
+      if (r.height <= room) {
+        const up = r.bottom - (vh - ch - GAP * 2) // card at the bottom
+        const down = r.top - (top + ch + GAP) // card at the top
+        const useBottom = !phone || Math.abs(up) <= Math.abs(down)
+        window.scrollBy({ top: useBottom ? up : down, behavior: 'instant' })
+        best = { v: useBottom ? 'bottom' : 'top', h: phone ? 'right' : 'left' }
+      }
+    }
+    setCorner((c) => (c.v === best.v && c.h === best.h && c.top === top ? c : { v: best.v, h: best.h, top }))
+  }, [step])
+
   useEffect(() => {
     if (!onPage) return undefined
     const target = document.querySelector(step.selector || `[data-site-tour="${step.target}"]`)
     if (!target) return undefined
     target.classList.add('site-tour-highlight')
-    if (!step.selector) {
-      target.scrollIntoView({
-        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-        block: 'center',
-      })
+    const instant = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!step.selector) target.scrollIntoView({ behavior: instant ? 'instant' : 'smooth', block: 'center' })
+    const timer = setTimeout(() => place(true), instant ? 30 : 650)
+    let idle
+    const onMove = () => { clearTimeout(idle); idle = setTimeout(() => place(false), 150) }
+    window.addEventListener('resize', onMove)
+    window.addEventListener('scroll', onMove, { passive: true })
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(idle)
+      window.removeEventListener('resize', onMove)
+      window.removeEventListener('scroll', onMove)
+      target.classList.remove('site-tour-highlight')
     }
-    return () => target.classList.remove('site-tour-highlight')
-  }, [onPage, step])
+  }, [onPage, step, place])
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -134,7 +193,9 @@ function SiteTour({ onClose }) {
   return createPortal(
     <aside
       id="site-tour-panel"
-      className={`site-tour${step.assistant ? ' is-assistant' : ''}`}
+      ref={cardRef}
+      className={`site-tour at-${corner.v} at-${corner.h}`}
+      style={corner.v === 'top' ? { top: corner.top } : undefined}
       role="dialog"
       aria-modal="false"
       aria-label="Website tour"

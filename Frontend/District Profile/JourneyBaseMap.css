@@ -300,3 +300,8 @@
 @media (max-width: 1100px) {
   .map-toolbar .district-chips .county-toggle { grid-column: span 2; justify-content: center; }
 }
+
+/* Outside the journey planner a map click doesn't set A/B, so no crosshair and no "click the map" hint */
+.district-map.is-browsing .jp-route-map.leaflet-container { cursor: grab; }
+.district-map.is-browsing .jp-route-map.leaflet-container.leaflet-dragging { cursor: grabbing; }
+.district-map.is-browsing .jp-map-hint { display: none; }

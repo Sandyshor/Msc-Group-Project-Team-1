@@ -18,8 +18,9 @@
   font-family: 'DM Sans', sans-serif;
   animation: st-arrive 0.45s cubic-bezier(.2, .8, .2, 1) both;
 }
-/* the assistant step points at the "Ask me" button (bottom right), so the card moves out of its way */
-.site-tour.is-assistant { right: auto; left: max(20px, env(safe-area-inset-left)); }
+/* the tour moves the card to whichever corner keeps the highlighted part of the page in view */
+.site-tour.at-left { right: auto; left: max(20px, env(safe-area-inset-left)); }
+.site-tour.at-top { bottom: auto; top: max(16px, env(safe-area-inset-top)); }
 
 @keyframes st-arrive {
   from { opacity: 0; transform: translateY(18px) scale(.97); }
@@ -237,6 +238,7 @@
 .site-tour-next span { display: inline-block; transition: transform 0.2s; }
 .site-tour-next:hover span { transform: translateX(3px); }
 .site-tour button:focus-visible { outline: 2px solid var(--st-gold); outline-offset: 2px; }
+.site-tour-skip, .site-tour-back { border-radius: 99px; padding-inline: 10px; }
 
 /* ---------- the highlighted part of the page ---------- */
 .site-tour-highlight {
@@ -264,8 +266,8 @@
     width: calc(100vw - 24px);
     border-radius: 18px;
   }
-  /* on phones the assistant step sits at the top so the "Ask me" button stays visible */
-  .site-tour.is-assistant { left: 12px; right: 12px; top: max(12px, env(safe-area-inset-top)); bottom: auto; }
+  .site-tour.at-left { left: 12px; right: 12px; }
+  .site-tour.at-top { top: max(12px, env(safe-area-inset-top)); bottom: auto; }
   .site-tour-body { padding: 16px 18px 2px; }
   .site-tour h2 { font-size: 22px; }
   .site-tour-description { font-size: 14px; }

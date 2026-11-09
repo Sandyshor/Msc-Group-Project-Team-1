@@ -1191,10 +1191,10 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
   }));
 
   return (
-    <div ref={boxRef} className="district-map jp-scope z-far z-low">
-      <div ref={containerRef} className="jp-route-map" aria-label="Map: click to set start and end points" />
+    <div ref={boxRef} className={`district-map jp-scope z-far z-low${props.planning === false ? ' is-browsing' : ''}`}>
+      <div ref={containerRef} className="jp-route-map" aria-label={props.planning === false ? 'Map of Dublin districts' : 'Map: click to set start and end points'} />
       <div className="jp-map-vignette" aria-hidden="true" />
-      <div ref={hintRef} className="jp-map-hint" aria-live="polite" />
+      <div ref={hintRef} className="jp-map-hint" aria-live="polite" hidden={props.planning === false} />
       <div ref={statusRef} className="jp-amenity-status" role="status" aria-live="polite" hidden />
       <div ref={legendRef} className="jp-map-legend" hidden>
         <span><i className="jp-legend-walk" />Walk</span>
