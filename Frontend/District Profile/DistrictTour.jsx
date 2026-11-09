@@ -3,6 +3,7 @@
 // simple sentence per district from D1 (where it is, which side of the Liffey, a couple of neighbourhoods), then a
 // wrap-up. The page shows each district on the map and its full profile on the right.
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { districtProfiles } from './districtProfiles';
 import './DistrictTour.css';
 
@@ -57,6 +58,9 @@ export default function DistrictTour({ data, codes, onShow, onFeature, onEnd }) 
   const [step, setStep] = useState(-1);
   const [paused, setPaused] = useState(false);
   const [hover, setHover] = useState(false);
+  // phones and tablets: the profile is below the map, so for its tab steps the page scrolls down to it and
+  // the bar docks to the bottom of the screen; on the map steps it goes back over the map
+  const [docked, setDocked] = useState(false);
   const n = codes.length;
   const last = F + n; // the wrap-up
   const feature = step >= 0 && step < F ? FEATURES[step] : null;
@@ -70,6 +74,17 @@ export default function DistrictTour({ data, codes, onShow, onFeature, onEnd }) 
 
   useEffect(() => { if (district >= 0) showRef.current(codes[district]); }, [district, codes]);
 
+  const stacked = () => window.innerWidth <= 1100; // profile card below the map
+  const smooth = () => (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth');
+  // district stops (and the intro) happen on the map: bring it back into view
+  useEffect(() => {
+    if (feature || !stacked()) return;
+    setDocked(false);
+    const stage = document.querySelector('.map-stage');
+    const r = stage?.getBoundingClientRect();
+    if (r && (r.top < 0 || r.top > window.innerHeight * 0.5)) stage.scrollIntoView({ block: 'start', behavior: smooth() });
+  }, [feature, district]);
+
   // a feature step: open its tab on the example district, then highlight the button it's about
   useEffect(() => {
     if (!feature) return undefined;
@@ -79,8 +94,15 @@ export default function DistrictTour({ data, codes, onShow, onFeature, onEnd }) 
       spot = document.querySelector(feature.spot);
       if (!spot) return;
       spot.classList.add('dt-spot');
-      // laptops: bring it into view (on phones the profile is below the map and the tour bar would scroll away)
-      if (window.innerWidth > 1100) spot.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      if (!stacked()) { spot.scrollIntoView({ block: 'nearest', behavior: smooth() }); return; }
+      if (feature.tab) {
+        // show the profile from its tabs, so the section starts at the top of the screen
+        setDocked(true);
+        document.querySelector('.pc .profile-tabs')?.scrollIntoView({ block: 'start', behavior: smooth() });
+      } else {
+        setDocked(false);
+        spot.scrollIntoView({ block: 'center', behavior: smooth() });
+      }
     }, 150);
     return () => { clearTimeout(timer); spot?.classList.remove('dt-spot'); };
   }, [feature]);
@@ -106,8 +128,8 @@ export default function DistrictTour({ data, codes, onShow, onFeature, onEnd }) 
 
   const stop = district >= 0 ? outline(codes[district], data) : null;
 
-  return (
-    <aside className="dt-bar" role="region" aria-label="District tour" aria-live="polite"
+  const bar = (
+    <aside className={`dt-bar${docked ? ' is-docked' : ''}`} role="region" aria-label="District tour" aria-live="polite"
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div className="dt-row" key={step}>
         <span className={`dt-badge${stop ? (stop.north ? ' is-north' : ' is-south') : ''}${feature ? ' is-feature' : ''}`} aria-hidden="true">
@@ -153,4 +175,7 @@ export default function DistrictTour({ data, codes, onShow, onFeature, onEnd }) 
       </div>
     </aside>
   );
+  // docked at the bottom of the screen it goes on <body>: the map card around it would otherwise pin a
+  // "fixed" bar to itself (it scrolls off-screen with the map)
+  return docked ? createPortal(bar, document.body) : bar;
 }
