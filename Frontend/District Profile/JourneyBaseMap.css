@@ -296,7 +296,7 @@
   .jp-map-hint { top: 62px; left: 12px; right: auto; max-width: calc(100% - 72px); transform: none; padding: 8px 12px; border-radius: 14px; white-space: normal; line-height: 1.35; }
   .jp-map-hint .jp-hint-text { white-space: normal; overflow: visible; }
 }
-/* Phones: "County Dublin" gets two cells so its label fits */
-@media (max-width: 600px) {
+/* Phones and tablets: "County Dublin" gets two cells so its label fits */
+@media (max-width: 1100px) {
   .map-toolbar .district-chips .county-toggle { grid-column: span 2; justify-content: center; }
 }

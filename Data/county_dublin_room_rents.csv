@@ -1,13 +1,13 @@
-Eircode,Area,Daft_Region,Single_Sharing,Double_Room,Double_Sharing_Est,Source,Source_URL
-A41,Ballyboughal,North Dublin County,718,843,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-A42,Garristown,North Dublin County,718,843,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-A45,Oldtown,North Dublin County,718,843,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-K32,Balbriggan,North Dublin County,718,843,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-K34,Skerries,North Dublin County,718,843,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-K36,Malahide & Donabate,North Dublin County,718,843,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-K45,Lusk,North Dublin County,718,843,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-K56,Rush,North Dublin County,718,843,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-K67,Swords,North Dublin County,718,843,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-A94,Blackrock & Stillorgan,South Dublin County,827,946,660,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-A96,Dún Laoghaire & Dalkey,South Dublin County,827,946,660,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
-K78,Lucan,West Dublin,737,842,585,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+Eircode,Area,Daft_Region,Single_Sharing,Double_Room,Double_Sharing_Est,One_Bed_Apartment,Two_Bed_Apartment,Source,Source_URL
+A41,Ballyboughal,North Dublin County,718,843,585,1974,2407,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+A42,Garristown,North Dublin County,718,843,585,1974,2407,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+A45,Oldtown,North Dublin County,718,843,585,1974,2407,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+K32,Balbriggan,North Dublin County,718,843,585,1974,2407,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+K34,Skerries,North Dublin County,718,843,585,1974,2407,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+K36,Malahide & Donabate,North Dublin County,718,843,585,1974,2407,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+K45,Lusk,North Dublin County,718,843,585,1974,2407,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+K56,Rush,North Dublin County,718,843,585,1974,2407,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+K67,Swords,North Dublin County,718,843,585,1974,2407,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+A94,Blackrock & Stillorgan,South Dublin County,827,946,660,2116,2605,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+A96,Dún Laoghaire & Dalkey,South Dublin County,827,946,660,2116,2605,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
+K78,Lucan,West Dublin,737,842,585,1862,2332,Daft.ie Rental Report 2026 Q1,https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf

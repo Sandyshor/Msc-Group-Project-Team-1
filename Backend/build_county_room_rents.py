@@ -9,6 +9,8 @@ Data/daft_room_rents_2026q1.csv. Report: https://www.rte.ie/documents/news/2026/
   double room     = Daft "double room in a house, no en suite"
   double sharing  = ESTIMATE per person for a twin/shared room. Daft doesn't report twin rooms, so it is the
                     double-room figure x the twin-to-double ratio in the project's own Dublin listings (Data/D*.xlsx).
+  1 bed / 2 bed   = Daft "Snapshot of average monthly rent, by region and segment" (p. 19), apartments,
+                    typed into Data/daft_home_rents_2026q1.csv
 
 Run from the repo root:  python Backend/build_county_room_rents.py
 Writes Data/county_dublin_room_rents.csv and adds "roomReport" to Frontend/public/data/county-dublin-profiles.json.
@@ -21,6 +23,7 @@ import pandas as pd
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 DAFT_CSV = os.path.join(ROOT, "Data", "daft_room_rents_2026q1.csv")
+DAFT_HOMES_CSV = os.path.join(ROOT, "Data", "daft_home_rents_2026q1.csv")
 OUT_CSV = os.path.join(ROOT, "Data", "county_dublin_room_rents.csv")
 PROFILES_JSON = os.path.join(ROOT, "Frontend", "public", "data", "county-dublin-profiles.json")
 REPORT = "Daft.ie Rental Report 2026 Q1"
@@ -35,6 +38,9 @@ REGION = {
     "A94": "South Dublin County", "A96": "South Dublin County",
     "K78": "West Dublin",
 }
+# Dublin districts that have no room listings of their own get their Daft region's room rents too
+# (profile page only; the recommender has its own room figures for the districts)
+CITY_FALLBACK = {"D9": "North Dublin City"}
 SHARED_LABELS = ["twin", "shared", "twin & shared"]
 
 
@@ -52,17 +58,26 @@ def main():
     house = daft[(daft["Setting"] == "House") & (daft["Ensuite"] == "No")]
     rent = house.pivot(index="Region", columns="Room", values="Monthly_Rent")
     ratio, n_shared, n_double = twin_to_double_ratio()
+    homes = pd.read_csv(DAFT_HOMES_CSV).pivot(index="Region", columns="Bedrooms", values="Monthly_Rent")
 
     profiles = json.load(open(PROFILES_JSON, encoding="utf-8"))
     rows, report = [], {}
     for code, region in REGION.items():
         single, double = int(rent.loc[region, "Single"]), int(rent.loc[region, "Double"])
         sharing = int(round(double * ratio / 5) * 5)
+        one_bed, two_bed = int(homes.loc[region, 1]), int(homes.loc[region, 2])
         name = profiles["profiles"][code]["name"]
         rows.append({"Eircode": code, "Area": name, "Daft_Region": region,
                      "Single_Sharing": single, "Double_Room": double, "Double_Sharing_Est": sharing,
+                     "One_Bed_Apartment": one_bed, "Two_Bed_Apartment": two_bed,
                      "Source": REPORT, "Source_URL": REPORT_URL})
-        report[code] = {"region": region, "single": single, "double": double, "sharing": sharing}
+        report[code] = {"region": region, "single": single, "double": double, "sharing": sharing,
+                        "oneBed": one_bed, "twoBed": two_bed}
+
+    for code, region in CITY_FALLBACK.items():
+        single, double = int(rent.loc[region, "Single"]), int(rent.loc[region, "Double"])
+        report[code] = {"region": region, "single": single, "double": double,
+                        "sharing": int(round(double * ratio / 5) * 5)}
 
     pd.DataFrame(rows).to_csv(OUT_CSV, index=False)
     profiles["roomReport"] = {
@@ -75,7 +90,8 @@ def main():
     with open(PROFILES_JSON, "w", encoding="utf-8") as f:
         json.dump(profiles, f, ensure_ascii=False, separators=(",", ":"))
     print(f"twin/double ratio {ratio:.3f} ({n_shared} vs {n_double} listings)")
-    print(pd.DataFrame(rows)[["Eircode", "Area", "Daft_Region", "Single_Sharing", "Double_Room", "Double_Sharing_Est"]].to_string(index=False))
+    print(pd.DataFrame(rows)[["Eircode", "Area", "Daft_Region", "Single_Sharing", "Double_Room", "Double_Sharing_Est",
+                             "One_Bed_Apartment", "Two_Bed_Apartment"]].to_string(index=False))
 
 
 if __name__ == "__main__":

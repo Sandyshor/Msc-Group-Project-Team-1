@@ -480,6 +480,13 @@ def load_county(university_points):
     return points, areas[areas["Area"].isin(points["Area"])].reset_index(drop=True)
 
 
+def _home_source(source, region):
+    """Where a County Dublin area's 1- or 2-bed rent comes from (shown on the results page)."""
+    if source == "daft":
+        return f"Daft.ie report apartment average for {region}"
+    return "RTB average rent, all homes"
+
+
 def county_safety(county):
     """{area: safety figures} for the County Dublin areas, shaped like load_safety()'s."""
     out = {}
@@ -631,7 +638,8 @@ def load_data():
             rent_sources[area] = {
                 "private_room": f"Daft.ie report average for {region}",
                 "shared_room": f"estimate from the Daft.ie report for {region}",
-                "one_bed": "RTB average rent, all homes", "two_bed": "RTB average rent, all homes"}
+                "one_bed": _home_source(row.get("One_Bed_Source"), region),
+                "two_bed": _home_source(row.get("Two_Bed_Source"), region)}
 
     area_data = (
         census

@@ -598,3 +598,10 @@
   .hx-card { width: min(380px, calc(100% - 32px)); margin-inline: 16px; }
   .hx-sparkle-card { right: 4px; }
 }
+
+/* Tablets: the "New to Dublin?" card spans the page with its checklist in two columns,
+   instead of a narrow card in the corner with empty space beside it */
+@media (min-width: 701px) and (max-width: 1100px) {
+  .hx-card { width: auto; margin-inline: 6%; }
+  .hx-card ul { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+}

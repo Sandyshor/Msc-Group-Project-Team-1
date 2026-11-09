@@ -130,19 +130,33 @@ function RentSection({ code, data, rentMode, setRentMode }) {
   const listing = rentMode === 'rooms' ? r.rooms : r.homes;
   const keys = rentMode === 'rooms' ? ['single', 'double'] : ['studio', '1 bed', '2 bed', '3 bed', '4+ bed'];
   const have = keys.filter((k) => listing?.[k]);
-  // County Dublin areas have no room listings of their own: show the Daft report average for their part of Dublin
-  const report = data.roomReport;
-  const reportRooms = rentMode === 'rooms' && !have.length ? report?.areas?.[code] : null;
+  // No listings of this kind here: fall back to report averages instead of an empty box.
+  // Rooms: the Daft.ie report's averages for the area's part of Dublin.
+  // Whole homes: RTB 2025 averages when RTB has both the 1- and 2-bed figure, else the Daft.ie report's.
+  const report = data.roomReport?.areas?.[code];
+  const rtbHomes = rtb?.district?.['1 bed'] && rtb?.district?.['2 bed'] ? rtb.district : null;
+  let fallback = null;
+  if (!have.length && rentMode === 'rooms' && report) {
+    fallback = {
+      eyebrow: 'DAFT REPORT 2026 Q1',
+      tiles: [['Single sharing', report.single, 'single room'], ['Double room', report.double, 'one person'], ['Double sharing · est.', report.sharing, 'per person · twin room']],
+    };
+  } else if (!have.length && rentMode === 'homes' && (rtbHomes || report?.oneBed)) {
+    fallback = rtbHomes
+      ? { eyebrow: 'RTB 2025', tiles: [['1 bed', rtbHomes['1 bed'], 'average'], ['2 bed', rtbHomes['2 bed'], 'average'], ...(rtbHomes['3 bed'] ? [['3 bed', rtbHomes['3 bed'], 'average']] : [])] }
+      : { eyebrow: 'DAFT REPORT 2026 Q1', tiles: [['1 bed apartment', report.oneBed, 'average'], ['2 bed apartment', report.twoBed, 'average']] };
+  }
   const areas = Object.entries(rtb?.areas || {}).filter(([, v]) => v.all).sort((a, b) => a[1].all - b[1].all);
+  const hasRtb = rtb?.district && Object.keys(rtb.district).length > 0;
   return (
     <>
       <section className="profile-section">
-        <SectionTitle eyebrow={reportRooms ? 'DAFT REPORT 2026 Q1' : 'DAFT LISTINGS'} title="Monthly rent" icon="village" />
+        <SectionTitle eyebrow={fallback ? fallback.eyebrow : 'DAFT LISTINGS'} title="Monthly rent" icon="village" />
         <div className="seg-toggle" role="group" aria-label="Rent type">
           <button type="button" aria-pressed={rentMode === 'rooms'} onClick={() => setRentMode('rooms')}>Rooms</button>
           <button type="button" aria-pressed={rentMode === 'homes'} onClick={() => setRentMode('homes')}>Whole homes</button>
         </div>
-        {have.length ? (
+        {have.length > 0 && (
           <div className="rent-grid">
             {have.map((k) => {
               const x = listing[k];
@@ -155,41 +169,34 @@ function RentSection({ code, data, rentMode, setRentMode }) {
               );
             })}
           </div>
-        ) : reportRooms ? (
-          <>
-            <div className="rent-grid">
-              <div className="rent-tile"><span>Single sharing</span><strong>{eur(reportRooms.single)}</strong><small>single room · per month</small></div>
-              <div className="rent-tile"><span>Double room</span><strong>{eur(reportRooms.double)}</strong><small>one person · per month</small></div>
-              <div className="rent-tile"><span>Double sharing · est.</span><strong>{eur(reportRooms.sharing)}</strong><small>per person · twin room</small></div>
-            </div>
-            <p className="section-description top-gap">
-              No room listings collected here yet, so these are the {report.source} averages for {reportRooms.region}. {report.basis}{' '}
-              Double sharing: {report.sharingNote}{' '}
-              <a href={report.url} target="_blank" rel="noopener noreferrer">Read the report ↗</a>
-            </p>
-          </>
-        ) : <EmptyNote>{rentMode === 'rooms' ? 'room' : 'whole-property'} listings for {code}</EmptyNote>}
+        )}
+        {fallback && (
+          <div className="rent-grid">
+            {fallback.tiles.map(([label, value, note]) => (
+              <div className="rent-tile" key={label}><span>{label}</span><strong>{eur(value)}</strong><small>{note} · per month</small></div>
+            ))}
+          </div>
+        )}
       </section>
-      <section className="profile-section">
-        <SectionTitle eyebrow="RTB 2025" title="Official average rent" icon="landmark" />
-        {rtb?.district && Object.keys(rtb.district).length ? (
-          <>
-            <div className="rent-grid">
-              {[['all', 'All homes'], ['1 bed', '1 bed'], ['2 bed', '2 bed'], ['3 bed', '3 bed']].filter(([k]) => rtb.district[k]).map(([k, l]) => (
-                <div className="rent-tile" key={k}><span>{l}</span><strong>{eur(rtb.district[k])}</strong><small>per month</small></div>
-              ))}
+      {hasRtb && (
+        <section className="profile-section">
+          <SectionTitle eyebrow="RTB 2025" title="Official average rent" icon="landmark" />
+          <div className="rent-grid">
+            {/* sizes already shown above (whole homes from RTB) aren't repeated */}
+            {[['all', 'All homes'], ['1 bed', '1 bed'], ['2 bed', '2 bed'], ['3 bed', '3 bed']].filter(([k]) => rtb.district[k] && !(fallback?.eyebrow === 'RTB 2025' && k !== 'all')).map(([k, l]) => (
+              <div className="rent-tile" key={k}><span>{l}</span><strong>{eur(rtb.district[k])}</strong><small>per month</small></div>
+            ))}
+          </div>
+          {areas.length > 0 && (
+            <div className="rtb-areas">
+              {areas.map(([n, v]) => <div key={n}><span>{n}</span><b>{eur(v.all)}</b></div>)}
             </div>
-            {areas.length > 0 && (
-              <div className="rtb-areas">
-                {areas.map(([n, v]) => <div key={n}><span>{n}</span><b>{eur(v.all)}</b></div>)}
-              </div>
-            )}
-            <p className="section-description top-gap">
-              RTB average monthly rent, 2025, all property types{(rtb.derived || []).length ? '. District figure is the mean of its RTB areas.' : '.'}
-            </p>
-          </>
-        ) : <EmptyNote>RTB averages for {code}</EmptyNote>}
-      </section>
+          )}
+          <p className="section-description top-gap">
+            RTB average monthly rent, 2025, all property types{(rtb.derived || []).length ? '. District figure is the mean of its RTB areas.' : '.'}
+          </p>
+        </section>
+      )}
     </>
   );
 }
