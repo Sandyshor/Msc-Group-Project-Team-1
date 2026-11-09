@@ -69,11 +69,13 @@ function App() {
   const [tourOpen, setTourOpen] = useState(false)
   // The tour opens by itself every time someone opens (or reloads) the website on the home page.
   // Pages opened from a link (a district, the results...) are left alone so the tour doesn't pull people away.
+  // (once per page load; if they leave the home page before it opens, it doesn't open)
+  const tourShown = useRef(false)
   useEffect(() => {
-    if (location.pathname !== '/') return undefined
-    const timer = setTimeout(() => setTourOpen(true), 1200)
+    if (tourShown.current || location.pathname !== '/') return undefined
+    const timer = setTimeout(() => { tourShown.current = true; setTourOpen(true) }, 1200)
     return () => clearTimeout(timer)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [location.pathname])
   // The menu button appears when the header runs out of room (narrow windows or a zoomed-in browser)
   const [menuOpen, setMenuOpen] = useState(false)
   const headerRef = useRef(null)

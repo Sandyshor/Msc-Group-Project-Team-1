@@ -9,12 +9,13 @@ import './Compare.css';
 const eur = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
 const num = (v) => Number(v).toLocaleString('en-IE');
 
+// [key, chip label, what it compares]
 const PRIORITIES = [
-  ['budget', 'Low rent'],
-  ['safety', 'Safety'],
-  ['campus', 'Close to campus'],
-  ['amenities', 'Shops & things to do'],
-  ['students', 'Student life'],
+  ['budget', 'Low rent', 'room and apartment rents'],
+  ['safety', 'Safety', 'the safety score'],
+  ['campus', 'Close to campus', 'walking distance to your university'],
+  ['amenities', 'Shops & things to do', 'supermarkets, cafés, restaurants, gyms, parks and more'],
+  ['students', 'Student life', 'share of students, people aged 20–29 and people born outside Ireland'],
 ];
 
 // Rent for one size: the district's own listings first, then the RTB average, then the Daft.ie report
@@ -157,15 +158,18 @@ export default function CompareDistricts({ data, amenityCounts, first, onOpen, o
   const [uni, setUni] = useState(() => { try { return localStorage.getItem('compare-uni') || ''; } catch { return ''; } });
   const [chosen, setChosen] = useState(['budget', 'safety', 'amenities']);
   const dialog = useRef(null);
+  const close = useRef(onClose);
+  close.current = onClose;
 
+  // once, when the window opens (the page re-renders often, and this must not steal focus each time)
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e) => { if (e.key === 'Escape') close.current(); };
     window.addEventListener('keydown', onKey);
     dialog.current?.focus();
     const scroll = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = scroll; };
-  }, [onClose]);
+  }, []);
 
   useEffect(() => { try { localStorage.setItem('compare-uni', uni); } catch { /* storage blocked */ } }, [uni]);
 
@@ -215,10 +219,15 @@ export default function CompareDistricts({ data, amenityCounts, first, onOpen, o
         <div className="cmp-prefs">
           <p><b>What matters to you?</b> Pick any.</p>
           <div className="cmp-chips">
-            {PRIORITIES.map(([k, l]) => (
-              <button type="button" key={k} aria-pressed={chosen.includes(k)} onClick={() => toggle(k)}>{chosen.includes(k) ? '✓ ' : ''}{l}</button>
+            {PRIORITIES.map(([k, l, about]) => (
+              <button type="button" key={k} aria-pressed={chosen.includes(k)} title={`Compares ${about}`} onClick={() => toggle(k)}>{chosen.includes(k) ? '✓ ' : ''}{l}</button>
             ))}
           </div>
+          {chosen.length > 0 && (
+            <ul className="cmp-about">
+              {PRIORITIES.filter(([k]) => chosen.includes(k)).map(([k, l, about]) => <li key={k}><b>{l}:</b> {about}</li>)}
+            </ul>
+          )}
           {chosen.includes('campus') && (
             <select className="cmp-uni" value={uni} onChange={(e) => setUni(e.target.value)} aria-label="Your university">
               <option value="">Choose your university…</option>

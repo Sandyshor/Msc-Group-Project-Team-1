@@ -1204,8 +1204,8 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     if (!st) return;
     if (props.showBus) st.bus.addTo(st.map); else st.bus.remove();
     // turned on while zoomed out: zoom in so the stops appear straight away (not on the first load)
-    if (props.showBus && st.busReady && st.map.getZoom() < Z_BUS) st.map.setZoom(Z_BUS_ICON, { animate: !REDUCED_MOTION });
-    st.busReady = true;
+    if (props.showBus && st.busWasOn === false && st.map.getZoom() < Z_BUS) st.map.setZoom(Z_BUS_ICON, { animate: !REDUCED_MOTION });
+    st.busWasOn = props.showBus;
     st.renderBusStops();
   }, [props.showBus]);
 

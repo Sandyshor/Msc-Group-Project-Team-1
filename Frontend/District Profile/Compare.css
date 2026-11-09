@@ -254,3 +254,5 @@
 @media (prefers-reduced-motion: reduce) { .cmp, .cmp-backdrop { animation: none; } }
 .map-toolbar .tour-button.compare-button { background: #173f37; color: #d9f17e; }
 .map-toolbar .tour-button.compare-button:hover { background: #245b48; }
+.cmp-about { display: grid; gap: 2px; margin: 8px 0 0; padding: 0; list-style: none; color: #74817a; font-size: 12px; line-height: 1.45; }
+.cmp-about b { color: #4f5f55; font-weight: 700; }
