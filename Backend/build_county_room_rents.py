@@ -2,7 +2,7 @@
 Room rents for the County Dublin areas (A and K Eircodes), which have no room listings of their own.
 
 Source: Daft.ie Rental Report 2026 Q1, "Snapshot of average room rent in Dublin, by market and type" (p. 24),
-average listed monthly rents for North Dublin County, South Dublin County and West Dublin, typed into
+average listed monthly rents for Daft's six Dublin markets, typed into
 Data/daft_room_rents_2026q1.csv. Report: https://www.rte.ie/documents/news/2026/05/daft.ie-rental-report-2026q1.pdf
 
   single sharing  = Daft "single room in a house, no en suite"
@@ -38,9 +38,19 @@ REGION = {
     "A94": "South Dublin County", "A96": "South Dublin County",
     "K78": "West Dublin",
 }
-# Dublin districts that have no room listings of their own get their Daft region's room rents too
-# (profile page only; the recommender has its own room figures for the districts)
-CITY_FALLBACK = {"D9": "North Dublin City"}
+# Every Dublin district also gets its Daft market's averages, which the profile page and the district comparison
+# use wherever the district has no listings of that kind (the recommender has its own figures for the districts).
+# Daft's report names six Dublin markets but doesn't list their postcodes; each district goes to the market its
+# area belongs to.
+CITY_FALLBACK = {
+    "D1": "Dublin City Centre", "D2": "Dublin City Centre",
+    "D3": "North Dublin City", "D5": "North Dublin City", "D7": "North Dublin City", "D9": "North Dublin City",
+    "D11": "North Dublin City", "D13": "North Dublin City", "D17": "North Dublin City",
+    "D4": "South Dublin City", "D6": "South Dublin City", "D6W": "South Dublin City", "D8": "South Dublin City",
+    "D12": "South Dublin City", "D14": "South Dublin City",
+    "D16": "South Dublin County", "D18": "South Dublin County",
+    "D10": "West Dublin", "D15": "West Dublin", "D20": "West Dublin", "D22": "West Dublin", "D24": "West Dublin",
+}
 SHARED_LABELS = ["twin", "shared", "twin & shared"]
 
 
@@ -77,7 +87,8 @@ def main():
     for code, region in CITY_FALLBACK.items():
         single, double = int(rent.loc[region, "Single"]), int(rent.loc[region, "Double"])
         report[code] = {"region": region, "single": single, "double": double,
-                        "sharing": int(round(double * ratio / 5) * 5)}
+                        "sharing": int(round(double * ratio / 5) * 5),
+                        "oneBed": int(homes.loc[region, 1]), "twoBed": int(homes.loc[region, 2])}
 
     pd.DataFrame(rows).to_csv(OUT_CSV, index=False)
     profiles["roomReport"] = {

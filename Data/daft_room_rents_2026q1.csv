@@ -23,5 +23,27 @@ West Dublin,Single,House,Yes,941,12.1
 West Dublin,Single,House,No,737,6.3
 West Dublin,Single,Apartment,Yes,,
 West Dublin,Single,Apartment,No,785,4.0
+Dublin City Centre,Double,House,Yes,1080,4.2
+Dublin City Centre,Double,House,No,944,2.7
+Dublin City Centre,Double,Apartment,Yes,1207,2.0
+Dublin City Centre,Double,Apartment,No,1090,7.0
+Dublin City Centre,Single,House,Yes,890,3.2
+Dublin City Centre,Single,House,No,804,3.7
+Dublin City Centre,Single,Apartment,Yes,1284,12.5
+Dublin City Centre,Single,Apartment,No,1002,7.8
+North Dublin City,Double,House,Yes,1058,7.0
 North Dublin City,Double,House,No,893,7.2
+North Dublin City,Double,Apartment,Yes,1087,3.4
+North Dublin City,Double,Apartment,No,936,5.4
+North Dublin City,Single,House,Yes,948,9.4
 North Dublin City,Single,House,No,764,4.1
+North Dublin City,Single,Apartment,Yes,952,-3.0
+North Dublin City,Single,Apartment,No,868,9.3
+South Dublin City,Double,House,Yes,1093,5.4
+South Dublin City,Double,House,No,903,4.6
+South Dublin City,Double,Apartment,Yes,1195,2.1
+South Dublin City,Double,Apartment,No,1089,4.9
+South Dublin City,Single,House,Yes,955,0.7
+South Dublin City,Single,House,No,786,6.3
+South Dublin City,Single,Apartment,Yes,1157,-2.2
+South Dublin City,Single,Apartment,No,903,-2.2
