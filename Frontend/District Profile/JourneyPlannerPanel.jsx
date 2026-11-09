@@ -1,6 +1,7 @@
 // The journey planner's side panel (public/journey-planner/route.html), shown in the profile's Journey tab.
 // The route itself is drawn on the main map by JourneyBaseMap.
 import { MODE_STYLE, TRAVEL_MODES, dublinNowInputValue, formatDistance, formatMinutes, formatTime, legColor, lineLabel } from './journey';
+import PlaceSearch from './PlaceSearch';
 import './JourneyPlanner.css';
 import './JourneyBaseMap.css';
 
@@ -64,17 +65,29 @@ export default function JourneyPlannerPanel({ trip, setTrip, onReset, quickStart
           )}
           <button type="button" className="jp-reset-button jp-route-reset" title="Clear start and end points" onClick={onReset}>↻ <span>Reset</span></button>
         </div>
-        {/* Where the trip goes, by name: "From TU Dublin Grangegorman → To Temple Bar" */}
-        <ol className="jp-trip" aria-label="Your journey">
-          <li className={`is-a ${trip.from ? '' : 'is-empty'}`}>
-            <b>A</b>
-            <span><small>From</small>{trip.from ? pointLabel(trip.from) : 'Click the map to set the start'}</span>
-          </li>
-          <li className={`is-b ${trip.to ? '' : 'is-empty'}`}>
-            <b>B</b>
-            <span><small>To</small>{trip.to ? pointLabel(trip.to) : 'Then click to set the destination'}</span>
-          </li>
-        </ol>
+        {/* A and B: type a place, street or university, or click the map */}
+        <div className="jp-ends" role="group" aria-label="Your journey">
+          <PlaceSearch
+            className="is-a"
+            badge="A"
+            label="Start point"
+            placeholder="From: type a place, or click the map"
+            value={trip.from ? pointLabel(trip.from) : ''}
+            onPick={(p) => set({ from: { lat: p.lat, lng: p.lng, label: p.label } })}
+            onClear={() => set({ from: null, status: 'idle', itineraries: [] })}
+          />
+          <PlaceSearch
+            className="is-b"
+            badge="B"
+            label="Destination"
+            placeholder="To: type a place, or click the map"
+            value={trip.to ? pointLabel(trip.to) : ''}
+            onPick={(p) => set({ to: { lat: p.lat, lng: p.lng, label: p.label } })}
+            onClear={() => set({ to: null, status: 'idle', itineraries: [] })}
+          />
+          <button type="button" className="jp-swap" title="Swap start and destination" aria-label="Swap start and destination"
+            disabled={!trip.from && !trip.to} onClick={() => set({ from: trip.to, to: trip.from })}>⇅</button>
+        </div>
       </div>
 
       {trip.status === 'loading' && (
@@ -130,7 +143,7 @@ export default function JourneyPlannerPanel({ trip, setTrip, onReset, quickStart
             <g className="jp-empty-pin jp-empty-pin-b" transform="translate(210 30)"><path d="M0 0 C -9 -12 -11 -16 -11 -21 a11 11 0 0 1 22 0 c0 5 -2 9 -11 21z" /><text y="-17">B</text></g>
           </svg>
           <strong>Where are you going?</strong>
-          <p>Click the map to set your start and destination, or choose a university, famous place or amenity from the map layers. Drag either pin to adjust the route.</p>
+          <p>Type a university, place or street in the A and B boxes, or click the map. Drag either pin to adjust the route.</p>
           {quickStarts.length > 0 && (
             <div className="jp-quick">
               {quickStarts.map(([label, point]) => <button type="button" key={label} onClick={() => set({ from: point })}>{label}</button>)}

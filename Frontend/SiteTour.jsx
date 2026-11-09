@@ -20,18 +20,18 @@ const ICONS = {
 
 const steps = [
   {
-    path: '/', target: 'home', icon: 'home', place: 'Home',
+    path: '/', target: 'home', corner: 'right', icon: 'home', place: 'Home',
     title: 'Welcome to Find My Dublin',
     description: 'Your guide to living and studying in Dublin: find a neighbourhood that fits your budget, campus and lifestyle.',
     tip: 'Take the tour any time from “Take a tour” in the header.',
   },
   {
-    path: '/', target: 'home-film', keepClear: '.hf-frame', icon: 'film', place: 'Home',
+    path: '/', target: 'home-film', keepClear: '.hf-frame', corner: 'left', icon: 'film', place: 'Home',
     title: 'Watch the Dublin introduction',
     description: 'A short film that shows the city and its everyday atmosphere before you arrive.',
   },
   {
-    path: '/', target: 'faq', icon: 'faq', place: 'Home', isNew: true,
+    path: '/', target: 'faq', corner: 'left', icon: 'faq', place: 'Home', isNew: true,
     title: 'Quick answers in the FAQ',
     description: 'Short answers to what new students ask most: which area to live in, rent, getting around, your first days, working while you study, and safety.',
     tip: 'Tap a question to open the answer.',
@@ -73,7 +73,7 @@ const steps = [
     description: 'Compare your recommended neighbourhoods: rent, commute, safety, places to live, and why each one matched.',
   },
   {
-    path: null, selector: '.chatw-fab', icon: 'chat', place: 'On every page', isNew: true, assistant: true,
+    path: null, selector: '.chatw-fab', corner: 'left', icon: 'chat', place: 'On every page', isNew: true, assistant: true,
     title: 'Ask the AI assistant',
     description: 'Stuck on something? The “Ask me” button opens the Crib Crew Assistant. Ask about areas, rent, transport or your first weeks in Dublin.',
     tip: 'It can make mistakes, so check important details with official sources.',
@@ -97,10 +97,40 @@ function overlap(a, b) {
   return w > 0 && h > 0 ? w * h : 0
 }
 
+const SOLID = 'a, button, input, select, textarea, video, iframe, canvas, img, .leaflet-container, [role="button"]'
+
+// How much real content (text, buttons, pictures, maps) sits under a spot: checks a grid of points
+// and counts those that land on text or a control, looking underneath the tour card itself.
+function busyness(card, spot) {
+  let hits = 0
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 6; j++) {
+      const x = spot.left + ((i + 0.5) / 8) * spot.width
+      const y = spot.top + ((j + 0.5) / 6) * spot.height
+      const stack = document.elementsFromPoint(x, y).filter((el) => !card.contains(el)).slice(0, 6)
+      const hit = stack.some((el) => {
+        const solid = el.closest(SOLID)
+        if (solid) {
+          const b = solid.getBoundingClientRect()
+          return b.width < window.innerWidth * 0.6 // a full-width background picture doesn't count
+        }
+        return [...el.childNodes].some((n) => {
+          if (n.nodeType !== 3 || !n.textContent.trim()) return false
+          const range = document.createRange()
+          range.selectNodeContents(n)
+          return [...range.getClientRects()].some((q) => x >= q.left && x <= q.right && y >= q.top && y <= q.bottom)
+        })
+      })
+      if (hit) hits++
+    }
+  }
+  return hits
+}
+
 function SiteTour({ onClose }) {
   const [stepIndex, setStepIndex] = useState(0)
   // which corner of the screen the card sits in, so it never hides the part of the page being shown
-  const [corner, setCorner] = useState({ v: 'bottom', h: window.innerWidth <= 480 ? 'right' : 'left' })
+  const [corner, setCorner] = useState({ v: 'bottom', h: 'right' })
   const cardRef = useRef(null)
   const location = useLocation()
   const navigate = useNavigate()
@@ -111,8 +141,9 @@ function SiteTour({ onClose }) {
     if (step.path && location.pathname !== step.path) navigate(step.path)
   }, [location.pathname, navigate, step.path])
 
-  // The card sits bottom left (phones: bottom or top, whichever covers less). If it still covers the
-  // highlighted part and that part is small enough, scroll the page so it sits fully above or below the card.
+  // Where the card sits. Steps can name a corner (home: bottom right; film and FAQ: bottom left, next to the
+  // video and the questions). Other steps take the bottom corner that hides the least text, buttons and
+  // pictures. Phones (card spans the width): bottom, or top when that hides less of the highlighted part.
   const place = useCallback((allowScroll) => {
     const card = cardRef.current
     const target = document.querySelector(step.selector || `[data-site-tour="${step.target}"]`)
@@ -126,26 +157,39 @@ function SiteTour({ onClose }) {
     const r = clear.getBoundingClientRect()
     const seen = { left: r.left, right: r.right, top: Math.max(r.top, 0), bottom: Math.min(r.bottom, vh) }
     const phone = vw <= 480
-    const spots = []
-    // laptops and tablets: always bottom left. Phones (card spans the width): bottom, or top when that hides less.
-    for (const v of phone ? ['bottom', 'top'] : ['bottom']) {
-      for (const h of phone ? ['right'] : ['left']) {
+    let best
+
+    if (phone) {
+      const spots = ['bottom', 'top'].map((v) => {
         const y = v === 'bottom' ? vh - GAP - ch : top
-        const x = phone || h === 'left' ? GAP : vw - GAP - cw
-        spots.push({ v, h, cover: overlap(seen, { left: x, right: x + cw, top: y, bottom: y + ch }) })
-      }
+        return { v, h: 'right', cover: overlap(seen, { left: GAP, right: GAP + cw, top: y, bottom: y + ch }) }
+      }).sort((a, b) => a.cover - b.cover)
+      best = spots[0]
+    } else if (step.corner) {
+      best = { v: 'bottom', h: step.corner }
+    } else {
+      const y = vh - GAP - ch
+      const score = (h) => busyness(card, { left: h === 'left' ? GAP : vw - GAP - cw, top: y, width: cw, height: ch })
+      const left = score('left')
+      const right = score('right')
+      // keep the current side unless the other one is clearly emptier, so the card doesn't jump while scrolling
+      const now = cardRef.current.classList.contains('at-left') ? 'left' : 'right'
+      const other = now === 'left' ? 'right' : 'left'
+      const s = { left, right }
+      best = { v: 'bottom', h: s[other] + 3 < s[now] ? other : now }
     }
-    spots.sort((a, b) => a.cover - b.cover)
-    let best = spots[0]
-    if (best.cover > 0 && allowScroll) {
-      // the card still covers it: scroll so the part ends above the card, or starts below it, whichever is the smaller move
+
+    if (allowScroll) {
+      // still covering the highlighted part? scroll so it sits fully above (or on phones, below) the card
+      const x = phone || best.h === 'left' ? GAP : vw - GAP - cw
+      const y = best.v === 'bottom' ? vh - GAP - ch : top
       const room = vh - top - ch - GAP * 2
-      if (r.height <= room) {
-        const up = r.bottom - (vh - ch - GAP * 2) // card at the bottom
-        const down = r.top - (top + ch + GAP) // card at the top
+      if (overlap(seen, { left: x, right: x + cw, top: y, bottom: y + ch }) > 0 && r.height <= room) {
+        const up = r.bottom - (vh - ch - GAP * 2)
+        const down = r.top - (top + ch + GAP)
         const useBottom = !phone || Math.abs(up) <= Math.abs(down)
         window.scrollBy({ top: useBottom ? up : down, behavior: 'instant' })
-        best = { v: useBottom ? 'bottom' : 'top', h: phone ? 'right' : 'left' }
+        best = { v: useBottom ? 'bottom' : 'top', h: best.h }
       }
     }
     setCorner((c) => (c.v === best.v && c.h === best.h && c.top === top ? c : { v: best.v, h: best.h, top }))
@@ -157,7 +201,12 @@ function SiteTour({ onClose }) {
     if (!target) return undefined
     target.classList.add('site-tour-highlight')
     const instant = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!step.selector) target.scrollIntoView({ behavior: instant ? 'instant' : 'smooth', block: 'center' })
+    if (!step.selector) {
+      // a whole page taller than the screen opens at its top (title and intro); smaller parts are centred
+      const focus = (step.keepClear && target.querySelector(step.keepClear)) || target
+      const tall = focus.getBoundingClientRect().height > window.innerHeight
+      focus.scrollIntoView({ behavior: instant ? 'instant' : 'smooth', block: tall ? 'start' : 'center' })
+    }
     const timer = setTimeout(() => place(true), instant ? 30 : 650)
     let idle
     const onMove = () => { clearTimeout(idle); idle = setTimeout(() => place(false), 150) }

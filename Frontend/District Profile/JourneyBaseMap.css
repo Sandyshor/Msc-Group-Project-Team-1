@@ -305,3 +305,26 @@
 .district-map.is-browsing .jp-route-map.leaflet-container { cursor: grab; }
 .district-map.is-browsing .jp-route-map.leaflet-container.leaflet-dragging { cursor: grabbing; }
 .district-map.is-browsing .jp-map-hint { display: none; }
+
+/* Search result: a gold pin with the place's name and direction buttons */
+.jp-search-pin span {
+  position: absolute;
+  inset: 0 3px 8px;
+  border: 3px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  background: #c29450;
+  box-shadow: 0 6px 14px rgba(16, 47, 42, .35);
+  transform: rotate(-45deg);
+  animation: jp-search-drop .45s cubic-bezier(.3, 1.4, .5, 1) both;
+}
+.jp-search-pin span::after { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: #fff; }
+@keyframes jp-search-drop { from { opacity: 0; transform: translateY(-18px) rotate(-45deg); } }
+.jp-search-popup .leaflet-popup-content { margin: 12px 14px; }
+.jp-search-pop strong { display: block; color: #202d29; font: 700 14px 'DM Sans', sans-serif; }
+.jp-search-pop small { display: block; margin-top: 2px; color: #74817a; font: 500 12px 'DM Sans', sans-serif; }
+.jp-search-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.jp-search-actions button { padding: 7px 11px; border: 1px solid #dfe8da; border-radius: 99px; background: #fff; color: #214b39; font: 700 12px 'DM Sans', sans-serif; cursor: pointer; }
+.jp-search-actions button:hover { background: #f0f5ec; border-color: #9cbfa6; }
+.jp-search-actions button[data-end="to"] { background: #173f37; border-color: #173f37; color: #d9f17e; }
+@media (prefers-reduced-motion: reduce) { .jp-search-pin span { animation: none; } }
+.district-map.has-search-pop .jp-map-hint { display: none; }

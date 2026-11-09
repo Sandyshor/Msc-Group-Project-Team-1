@@ -6,6 +6,8 @@ import JourneyPlannerPanel, { routeTabLabel } from './JourneyPlannerPanel';
 import { fetchRoutes } from './journey';
 import { chainShops as buildChainShops, loadAmenityRecords, loadVerifiedAmenityCounts, loadVerifiedChainShops } from './amenityData';
 import { streetName } from './placeNames';
+import PlaceSearch from './PlaceSearch';
+import { addDistrictPlaces } from './placeIndex';
 import { districtProfiles } from './districtProfiles';
 import DistrictTour from './DistrictTour';
 import './App.css';
@@ -159,6 +161,7 @@ export default function App() {
         .then((county) => {
           if (county) ['profiles', 'labels', 'census', 'safety', 'rtb'].forEach((k) => { d[k] = { ...(d[k] || {}), ...(county[k] || {}) }; });
           if (county?.roomReport) d.roomReport = county.roomReport; // Daft report room rents for County Dublin
+          addDistrictPlaces(d); // districts, neighbourhoods and Luas stops for the search box
           setData(d);
         }))
       .catch((e) => setError(e.message));
@@ -249,6 +252,12 @@ export default function App() {
   const showTourStop = useCallback((code) => selectDistrict(code, true), [selectDistrict]);
   const endTour = useCallback(() => setTouring(false), []);
 
+  // A start typed into the planner: bring it into view (with both ends set, the route is fitted instead)
+  useEffect(() => {
+    const end = trip.to && !trip.from ? trip.to : trip.from && !trip.to ? trip.from : null;
+    if (end) mapApi.current?.reveal(end.lat, end.lng);
+  }, [trip.from?.lat, trip.from?.lng, trip.to?.lat, trip.to?.lng]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (error) return <div className="district-page"><p className="empty-note">Could not load district data: {error}</p></div>;
   if (!data) return <div className="district-page"><p className="empty-note">Loading district map…</p></div>;
 
@@ -296,6 +305,18 @@ export default function App() {
     onMapPoint(p);
   };
 
+  // The search box above the map: a district opens its profile; anything else gets a pin on the map
+  const onSearchPick = (p) => {
+    if (p.kind === 'district' && data.profiles[p.code]) { mapApi.current?.clearSearchPin(); selectDistrict(p.code); return; }
+    mapApi.current?.showSearchResult(p);
+  };
+  // "Directions from / to here" on the search pin
+  const onSearchDirections = (which, p) => {
+    setTouring(false);
+    setTrip((t) => ({ ...t, [which]: { lat: p.lat, lng: p.lng, label: p.label } }));
+    if (selectedId && tab !== 'journey') setTab('journey');
+  };
+
   const hasCounty = COUNTY_AREAS.some((c) => data.profiles[c]);
   const countyIsSelected = COUNTY_AREAS.includes(selectedId);
   const showCountyRow = hasCounty && (countyOpen || countyIsSelected);
@@ -318,6 +339,13 @@ export default function App() {
         <section className="map-card">
           {/* Everything that controls the map sits on top of it, so the district list and the map are always on screen together */}
           <div className="map-toolbar">
+            <div className="map-search">
+              <PlaceSearch
+                label="Search the map"
+                placeholder="Search a university, place, street or district, e.g. UCD, Temple Bar, D8"
+                onPick={onSearchPick}
+              />
+            </div>
             <div className="district-controls">
               <div className="seg-toggle" role="group" aria-label="Filter by side of the Liffey">
                 {[['all', 'All'], ['Northside', 'Northside'], ['Southside', 'Southside']].map(([v, l]) => (
@@ -378,6 +406,7 @@ export default function App() {
             onPlaceClick={onPlaceClick}
             trip={trip}
             planning={planning}
+            onSearchDirections={onSearchDirections}
             onMapPoint={onMapPoint}
             onLandmarkPoint={onLandmarkPoint}
             onDragPoint={onDragPoint}
