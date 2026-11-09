@@ -1014,9 +1014,9 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     const loading = trip.status === 'loading';
     let html;
     if (loading) html = 'Finding the best routes…';
-    else if (!trip.from) html = 'Click the map or a university to set your <strong>start</strong> point';
-    else if (!trip.to) html = 'Now click to set your <strong>destination</strong>';
-    else html = `From <strong>${escapeHtml(trip.from.label || 'start')}</strong> to <strong>${escapeHtml(trip.to.label || 'destination')}</strong>`;
+    else if (!trip.from) html = 'Click the map to drop your <strong>start (A)</strong>, or type a place in box A';
+    else if (!trip.to) html = 'Now click the map to drop your <strong>destination (B)</strong>';
+    else html = '<strong>Drag the A or B pin</strong> on the map to change your route';
     if (node.dataset.html === html) return;
     node.dataset.html = html;
     node.classList.toggle('jp-is-loading', loading);

@@ -44,6 +44,14 @@ export default function JourneyPlannerPanel({ trip, setTrip, onReset, quickStart
 
   return (
     <div className="jp-scope jp-panel">
+      {/* Evaluation feedback: people looked for a search bar and didn't know the pins can be dragged */}
+      <div className="jp-howto" aria-label="How to plan a journey">
+        <b>How to plan a journey</b>
+        <ol>
+          <li><span className="jp-howto-pin is-a">A</span><span className="jp-howto-pin is-b">B</span>Click the map to drop your start (A) and destination (B), or type a place in the boxes below.</li>
+          <li><span className="jp-howto-drag" aria-hidden="true">✥</span><span><strong>Drag the A or B pin on the map</strong> to move it. The route and times update straight away.</span></li>
+        </ol>
+      </div>
       <div className="jp-route-controls">
         <div className="jp-segmented" role="radiogroup" aria-label="Travel mode">
           {TRAVEL_MODES.map(([value, label]) => (
