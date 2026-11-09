@@ -58,7 +58,7 @@ function buildRows(data, counts, uni) {
       },
     },
     {
-      group: 'Getting around', key: 'walk', label: uni ? `Walk to ${uni}` : 'Walk to your campus', better: 'low', priority: 'campus',
+      group: 'Getting around', key: 'walk', label: uni ? `Walking distance to ${uni}` : 'Walking distance to campus', better: 'low', priority: 'campus',
       get: (code) => {
         const w = uni && data.walk?.[code]?.[uni];
         return w ? { value: w.km, text: `${w.km.toFixed(1)} km`, note: `about ${w.min} min from ${w.center}` } : null;
@@ -176,7 +176,8 @@ export default function CompareDistricts({ data, amenityCounts, first, onOpen, o
     const vb = r.get(b);
     cells[r.key] = { a: va, b: vb, win: winner(r, va, vb) };
   });
-  const shown = rows.filter((r) => cells[r.key].a || cells[r.key].b);
+  // only rows where both districts have a figure
+  const shown = rows.filter((r) => cells[r.key].a && cells[r.key].b);
   const wins = { a: 0, b: 0 };
   shown.forEach((r) => { if (cells[r.key].win) wins[cells[r.key].win]++; });
   const result = a !== b ? verdict(rows, cells, a, b, chosen) : { text: 'Pick two different districts.' };
@@ -253,9 +254,8 @@ export default function CompareDistricts({ data, amenityCounts, first, onOpen, o
                             ? <b className="cmp-score" style={{ background: heatColor(v.score), color: textOnHeat(v.score) }}>{v.text}</b>
                             : <b>{v.text}</b>}
                           {c.win === side && <i aria-label="better">✓</i>}
-                          {v.note && <small>{v.note}</small>}
                         </>
-                      ) : <span className="cmp-none">No data</span>}
+                      ) : null}
                     </td>
                   );
                   return (
@@ -272,7 +272,7 @@ export default function CompareDistricts({ data, amenityCounts, first, onOpen, o
         </div>
 
         <footer className="cmp-foot">
-          <p>✓ marks the better figure. Rent uses each district&rsquo;s Daft.ie listings first, then RTB 2025 or Daft.ie report averages. Rows you care about are highlighted.</p>
+          <p>✓ marks the better figure. Rows you care about are highlighted.</p>
           <div>
             <button type="button" onClick={() => onOpen(a)}>Open {a} profile</button>
             <button type="button" onClick={() => onOpen(b)}>Open {b} profile</button>

@@ -161,7 +161,7 @@ export default function App() {
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null)
         .then((county) => {
-          if (county) ['profiles', 'labels', 'census', 'safety', 'rtb'].forEach((k) => { d[k] = { ...(d[k] || {}), ...(county[k] || {}) }; });
+          if (county) ['profiles', 'labels', 'census', 'safety', 'rtb', 'walk'].forEach((k) => { d[k] = { ...(d[k] || {}), ...(county[k] || {}) }; });
           if (county?.roomReport) d.roomReport = county.roomReport; // Daft report room rents for County Dublin
           addDistrictPlaces(d); // districts, neighbourhoods and Luas stops for the search box
           setData(d);
