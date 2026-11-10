@@ -21,6 +21,12 @@ const CAMPUS_ALIASES = {
   nci: 'nci national college of ireland',
   dbs: 'dbs dublin business school',
   iadt: 'iadt dun laoghaire',
+  maynooth: 'maynooth mu nuim',
+}
+// a university's own short names: typing one exactly puts that university first
+const SHORT_NAMES = {
+  tu: ['tu', 'tud', 'dit'], tcd: ['tcd', 'trinity'], ucd: ['ucd'], dcu: ['dcu'], rcsi: ['rcsi'], ncad: ['ncad'],
+  griffith: ['griffith'], nci: ['nci'], dbs: ['dbs'], iadt: ['iadt'], maynooth: ['maynooth', 'mu', 'nuim'],
 }
 
 // kind → [order in the results, label shown under the name]
@@ -70,7 +76,7 @@ async function build() {
   const list = [...extra]
   universities.forEach((u) => {
     const alias = CAMPUS_ALIASES[u.id.split('-')[0]] || ''
-    list.push({ kind: 'uni', label: u.name, sub: u.location, lat: u.coordinates[0], lng: u.coordinates[1], keys: `${u.name} ${alias} university college campus` })
+    list.push({ kind: 'uni', label: u.name, sub: u.location, lat: u.coordinates[0], lng: u.coordinates[1], keys: `${u.name} ${alias} university college campus`, short: SHORT_NAMES[u.id.split('-')[0]] || [] })
   })
   ;(places || []).forEach((p) => list.push({ kind: 'place', label: p.name, sub: p.category || 'Famous place', lat: p.lat, lng: p.lon }))
   ;(housing?.residences || []).forEach((r) => list.push({
@@ -108,6 +114,8 @@ export function searchPlaces(list, query, limit = 8) {
   for (const p of list) {
     if (!terms.every((t) => p.words.some((w) => w.startsWith(t)))) continue
     let score = KINDS[p.kind][0] * 10
+    // a university's own short name ("ucd", "dcu", "tcd", "trinity") puts it first, above places named after it
+    if (p.short?.includes(q)) score -= 60
     if (p.n === q) score -= 40
     else if (p.n.startsWith(q)) score -= 25
     else if (p.words[0].startsWith(terms[0])) score -= 12

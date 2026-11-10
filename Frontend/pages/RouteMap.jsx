@@ -10,6 +10,7 @@
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import '../District Profile/leafletNoTitle'
 import { streetName } from '../District Profile/placeNames'
 import { spreadPins } from '../District Profile/spreadPins'
 import { fitCard } from '../District Profile/placeCard'
