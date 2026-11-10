@@ -1,21 +1,43 @@
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../firebase'
+import { getAuthErrorMessage } from '../authErrors'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  // Accounts are not connected yet, so the form only shows a message.
-  function handleLogin(event) {
+  const navigate = useNavigate()
+
+  async function handleLogin(event) {
     event.preventDefault()
-    setError('Log in and sign up are coming soon. You can still use everything else on the site.')
+    setError('')
+    setShowSignupPrompt(false)
+    setLoading(true)
+
+    try {
+      await signInWithEmailAndPassword(auth, email.trim(), password)
+      navigate('/')
+    } catch (error) {
+      setShowSignupPrompt([
+        'auth/invalid-credential',
+        'auth/wrong-password',
+        'auth/user-not-found',
+      ].includes(error?.code))
+      setError(getAuthErrorMessage(error, 'log in'))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <section className="login-page">
+    <section className="login-page" data-site-tour="login">
       <div className="login-card">
         <Link className="login-back" to="/">
           ← Back to home
@@ -82,15 +104,22 @@ function Login() {
           {error && (
             <p className="signup-error" role="alert">
               {error}
+              {showSignupPrompt && (
+                <>
+                  {' '}Are you new to Find My Dublin? Then{' '}
+                  <Link to="/signup">create an account</Link>.
+                </>
+              )}
             </p>
           )}
 
           <button
             type="submit"
             className="login-submit"
+            disabled={loading}
           >
-            Log in
-            <span>→</span>
+            {loading ? 'Logging in...' : 'Log in'}
+            {!loading && <span>→</span>}
           </button>
         </form>
 

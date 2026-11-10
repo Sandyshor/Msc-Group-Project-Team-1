@@ -1,6 +1,9 @@
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth } from '../firebase'
+import { getAuthErrorMessage } from '../authErrors'
 
 function Signup() {
   const [name, setName] = useState('')
@@ -10,21 +13,49 @@ function Signup() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
-  // Accounts are not connected yet, so the form only checks the passwords and shows a message.
-  function handleSignup(event) {
+  async function handleSignup(event) {
     event.preventDefault()
+    setError('')
 
     if (password !== confirmPassword) {
       setError('Your passwords do not match. Please try again.')
       return
     }
 
-    setError('Log in and sign up are coming soon. You can still use everything else on the site.')
+    setLoading(true)
+
+    try {
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      )
+      try {
+        await updateProfile(user, { displayName: name.trim() })
+      } catch (profileError) {
+        console.error(
+          'Profile name update error:',
+          profileError?.code || profileError?.message || profileError
+        )
+        setError(
+          'Your account was created and you are signed in, but we could not save your name.'
+        )
+        return
+      }
+
+      navigate('/')
+    } catch (error) {
+      setError(getAuthErrorMessage(error, 'create your account'))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <section className="login-page">
+    <section className="login-page" data-site-tour="signup">
       <div className="login-card signup-card">
         <Link className="login-back" to="/">
           ← Back to home
@@ -130,9 +161,9 @@ function Signup() {
             </p>
           )}
 
-          <button type="submit" className="login-submit">
-            Create account
-            <span>→</span>
+          <button type="submit" className="login-submit" disabled={loading}>
+            {loading ? 'Creating account...' : 'Create account'}
+            {!loading && <span>→</span>}
           </button>
         </form>
 
