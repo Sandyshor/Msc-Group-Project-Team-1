@@ -292,7 +292,7 @@ function PlacesToLive({ area, places, budget, student, room }) {
       <p className="home-credits">
         Residences: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap
         contributors</a> (ODbL), the official websites of the operators and universities, and Amber Student, checked October 2026.
-        Find Your Dublin is not affiliated with Daft.ie, Rent.ie or any residence listed.
+        Find My Dublin is not affiliated with Daft.ie, Rent.ie or any residence listed.
       </p>
     </section>
   )
@@ -701,10 +701,10 @@ function LettingAgents() {
   return (
     <div className="agencies">
       <div className="agencies-panel">
+        <h3>Letting agents in Dublin</h3>
         <p className="agencies-intro">
-          A selection of licensed letting agents operating in Dublin. This is not a complete
-          list, and agents are shown in alphabetical order. Being listed here does not mean we
-          recommend them.
+          Licensed letting agents that rent out homes in Dublin, in alphabetical order. This is a
+          short list, not every agent in the city, and being on it doesn't mean we recommend them.
         </p>
         {failed && <p>We couldn't load the letting agents. Please try again later.</p>}
         {!agents && !failed && <p>Loading…</p>}
@@ -721,7 +721,7 @@ function LettingAgents() {
                 </div>
                 {a.Address && <p className="agent-address">📍 {a.Address}</p>}
                 <div className="agent-bottom">
-                  {a.PSRA_Licence && <span className="agent-psra">✓ PSRA {a.PSRA_Licence}</span>}
+                  {a.PSRA_Licence && <span className="agent-psra">✓ PSRA licence {a.PSRA_Licence}</span>}
                   {a.Website && (
                     <a className="agent-link" href={a.Website} target="_blank" rel="noreferrer">
                       Visit website ↗
@@ -734,10 +734,10 @@ function LettingAgents() {
         )}
         {agents && agents.length > 0 && (
           <p className="agencies-note">
-            Find Your Dublin is a student project and is not affiliated with, endorsed by or paid
-            by any of these agents. Details were correct when checked in October 2026, so please
-            confirm them directly with the agent. Never pay a deposit before viewing a property
-            and checking the agent's PSRA licence.
+            Find My Dublin is a student project and isn't linked to, endorsed by or paid by any of
+            these agents. We checked these details in October 2026, so please confirm them with the
+            agent. Never pay a deposit before you've viewed the property and checked the agent's
+            licence on the <a href="https://www.psr.ie" target="_blank" rel="noreferrer">PSRA register</a>.
           </p>
         )}
       </div>
@@ -864,7 +864,7 @@ function ShareResults() {
   const menuRef = useRef(null)
 
   const url = window.location.href
-  const text = 'My Dublin neighbourhood matches from Find Your Dublin'
+  const text = 'My Dublin neighbourhood matches from Find My Dublin'
   const isMac = /Mac|iPhone|iPad/.test(navigator.userAgent)
   const isPhone = window.matchMedia('(pointer: coarse)').matches
 

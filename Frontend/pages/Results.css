@@ -996,23 +996,15 @@
   transition: opacity 0.2s;
 }
 /* Letting agents */
-.agencies {
-  margin-top: 28px;
-}
-
 .agencies-panel {
-  margin-top: 14px;
-  padding: 20px;
-  border: 1px solid #e0d8c9;
-  border-radius: 12px;
-  background: #fffdf7;
   color: #173f32;
   font-size: 14px;
   line-height: 1.6;
 }
+.agencies-panel > h3:first-child { margin-top: 12px; }
 
 .agencies-intro {
-  margin: 0 0 16px;
+  margin: 6px 0 16px;
   color: #4f6158;
 }
 
@@ -1113,8 +1105,10 @@
 .agencies-note {
   margin: 16px 0 0;
   color: #6b7c72;
-  font-size: 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
 }
+.agencies-note a { color: #245b48; font-weight: 700; }
 
 /* Compare top areas: same headings, cards and colours as the other tabs */
 .compare { color: #173f32; }
