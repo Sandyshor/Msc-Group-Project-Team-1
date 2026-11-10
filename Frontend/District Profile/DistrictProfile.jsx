@@ -143,6 +143,33 @@ function PlacesSection({ code, places, hoverPlace, onHoverPlace, onPlaceClick })
   );
 }
 
+// Purpose-built student residences in the district (same list as the map's Student housing pins)
+let residencesLoad = null;
+const loadResidences = () => (residencesLoad ??= fetch('/data/student-residences.json').then((r) => (r.ok ? r.json() : null)).then((d) => d?.residences || []).catch(() => { residencesLoad = null; return []; }));
+
+function ResidencesSection({ code }) {
+  const [all, setAll] = useState(null);
+  useEffect(() => { let live = true; loadResidences().then((list) => { if (live) setAll(list); }); return () => { live = false; }; }, []);
+  const here = (all || []).filter((r) => r.district === code).sort((a, b) => (a.from ?? 1e9) - (b.from ?? 1e9));
+  if (!here.length) return null;
+  return (
+    <section className="profile-section">
+      <SectionTitle eyebrow="STUDENT HOUSING" title={`Student residences in ${code}`} icon="village" extra={<span className="place-count">{here.length}</span>} />
+      <ul className="pc-residences">
+        {here.map((r) => (
+          <li key={r.name}>
+            <span className="pc-res-name">
+              {r.website ? <a href={r.website} target="_blank" rel="noopener noreferrer">{r.name}</a> : r.name}
+              <small>{[r.operator, r.address].filter(Boolean).join(' · ')}</small>
+            </span>
+            {r.from && <b>from €{Math.round(r.from).toLocaleString('en-IE')}</b>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function RentSection({ code, data, rentMode, setRentMode }) {
   const r = data.rent[code] || { rooms: {}, homes: {} };
   const rtb = data.rtb[code];
@@ -216,6 +243,7 @@ function RentSection({ code, data, rentMode, setRentMode }) {
           </p>
         </section>
       )}
+      <ResidencesSection code={code} />
     </>
   );
 }

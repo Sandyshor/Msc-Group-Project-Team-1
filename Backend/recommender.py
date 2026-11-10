@@ -64,6 +64,12 @@ COMMUTE_FILES = ["Dublin_D1_D24_All_University_Commutes_clean_updated.csv", "Com
 # Commute times calculated with OpenTripPlanner by Backend/tools/build_commute_matrix.py. When the
 # file exists it replaces the Journey Planner export and the cycling estimate below.
 OTP_COMMUTE_FILE = "commute_otp.csv"
+# Universities added after the original landmark file (their journeys are only in the OTP files, added with
+# tools/build_commute_matrix.py --university ...): campus location for the map and the results page.
+# Keep in step with NEW_UNIVERSITIES in tools/build_commute_matrix.py.
+NEW_UNIVERSITY_LOCATIONS = {
+    "Maynooth University": (53.3842, -6.6010),  # North Campus, Maynooth, Co. Kildare
+}
 # The same for the safety data's neighbourhoods (build_commute_matrix.py --neighbourhoods). Until it
 # exists, a neighbourhood uses the times of the nearest commute point in its district.
 NEIGHBOURHOOD_COMMUTE_FILE = "commute_otp_neighbourhoods.csv"
@@ -591,6 +597,21 @@ def load_data():
                 commute_points[mode] = minutes[mode].reindex(commute_points.index).fillna(commute_points[mode])
                 commute_points[km_column] = km[mode].reindex(commute_points.index).fillna(commute_points[km_column])
         commute_points = commute_points.reset_index()
+        # universities that are only in the OTP file: their own rows, from the same landmarks
+        new_keys = minutes.index.difference(commute_points.set_index(keys).index)
+        new_keys = new_keys[new_keys.get_level_values("University").isin(NEW_UNIVERSITY_LOCATIONS)]
+        if len(new_keys):
+            starts = (commute_points.drop_duplicates(["Area", "Direction", "Landmark"])
+                      .set_index(["Area", "Direction", "Landmark"])[["Origin_Latitude", "Origin_Longitude"]])
+            extra = pd.DataFrame(index=new_keys).reset_index().join(starts, on=["Area", "Direction", "Landmark"])
+            extra["Destination_Latitude"] = extra["University"].map(lambda u: NEW_UNIVERSITY_LOCATIONS[u][0])
+            extra["Destination_Longitude"] = extra["University"].map(lambda u: NEW_UNIVERSITY_LOCATIONS[u][1])
+            for mode, km_column in MODE_DISTANCE.items():
+                if mode in minutes:
+                    extra[mode] = minutes[mode].reindex(new_keys).to_numpy()
+                    extra[km_column] = km[mode].reindex(new_keys).to_numpy()
+            extra["Travel_Time_Min"] = extra.get("public_transport")
+            commute_points = pd.concat([commute_points, extra], ignore_index=True)
         commute_source = (f"OpenTripPlanner (TFI timetables), public transport arriving by "
                           f"{otp['Arrive_By'].iloc[0][-5:]} on a weekday; calculated {otp['Calculated_At'].iloc[0][:10]}")
 
@@ -689,7 +710,7 @@ def load_data():
         # room rent of the parts with enough listings of their own: (Area, Part) -> mean, count
         "part_rent": {"shared_room": _part_room_rent(room_data[is_shared]),
                       "private_room": _part_room_rent(room_data[is_private])},
-        "universities": sorted(commute_by_university["University"].unique()),
+        "universities": sorted(set(commute_by_university["University"]) | set(commute_points["University"])),
         "safety": safety,
         "rent_sources": rent_sources,
         "safety_maps": load_safety_maps(),

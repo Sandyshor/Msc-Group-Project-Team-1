@@ -33,6 +33,8 @@ TRANSIT_MODES = {"BUS", "TRAM", "RAIL", "SUBWAY", "FERRY"}
 # so every mode sends an explicit object.
 OTP_MODES = {
     "transit": {"transit": {"transit": [{"mode": "BUS"}, {"mode": "TRAM"}, {"mode": "RAIL"}]}},
+    # buses only: the results map shows the bus option too when the fastest trip is by Luas or train
+    "bus": {"transit": {"transit": [{"mode": "BUS"}]}},
     "walk": {"directOnly": True, "direct": ["WALK"]},
     "bike": {"directOnly": True, "direct": ["BICYCLE"]},
 }
@@ -226,7 +228,7 @@ def route(
     from_lon: float,
     to_lat: float,
     to_lon: float,
-    mode: Literal["transit", "walk", "bike"] = "transit",
+    mode: Literal["transit", "bus", "walk", "bike"] = "transit",
     when: Optional[str] = Query(None, description="ISO date-time; defaults to now (Europe/Dublin)"),
     arrive_by: bool = False,
 ):

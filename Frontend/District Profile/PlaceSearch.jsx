@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { KINDS, loadPlaceIndex, searchAddresses, searchPlaces } from './placeIndex';
 import './PlaceSearch.css';
 
-const KIND_ICON = { district: '🗺️', uni: '🎓', place: '⭐', area: '🏘️', station: '🚉', amenity: '📍', address: '🏠' };
+const KIND_ICON = { district: '🗺️', uni: '🎓', place: '⭐', housing: '🏠', area: '🏘️', station: '🚉', amenity: '📍', address: '🏠' };
 
 export default function PlaceSearch({ value = '', onPick, onClear, placeholder, label, badge, className = '' }) {
   const id = useId();

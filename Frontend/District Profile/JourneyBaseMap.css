@@ -373,3 +373,18 @@
   font-style: normal;
   text-align: center;
 }
+
+/* Student residences: purple-ringed house pins; names from street level, like the universities */
+.district-controls .tr-toggle .tr-housing { width: auto; height: auto; background: none; font-size: 13px; font-style: normal; line-height: 1; }
+.z-near .pm-housing .pm-label { display: block; }
+.pm-housing .pm-label { color: #5a2d7a; }
+.sh-popup .leaflet-popup-content { margin: 12px 14px; }
+.sh-pop { display: grid; gap: 3px; font-family: 'DM Sans', sans-serif; }
+.sh-pop .sh-kicker { color: #7a3fa0; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.sh-pop strong { color: #202d29; font-size: 14.5px; font-weight: 800; }
+.sh-pop small { color: #5f6f67; font-size: 12px; font-weight: 600; }
+.sh-pop .sh-addr { color: #74817a; font-size: 12px; }
+.sh-pop .sh-price { margin-top: 4px; color: #202d29; font-size: 13px; }
+.sh-pop .sh-rooms { color: #74817a; font-size: 11.5px; }
+.sh-pop a { margin-top: 6px; color: #7a3fa0; font-size: 12.5px; font-weight: 800; text-decoration: none; }
+.sh-pop a:hover { text-decoration: underline; }

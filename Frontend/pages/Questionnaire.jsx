@@ -22,7 +22,11 @@ const UNIVERSITIES = [
   ['Griffith College Dublin', 'Griffith College Dublin'],
   ['Dublin Business School', 'Dublin Business School'],
   ['IADT - Dun Laoghaire', 'IADT — Dún Laoghaire'],
+  ['Maynooth University', 'Maynooth University'],
 ]
+// Only offered once the recommender has commute times for them (its universities are listed at /options)
+const NEEDS_DATA = new Set(['Maynooth University'])
+const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
 
 // label, backend accommodation key (null = no rent data yet)
 // Room types inside student residences: [value, label, what it is, typical monthly starting price]
@@ -102,6 +106,16 @@ function Questionnaire() {
   }
 
   const [needUniversity, setNeedUniversity] = useState(false)
+  // universities the recommender can match (null until it answers: the newer ones stay hidden until then)
+  const [served, setServed] = useState(null)
+  useEffect(() => {
+    let live = true
+    fetch(`${API_URL}/options`).then((r) => (r.ok ? r.json() : null)).then((d) => {
+      if (live && Array.isArray(d?.universities)) setServed(new Set(d.universities))
+    }).catch(() => {})
+    return () => { live = false }
+  }, [])
+  const universityOptions = UNIVERSITIES.filter(([value]) => !NEEDS_DATA.has(value) || served?.has(value))
   // Step 3 (the matches) opens once step 1 is complete and step 2 has been seen with at least one priority set
   const [seenPriorities, setSeenPriorities] = useState(state?.step === 2 || Boolean(earlier))
   useEffect(() => { if (step === 2) setSeenPriorities(true) }, [step])
@@ -204,7 +218,7 @@ function Questionnaire() {
             <FlowRow icon="cap" title="University" question="Which university will you attend?" htmlFor="destination">
               <select id="destination" value={destination} onChange={(event) => setDestination(event.target.value)}>
                 <option value="">Select your university</option>
-                {UNIVERSITIES.map(([value, label]) => (
+                {universityOptions.map(([value, label]) => (
                   <option key={value} value={value}>{label}</option>
                 ))}
               </select>

@@ -28,6 +28,7 @@ export const KINDS = {
   district: [0, 'District'],
   uni: [1, 'University'],
   place: [2, 'Famous place'],
+  housing: [2, 'Student residence'],
   area: [3, 'Neighbourhood'],
   station: [4, 'Station'],
   amenity: [5, 'Place'],
@@ -60,10 +61,11 @@ export function addDistrictPlaces(data) {
 const getJson = (url) => fetch(url, { headers: { Accept: 'application/json' } }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
 
 async function build() {
-  const [places, rail, records] = await Promise.all([
+  const [places, rail, records, housing] = await Promise.all([
     getJson(`${PLANNER}places.json`),
     getJson('/data/dublin-rail-stations.geojson'),
     loadAmenityRecords().catch(() => []),
+    getJson('/data/student-residences.json'),
   ])
   const list = [...extra]
   universities.forEach((u) => {
@@ -71,6 +73,10 @@ async function build() {
     list.push({ kind: 'uni', label: u.name, sub: u.location, lat: u.coordinates[0], lng: u.coordinates[1], keys: `${u.name} ${alias} university college campus` })
   })
   ;(places || []).forEach((p) => list.push({ kind: 'place', label: p.name, sub: p.category || 'Famous place', lat: p.lat, lng: p.lon }))
+  ;(housing?.residences || []).forEach((r) => list.push({
+    kind: 'housing', label: r.name, sub: [r.operator, r.address].filter(Boolean).join(' · ') || `Student residence in ${r.district}`,
+    lat: r.lat, lng: r.lon, keys: `${r.name} ${r.operator || ''} student residence accommodation housing ${r.district}`,
+  }))
   ;(rail?.features || []).forEach((f) => {
     const [lng, lat] = f.geometry.coordinates
     list.push({ kind: 'station', label: `${f.properties.name} station`, sub: f.properties.dart ? 'DART station' : 'Train station', lat, lng, keys: `${f.properties.name} station train rail ${f.properties.dart ? 'dart' : ''}` })

@@ -17,6 +17,14 @@ neighbourhood the times of the nearest landmark in its district.
 
 Add --county to do it for the County Dublin areas' places (A and K Eircodes, from the District Profile's
 county-dublin-profiles.json), saved to Data/commute_otp_county.csv with each place's coordinates.
+
+Add --university "Maynooth University" to plan only the journeys to one university (one of NEW_UNIVERSITIES
+below, or one already in the files) and put them into the existing file, replacing that university's old rows
+and keeping everyone else's. Run it three times to cover every file:
+    python tools/build_commute_matrix.py --university "Maynooth University"
+    python tools/build_commute_matrix.py --university "Maynooth University" --neighbourhoods
+    python tools/build_commute_matrix.py --university "Maynooth University" --county
+OTP's graph must include the university (Maynooth is in Kildare: the OpenStreetMap extract has to reach it).
 """
 import json
 import os
@@ -41,6 +49,10 @@ COUNTY_PROFILES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
 COUNTY_OUTPUT = os.path.join(DATA_FOLDER, "commute_otp_county.csv")
 
 ARRIVE_BY = "09:00"
+# Universities that aren't in the original landmark file yet: name -> (latitude, longitude) of the campus
+NEW_UNIVERSITIES = {
+    "Maynooth University": (53.3842, -6.6010),  # North Campus, Maynooth, Co. Kildare (OpenStreetMap)
+}
 # recommender travel mode -> routing.py mode
 MODES = {"public_transport": "transit", "walk": "walk", "cycle": "bike"}
 WORKERS = 4  # parallel requests; OTP on a laptop or the 2-CPU VM copes with 4
@@ -95,13 +107,30 @@ def county_points(commutes):
     return places.merge(universities, how="cross")
 
 
+def only_university(points, name):
+    """The same start points, each paired with just this one university."""
+    if name in NEW_UNIVERSITIES:
+        lat, lon = NEW_UNIVERSITIES[name]
+    else:
+        known = points[points["University"] == name]
+        if known.empty:
+            raise SystemExit(f"Unknown university '{name}': add its campus to NEW_UNIVERSITIES first.")
+        lat, lon = known.iloc[0][["Destination_Latitude", "Destination_Longitude"]]
+    starts = points.drop_duplicates(["District", "Landmark"]).drop(
+        columns=["University", "Destination_Latitude", "Destination_Longitude"])
+    return starts.assign(University=name, Destination_Latitude=lat, Destination_Longitude=lon)
+
+
 def main():
     for_neighbourhoods = "--neighbourhoods" in sys.argv
     for_county = "--county" in sys.argv
+    university = sys.argv[sys.argv.index("--university") + 1] if "--university" in sys.argv else None
     points = pd.read_csv(POINTS_FILE)[[
         "District", "Direction", "Landmark", "Origin_Latitude", "Origin_Longitude",
         "University", "Destination_Latitude", "Destination_Longitude",
     ]]
+    if university:
+        points = only_university(points, university)
     if for_neighbourhoods:
         points = neighbourhood_points(points)
     elif for_county:
@@ -135,6 +164,11 @@ def main():
     if for_neighbourhoods:
         matrix = matrix.rename(columns={"Landmark": "Neighbourhood"}).drop(columns="Direction")
         output = NEIGHBOURHOODS_OUTPUT
+    if university and os.path.exists(output):
+        # keep every other university's journeys; replace only this one's
+        old = pd.read_csv(output)
+        matrix = pd.concat([old[old["University"] != university], matrix[old.columns.intersection(matrix.columns)]],
+                           ignore_index=True)
     matrix.to_csv(output, index=False)
     print(f"Saved {len(matrix)} journeys to {output} ({missing} had no route)")
     print(matrix.groupby("Mode")["Minutes"].describe()[["count", "mean", "min", "max"]].round(1).to_string())

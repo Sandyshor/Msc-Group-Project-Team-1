@@ -1324,3 +1324,48 @@
   .flow-page-results .flow-panel .flow-choice { flex-direction: column; justify-content: center; gap: 4px; min-width: 0; min-height: 56px; padding: 8px 4px; white-space: normal; text-align: center; line-height: 1.15; font-size: 13px; }
   .flow-page-results .flow-panel .route-end > span { white-space: normal; overflow: visible; }
 }
+
+/* Results map: stops and residences around the start, named so students can see what is near */
+.rm-ctx { background: transparent; border: 0; }
+.rm-ctx > span:first-child { display: grid; box-sizing: border-box; place-items: center; width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 2px 6px rgba(0, 0, 0, .3); }
+.rm-luas { border: 2.5px solid #fff; background: var(--c); color: #fff; font: 900 12px/1 "DM Sans", sans-serif; }
+.rm-rail { border: 2.5px solid #fff; background: #6f3f98; font-size: 12px; }
+.rm-bus { border: 2px solid #173f37; background: #f5b400; }
+.rm-bus svg { width: 15px; height: 15px; }
+.rm-home { border: 2px solid #7a3fa0; background: #fff; font-size: 11px; }
+.rm-label { position: absolute; top: calc(100% + 2px); left: 50%; display: none; max-width: 130px; padding: 1px 5px; border-radius: 5px; background: rgba(255, 255, 255, .92); color: #5a2d7a; font: 700 10px/1.3 "DM Sans", sans-serif; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: translateX(-50%); box-shadow: 0 1px 3px rgba(0, 0, 0, .15); }
+.rm-near .rm-label { display: block; }
+.leaflet-tooltip.rm-tip { padding: 5px 8px; border: 0; border-radius: 8px; color: #33443b; box-shadow: 0 4px 12px rgba(16, 47, 42, .2); font: 500 11px/1.35 "DM Sans", sans-serif; }
+.leaflet-tooltip.rm-tip b { color: #173f32; font-weight: 800; }
+.leaflet-tooltip.rm-bus-tip b { color: #6b4b00; }
+.leaflet-tooltip.rm-board-tip { padding: 4px 8px; border: 0; border-radius: 8px; background: #173f32; color: #f6f1e6; box-shadow: 0 4px 12px rgba(16, 47, 42, .3); font: 500 11px/1.35 "DM Sans", sans-serif; }
+.leaflet-tooltip.rm-board-tip b { color: #d9f17e; }
+.leaflet-tooltip.rm-board-tip::before { border-top-color: #173f32; }
+.rm-pop { display: grid; gap: 2px; font: 500 12px/1.4 "DM Sans", sans-serif; color: #4d5e53; }
+.rm-pop small { color: #7a3fa0; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.rm-pop strong { color: #202d29; font-size: 14px; }
+.rm-pop a { margin-top: 4px; color: #7a3fa0; font-weight: 800; text-decoration: none; }
+
+/* fastest trip / trip by bus */
+.rm-options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding-top: 8px; border-top: 1px dashed #ddd5c5; }
+.rm-options button { display: grid; gap: 1px; padding: 8px 10px; border: 1.5px solid #dbe4d4; border-radius: 12px; background: #fff; color: #4d5e53; font: inherit; text-align: left; cursor: pointer; transition: border-color .15s, background .15s; }
+.rm-options button small { color: #7a877f; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.rm-options button b { color: #173f32; font-size: 16px; }
+.rm-options button span { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.rm-options button[aria-checked="true"] { border-color: #173f32; background: #eef5ef; }
+
+/* map key */
+.rm-legend i { display: inline-grid; place-items: center; box-sizing: border-box; font-style: normal; }
+.rm-legend .rm-key-a, .rm-legend .rm-key-b { width: 16px; height: 16px; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 800; }
+.rm-legend .rm-key-a { background: #a8753f; }
+.rm-legend .rm-key-b { background: #173f32; }
+.rm-legend .rm-key-bus { width: 12px; height: 12px; border: 2px solid #173f37; border-radius: 50%; background: #f5b400; }
+.rm-legend .rm-key-luas { width: 15px; height: 15px; border-radius: 50%; background: var(--c); color: #fff; font-size: 9px; font-weight: 900; }
+.rm-legend .rm-key-rail { width: 15px; height: 15px; border-radius: 50%; background: #6f3f98; font-size: 8px; }
+.rm-legend .rm-key-home { width: 15px; height: 15px; border: 1.5px solid #7a3fa0; border-radius: 50%; background: #fff; font-size: 8px; }
+.leaflet-tooltip.rm-tip-hidden { visibility: hidden; }
+/* a hidden label comes back while its stop is hovered */
+.leaflet-marker-icon:hover + .leaflet-tooltip.rm-tip-hidden { visibility: visible; }
+.flow-page-results .route-map { height: 380px; }
+.flow-page-results .route-map-hint { top: auto; bottom: 10px; left: 10px; padding: 5px 10px; font-size: 11px; transform: none; }
+.leaflet-tooltip.rm-tip small { color: #6b4b00; font-size: 10.5px; font-weight: 700; }

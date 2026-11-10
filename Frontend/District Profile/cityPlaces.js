@@ -18,6 +18,7 @@ export const universities = [
   { id: 'dbs', name: 'Dublin Business School — Aungier Street', location: '13/14 Aungier Street, Dublin 2', coordinates: [53.3405, -6.2654], icon: 'school', image: '/images/campus-dbs.jpg', imageCredit: { source: 'Dublin Business School', url: 'https://www.dbs.ie/' }, url: 'https://www.dbs.ie/' },
   { id: 'dbs-castle', name: 'Dublin Business School — Castle House', location: 'South Great George’s Street, Dublin 2', coordinates: [53.3434, -6.2647], icon: 'school', image: '/images/campus-dbs.jpg', imageCredit: { source: 'Dublin Business School', url: 'https://www.dbs.ie/' }, url: 'https://www.dbs.ie/' },
   { id: 'iadt', name: 'IADT — Dún Laoghaire', location: 'Kill Avenue, Dún Laoghaire', coordinates: [53.2795, -6.1537], icon: 'school', image: '/images/campus-iadt.jpg', imageCredit: { author: 'DubhEire', license: 'CC0', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/', url: 'https://commons.wikimedia.org/wiki/File:D%C3%BAn_Laoghaire_Institute_of_Art_Design_and_Technology_Media_Cube.jpg' }, url: 'https://iadt.ie/' },
+  { id: 'maynooth', name: 'Maynooth University', location: 'Maynooth, Co. Kildare', coordinates: [53.3842, -6.601], icon: 'school', image: '/images/campus-maynooth.jpg', imageCredit: { author: '瑞丽江的河水', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', url: 'https://commons.wikimedia.org/wiki/File:Maynooth_University_01.jpg' }, url: 'https://www.maynoothuniversity.ie/' },
 ];
 
 export const attractions = [

@@ -183,6 +183,16 @@ const universities = [
     imageCredit: { author: 'DubhEire', license: 'CC0', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/', url: 'https://commons.wikimedia.org/wiki/File:D%C3%BAn_Laoghaire_Institute_of_Art_Design_and_Technology_Media_Cube.jpg' },
     url: 'https://iadt.ie/',
   },
+  {
+    id: 'maynooth',
+    name: 'Maynooth University',
+    location: 'Maynooth, Co. Kildare',
+    coordinates: [53.3842, -6.601],
+    icon: 'school',
+    image: '/images/campus-maynooth.jpg',
+    imageCredit: { author: '瑞丽江的河水', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', url: 'https://commons.wikimedia.org/wiki/File:Maynooth_University_01.jpg' },
+    url: 'https://www.maynoothuniversity.ie/',
+  },
 ]
 
 const attractions = [

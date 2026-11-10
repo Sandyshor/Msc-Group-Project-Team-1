@@ -15,6 +15,7 @@ const HIGHLIGHTS = [
 
 const ICONS = {
   play: 'M8 5.5v13l11-6.5-11-6.5Z',
+  pause: 'M7 5h3.5v14H7zM13.5 5H17v14h-3.5z',
   plane: 'M2.5 13.5 21 6.5c.8-.3 1.5.6 1 1.3l-3 3.7-6 1.5-3.5 5.5H7.6l1.4-5-4 1-2-1.5 1.5-1Z',
   tram: 'M7 3h10a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Zm-3 8h16M8 21l2-3m6 3-2-3M9 1.5h6M8 14.5h.01M16 14.5h.01',
   people: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6.5 9c.4-3.4 3-5.5 6.5-5.5s6.1 2.1 6.5 5.5M16 4.3a3.5 3.5 0 0 1 0 6.4m2.3 3.8c1.9.8 3 2.6 3.2 5.5',
@@ -30,6 +31,9 @@ const Icon = ({ name, filled = false }) => (
 export default function HomeFilm() {
   const video = useRef(null)
   const [started, setStarted] = useState(false)
+  // what the film is doing right now, from the video's own events (so the button never says Resume while it plays)
+  const [playing, setPlaying] = useState(false)
+  const [ended, setEnded] = useState(false)
 
   const play = (at) => {
     const v = video.current
@@ -76,8 +80,10 @@ export default function HomeFilm() {
           </ul>
 
           <div className="hf-cta">
-            <button type="button" className="hf-btn hf-btn-primary" onClick={() => play(started ? undefined : 0)}>
-              <Icon name="play" filled /> {started ? 'Resume' : 'Play the film'} <small>1:16</small>
+            <button type="button" className="hf-btn hf-btn-primary" aria-pressed={playing}
+              onClick={() => (playing ? video.current?.pause() : play(started && !ended ? undefined : 0))}>
+              <Icon name={playing ? 'pause' : 'play'} filled />
+              {playing ? 'Pause' : ended ? 'Play again' : started ? 'Resume' : 'Play the film'} <small>1:16</small>
             </button>
             <Link className="hf-btn hf-btn-ghost" to="/questionnaire">Find my match <Icon name="arrow" /></Link>
           </div>
@@ -93,7 +99,9 @@ export default function HomeFilm() {
               controls={started}
               playsInline
               preload="metadata"
-              onPlay={() => setStarted(true)}
+              onPlay={() => { setStarted(true); setPlaying(true); setEnded(false) }}
+              onPause={() => setPlaying(false)}
+              onEnded={() => { setPlaying(false); setEnded(true) }}
             >
               Your browser does not support embedded video.
             </video>
