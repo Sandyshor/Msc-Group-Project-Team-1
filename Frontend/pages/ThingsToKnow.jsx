@@ -133,8 +133,6 @@ export default function ThingsToKnow() {
   const [done, setDone] = useState(loadDone)
   useEffect(() => { try { localStorage.setItem(STORE_KEY, JSON.stringify([...done])) } catch { /* private mode */ } }, [done])
   const toggle = (id) => setDone((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next })
-  const count = ALL_IDS.filter((id) => done.has(id)).length
-  const pct = Math.round((count / ALL_IDS.length) * 100)
 
   return (
     <div className="cg-page ttk-page" data-site-tour="things-to-know">
@@ -155,10 +153,8 @@ export default function ThingsToKnow() {
 
       <div className="ttk-progress" aria-live="polite">
         <div>
-          <strong>{count === ALL_IDS.length ? 'All done. Welcome to Dublin! 🎉' : `${count} of ${ALL_IDS.length} done`}</strong>
           <span>Tick each step as you complete it. Your progress is saved on this device.</span>
         </div>
-        <span className="ttk-bar" role="img" aria-label={`${pct}% complete`}><i style={{ width: `${pct}%` }} /></span>
         <nav className="ttk-jump" aria-label="Jump to a stage">
           {PHASES.map((p, i) => <a key={p.id} href={`#${p.id}`}><b>{i + 1}</b>{p.title}</a>)}
         </nav>
