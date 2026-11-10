@@ -10,6 +10,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import './leafletNoTitle';
 import proj4 from 'proj4';
 import { ACTIVE_DISTRICTS, ALL_DISTRICTS, AMENITY_TYPES, heatColor, safetyLabel, strongColor, textOnHeat } from './mapShared';
 // Safety score per Census area (crime-heatmap.geojson is cut off, so the complete copy is used)
