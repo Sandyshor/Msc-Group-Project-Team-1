@@ -558,6 +558,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
           })
             .bindTooltip(`<b>${g.items.length} student residences</b><small>${names.slice(0, 6).join('<br>')}${names.length > 6 ? `<br>and ${names.length - 6} more` : ''}</small><small class="sh-tip-hint">Click to zoom in</small>`,
               { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip sh-tip' })
+            .on('tooltipopen', (e) => roomyTooltip(map, e.tooltip, 22))
             .on('click', () => map.fitBounds(L.latLngBounds(g.items.map((x) => [x.r.lat, x.r.lon])).pad(0.4), { maxZoom: 17, animate: !REDUCED_MOTION }))
             .addTo(st.housing);
           return;
@@ -1423,5 +1424,23 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     </div>
   );
 });
+
+// Open a tooltip on the side of the pin that has room (below near the top edge, to the left near the right edge),
+// so it is never cut off by the map frame or hidden under the hint at the top
+function roomyTooltip(map, tooltip, gap) {
+  const p = map.latLngToContainerPoint(tooltip.getLatLng());
+  const size = map.getSize();
+  const el = tooltip.getElement();
+  const w = el?.offsetWidth || 200;
+  const h = el?.offsetHeight || 120;
+  let dir = 'top';
+  if (p.y - gap - h < 70) dir = p.y + gap + h < size.y - 10 ? 'bottom' : (p.x > size.x / 2 ? 'left' : 'right');
+  else if (p.x + w / 2 > size.x - 10) dir = 'left';
+  else if (p.x - w / 2 < 10) dir = 'right';
+  if (dir === 'top' && p.x + w / 2 <= size.x - 10 && p.x - w / 2 >= 10 && tooltip.options.direction === 'top') return;
+  tooltip.options.direction = dir;
+  tooltip.options.offset = { top: [0, -gap], bottom: [0, gap], left: [-gap, 0], right: [gap, 0] }[dir];
+  tooltip.update();
+}
 
 export default JourneyBaseMap;
