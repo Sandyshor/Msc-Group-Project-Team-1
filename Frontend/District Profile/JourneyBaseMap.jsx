@@ -1097,9 +1097,14 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     setTimeout(() => m.remove(), 700);
   }
 
+  // The journey (A/B pins, route lines, the moving dot, the route key) is only on the map while the journey
+  // planner is on screen: switching to Places, Rent, Amenities... takes it off; back on Journey it returns.
+  const journeyShown = () => latest.current.planning !== false;
+
   function syncPins() {
     const st = s.current;
     if (!st) return;
+    if (!journeyShown()) { ['from', 'to'].forEach((k) => { st.pins[k]?.remove(); st.pins[k] = null; }); return; }
     const { trip } = latest.current;
     [['from', 'A', 'jp-pin-start'], ['to', 'B', 'jp-pin-end']].forEach(([k, label, cls]) => {
       const p = trip[k];
@@ -1208,6 +1213,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     stopTraveller();
     st.route.clearLayers();
     st.alt.clearLayers();
+    if (!journeyShown()) { if (legendRef.current) legendRef.current.hidden = true; return; }
     const itineraries = trip.itineraries || [];
     const itinerary = itineraries[trip.selected];
     if (legendRef.current) legendRef.current.hidden = !itinerary;
@@ -1341,6 +1347,8 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
   const { trip } = props;
   useEffect(() => { syncPins(); updateHint(); }, [trip.from, trip.to, trip.status, trip.from?.label, trip.to?.label]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { drawRoute(); }, [trip.itineraries, trip.selected]); // eslint-disable-line react-hooks/exhaustive-deps
+  // leaving / returning to the journey planner: take the journey off the map or put it back (the trip itself is kept)
+  useEffect(() => { syncPins(); drawRoute(); }, [props.planning]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useImperativeHandle(ref, () => ({
     getMap() { return s.current?.map; },
