@@ -20,6 +20,7 @@ import { decodePolyline, fetchRoutes, formatDistance, formatMinutes, legColor, l
 import { chainInfo } from './shopChains';
 import { loadAmenityRecords as loadCsv } from './amenityData';
 import { universities as campusList } from './cityPlaces';
+import { groupPins, spreadPins } from './spreadPins';
 import './JourneyPlanner.css';
 import './JourneyBaseMap.css';
 import './Bikes.css';
@@ -417,6 +418,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     st.names.addLayer(st.codes).addLayer(st.areas);
     st.placeLayer = L.layerGroup([st.cityPlaces, st.districtPlaces]);
     s.current = st;
+    if (import.meta.env.DEV) window.__fmdMap = map; // lets the local browser tests move the map (never in the live build)
 
     const setBasemap = () => {
       st.baseLayer?.remove();
@@ -474,6 +476,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       .then((r) => { if (!r.ok) throw new Error(`${file} returned ${r.status}`); return r.json(); })
       .then((list) => {
         addLandmarks(list, layer, kind);
+        if (kind === 'uni') st.renderHousing?.(); // residences step aside from the campus pins
         if (kind === 'place') {
           st.cityPlacePoints = list.map((i) => [i.lon, i.lat]);
           addLandmarks(list.filter((i) => !['Airport', 'Rail station'].includes(i.category)), cityLandmarkLayer, 'landmark');
@@ -555,24 +558,91 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       show();
       return box;
     }
-    fetch(RESIDENCES_URL, { headers: { Accept: 'application/json' } }).then((r) => (r.ok ? r.json() : null)).then((d) => {
-      (d?.residences || []).forEach((r) => {
-        const latlng = L.latLng(r.lat, r.lon);
-        // hover: the details at a glance
-        const tip = `<b>${escapeHtml(r.name)}</b>${r.operator ? ` · ${escapeHtml(r.operator)}` : ''}`
-          + `${r.from ? `<small>From ${euro(r.from)} a month${r.rooms ? ` · ${escapeHtml(r.rooms)}` : ''}</small>` : r.rooms ? `<small>${escapeHtml(r.rooms)}</small>` : ''}`
-          + `${r.address ? `<small>${escapeHtml(r.address)}</small>` : ''}<small class="sh-tip-hint">Click for the distance to your college</small>`;
-        const marker = L.marker(latlng, { icon: pinIcon({ emoji: '🏠', ring: RING.housing, kind: 'housing', label: r.name }), title: `${r.name} (student residence)`, riseOnHover: true })
-          .bindTooltip(tip, { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip sh-tip' })
-          .bindPopup('', { maxWidth: 300, minWidth: 250, offset: [0, -12], className: 'sh-popup', autoPanPaddingTopLeft: [20, 70] })
-          .addTo(st.housing);
-        // click: details and the distance to a college, built once per opening (so it uses the current choice).
-        // It is set as finished content, not a function, so popup.update() only re-places it.
-        marker.on('popupopen', (e) => { if (!e.popup.getContent()) e.popup.setContent(residencePopup(r, latlng, marker)); });
-        marker.on('popupclose', (e) => { e.popup.setContent(''); });
-        st.named.landmarks.push({ name: r.name, lat: r.lat, lng: r.lon });
+    // one residence pin: hover = details, click = details + distance to a college. Drawn at `at` (pushed aside when
+    // it would cover another pin) but everything about it uses the residence's true location.
+    const residenceMarker = (r, at) => {
+      const latlng = L.latLng(r.lat, r.lon);
+      const tip = `<b>${escapeHtml(r.name)}</b>${r.operator ? ` · ${escapeHtml(r.operator)}` : ''}`
+        + `${r.from ? `<small>From ${euro(r.from)} a month${r.rooms ? ` · ${escapeHtml(r.rooms)}` : ''}</small>` : r.rooms ? `<small>${escapeHtml(r.rooms)}</small>` : ''}`
+        + `${r.address ? `<small>${escapeHtml(r.address)}</small>` : ''}<small class="sh-tip-hint">Click for the distance to your college</small>`;
+      const marker = L.marker(at, { icon: pinIcon({ emoji: '🏠', ring: RING.housing, kind: 'housing', label: r.name }), title: `${r.name} (student residence)`, riseOnHover: true })
+        .bindTooltip(tip, { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip sh-tip' })
+        .bindPopup('', { maxWidth: 300, minWidth: 250, offset: [0, -12], className: 'sh-popup', autoPanPaddingTopLeft: [20, 70] });
+      // built once per opening and set as finished content, so popup.update() only re-places it
+      marker.on('popupopen', (e) => { if (!e.popup.getContent()) e.popup.setContent(residencePopup(r, latlng, marker)); });
+      marker.on('popupclose', (e) => { e.popup.setContent(''); });
+      return marker;
+    };
+    // Zoomed out, residences that would touch become one count badge (click to zoom in to them); zoomed in, any that
+    // still overlap each other or a campus pin are pushed apart, with a dotted line back to the true spot.
+    const HOUSING_GROUP_ZOOM = 14;
+    st.uniLines = L.layerGroup().addTo(universityLayer); // dotted lines back to a campus that had to step aside
+    const renderHousing = () => {
+      const z0 = map.getZoom();
+      const pinSize = (z0 < Z_MID ? 20 : z0 >= Z_STREET ? 38 : z0 >= Z_NEAR ? 34 : 30) + 4;
+      // campus pins first: spread any that would touch (TU Aungier Street, DBS and RCSI are a block apart)
+      const unis = [];
+      universityLayer.eachLayer((m) => { if (m instanceof L.Marker) { m.trueLatLng ??= m.getLatLng(); unis.push(m); } });
+      const uniSpots = unis.map((m) => { const p = map.latLngToContainerPoint(m.trueLatLng); return { x: p.x, y: p.y, r: pinSize / 2, from: p }; });
+      spreadPins(uniSpots, [], 3);
+      st.uniLines.clearLayers();
+      unis.forEach((m, i) => {
+        const at = map.containerPointToLatLng([uniSpots[i].x, uniSpots[i].y]);
+        m.setLatLng(at);
+        if (Math.hypot(uniSpots[i].x - uniSpots[i].from.x, uniSpots[i].y - uniSpots[i].from.y) > 6) {
+          L.polyline([m.trueLatLng, at], { color: RING.uni, weight: 1.5, opacity: 0.7, dashArray: '2 4', interactive: false }).addTo(st.uniLines);
+          L.circleMarker(m.trueLatLng, { radius: 3, color: '#fff', weight: 1.5, fillColor: RING.uni, fillOpacity: 1, interactive: false }).addTo(st.uniLines);
+        }
+      });
+      if (!st.housingData || !map.hasLayer(st.housing)) return;
+      const open = st.housing.getLayers().find((l) => l.isPopupOpen?.());
+      if (open) return; // don't pull an open popup out from under the reader
+      st.housing.clearLayers();
+      const z = map.getZoom();
+      // a pin's width on screen at this zoom: CSS --size plus its 2 px ring on each side; count badges are wider pills
+      const size = (z < Z_MID ? 20 : z >= Z_STREET ? 38 : z >= Z_NEAR ? 34 : 30) + 4;
+      const badgeR = z < Z_MID ? 22 : 25;
+      const items = st.housingData.map((r) => ({ r, point: map.latLngToContainerPoint([r.lat, r.lon]) }));
+      const fixed = [];
+      const fixedPoint = (latlng, r) => { const p = map.latLngToContainerPoint(latlng); return { x: p.x, y: p.y, r }; };
+      // pins residences must not cover: campuses, famous places (city-wide and the district's) when they're shown
+      if (map.hasLayer(universityLayer)) uniSpots.forEach((p) => fixed.push({ x: p.x, y: p.y, r: size / 2 }));
+      [st.cityPlaces, st.districtPlaces, cityLandmarkLayer].filter((layer) => map.hasLayer(layer) || layer === st.districtPlaces)
+        .forEach((layer) => layer.eachLayer((m) => { if (m instanceof L.Marker) fixed.push(fixedPoint(m.getLatLng(), size / 2)); }));
+      if (st.searchPin) fixed.push(fixedPoint(st.searchPin.getLatLng(), 18));
+      const groups = z < HOUSING_GROUP_ZOOM ? groupPins(items, size + 8) : items.map((item) => ({ items: [item], cx: item.point.x, cy: item.point.y }));
+      const spots = groups.map((g) => ({ x: g.cx, y: g.cy, r: g.items.length > 1 ? badgeR : size / 2 }));
+      spreadPins(spots, fixed, 3);
+      groups.forEach((g, i) => {
+        const at = map.containerPointToLatLng([spots[i].x, spots[i].y]);
+        if (g.items.length > 1) {
+          const names = g.items.map((x) => escapeHtml(x.r.name));
+          L.marker(at, {
+            icon: L.divIcon({ className: 'pm-icon', html: `<div class="sh-cluster" style="--ring:${RING.housing}"><span>🏠</span><b>${g.items.length}</b></div>`, iconSize: [0, 0] }),
+            title: `${g.items.length} student residences`, riseOnHover: true,
+          })
+            .bindTooltip(`<b>${g.items.length} student residences</b><small>${names.slice(0, 6).join('<br>')}${names.length > 6 ? `<br>and ${names.length - 6} more` : ''}</small><small class="sh-tip-hint">Click to zoom in</small>`,
+              { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip sh-tip' })
+            .on('click', () => map.fitBounds(L.latLngBounds(g.items.map((x) => [x.r.lat, x.r.lon])).pad(0.4), { maxZoom: 17, animate: !REDUCED_MOTION }))
+            .addTo(st.housing);
+          return;
+        }
+        const { r, point } = g.items[0];
+        if (Math.hypot(spots[i].x - point.x, spots[i].y - point.y) > 6) {
+          // moved aside: a thin line and a dot show where it really is
+          L.polyline([[r.lat, r.lon], at], { color: RING.housing, weight: 1.5, opacity: 0.8, dashArray: '2 4', interactive: false }).addTo(st.housing);
+          L.circleMarker([r.lat, r.lon], { radius: 3, color: '#fff', weight: 1.5, fillColor: RING.housing, fillOpacity: 1, interactive: false }).addTo(st.housing);
+        }
+        residenceMarker(r, at).addTo(st.housing);
       });
       st.declutter?.();
+    };
+    st.renderHousing = renderHousing;
+    map.on('zoomend overlayadd overlayremove', renderHousing);
+    fetch(RESIDENCES_URL, { headers: { Accept: 'application/json' } }).then((r) => (r.ok ? r.json() : null)).then((d) => {
+      st.housingData = d?.residences || [];
+      st.housingData.forEach((r) => st.named.landmarks.push({ name: r.name, lat: r.lat, lng: r.lon }));
+      renderHousing();
     }).catch((e) => console.error('Could not load student residences', e));
 
     // ---------------- layer list
@@ -988,6 +1058,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       if (!duplicate) marker.addTo(st.districtPlaces);
       return marker;
     });
+    st.renderHousing?.(); // residences step aside from this district's place pins
   }
 
   // Name for a clicked or dragged point: the nearest landmark, station or stop, shop or café,
@@ -1302,7 +1373,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
   useEffect(() => {
     const st = s.current;
     if (!st) return;
-    if (props.showHousing) st.housing.addTo(st.map); else st.housing.remove();
+    if (props.showHousing) { st.housing.addTo(st.map); st.renderHousing?.(); } else st.housing.remove();
     st.declutter();
   }, [props.showHousing]);
   useEffect(() => {
@@ -1371,6 +1442,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         }));
       });
       st.searchPin = marker;
+      st.renderHousing?.();
       let opened = false;
       const open = () => { if (!opened && st.searchPin === marker) { opened = true; marker.openPopup(); } };
       st.map.once('moveend', open);

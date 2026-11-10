@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { streetName } from '../District Profile/placeNames'
+import { spreadPins } from '../District Profile/spreadPins'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
@@ -144,6 +145,34 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
   const [near, setNear] = useState(null) // nearby transport: stations, bus stops (both ends), bike docks
   const [homes, setHomes] = useState([]) // student residences around the start
   const animRef = useRef({ timer: null, frame: null, traveller: null })
+  const homeMarkers = useRef([]) // residence pins (drawn at their true spot, then moved aside if they'd cover something)
+  const homeLines = useRef(null)
+
+  // Residences step aside from the A/B pins, the stops and stations, and each other, so nothing overlaps;
+  // a dotted line and a dot show where one really is. Re-run when the zoom or the drawing changes.
+  function arrangeHomes() {
+    const map = mapRef.current
+    if (!map || !homeLines.current) return
+    homeLines.current.clearLayers()
+    if (!homeMarkers.current.length) return
+    const isHome = new Set(homeMarkers.current)
+    const fixed = []
+    ;[ctxRef.current, layerRef.current].forEach((group) => group?.eachLayer((m) => {
+      if (!(m instanceof L.Marker) || isHome.has(m) || m === animRef.current.traveller) return
+      const p = map.latLngToContainerPoint(m.getLatLng())
+      fixed.push({ x: p.x, y: p.y, r: (m.options.icon?.options?.iconSize?.[0] || 20) / 2 })
+    }))
+    const spots = homeMarkers.current.map((m) => { const p = map.latLngToContainerPoint(m.trueLatLng); return { x: p.x, y: p.y, r: 11, from: p } })
+    spreadPins(spots, fixed, 3)
+    homeMarkers.current.forEach((m, i) => {
+      const at = map.containerPointToLatLng([spots[i].x, spots[i].y])
+      m.setLatLng(at)
+      if (Math.hypot(spots[i].x - spots[i].from.x, spots[i].y - spots[i].from.y) > 5) {
+        L.polyline([m.trueLatLng, at], { color: '#7a3fa0', weight: 1.5, opacity: 0.8, dashArray: '2 4', interactive: false }).addTo(homeLines.current)
+        L.circleMarker(m.trueLatLng, { radius: 3, color: '#fff', weight: 1.5, fillColor: '#7a3fa0', fillOpacity: 1, interactive: false }).addTo(homeLines.current)
+      }
+    })
+  }
 
   function stopTraveller() {
     const a = animRef.current
@@ -226,6 +255,8 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     let tidy
     map.on('zoomend moveend', () => { clearTimeout(tidy); tidy = setTimeout(() => declutterTips(boxRef.current), 60) })
     mapRef.current = map
+    homeLines.current = L.layerGroup().addTo(map)
+    map.on('zoomend', () => arrangeHomes())
     ctxRef.current = L.layerGroup().addTo(map)
     layerRef.current = L.layerGroup().addTo(map)
     return () => { stopTraveller(); map.remove(); mapRef.current = null }
@@ -289,6 +320,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     }
     if (animate) animRef.current.timer = setTimeout(() => startTraveller(lines), REDUCED_MOTION ? 0 : delay + 300)
     setTimeout(() => declutterTips(boxRef.current), animate && !REDUCED_MOTION ? delay + 80 : 80)
+    setTimeout(arrangeHomes, 0)
   }
 
   const linesOf = (itinerary) => itinerary.legs.filter((leg) => leg.geometry).map((leg) => ({
@@ -419,6 +451,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     const layer = ctxRef.current
     if (!layer) return
     layer.clearLayers()
+    homeMarkers.current = []
     homes.forEach((r) => {
       const price = r.from ? `From <b>€${Math.round(r.from).toLocaleString('en-IE')}</b> a month` : ''
       // hover: the details; click: the same plus how far it is from the university, walking and by public transport
@@ -438,10 +471,12 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
         }).catch(() => { box.querySelector('.rm-transit').innerHTML = '🚌 The journey planner can\'t reach this trip yet' })
         return box
       }
-      L.marker([r.lat, r.lon], { icon: ctxIcon(`<span class="rm-home">🏠</span><span class="rm-label rm-home-label">${escapeHtml(r.name)}</span>`, 22), title: `${r.name} (student residence)`, zIndexOffset: 50 })
+      const marker = L.marker([r.lat, r.lon], { icon: ctxIcon(`<span class="rm-home">🏠</span><span class="rm-label rm-home-label">${escapeHtml(r.name)}</span>`, 22), title: `${r.name} (student residence)`, zIndexOffset: 50 })
         .bindTooltip(tip, { direction: 'top', offset: [0, -12], className: 'rm-tip' })
         .bindPopup(popup, { maxWidth: 260, minWidth: 220 })
         .addTo(layer)
+      marker.trueLatLng = L.latLng(r.lat, r.lon)
+      homeMarkers.current.push(marker)
     })
     if (near?.kind === 'transit') {
       const station = (s, html, tip) => s && L.marker([s.lat, s.lng], { icon: ctxIcon(html, 26), zIndexOffset: 200, title: s.name })
@@ -463,6 +498,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       ;[[near.a, 'near the start'], [near.b, 'near the university']].forEach(([d, where]) => d && L.marker([d.lat, d.lng], { icon: ctxIcon('<span class="route-bike">🚲</span>', 22), title: d.name })
         .bindTooltip(`<b>Dublin Bikes · ${escapeHtml(d.name)}</b><br>${where}${d.bikes != null ? ` · ${d.bikes} bikes free` : ''}`, { direction: 'top', offset: [0, -10], className: 'rm-tip' }).addTo(layer))
     }
+    arrangeHomes()
     setTimeout(() => declutterTips(boxRef.current), 80)
   }, [near, homes, toName, toLat, toLon]) // eslint-disable-line react-hooks/exhaustive-deps
 
