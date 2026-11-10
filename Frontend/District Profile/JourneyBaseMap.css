@@ -413,3 +413,16 @@
 .sh-cluster span { font-size: 13px; }
 .sh-cluster:hover { transform: translate(-50%, -50%) scale(1.1); }
 .z-far .sh-cluster { padding: 2px 6px 2px 4px; font-size: 11px; }
+
+/* Student residence hover card: the same card for every residence, a fixed width so it never squeezes */
+.leaflet-popup.sh-hover .leaflet-popup-content { width: 250px !important; margin: 12px 14px; }
+.sh-pop .sh-actions .sh-web { padding: 6px 11px; border: 1.5px solid #d9c8e6; border-radius: 999px; background: #fbf8fd; text-decoration: none; }
+.sh-pop .sh-actions .sh-web:hover { border-color: #7a3fa0; background: #f3ecf8; text-decoration: none; }
+.sh-pop .sh-actions:empty { display: none; }
+.sh-pop .sh-hint { margin-top: 6px; padding-top: 7px; border-top: 1px dashed #e2d6ec; color: #74817a; font-size: 11.5px; line-height: 1.4; }
+.sh-pop .sh-hint b { display: inline-grid; width: 16px; height: 16px; place-items: center; border-radius: 50%; font-size: 9.5px; }
+.sh-pop .sh-hint b.is-a { background: #173f37; color: #d9f17e; }
+.sh-pop .sh-hint b.is-b { background: #c8352b; color: #fff; }
+/* hover card shown below its pin: the tip points up */
+.leaflet-popup.is-below .leaflet-popup-tip-container { top: -20px; bottom: auto; transform: translateX(var(--tip-x, 0px)) rotate(180deg); }
+.leaflet-popup .leaflet-popup-tip-container { transform: translateX(var(--tip-x, 0px)); }

@@ -12,6 +12,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { streetName } from '../District Profile/placeNames'
 import { spreadPins } from '../District Profile/spreadPins'
+import { fitCard } from '../District Profile/placeCard'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
@@ -145,6 +146,17 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
   const [near, setNear] = useState(null) // nearby transport: stations, bus stops (both ends), bike docks
   const [homes, setHomes] = useState([]) // student residences around the start
   const animRef = useRef({ timer: null, frame: null, traveller: null })
+  const cardRef = useRef(null) // the residence hover card
+  const cardTimer = useRef(0)
+  const cardHide = () => { clearTimeout(cardTimer.current); cardTimer.current = setTimeout(() => mapRef.current?.closePopup(cardRef.current), 220) }
+  const cardKeep = () => clearTimeout(cardTimer.current)
+  const homeCard = (r) => {
+    const who = [r.operator, r.address].filter(Boolean).map(escapeHtml).join(' · ')
+    return `<div class="rm-pop rm-card"><small>Student residence</small><strong>${escapeHtml(r.name)}</strong>${who ? `<span>${who}</span>` : ''}`
+      + `${r.from || r.rooms ? `<span>${r.from ? `From <b>€${Math.round(r.from).toLocaleString('en-IE')}</b> a month` : ''}${r.from && r.rooms ? ' · ' : ''}${r.rooms ? escapeHtml(r.rooms) : ''}</span>` : ''}`
+      + `${r.website ? `<a class="rm-web" href="${escapeHtml(r.website)}" target="_blank" rel="noopener noreferrer">Visit website ↗</a>` : ''}`
+      + '<em class="rm-hint">Click the pin to start your trip here (A) and see the distance to the university</em></div>'
+  }
   const homeMarkers = useRef([]) // residence pins (drawn at their true spot, then moved aside if they'd cover something)
   const homeLines = useRef(null)
 
@@ -256,6 +268,12 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     map.on('zoomend moveend', () => { clearTimeout(tidy); tidy = setTimeout(() => declutterTips(boxRef.current), 60) })
     mapRef.current = map
     homeLines.current = L.layerGroup().addTo(map)
+    cardRef.current = L.popup({ closeButton: false, autoPan: false, offset: [0, -12], maxWidth: 280, minWidth: 240, className: 'rm-hover' })
+      .on('add', () => {
+        const node = cardRef.current.getElement()
+        node?.addEventListener('mouseenter', () => clearTimeout(cardTimer.current))
+        node?.addEventListener('mouseleave', () => { cardTimer.current = setTimeout(() => map.closePopup(cardRef.current), 220) })
+      })
     map.on('zoomend', () => arrangeHomes())
     ctxRef.current = L.layerGroup().addTo(map)
     layerRef.current = L.layerGroup().addTo(map)
@@ -453,27 +471,16 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     layer.clearLayers()
     homeMarkers.current = []
     homes.forEach((r) => {
-      const price = r.from ? `From <b>€${Math.round(r.from).toLocaleString('en-IE')}</b> a month` : ''
-      // hover: the details; click: the same plus how far it is from the university, walking and by public transport
-      const tip = `<b>${escapeHtml(r.name)}</b>${r.operator ? ` · ${escapeHtml(r.operator)}` : ''}${price ? `<br>${price}${r.rooms ? ` · ${escapeHtml(r.rooms)}` : ''}` : ''}${r.address ? `<br>${escapeHtml(r.address)}` : ''}<br><small>Click for the distance to ${escapeHtml(toName)}</small>`
-      const popup = () => {
-        const box = document.createElement('div')
-        box.className = 'rm-pop'
-        box.innerHTML = `<small>Student residence</small><strong>${escapeHtml(r.name)}</strong>${r.operator ? `<span>${escapeHtml(r.operator)}</span>` : ''}${r.address ? `<span>${escapeHtml(r.address)}</span>` : ''}${price ? `<span>${price}</span>` : ''}`
-          + `<span class="rm-pop-dist"><b>To ${escapeHtml(toName)}</b><span class="rm-walk">🚶 ${fmtKm(km([r.lat, r.lon], to))} in a straight line</span><span class="rm-transit">🚌 <i>Working out the trip…</i></span></span>`
-          + `${r.website ? `<a href="${escapeHtml(r.website)}" target="_blank" rel="noopener noreferrer">Website ↗</a>` : ''}`
-        const ask = (routeMode) => fetch(`${API_URL}/route?${new URLSearchParams({ from_lat: r.lat, from_lon: r.lon, to_lat: to[0], to_lon: to[1], mode: routeMode, when: nextWeekdayNine(), arrive_by: 'true' })}`)
-          .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
-          .then((plan) => [...plan.itineraries].sort((x, y) => x.total_minutes - y.total_minutes)[0])
-        ask('walk').then((it) => { box.querySelector('.rm-walk').innerHTML = `🚶 <b>${fmtKm(it.total_distance_km)}</b> walk · ${Math.round(it.total_minutes)} min` }).catch(() => {})
-        ask('transit').then((it) => {
-          box.querySelector('.rm-transit').innerHTML = `🚌 <b>${Math.round(it.total_minutes)} min</b> by public transport${it.legs.some((leg) => leg.mode !== 'WALK') ? ` · ${escapeHtml(rideWords(it))}` : ' (walking is quickest)'}`
-        }).catch(() => { box.querySelector('.rm-transit').innerHTML = '🚌 The journey planner can\'t reach this trip yet' })
-        return box
-      }
+      // hover: the same card as on the district map, with the website link (it stays open while the pointer is on
+      // it); click: the residence becomes the start (A), so the trip and distance to the university are worked out
       const marker = L.marker([r.lat, r.lon], { icon: ctxIcon(`<span class="rm-home">🏠</span><span class="rm-label rm-home-label">${escapeHtml(r.name)}</span>`, 22), title: `${r.name} (student residence)`, zIndexOffset: 50 })
-        .bindTooltip(tip, { direction: 'top', offset: [0, -12], className: 'rm-tip' })
-        .bindPopup(popup, { maxWidth: 260, minWidth: 220 })
+        .on('mouseover', () => { cardKeep(); cardRef.current?.setLatLng(marker.getLatLng()).setContent(homeCard(r)).openOn(mapRef.current); fitCard(cardRef.current, mapRef.current, { pinGap: 12 }) })
+        .on('mouseout', cardHide)
+        .on('click', (e) => {
+          L.DomEvent.stopPropagation(e)
+          mapRef.current?.closePopup(cardRef.current)
+          setStart({ lat: r.lat, lng: r.lon, name: r.name })
+        })
         .addTo(layer)
       marker.trueLatLng = L.latLng(r.lat, r.lon)
       homeMarkers.current.push(marker)
