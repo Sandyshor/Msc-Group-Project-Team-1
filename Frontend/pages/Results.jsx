@@ -746,73 +746,84 @@ function LettingAgents() {
 }
 
 const COMPARE_ROWS = [
-  { label: 'Match score', get: (r) => r.match_score, show: (v) => `${v.toFixed(1)}%`, better: 'high' },
-  { label: 'Monthly rent', get: (r) => r.rent, show: (v) => euro(v), better: 'low' },
-  { label: 'Commute', get: (r) => r.commute_minutes, show: (v) => `${v} min`, better: 'low' },
-  { label: 'Walk to campus', get: (r) => r.walking?.average_minutes, show: (v) => `${v} min`, better: 'low' },
-  { label: 'Relative crime score', get: (r) => r.safety?.index, show: (v) => `${v.toFixed(1)} / 100`, better: 'high' },
+  { label: 'Match score', icon: 'check', get: (r) => r.match_score, show: (v) => `${v.toFixed(1)}%`, better: 'high', win: 'Best match' },
+  { label: 'Monthly rent', icon: 'euro', get: (r) => r.rent, show: (v) => euro(v), better: 'low', win: 'Cheapest' },
+  { label: 'Commute', icon: 'clock', get: (r) => r.commute_minutes, show: (v) => `${v} min`, better: 'low', win: 'Quickest commute' },
+  { label: 'Walk to campus', icon: 'walk', get: (r) => r.walking?.average_minutes, show: (v) => `${v} min`, better: 'low', win: 'Shortest walk' },
+  { label: 'Safety score', icon: 'shield', get: (r) => r.safety?.index, show: (v) => `${v.toFixed(1)}/100`, better: 'high', win: 'Safest' },
 ]
 
 function CompareAreas({ results, budget }) {
   if (!results || results.length < 2) return <p className="result-muted">Only one area matched, so there is nothing to compare.</p>
 
-  // only show rows where at least two areas have a value
-  const rows = COMPARE_ROWS.filter((row) => results.filter((r) => row.get(r) != null).length >= 2)
+  // only rows where at least two areas have a value; each row knows its best area
+  const rows = COMPARE_ROWS.filter((row) => results.filter((r) => row.get(r) != null).length >= 2).map((row) => {
+    const values = results.map((r) => row.get(r))
+    const known = values.filter((v) => v != null)
+    const best = row.better === 'low' ? Math.min(...known) : Math.max(...known)
+    const lo = Math.min(...known)
+    const hi = Math.max(...known)
+    // bar: in proportion to the best area on this row (the best one is full)
+    const fill = (v) => {
+      if (row.label === 'Match score') return v
+      const ratio = row.better === 'low' ? (v > 0 ? lo / v : 1) : (hi > 0 ? v / hi : 1)
+      return Math.max(6, ratio * 100)
+    }
+    return { ...row, values, best, fill }
+  })
+  const wins = results.map((_, i) => rows.filter((row) => row.values[i] != null && row.values[i] === row.best && row.label !== 'Match score').map((row) => row.win))
 
   return (
-    <div className="compare-wrap">
-      <section className="compare" aria-label="Compare your top areas">
-        <h2 className="compare-title">Your top {results.length} side by side</h2>
-        <p className="compare-subtitle">The best area for each row is highlighted.</p>
+    <section className="compare" aria-label="Compare your top areas">
+      <h3>Your top {results.length} side by side</h3>
+      <p className="result-muted compare-subtitle">The best area on each row is marked, so you can see what each one is strongest at.</p>
 
-        <div className="compare-table" style={{ '--areas': results.length }}>
-          <div className="compare-corner" />
-          {results.map((r) => (
-            <div className="compare-head" key={r.rank}>
-              <span className="compare-rank">#{r.rank}</span>
-              <strong>{r.area}</strong>
-              {r.neighbourhood && <span className="compare-sub">{r.neighbourhood.name}</span>}
-            </div>
-          ))}
+      <div className="compare-table" style={{ '--areas': results.length }}>
+        <div className="compare-corner" aria-hidden="true" />
+        {results.map((r, i) => (
+          <div className={`compare-head${i === 0 ? ' is-top' : ''}`} key={r.rank}>
+            <span className="compare-rank">#{r.rank}{i === 0 && <span className="compare-top"> · Top match</span>}</span>
+            <strong>{r.neighbourhood?.name ?? r.area}</strong>
+            {r.neighbourhood && <span className="compare-sub">{r.area}</span>}
+            <span className="compare-wins">
+              {wins[i].length ? wins[i].map((w) => <em key={w}>{w}</em>) : <em className="is-plain">Good all-rounder</em>}
+            </span>
+          </div>
+        ))}
 
-          {rows.map((row) => {
-            const values = results.map((r) => row.get(r))
-            const known = values.filter((v) => v != null)
-            const best = row.better === 'low' ? Math.min(...known) : Math.max(...known)
-            const max = Math.max(...known)
-            return [
-              <div className="compare-label" key={row.label}>{row.label}</div>,
-              ...results.map((r, i) => {
-                const v = values[i]
-                const isBest = v != null && v === best
-                return (
-                  <div className={isBest ? 'compare-cell best' : 'compare-cell'} key={row.label + r.rank}>
-                    {v == null ? (
-                      <span className="compare-na">Not available</span>
-                    ) : (
-                      <>
-                        <span className="compare-value">
-                          {row.show(v)}
-                          {isBest && <span className="compare-badge">Best</span>}
-                        </span>
-                        <span className="compare-bar">
-                          <span style={{ width: `${max ? Math.max((v / max) * 100, 4) : 0}%` }} />
-                        </span>
-                        {row.label === 'Monthly rent' && budget && (
-                          <span className={v <= budget ? 'compare-note ok' : 'compare-note over'}>
-                            {v <= budget ? 'Within budget' : `${euro(v - budget)} over`}
-                          </span>
-                        )}
-                      </>
+        {rows.map((row) => [
+          <div className="compare-label" key={row.label}>
+            <span className="why-icon"><FlowIcon name={row.icon} /></span>
+            {row.label}
+          </div>,
+          ...results.map((r, i) => {
+            const v = row.values[i]
+            const isBest = v != null && v === row.best
+            return (
+              <div className={isBest ? 'compare-cell best' : 'compare-cell'} key={row.label + r.rank}>
+                <span className="compare-cell-label" aria-hidden="true">{row.label}</span>
+                {v == null ? (
+                  <span className="compare-na">Not available</span>
+                ) : (
+                  <>
+                    <span className="compare-value">
+                      {row.show(v)}
+                      {isBest && <span className="compare-badge">★ Best</span>}
+                    </span>
+                    <span className="compare-bar"><span style={{ width: `${row.fill(v)}%` }} /></span>
+                    {row.label === 'Monthly rent' && budget && (
+                      <span className={v <= budget ? 'compare-note ok' : 'compare-note over'}>
+                        {v <= budget ? `${euro(budget - v)} under budget` : `${euro(v - budget)} over budget`}
+                      </span>
                     )}
-                  </div>
-                )
-              }),
-            ]
-          })}
-        </div>
-      </section>
-    </div>
+                  </>
+                )}
+              </div>
+            )
+          }),
+        ])}
+      </div>
+    </section>
   )
 }
 
