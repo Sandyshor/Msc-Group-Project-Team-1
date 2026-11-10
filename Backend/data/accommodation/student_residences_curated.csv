@@ -24,7 +24,7 @@ New Mill,,Yugo,https://yugo.com/en-gb/global/ireland/dublin/new-mill,"Mill Stree
 Brewers Close,Sweeney's Corner,Yugo,https://yugo.com/en-gb/global/ireland/dublin/brewers-close,"Mill Street, Dublin 8",,D8,https://yugo.com/en-gb/global/ireland/dublin,-6.276934,53.33726,address
 Ardee Point,,Destiny Student,https://destinystudent.com/accommodation/dublin/ardee-point-dublin/,"Ardee Street, Dublin 8",,D8,https://destinystudent.com/accommodation/dublin/,-6.278293,53.338453,OpenStreetMap
 Here! Cork Street,,Here Students,https://herestudents.com/location/dublin/cork-street/,"35-38 Cork Street, Dublin 8",D08 HRR9,D8,https://herestudents.com/location/dublin/cork-street/,-6.284287,53.337703,address
-Griffith Halls of Residence,,Griffith College,https://www.griffith.ie/locations/dublin/accommodation,"South Circular Road, Dublin 8",,D8,https://www.griffith.ie/about-griffith/news/griffith-halls-residence-provide-additional-bed-spaces-students-dublin,-6.299136,53.337147,street (approximate)
+Griffith Halls of Residence,,Griffith College,https://www.griffith.ie/locations/dublin/accommodation,"South Circular Road, Dublin 8",,D8,https://www.griffith.ie/about-griffith/news/griffith-halls-residence-provide-additional-bed-spaces-students-dublin,-6.278240,53.330650,campus (approximate)
 Aspen,,Mezzino,https://www.mezzino.com/property/aspen/,"Ballymun Road, Dublin 11",D11 ETF7,D11,https://mezzino.com/locations/dublin,-6.264484,53.39704,address
 Trinity Hall,,Trinity College Dublin,https://www.tcd.ie/accommodation/rooms/,"Dartry Road, Dublin 6",,D6,https://www.tcd.ie/accommodation/rooms/,-6.261247,53.309795,street (approximate)
 Brickworks,,Mezzino,https://www.mezzino.com/property/brickworks/,"Brickfield Lane, Dublin 8",D08 PFY5,D8,https://www.mezzino.com/property/brickworks/,-6.282951,53.336678,address
@@ -45,3 +45,5 @@ Clonmacnoise,,Dublin City University,https://www.dcuaccommodation.ie,"DCU St Pat
 Glendalough,,Dublin City University,https://www.dcuaccommodation.ie,"DCU St Patrick's Campus, Drumcondra, Dublin 9",,D9,https://www.dcu.ie/campus-maps,-6.255669,53.369837,OpenStreetMap
 Lismore,,Dublin City University,https://www.dcuaccommodation.ie,"DCU St Patrick's Campus, Drumcondra, Dublin 9",,D9,https://www.dcu.ie/campus-maps,-6.256502,53.36971,OpenStreetMap
 Moville,,Dublin City University,https://www.dcuaccommodation.ie,"DCU St Patrick's Campus, Drumcondra, Dublin 9",,D9,https://www.dcu.ie/campus-maps,-6.256261,53.3705,OpenStreetMap
+Merville Residence,,University College Dublin,https://www.ucd.ie/residences/,"Merville, UCD Belfield, Dublin 4",,D4,https://www.openstreetmap.org,-6.21573,53.30302,OpenStreetMap
+Belgrove Student Residences,,University College Dublin,https://www.ucd.ie/residences/,"Belgrove, UCD Belfield, Dublin 4",,D4,https://www.openstreetmap.org,-6.22434,53.3047,OpenStreetMap

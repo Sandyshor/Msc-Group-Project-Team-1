@@ -144,6 +144,7 @@ export default function App() {
   const [showBus, setShowBus] = useState(false);
   const [showBikes, setShowBikes] = useState(false);
   const [showRail, setShowRail] = useState(false);
+  const [showHousing, setShowHousing] = useState(true); // student residences, shown from the start
   const [showSafety, setShowSafety] = useState(false);
   const [countyOpen, setCountyOpen] = useState(false); // County Dublin areas row, opened with its button
   // A saved tab that no longer exists (Commute, Universities) falls back to Places
@@ -352,9 +353,11 @@ export default function App() {
           {/* Everything that controls the map sits on top of it, so the district list and the map are always on screen together */}
           <div className="map-toolbar">
             <div className="map-search">
+              <p className="map-search-kicker" aria-hidden="true"><span>🔎</span> Search Dublin</p>
               <PlaceSearch
+                className="ps-hero"
                 label="Search the map"
-                placeholder="Search a university, place, street or district, e.g. UCD, Temple Bar, D8"
+                placeholder={typeof window !== 'undefined' && window.innerWidth < 560 ? 'University, place, street or D8…' : 'Search a university, place, street or district, e.g. UCD, Temple Bar, D8'}
                 onPick={onSearchPick}
                 onClear={() => mapApi.current?.clearSearchPin()}
               />
@@ -374,6 +377,7 @@ export default function App() {
               <button type="button" className="luas-toggle tr-toggle" aria-pressed={showBus} onClick={() => setShowBus((v) => !v)}><i className="tr-bus" /> Bus stops</button>
               <button type="button" className="luas-toggle tr-toggle" aria-pressed={showBikes} onClick={() => setShowBikes((v) => !v)}><i className="tr-bikes" /> Dublin Bikes</button>
               <button type="button" className="luas-toggle tr-toggle" aria-pressed={showRail} onClick={() => setShowRail((v) => !v)}><i className="tr-rail" /> DART &amp; rail</button>
+              <button type="button" className="luas-toggle tr-toggle" aria-pressed={showHousing} onClick={() => setShowHousing((v) => !v)}><i className="tr-housing" aria-hidden="true">🏠</i> Student housing</button>
               <button type="button" className="luas-toggle tr-toggle" aria-pressed={showSafety} onClick={() => setShowSafety((v) => !v)}><i className="tr-safety" /> Safety map</button>
             </div>
             {[['Districts', DUBLIN_DISTRICTS, ''], ['County Dublin', COUNTY_AREAS, ' county-chips']].map(([group, codes, cls]) => ((!cls || showCountyRow) && (
@@ -414,6 +418,7 @@ export default function App() {
             showBus={showBus}
             showBikes={showBikes}
             showRail={showRail}
+            showHousing={showHousing}
             showSafety={showSafety}
             hoverPlace={hoverPlace}
             onHoverPlace={setHoverPlace}
@@ -446,6 +451,7 @@ export default function App() {
             {showLuas && <span><i className="legend-line" style={{ background: '#00a651' }} />Luas Green</span>}
             {showRail && <span><i className="legend-line" style={{ background: '#7ac143' }} />DART</span>}
             {showRail && <span><i className="legend-line" style={{ background: '#6f3f98' }} />Commuter rail</span>}
+            {showHousing && <span className="legend-pin"><i>🏠</i>Student residences</span>}
             {showBus && <span><i className="legend-dot legend-bus" />Bus stops (zoom in)</span>}
             {showSafety && <span className="legend-safety">More crime <i /> Less crime</span>}
             {showBikes && <span><i className="legend-dot" style={{ background: '#1f6fb2' }} />Dublin Bikes (live)</span>}

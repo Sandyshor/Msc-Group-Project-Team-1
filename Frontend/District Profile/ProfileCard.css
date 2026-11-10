@@ -108,3 +108,11 @@
 .pc-hoods li.pc-hoods-more { padding: 0; border: 0; background: none; }
 .pc-hoods-more button { padding: 4px 10px; border: 1px dashed rgba(255, 255, 255, 0.45); border-radius: 999px; background: transparent; color: #fffdf3; font: inherit; font-size: 0.74rem; font-weight: 700; cursor: pointer; }
 .pc-hoods-more button:hover { background: rgba(255, 255, 255, 0.14); }
+/* Rent tab: student residences in the district */
+.pc-residences { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.pc-residences li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border: 1px solid #ece6f2; border-radius: 12px; background: #fbf8fd; }
+.pc-res-name { display: grid; min-width: 0; color: #202d29; font-size: 13.5px; font-weight: 800; }
+.pc-res-name a { color: #5a2d7a; text-decoration: none; }
+.pc-res-name a:hover { text-decoration: underline; }
+.pc-res-name small { overflow: hidden; color: #74817a; font-size: 11.5px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.pc-residences b { flex: none; color: #202d29; font-size: 13px; }

@@ -588,6 +588,7 @@ function GettingThere({ result, university, universityLocation, mode, onMode }) 
           toLat={universityLocation.lat}
           toLon={universityLocation.lon}
           toName={university}
+          area={result.area}
           mode={commute?.walk_faster ? 'walk' : mode}
           defaultMinutes={commute?.minutes ?? null}
           defaultKm={commute?.km ?? null}

@@ -123,3 +123,32 @@
   .ps-list em { display: none; }
   .ps input { font-size: 16px; } /* stops iPhone zooming into the box */
 }
+
+/* The district page's search bar: the first thing the eye lands on. A raised white bar with a slowly moving
+   gold-to-lime border and a soft glow, which pulses three times when the page opens. */
+.map-search-kicker { display: flex; align-items: center; gap: 6px; margin: 0 0 6px 4px; color: #9a7445; font: 800 11px 'DM Sans', sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.map-search-kicker span { font-size: 12px; }
+.ps.ps-hero {
+  padding: 0 8px 0 16px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, #ffffff, #fbfdf6) padding-box,
+    linear-gradient(120deg, #c29450, #dff27f, #2f8f6a, #e9cf9a, #c29450) border-box;
+  background-size: 100% 100%, 300% 300%;
+  box-shadow: 0 12px 30px rgba(23, 63, 50, .16), 0 0 0 5px rgba(223, 242, 127, .28), inset 0 2px 0 #ffffff, inset 0 -2px 0 rgba(23, 63, 50, .05);
+  animation: ps-border 8s linear infinite, ps-attention 1.5s ease-out .8s 3;
+}
+.ps.ps-hero input { height: 52px; color: #173f32; font-size: 15.5px; font-weight: 700; }
+.ps.ps-hero input::placeholder { color: #55665c; font-weight: 600; }
+.ps.ps-hero .ps-icon { width: 22px; height: 22px; stroke: #a8753f; stroke-width: 2.4; }
+.ps.ps-hero:focus-within { box-shadow: 0 14px 34px rgba(23, 63, 50, .2), 0 0 0 6px rgba(223, 242, 127, .55), inset 0 2px 0 #ffffff; animation-play-state: running, paused; }
+.ps.ps-hero.is-open { border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; }
+@keyframes ps-border { to { background-position: 0 0, 300% 0; } }
+@keyframes ps-attention {
+  0% { transform: none; }
+  30% { transform: translateY(-2px) scale(1.012); filter: drop-shadow(0 0 12px rgba(223, 242, 127, .9)); }
+  100% { transform: none; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) { .ps.ps-hero { animation: none; } }
+@media (max-width: 480px) { .ps.ps-hero input { height: 48px; font-size: 16px; } }

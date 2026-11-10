@@ -12,6 +12,7 @@ import Results from './pages/Results'
 import { AttractionsPage, UniversitiesPage } from './pages/CityGuide'
 import LanguageSwitcher from './LanguageSwitcher'
 import SiteTour from './SiteTour'
+import FloatingMatch from './FloatingMatch'
 import SiteFooter from './SiteFooter'
 import ChatWidget from './ChatWidget'
 import BrandLogo from './BrandLogo'
@@ -184,6 +185,7 @@ function App() {
       {!['/questionnaire', '/results'].includes(location.pathname) && <SiteFooter />}
 
       {tourOpen && <SiteTour onClose={() => setTourOpen(false)} />}
+      <FloatingMatch hidden={tourOpen} />
       <ChatWidget />
     </div>
   )

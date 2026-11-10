@@ -120,7 +120,8 @@ const PLACE_EMOJI = {
   beach: '🏖️', water: '🌊', castle: '🏰', church: '⛪', landmark: '📍', monument: '🗿', market: '🏪',
   shop: '🛍️', cinema: '🎬', venue: '🎭', village: '🏘️', nature: '🌿', hospital: '🏥',
 };
-const RING = { uni: '#173f37', place: '#b8862f', landmark: '#a65c3b' };
+const RING = { uni: '#173f37', place: '#b8862f', landmark: '#a65c3b', housing: '#7a3fa0' };
+const RESIDENCES_URL = '/data/student-residences.json';
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -371,6 +372,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       railStations: L.layerGroup(),
       bus: L.layerGroup(),
       busStops: null,
+      housing: L.layerGroup(), // student residences (button above the map)
       bikes: L.layerGroup(),
       bikesLoad: null,
       safety: L.layerGroup(),
@@ -463,6 +465,23 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       .catch((e) => console.error(`Could not load ${file}`, e));
     loadLandmarks('universities.json', universityLayer, 'uni');
     loadLandmarks('places.json', st.cityPlaces, 'place');
+
+    // ---------------- student residences: every purpose-built residence at its own address
+    fetch(RESIDENCES_URL, { headers: { Accept: 'application/json' } }).then((r) => (r.ok ? r.json() : null)).then((d) => {
+      (d?.residences || []).forEach((r) => {
+        const price = r.from ? `From <b>€${Math.round(r.from).toLocaleString('en-IE')}</b> a month` : '';
+        const html = `<div class="sh-pop"><span class="sh-kicker">Student residence · ${escapeHtml(r.district)}</span><strong>${escapeHtml(r.name)}</strong>`
+          + `${r.operator ? `<small>${escapeHtml(r.operator)}</small>` : ''}${r.address ? `<span class="sh-addr">${escapeHtml(r.address)}</span>` : ''}`
+          + `${price ? `<span class="sh-price">${price}</span>` : ''}${r.rooms ? `<span class="sh-rooms">${escapeHtml(r.rooms)}</span>` : ''}`
+          + `${r.website ? `<a href="${escapeHtml(r.website)}" target="_blank" rel="noopener noreferrer">Website ↗</a>` : ''}</div>`;
+        const latlng = L.latLng(r.lat, r.lon);
+        L.marker(latlng, { icon: pinIcon({ emoji: '🏠', ring: RING.housing, kind: 'housing', label: r.name }), title: `${r.name} (student residence)`, riseOnHover: true })
+          .bindPopup(html, { maxWidth: 260, offset: [0, -12], className: 'sh-popup' })
+          .addTo(st.housing);
+        st.named.landmarks.push({ name: r.name, lat: r.lat, lng: r.lon });
+      });
+      st.declutter?.();
+    }).catch((e) => console.error('Could not load student residences', e));
 
     // ---------------- layer list
     const amenityLayers = Object.fromEntries(Object.keys(AMENITY_CATEGORIES).map((k) => [k, L.layerGroup()]));
@@ -1188,6 +1207,12 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     if (props.showRail) st.rail.addTo(st.map); else st.rail.remove();
     st.declutter();
   }, [props.showRail]);
+  useEffect(() => {
+    const st = s.current;
+    if (!st) return;
+    if (props.showHousing) st.housing.addTo(st.map); else st.housing.remove();
+    st.declutter();
+  }, [props.showHousing]);
   useEffect(() => {
     const st = s.current;
     if (!st) return;

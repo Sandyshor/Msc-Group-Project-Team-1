@@ -52,6 +52,7 @@ const UNIVERSITIES = {
   'TU Dublin - Tallaght': [-6.3631, 53.2910],
   'Trinity College Dublin': [-6.2546, 53.3438],
   'University College Dublin - Belfield': [-6.2210, 53.3065],
+  'Maynooth University': [-6.6010, 53.3842],
 };
 
 

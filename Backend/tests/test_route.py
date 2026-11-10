@@ -129,6 +129,7 @@ def test_irish_rail_line_uses_long_name(otp):
 
 @pytest.mark.parametrize("mode, expected", [
     ("transit", {"transit": {"transit": [{"mode": "BUS"}, {"mode": "TRAM"}, {"mode": "RAIL"}]}}),
+    ("bus", {"transit": {"transit": [{"mode": "BUS"}]}}),
     ("walk", {"directOnly": True, "direct": ["WALK"]}),
     ("bike", {"directOnly": True, "direct": ["BICYCLE"]}),
 ])

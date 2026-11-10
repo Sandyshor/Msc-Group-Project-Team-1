@@ -14,5 +14,6 @@
   {"name": "National College of Ireland — IFSC", "lat": 53.3491, "lon": -6.2429},
   {"name": "Dublin Business School — Aungier Street", "lat": 53.3405, "lon": -6.2654},
   {"name": "IADT — Dún Laoghaire", "lat": 53.2795, "lon": -6.1537},
-  {"name": "Dublin Business School — Castle House", "lat": 53.3434, "lon": -6.2647}
+  {"name": "Dublin Business School — Castle House", "lat": 53.3434, "lon": -6.2647},
+  {"name": "Maynooth University", "lat": 53.3842, "lon": -6.601}
 ]
