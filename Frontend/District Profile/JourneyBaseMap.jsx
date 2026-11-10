@@ -16,7 +16,7 @@ import { ACTIVE_DISTRICTS, ALL_DISTRICTS, AMENITY_TYPES, heatColor, safetyLabel,
 import crimeAreasUrl from './crime-heatmap1.geojson?url';
 const countyAreasUrl = '/data/county-dublin-areas.geojson'; // approximate A/K routing areas
 const countySafetyUrl = '/data/county-dublin-safety.geojson';
-import { decodePolyline, formatDistance, formatMinutes, legColor, lineLabel, MODE_STYLE } from './journey';
+import { decodePolyline, fetchRoutes, formatDistance, formatMinutes, legColor, lineLabel, MODE_STYLE } from './journey';
 import { chainInfo } from './shopChains';
 import { loadAmenityRecords as loadCsv } from './amenityData';
 import { universities as campusList } from './cityPlaces';
@@ -122,6 +122,24 @@ const PLACE_EMOJI = {
 };
 const RING = { uni: '#173f37', place: '#b8862f', landmark: '#a65c3b', housing: '#7a3fa0' };
 const RESIDENCES_URL = '/data/student-residences.json';
+// the recommender's university names (questionnaire, Compare) -> campus ids in cityPlaces
+const CAMPUS_IDS = {
+  "DCU - St Patrick's Campus": 'dcu-st-patricks', 'Dublin Business School': 'dbs', 'Dublin City University - Glasnevin': 'dcu',
+  'Griffith College Dublin': 'griffith', 'IADT - Dun Laoghaire': 'iadt', 'National College of Art and Design': 'ncad',
+  'National College of Ireland - IFSC': 'nci', 'Royal College of Surgeons Ireland': 'rcsi', 'TU Dublin - Aungier Street': 'tu-aungier',
+  'TU Dublin - Blanchardstown': 'tu-blanchardstown', 'TU Dublin - Bolton Street': 'tu-bolton', 'TU Dublin - Grangegorman': 'tu-grangegorman',
+  'TU Dublin - Tallaght': 'tu-tallaght', 'Trinity College Dublin': 'tcd', 'University College Dublin - Belfield': 'ucd', 'Maynooth University': 'maynooth',
+};
+// the student's college: picked in a residence popup before, else from the questionnaire or Compare
+function rememberedCampus() {
+  try {
+    const own = localStorage.getItem('housing-uni');
+    if (own && campusList.some((u) => u.id === own)) return own;
+    const name = JSON.parse(sessionStorage.getItem('questionnaireAnswers') || 'null')?.university || localStorage.getItem('compare-uni');
+    return CAMPUS_IDS[name] || null;
+  } catch { return null; }
+}
+const euro = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -467,17 +485,91 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     loadLandmarks('places.json', st.cityPlaces, 'place');
 
     // ---------------- student residences: every purpose-built residence at its own address
+    // The popup: details, then the distance to the student's college by foot and by public transport
+    // (the journey planner's real routes), and a button that draws the trip on the map.
+    function residencePopup(r, latlng, marker) {
+      const box = el('div', 'sh-pop');
+      const who = [r.operator, r.address].filter(Boolean).map(escapeHtml).join(' · ');
+      box.innerHTML = `<span class="sh-kicker">Student residence · ${escapeHtml(r.district)}</span><strong>${escapeHtml(r.name)}</strong>`
+        + `${who ? `<span class="sh-addr">${who}</span>` : ''}`
+        + `${r.from || r.rooms ? `<span class="sh-price">${r.from ? `From <b>${euro(r.from)}</b> a month` : ''}${r.from && r.rooms ? ' · ' : ''}${r.rooms ? `<span class="sh-rooms">${escapeHtml(r.rooms)}</span>` : ''}</span>` : ''}`;
+      const campuses = campusList.map((u) => ({ ...u, m: latlng.distanceTo(u.coordinates) })).sort((a, b) => a.m - b.m);
+      const uniBox = el('div', 'sh-uni');
+      const label = el('label', 'sh-uni-label', 'Distance to');
+      const select = el('select');
+      select.setAttribute('aria-label', 'College');
+      campuses.forEach((u) => { const o = el('option', null, `${u.name} (${formatDistance(u.m / 1000)})`); o.value = u.id; select.append(o); });
+      select.value = rememberedCampus() && campuses.some((u) => u.id === rememberedCampus()) ? rememberedCampus() : campuses[0].id;
+      label.append(select);
+      const walk = el('p', 'sh-row');
+      const transit = el('p', 'sh-row');
+      const go = el('button', 'sh-go', 'Show the route');
+      go.type = 'button';
+      const actions = el('div', 'sh-actions');
+      actions.append(go);
+      if (r.website) {
+        const web = el('a', 'sh-web', 'Website ↗');
+        Object.assign(web, { href: r.website, target: '_blank', rel: 'noopener noreferrer' });
+        actions.append(web);
+      }
+      uniBox.append(label, walk, transit, actions);
+      box.append(uniBox);
+      let ctrl = null;
+      // the times arrive after the popup opens: keep it placed and fully inside the map
+      const refit = () => {
+        const popup = marker?.getPopup();
+        if (!popup?.isOpen()) return;
+        popup.update();
+        const node = popup.getElement();
+        const mapBox = map.getContainer().getBoundingClientRect();
+        const r2 = node?.getBoundingClientRect();
+        if (r2 && r2.top < mapBox.top + 10) map.panBy([0, r2.top - mapBox.top - 10], { animate: true });
+      };
+      const show = () => {
+        const u = campuses.find((x) => x.id === select.value);
+        const to = { lat: u.coordinates[0], lng: u.coordinates[1] };
+        walk.innerHTML = `<span>🚶</span><b>${formatDistance(u.m / 1000)}</b> in a straight line`;
+        transit.innerHTML = '<span>🚌</span><i>Working out the trip…</i>';
+        ctrl?.abort();
+        ctrl = new AbortController();
+        const from = { lat: r.lat, lng: r.lon };
+        fetchRoutes({ from, to, mode: 'walk', timeType: 'now' }, ctrl.signal).then((its) => {
+          const best = its[0];
+          walk.innerHTML = `<span>🚶</span><b>${formatDistance(best.total_distance_km)}</b> walk · ${formatMinutes(best.total_minutes)}`;
+          refit();
+        }).catch(() => {});
+        fetchRoutes({ from, to, mode: 'transit', timeType: 'now' }, ctrl.signal).then((its) => {
+          const best = [...its].sort((a, b) => a.total_minutes - b.total_minutes)[0];
+          const rides = best.legs.filter((leg) => leg.mode !== 'WALK').map(lineLabel).join(' → ');
+          transit.innerHTML = `<span>🚌</span><b>${formatMinutes(best.total_minutes)}</b> by public transport${rides ? ` · ${escapeHtml(rides)}` : ' (walking is quickest)'}`;
+          refit();
+        }).catch((e) => { if (e.name !== 'AbortError') transit.innerHTML = '<span>🚌</span>The journey planner can\'t reach this trip yet'; });
+      };
+      select.addEventListener('change', () => { try { localStorage.setItem('housing-uni', select.value); } catch { /* storage blocked */ } show(); });
+      go.addEventListener('click', () => {
+        const u = campuses.find((x) => x.id === select.value);
+        map.closePopup();
+        latest.current.onPlanTrip?.({ lat: r.lat, lng: r.lon, label: r.name }, { lat: u.coordinates[0], lng: u.coordinates[1], label: u.name });
+      });
+      L.DomEvent.disableClickPropagation(box);
+      show();
+      return box;
+    }
     fetch(RESIDENCES_URL, { headers: { Accept: 'application/json' } }).then((r) => (r.ok ? r.json() : null)).then((d) => {
       (d?.residences || []).forEach((r) => {
-        const price = r.from ? `From <b>€${Math.round(r.from).toLocaleString('en-IE')}</b> a month` : '';
-        const html = `<div class="sh-pop"><span class="sh-kicker">Student residence · ${escapeHtml(r.district)}</span><strong>${escapeHtml(r.name)}</strong>`
-          + `${r.operator ? `<small>${escapeHtml(r.operator)}</small>` : ''}${r.address ? `<span class="sh-addr">${escapeHtml(r.address)}</span>` : ''}`
-          + `${price ? `<span class="sh-price">${price}</span>` : ''}${r.rooms ? `<span class="sh-rooms">${escapeHtml(r.rooms)}</span>` : ''}`
-          + `${r.website ? `<a href="${escapeHtml(r.website)}" target="_blank" rel="noopener noreferrer">Website ↗</a>` : ''}</div>`;
         const latlng = L.latLng(r.lat, r.lon);
-        L.marker(latlng, { icon: pinIcon({ emoji: '🏠', ring: RING.housing, kind: 'housing', label: r.name }), title: `${r.name} (student residence)`, riseOnHover: true })
-          .bindPopup(html, { maxWidth: 260, offset: [0, -12], className: 'sh-popup' })
+        // hover: the details at a glance
+        const tip = `<b>${escapeHtml(r.name)}</b>${r.operator ? ` · ${escapeHtml(r.operator)}` : ''}`
+          + `${r.from ? `<small>From ${euro(r.from)} a month${r.rooms ? ` · ${escapeHtml(r.rooms)}` : ''}</small>` : r.rooms ? `<small>${escapeHtml(r.rooms)}</small>` : ''}`
+          + `${r.address ? `<small>${escapeHtml(r.address)}</small>` : ''}<small class="sh-tip-hint">Click for the distance to your college</small>`;
+        const marker = L.marker(latlng, { icon: pinIcon({ emoji: '🏠', ring: RING.housing, kind: 'housing', label: r.name }), title: `${r.name} (student residence)`, riseOnHover: true })
+          .bindTooltip(tip, { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip sh-tip' })
+          .bindPopup('', { maxWidth: 300, minWidth: 250, offset: [0, -12], className: 'sh-popup', autoPanPaddingTopLeft: [20, 70] })
           .addTo(st.housing);
+        // click: details and the distance to a college, built once per opening (so it uses the current choice).
+        // It is set as finished content, not a function, so popup.update() only re-places it.
+        marker.on('popupopen', (e) => { if (!e.popup.getContent()) e.popup.setContent(residencePopup(r, latlng, marker)); });
+        marker.on('popupclose', (e) => { e.popup.setContent(''); });
         st.named.landmarks.push({ name: r.name, lat: r.lat, lng: r.lon });
       });
       st.declutter?.();

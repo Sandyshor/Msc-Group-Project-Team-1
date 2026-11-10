@@ -420,9 +420,27 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     if (!layer) return
     layer.clearLayers()
     homes.forEach((r) => {
-      const price = r.from ? `<br>From <b>€${Math.round(r.from).toLocaleString('en-IE')}</b> a month` : ''
+      const price = r.from ? `From <b>€${Math.round(r.from).toLocaleString('en-IE')}</b> a month` : ''
+      // hover: the details; click: the same plus how far it is from the university, walking and by public transport
+      const tip = `<b>${escapeHtml(r.name)}</b>${r.operator ? ` · ${escapeHtml(r.operator)}` : ''}${price ? `<br>${price}${r.rooms ? ` · ${escapeHtml(r.rooms)}` : ''}` : ''}${r.address ? `<br>${escapeHtml(r.address)}` : ''}<br><small>Click for the distance to ${escapeHtml(toName)}</small>`
+      const popup = () => {
+        const box = document.createElement('div')
+        box.className = 'rm-pop'
+        box.innerHTML = `<small>Student residence</small><strong>${escapeHtml(r.name)}</strong>${r.operator ? `<span>${escapeHtml(r.operator)}</span>` : ''}${r.address ? `<span>${escapeHtml(r.address)}</span>` : ''}${price ? `<span>${price}</span>` : ''}`
+          + `<span class="rm-pop-dist"><b>To ${escapeHtml(toName)}</b><span class="rm-walk">🚶 ${fmtKm(km([r.lat, r.lon], to))} in a straight line</span><span class="rm-transit">🚌 <i>Working out the trip…</i></span></span>`
+          + `${r.website ? `<a href="${escapeHtml(r.website)}" target="_blank" rel="noopener noreferrer">Website ↗</a>` : ''}`
+        const ask = (routeMode) => fetch(`${API_URL}/route?${new URLSearchParams({ from_lat: r.lat, from_lon: r.lon, to_lat: to[0], to_lon: to[1], mode: routeMode, when: nextWeekdayNine(), arrive_by: 'true' })}`)
+          .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
+          .then((plan) => [...plan.itineraries].sort((x, y) => x.total_minutes - y.total_minutes)[0])
+        ask('walk').then((it) => { box.querySelector('.rm-walk').innerHTML = `🚶 <b>${fmtKm(it.total_distance_km)}</b> walk · ${Math.round(it.total_minutes)} min` }).catch(() => {})
+        ask('transit').then((it) => {
+          box.querySelector('.rm-transit').innerHTML = `🚌 <b>${Math.round(it.total_minutes)} min</b> by public transport${it.legs.some((leg) => leg.mode !== 'WALK') ? ` · ${escapeHtml(rideWords(it))}` : ' (walking is quickest)'}`
+        }).catch(() => { box.querySelector('.rm-transit').innerHTML = '🚌 The journey planner can\'t reach this trip yet' })
+        return box
+      }
       L.marker([r.lat, r.lon], { icon: ctxIcon(`<span class="rm-home">🏠</span><span class="rm-label rm-home-label">${escapeHtml(r.name)}</span>`, 22), title: `${r.name} (student residence)`, zIndexOffset: 50 })
-        .bindPopup(`<div class="rm-pop"><small>Student residence</small><strong>${escapeHtml(r.name)}</strong>${r.operator ? `<span>${escapeHtml(r.operator)}</span>` : ''}${r.address ? `<span>${escapeHtml(r.address)}</span>` : ''}${price}${r.website ? `<a href="${escapeHtml(r.website)}" target="_blank" rel="noopener noreferrer">Website ↗</a>` : ''}</div>`, { maxWidth: 240 })
+        .bindTooltip(tip, { direction: 'top', offset: [0, -12], className: 'rm-tip' })
+        .bindPopup(popup, { maxWidth: 260, minWidth: 220 })
         .addTo(layer)
     })
     if (near?.kind === 'transit') {
@@ -446,7 +464,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
         .bindTooltip(`<b>Dublin Bikes · ${escapeHtml(d.name)}</b><br>${where}${d.bikes != null ? ` · ${d.bikes} bikes free` : ''}`, { direction: 'top', offset: [0, -10], className: 'rm-tip' }).addTo(layer))
     }
     setTimeout(() => declutterTips(boxRef.current), 80)
-  }, [near, homes, toName])
+  }, [near, homes, toName, toLat, toLon]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // keep the pin's tooltip in step with the street name when it arrives
   useEffect(() => { startRef.current?.setTooltipContent(`${escapeHtml(start ? start.name : fromName)}<br><small>Drag or click the map to start elsewhere</small>`) }, [start?.name, fromName])

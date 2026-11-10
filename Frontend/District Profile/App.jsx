@@ -323,6 +323,12 @@ export default function App() {
     if (p.kind === 'district' && data.profiles[p.code]) { mapApi.current?.clearSearchPin(); selectDistrict(p.code); return; }
     mapApi.current?.showSearchResult(p);
   };
+  // "Show the route on the map" in a student residence popup: residence -> college
+  const onPlanTrip = (from, to) => {
+    setTouring(false);
+    setTrip((t) => ({ ...t, from, to, mode: 'transit' }));
+    if (selectedId && tab !== 'journey') setTab('journey');
+  };
   // "Directions from / to here" on the search pin
   const onSearchDirections = (which, p) => {
     setTouring(false);
@@ -426,6 +432,7 @@ export default function App() {
             trip={trip}
             planning={planning}
             onSearchDirections={onSearchDirections}
+            onPlanTrip={onPlanTrip}
             onMapPoint={onMapPoint}
             onLandmarkPoint={onLandmarkPoint}
             onDragPoint={onDragPoint}
