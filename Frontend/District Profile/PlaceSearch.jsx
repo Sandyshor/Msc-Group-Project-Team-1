@@ -1,6 +1,7 @@
 // Search box with suggestions (universities, places, districts, stations, shops; streets and addresses on
 // Enter). Used above the district map and for the journey planner's A and B.
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { KINDS, loadPlaceIndex, searchAddresses, searchPlaces } from './placeIndex';
 import './PlaceSearch.css';
 
@@ -30,7 +31,7 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
 
   useEffect(() => {
     if (!open) return undefined;
-    const close = (e) => { if (!box.current?.contains(e.target)) leave(); };
+    const close = (e) => { if (!box.current?.contains(e.target) && !listRef.current?.contains(e.target)) leave(); };
     document.addEventListener('pointerdown', close);
     return () => document.removeEventListener('pointerdown', close);
   }, [open, value]);
@@ -78,8 +79,28 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
   const listId = `${id}-list`;
   const showList = open && typed && typed !== value;
 
+  // The list is drawn on <body>, placed under the box (or above it when there's no room below), so the panel
+  // around the box (journey planner, profile card) can't cut it off. It follows the box when the page scrolls.
+  const listRef = useRef(null);
+  const [place, setPlace] = useState(null);
+  useLayoutEffect(() => {
+    if (!showList) { setPlace(null); return undefined; }
+    const measure = () => {
+      const r = box.current?.getBoundingClientRect();
+      if (!r) return;
+      const below = window.innerHeight - r.bottom - 10;
+      const above = r.top - 10;
+      const up = below < 240 && above > below;
+      setPlace({ left: r.left, width: r.width, up, top: r.bottom + 4, bottom: window.innerHeight - r.top + 4, max: Math.max(150, Math.min(360, up ? above : below)) });
+    };
+    measure();
+    window.addEventListener('scroll', measure, true);
+    window.addEventListener('resize', measure);
+    return () => { window.removeEventListener('scroll', measure, true); window.removeEventListener('resize', measure); };
+  }, [showList]);
+
   return (
-    <div ref={box} className={`ps ${className}${showList ? ' is-open' : ''}`}
+    <div ref={box} className={`ps ${className}${showList ? ' is-open' : ''}${place?.up ? ' is-up' : ''}`}
       onBlur={(e) => { if (!box.current?.contains(e.relatedTarget)) leave(); }}>
       {badge ? <b className="ps-badge" aria-hidden="true">{badge}</b> : (
         <svg className="ps-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
@@ -105,8 +126,9 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
         <button type="button" className="ps-clear" aria-label={`Clear ${label}`} title="Clear"
           onClick={() => { setText(''); setAddresses(null); setActive(-1); onClear?.(); input.current?.focus(); }}>×</button>
       )}
-      {showList && (
-        <ul id={listId} role="listbox" className="ps-list" aria-label={`${label} suggestions`}>
+      {showList && place && createPortal(
+        <ul id={listId} ref={listRef} role="listbox" className={`ps-list ps-floating${place.up ? ' is-up' : ''}`} aria-label={`${label} suggestions`}
+          style={{ left: place.left, width: place.width, maxHeight: place.max, ...(place.up ? { top: 'auto', bottom: place.bottom } : { top: place.top, bottom: 'auto' }) }}>
           {!index && !failed && <li className="ps-note">Loading places…</li>}
           {failed && <li className="ps-note">Couldn&rsquo;t load the place list. Press Enter to search addresses.</li>}
           {options.map((p, i) => (
@@ -140,7 +162,8 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
               <span className="ps-text"><strong>{looking ? 'Searching streets and addresses…' : `Search streets and addresses for “${typed}”`}</strong><small>{local.length ? 'From OpenStreetMap' : 'From OpenStreetMap · press Enter'}</small></span>
             </li>
           )}
-        </ul>
+        </ul>,
+        document.body,
       )}
     </div>
   );
