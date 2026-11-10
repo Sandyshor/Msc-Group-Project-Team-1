@@ -21,8 +21,9 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 OUT = os.path.join(ROOT, "Frontend", "public", "data", "dublin-bus-stops.geojson")
 GTFS_ZIP = (sys.argv[1] if len(sys.argv) > 1 else
             os.getenv("GTFS_ZIP", os.path.expanduser("~/dublin-otp/GTFS_All.zip")))
-# County Dublin with a margin (the County Dublin areas reach Balbriggan and the Naul in the north)
-BOUNDS = {"min_lat": 53.17, "max_lat": 53.65, "min_lon": -6.60, "max_lon": -5.98}
+# County Dublin with a margin (the County Dublin areas reach Balbriggan and the Naul in the north), and west to
+# Maynooth so the bus stops at Maynooth University are on the map too
+BOUNDS = {"min_lat": 53.17, "max_lat": 53.65, "min_lon": -6.70, "max_lon": -5.98}
 # GTFS route_type for buses: 3, and the extended 700-799 range
 is_bus = lambda route_type: route_type == "3" or route_type.startswith("7")  # noqa: E731
 
