@@ -60,6 +60,11 @@ function errorMessage(status, detail) {
   const code = detail?.code;
   const message = typeof detail === 'string' ? detail : detail?.message;
   if (code === 'OUTSIDE_DUBLIN') return `${message} Pick a point inside the Dublin area.`;
+  // OTP says "Origin/Destination is unknown" when a point is off its map (e.g. outside the area it was built for)
+  if (code === 'NO_ROUTE' && /(origin|destination) is unknown/i.test(message || '')) {
+    const which = /origin/i.test(message) ? 'start' : 'destination';
+    return `The journey planner can't reach your ${which} yet: it's outside the area its map covers. Try a ${which} closer to Dublin city, or a nearby town centre or station.`;
+  }
   if (code === 'NO_ROUTE') return `No route found. ${message} Try a different time or travel mode.`;
   if (code === 'OTP_UNAVAILABLE') return 'The journey planner is offline: OpenTripPlanner is not running or not reachable. Try again shortly.';
   if (code === 'OTP_ERROR') return message;
