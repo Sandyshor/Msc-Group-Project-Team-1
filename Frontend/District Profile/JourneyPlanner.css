@@ -239,3 +239,14 @@
 @media (max-width: 650px) {
   .jp-amenity-status { top: 12px; left: 12px; max-width: min(250px, calc(100% - 72px)); }
 }
+
+/* How to plan a journey: always shown at the top of the panel (people looked for a search bar and didn't know the pins can be dragged) */
+.jp-howto { margin: 0 0 12px; padding: 11px 13px; border: 1px solid #d9e6dc; border-radius: 14px; background: #f1f7f2; color: var(--ink); }
+.jp-howto > b { display: block; margin-bottom: 6px; color: var(--forest); font: 800 13px "Manrope", sans-serif; }
+.jp-howto ol { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.jp-howto li { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; line-height: 1.45; }
+.jp-howto li strong { color: var(--forest); }
+.jp-howto-pin, .jp-howto-drag { display: inline-grid; flex: none; place-items: center; width: 20px; height: 20px; border-radius: 50%; color: #fff; font-size: 10px; font-weight: 800; }
+.jp-howto-pin.is-a { color: #d9f17e; background: #173f37; }
+.jp-howto-pin.is-b { background: #c8352b; }
+.jp-howto-drag { color: var(--forest); background: #fff; border: 1px solid #cfdccf; font-size: 13px; }
