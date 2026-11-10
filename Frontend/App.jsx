@@ -18,6 +18,7 @@ import ChatWidget from './ChatWidget'
 import BrandLogo from './BrandLogo'
 import InfoPage from './pages/InfoPages'
 import ThingsToKnow from './pages/ThingsToKnow'
+import { watchUser, logOut } from './firebase'
 
 // Fits the header to whatever room it has - window size, browser zoom, Windows display scaling, scrollbars,
 // fonts loading late or longer translations. It tries the full header, then two tighter versions, and only
@@ -79,8 +80,12 @@ function App() {
   }, [location.pathname])
   // The menu button appears when the header runs out of room (narrow windows or a zoomed-in browser)
   const [menuOpen, setMenuOpen] = useState(false)
+  // Who is logged in (Firebase), so the header can say so and offer Log out
+  const [user, setUser] = useState(null)
+  useEffect(() => watchUser(setUser), [])
+  const firstName = user ? (user.displayName || user.email || 'you').split(/[\s@]/)[0] : ''
   const headerRef = useRef(null)
-  const headerLevel = useHeaderFit(headerRef, [location.pathname])
+  const headerLevel = useHeaderFit(headerRef, [location.pathname, firstName])
   const compact = headerLevel === 'nav-compact'
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
   useEffect(() => { if (!compact) setMenuOpen(false) }, [compact])
@@ -130,10 +135,19 @@ function App() {
     Take a tour
   </button>
 
-  <Link className="login-link" to="/login">
-    <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" /></svg>
-    Log in
-  </Link>
+  {user ? (
+    // Same length as "Log in", so the header keeps its layout; who is logged in shows on hover
+    <button type="button" className="login-link login-user" onClick={logOut}
+      title={`Logged in as ${user.displayName || user.email}. Click to log out.`} aria-label={`Log out ${firstName}`}>
+      <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" /></svg>
+      Log out
+    </button>
+  ) : (
+    <Link className="login-link" to="/login">
+      <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" /></svg>
+      Log in
+    </Link>
+  )}
 
   <button type="button" className="menu-toggle" aria-label="Menu" aria-expanded={menuOpen} aria-controls="site-menu" onClick={() => setMenuOpen((v) => !v)}>
     <span className="menu-bars" aria-hidden="true"><i /><i /><i /></span>
@@ -151,7 +165,9 @@ function App() {
     <NavLink to="/how-it-works">How it works</NavLink>
     <div className="site-menu-row">
       <button type="button" onClick={() => { setMenuOpen(false); setTourOpen(true) }}>Take a tour</button>
-      <Link to="/login">Log in</Link>
+      {user
+        ? <button type="button" onClick={() => { setMenuOpen(false); logOut() }}>Log out ({firstName})</button>
+        : <Link to="/login">Log in</Link>}
     </div>
   </nav>
 )}
