@@ -151,6 +151,11 @@ def main():
             if done % 250 == 0 or done == len(jobs):
                 print(f"   {done}/{len(jobs)} done")
 
+    if not rows:
+        target = f" to {university}" if university else ""
+        raise SystemExit(f"No journeys{target} could be planned ({missing} had no route), so nothing was saved. "
+                         "OpenTripPlanner's graph probably doesn't reach it: rebuild the graph with an OpenStreetMap "
+                         "extract that covers it (Maynooth is in Kildare), then run this again.")
     matrix = pd.DataFrame(rows)
     matrix["Arrive_By"] = when
     matrix["Calculated_At"] = datetime.now(routing.DUBLIN_TZ).isoformat(timespec="seconds")

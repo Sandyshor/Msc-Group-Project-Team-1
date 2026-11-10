@@ -109,3 +109,26 @@ VNet integration is listed: `az webapp vnet-integration list -g <rg> -n <app>`.
 
 Graph won't load ("incompatible graph" in the logs): the jar on the VM isn't the one that built
 `graph.obj`. Re-run `deploy-otp.sh` from the laptop that built it.
+
+## Covering Maynooth and north County Dublin
+
+The first graph was built from a Dublin-only OpenStreetMap extract, so OTP can't route to Maynooth University
+(Kildare) or the far north of County Dublin (Balbriggan, Skerries, Garristown, Oldtown): it answers
+"Origin/Destination is unknown". To fix it, rebuild the graph **on the VM** (it downloads the Ireland map and the
+latest TFI timetable itself, cuts the Greater Dublin box out of the map and builds with its 8 GB of RAM):
+
+    bash deploy/otp/rebuild-graph.sh azureuser@<vm-public-ip>
+
+The planner is offline for about 15-30 minutes. The script keeps the old graph and puts it back if anything fails,
+and finishes by checking a trip from the city centre to Maynooth University.
+
+Then give the recommender Maynooth's commute times. Port 8080 isn't open to the internet, so tunnel to it over SSH
+in one terminal and run the commute script in another (from `Backend`, with the project's Python packages):
+
+    ssh -N -L 8081:localhost:8080 azureuser@<vm-public-ip>
+    cd Backend
+    OTP_URL=http://localhost:8081/otp/gtfs/v1 python3 tools/build_commute_matrix.py --university "Maynooth University"
+    OTP_URL=http://localhost:8081/otp/gtfs/v1 python3 tools/build_commute_matrix.py --university "Maynooth University" --neighbourhoods
+    OTP_URL=http://localhost:8081/otp/gtfs/v1 python3 tools/build_commute_matrix.py --university "Maynooth University" --county
+
+Commit the three updated `Data/commute_otp*.csv` files: Maynooth then appears in the questionnaire by itself.
