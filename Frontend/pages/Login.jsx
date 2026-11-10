@@ -99,7 +99,7 @@ function Login() {
         </div>
 
         <p className="login-bottom">
-          New to Find Your Dublin?
+          New to Find My Dublin?
           <br />
           <Link to="/signup">Sign up →</Link>
         </p>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find Your Dublin - automated relative crime score pipeline.
+"""Find My Dublin - automated relative crime score pipeline.
 
 Method (recorded crime only, normalised against an Irish reference rate):
   1. Every Garda station in Ireland (CSO CJA11, recorded crime incidents by Garda station, average of the latest
