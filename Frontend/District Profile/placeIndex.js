@@ -123,10 +123,15 @@ export function searchPlaces(list, query, limit = 8) {
     hits.push([score, p])
   }
   hits.sort((a, b) => a[0] - b[0])
-  // the same name twice (e.g. a chain shop) keeps both, but not more than three of one name
+  // rows that would look identical (e.g. three "Spar · Groceries · D1") show once; the same name in different
+  // areas stays (up to three)
   const count = {}
+  const seen = new Set()
   const out = []
   for (const [, p] of hits) {
+    const look = `${p.n}|${norm(p.sub)}`
+    if (seen.has(look)) continue
+    seen.add(look)
     count[p.n] = (count[p.n] || 0) + 1
     if (count[p.n] > 3) continue
     out.push(p)
