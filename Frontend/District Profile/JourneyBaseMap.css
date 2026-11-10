@@ -388,3 +388,22 @@
 .sh-pop .sh-rooms { color: #74817a; font-size: 11.5px; }
 .sh-pop a { margin-top: 6px; color: #7a3fa0; font-size: 12.5px; font-weight: 800; text-decoration: none; }
 .sh-pop a:hover { text-decoration: underline; }
+
+/* Student residence: hover card and the college distance in the popup */
+.leaflet-tooltip.sh-tip { max-width: 250px; white-space: normal; }
+.leaflet-tooltip.sh-tip small { display: block; margin-top: 2px; }
+.leaflet-tooltip.sh-tip .sh-tip-hint { margin-top: 5px; color: #7a3fa0; font-weight: 700; }
+.sh-pop .sh-web { justify-self: start; }
+.sh-uni { display: grid; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e2d6ec; }
+.sh-uni-label { display: grid; gap: 4px; color: #7a3fa0; font: 800 10.5px 'DM Sans', sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.sh-uni-label select { width: 100%; max-width: 100%; padding: 7px 8px; border: 1.5px solid #d9c8e6; border-radius: 9px; background: #fff; color: #202d29; font: 600 12.5px 'DM Sans', sans-serif; letter-spacing: 0; text-transform: none; }
+.sh-pop .sh-row { display: flex; gap: 7px; align-items: baseline; margin: 0; color: #4d5e53; font-size: 12.5px; line-height: 1.4; }
+.sh-pop .sh-row b { color: #202d29; }
+.sh-pop .sh-row i { color: #8a968f; }
+.sh-go { justify-self: start; margin-top: 2px; padding: 7px 12px; border: 0; border-radius: 999px; background: #5a2d7a; color: #fff; font: 700 12px 'DM Sans', sans-serif; cursor: pointer; }
+.sh-go:hover { background: #7a3fa0; }
+.sh-pop .sh-row b { white-space: nowrap; }
+.sh-pop .sh-price .sh-rooms { color: #74817a; font-size: 11.5px; }
+.sh-actions { display: flex; align-items: center; gap: 12px; margin-top: 2px; }
+.sh-actions .sh-web { margin: 0; }
+.sh-uni { margin-top: 8px; padding-top: 8px; }
