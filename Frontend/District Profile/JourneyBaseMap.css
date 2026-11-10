@@ -390,7 +390,7 @@
 .sh-pop a:hover { text-decoration: underline; }
 
 /* Student residence: hover card and the college distance in the popup */
-.leaflet-tooltip.sh-tip { max-width: 250px; white-space: normal; }
+.leaflet-tooltip.sh-tip { width: max-content; max-width: 260px; white-space: normal; }
 .leaflet-tooltip.sh-tip small { display: block; margin-top: 2px; }
 .leaflet-tooltip.sh-tip .sh-tip-hint { margin-top: 5px; color: #7a3fa0; font-weight: 700; }
 .sh-pop .sh-web { justify-self: start; }
@@ -426,3 +426,11 @@
 /* hover card shown below its pin: the tip points up */
 .leaflet-popup.is-below .leaflet-popup-tip-container { top: -20px; bottom: auto; transform: translateX(var(--tip-x, 0px)) rotate(180deg); }
 .leaflet-popup .leaflet-popup-tip-container { transform: translateX(var(--tip-x, 0px)); }
+
+/* Short or zoomed-in browser windows (e.g. a laptop at 125%): keep the map big. The two help lines are hidden and
+   the map gets most of the window height instead of what is left over under the toolbar. */
+@media (min-width: 1101px) and (max-height: 900px) {
+  .map-card .district-hint, .map-card .legend-more { display: none; }
+  .map-card { height: auto; min-height: 0; }
+  .map-card .district-map { flex: none; height: max(460px, calc(100vh - 140px)); }
+}
