@@ -1,0 +1,61 @@
+/* How it works: one type scale for the whole page (Fraunces headings, DM Sans text, the same sizes as the other
+   pages), rounded cards and readable labels. Scoped to .how-page so it wins over the older rules in App.css. */
+.how-page { font-family: 'DM Sans', sans-serif; }
+
+/* kickers and headings */
+.how-page .how-section-kicker,
+.how-page .how-ready .how-section-kicker { margin: 0 0 10px; color: #a8753f; font-size: 12.5px; font-weight: 800; letter-spacing: .12em; }
+.how-page .how-section-heading h2,
+.how-page .how-ready h2,
+.how-page .how-cta h2 { color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: clamp(30px, 3.4vw, 44px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; font-variation-settings: 'opsz' 72; }
+.how-page .how-section-heading > p,
+.how-page .how-ready-copy > p,
+.how-page .how-cta p:not(.how-section-kicker) { color: #4f6158; font-size: 16px; line-height: 1.6; }
+.how-page .how-section-heading > p { max-width: 400px; }
+
+/* step cards */
+.how-page .steps-grid { gap: 28px; }
+.how-page .step-flow-item:not(:last-child)::after { right: -22px; font-size: 18px; }
+.how-page .step-card { height: 100%; padding: 22px; border-radius: 20px; border-color: #e6dfcf; background: #fffdf8; box-shadow: 0 10px 28px rgba(23, 63, 50, .06); }
+.how-page .step-card:hover { box-shadow: 0 18px 38px rgba(23, 63, 50, .12); }
+.how-page .step-icon { border-radius: 16px; }
+.how-page .step-number { flex: none; width: auto; height: auto; padding: 5px 12px; border-radius: 999px; background: #173f32; color: #dff27f; font-size: 12px; font-weight: 800; letter-spacing: .06em; line-height: 1.2; }
+.how-page .step-card h3 { margin: 18px 0 6px; color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: 23px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; font-variation-settings: 'opsz' 36; }
+.how-page .step-description { margin: 0; color: #33463d; font-size: 15px; line-height: 1.6; }
+.how-page .step-detail { margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed #e2dacb; color: #66736b; font-size: 14px; line-height: 1.55; }
+.how-page .step-link { margin-top: auto; padding-top: 16px; color: #173f32; font-size: 15px; font-weight: 800; }
+
+/* the small pictures inside the cards: readable labels, rounded */
+.how-page .step-visual { border-radius: 14px; }
+.how-page .step-visual span, .how-page .step-visual small { font-size: 11.5px; letter-spacing: .04em; }
+.how-page .step-visual strong { font-family: 'Fraunces', Georgia, serif; font-weight: 700; }
+.how-page .budget-visual-top strong, .how-page .journey-visual-footer strong { font-size: 24px; letter-spacing: 0; }
+.how-page .area-visual-card { border-radius: 10px; }
+.how-page .area-visual-card strong { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0; }
+.how-page .area-visual-mark { font-family: 'Fraunces', Georgia, serif; font-weight: 700; }
+.how-page .area-visual-rating { font-size: 11px; font-weight: 800; }
+.how-page .budget-visual-campus { border-radius: 999px; font-size: 12px; }
+
+/* "A few details" */
+.how-page .how-ready { border-radius: 24px; border-color: #e6dfcf; }
+.how-page .how-ready-item { border-radius: 16px; border-color: #e6dfcf; box-shadow: 0 6px 18px rgba(23, 63, 50, .05); }
+.how-page .how-ready-icon { border-radius: 14px; }
+.how-page .how-ready-item strong { color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; font-variation-settings: 'opsz' 36; }
+.how-page .how-ready-item small { color: #5f6f67; font-size: 14.5px; line-height: 1.5; }
+.how-page .how-ready-check { background: #dcebd6; color: #1f5641; font-weight: 800; }
+
+/* closing call to action */
+.how-page .how-cta { border-radius: 24px; background: linear-gradient(135deg, #173f32, #245b48); color: #f7f2e8; box-shadow: 0 18px 40px rgba(23, 63, 50, .18); }
+.how-page .how-cta h2 { color: #fffdf7; }
+.how-page .how-cta p:not(.how-section-kicker),
+.how-page .how-cta > div:first-child > p:last-child { margin-top: 10px; color: #d4dfd5; font-size: 16px; line-height: 1.6; }
+.how-page .how-cta .how-section-kicker { color: #dff27f; }
+.how-page .how-button-green { border-radius: 999px; background: #dff27f; color: #173f32; font-size: 15.5px; font-weight: 800; }
+.how-page .how-cta-secondary { color: #fffdf7; font-size: 15px; font-weight: 700; }
+
+.how-page .how-page-footnote { color: #66736b; font-size: 13.5px; line-height: 1.6; }
+
+@media (max-width: 760px) {
+  .how-page .step-card h3 { font-size: 21px; }
+  .how-page .how-section-heading > p, .how-page .how-ready-copy > p, .how-page .how-cta p:not(.how-section-kicker) { font-size: 15px; }
+}

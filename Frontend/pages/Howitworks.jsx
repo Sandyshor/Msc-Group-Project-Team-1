@@ -1,35 +1,36 @@
 import { Link } from 'react-router-dom'
+import './Howitworks.css'
 
 const steps = [
   {
     number: '01',
     icon: 'home',
     visual: 'budget',
-    title: 'Set your starting point',
-    description: 'Enter your rent budget, choose your university and select the type of accommodation you prefer.',
-    detail: 'You can start with estimates if you have not decided everything yet.',
+    title: 'Tell us what you need',
+    description: 'Choose your university, set your monthly budget and the type of room you want, then rate what matters most to you.',
+    detail: 'Not sure yet? Start with a rough budget. You can change your answers at any time.',
     link: '/questionnaire',
-    linkText: 'Start with your details',
+    linkText: 'Find my match',
   },
   {
     number: '02',
     icon: 'neighbourhood',
     visual: 'areas',
     title: 'Compare neighbourhoods',
-    description: 'Explore Dublin areas and compare everyday factors like rent, travel and nearby amenities.',
-    detail: 'District profiles are still being expanded, so check which areas have details available.',
+    description: 'See your best-matching areas side by side: rent, commute, safety and the shops and parks nearby.',
+    detail: 'Every Dublin district and the County Dublin areas have a profile, with famous places and student life too.',
     link: '/districts',
-    linkText: 'Browse district profiles',
+    linkText: 'Explore districts',
   },
   {
     number: '03',
     icon: 'journey',
     visual: 'journey',
     title: 'Plan your daily journey',
-    description: 'Check routes between your chosen area and university, and discover useful places nearby.',
-    detail: 'Choose your start and destination, then switch map layers to view amenities.',
-    link: '/journey-planner/route.html',
-    linkText: 'Open the journey planner',
+    description: 'Check how you would get from your new area to campus by bus, Luas, DART, on foot or by bike.',
+    detail: 'Type a start and a destination, or click the map, and compare the routes and times.',
+    link: '/districts',
+    linkText: 'Plan a journey',
   },
 ]
 
@@ -189,7 +190,7 @@ function HowItWorks() {
         <div className="how-ready-copy">
           <p className="how-section-kicker">NO NEED TO HAVE IT ALL FIGURED OUT</p>
           <h2 id="how-ready-title">A few details can help you get started.</h2>
-          <p>Bring what you know today. You can still browse the guide if some plans are not settled yet.</p>
+          <p>Bring what you know today. If you are still deciding, you can explore the districts first.</p>
         </div>
         <ul className="how-ready-list">
           {readyItems.map((item) => (
@@ -209,14 +210,14 @@ function HowItWorks() {
             <span>YOUR NEXT STEP</span>
           </p>
           <h2 id="how-cta-title">Let’s make Dublin feel a little more familiar.</h2>
-          <p>Start with your budget and campus, or explore the city guide first.</p>
+          <p>Start with your budget and campus, or explore the districts first.</p>
         </div>
         <div className="how-cta-actions">
           <Link className="how-button how-button-green" to="/questionnaire">Get started <span aria-hidden="true">↗</span></Link>
           <Link className="how-cta-secondary" to="/districts">Explore districts</Link>
         </div>
       </section>
-      <p className="how-page-footnote">District profiles are still being expanded. Use local amenity and travel information as a starting point, and verify important details before making decisions.</p>
+      <p className="how-page-footnote">Rents, safety scores and travel times are estimates from public data. Use them as a starting point and check the details before you sign a lease.</p>
     </div>
   )
 }
