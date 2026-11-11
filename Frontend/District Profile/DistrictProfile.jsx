@@ -383,12 +383,12 @@ function SafetySection({ code, data }) {
             <span>{safetyPlain(s.score)}. Score {s.score.toFixed(1)} / 100, where 50 is the recorded-crime rate of Ireland’s towns and cities.</span>
           </div>
         </div>
-        <div className="safety-meter" aria-hidden="true">
-          <span className="safety-meter-fill" style={{ background: `linear-gradient(90deg, ${HEAT_STOPS.map(([v, c]) => `${c} ${v}%`).join(', ')})` }} />
-          <span className="safety-meter-avg" style={{ left: '50%' }} title="Irish town and city average" />
-          <span className="safety-meter-dot" style={{ left: `${Math.max(0, Math.min(100, s.score))}%` }} />
+        <div className="safety-scale" aria-hidden="true">
+          <span className="safety-scale-fill" style={{ background: `linear-gradient(90deg, ${HEAT_STOPS.map(([v, c]) => `${c} ${v}%`).join(', ')})` }} />
+          <span className="safety-scale-avg" style={{ left: '50%' }} title="Irish town and city average" />
+          <span className="safety-scale-dot" style={{ left: `${Math.max(0, Math.min(100, s.score))}%`, background: colour }} />
         </div>
-        <div className="safety-meter-labels"><span>More crime</span><span>Irish town average = 50</span><span>Less crime</span></div>
+        <div className="safety-scale-labels" aria-hidden="true"><span>← More crime</span><span>Irish town average = 50</span><span>Less crime →</span></div>
         {s.checkShare > 0 && (
           <p className="safety-check">⚠ {Math.round(s.checkShare * 100)}% of residents in {code} live in areas marked “check the specific street before choosing” (Pobal deprivation index). Crime figures cover whole Garda station areas and can hide local problems.</p>
         )}
@@ -423,7 +423,7 @@ function SafetySection({ code, data }) {
         <SectionTitle eyebrow="ALSO WORTH KNOWING" title="Around the area" icon="village" />
         <div className="rent-grid">
           {s.garda != null && <div className="rent-tile"><span>Nearest Garda station</span><strong>{Number(s.garda).toFixed(1)} km</strong><small>average from homes in {code}</small></div>}
-          {s.night != null && <div className="rent-tile"><span>Night transport</span><strong>{Math.round(s.night * 100)}%</strong><small>of streets near a stop served 23:00–05:00</small></div>}
+          {s.night != null && <div className="rent-tile"><span>Late-night public transport</span><strong>{Math.round(s.night * 100)}%</strong><small>of streets are near a bus, Luas or train stop used between 11pm and 5am</small></div>}
           {s.lit != null && <div className="rent-tile"><span>Street lighting</span><strong>{Math.round(s.lit * 100)}%</strong><small>of mapped streets are lit</small></div>}
         </div>
       </section>
@@ -431,15 +431,33 @@ function SafetySection({ code, data }) {
       {s.hoods?.length > 0 && (
         <section className="profile-section">
           <SectionTitle eyebrow="NEIGHBOURHOODS" title={`Safety across ${code}`} extra={<span className="place-count">{s.hoods.length} areas</span>} />
-          <div className="safety-hoods">
-            {s.hoods.map(([name, score, check]) => (
-              <div key={name}>
-                <i style={{ background: heatColor(Number(score)) }} />
-                <span>{name}</span>
-                <b>{Number(score).toFixed(0)}{check && <em title="Check the specific street before choosing">⚠ check street</em>}</b>
-              </div>
-            ))}
+          {/* One line down the middle at 50 (the Irish town average): areas with more crime reach left, safer areas right */}
+          <div className="safety-diverge" role="list" aria-label={`Safety score of each area in ${code}; 50 is the Irish town average`}>
+            <div className="safety-diverge-head" aria-hidden="true">
+              <span />
+              <span className="safety-diverge-ends"><span>← More crime</span><span>50</span><span>Less crime →</span></span>
+              <span />
+            </div>
+            {s.hoods.map(([name, score, check]) => {
+              const value = Number(score);
+              const offset = Math.max(-50, Math.min(50, value - 50));  // score points from 50; 50 points = half the track
+              return (
+                <div key={name} className="safety-diverge-row" role="listitem" aria-label={`${name}: ${value.toFixed(0)}, ${safetyLabel(value)}${check ? ', check the specific street' : ''}`}>
+                  <span className="safety-diverge-name" title={name}>
+                    <span>{name}</span>
+                    {check && <em title="Check the specific street before choosing">⚠</em>}
+                  </span>
+                  <span className="safety-diverge-track">
+                    <i style={{ [offset < 0 ? 'right' : 'left']: '50%', width: `${Math.abs(offset)}%`, background: heatColor(value) }} />
+                  </span>
+                  <b>{value.toFixed(0)}</b>
+                </div>
+              );
+            })}
           </div>
+          {s.hoods.some(([, , check]) => check) && (
+            <p className="safety-diverge-note">⚠ Check the specific street before choosing (Pobal deprivation index).</p>
+          )}
         </section>
       )}
 
