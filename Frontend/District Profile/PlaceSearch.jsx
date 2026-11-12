@@ -131,9 +131,10 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
           style={{ left: place.left, width: place.width, maxHeight: place.max, ...(place.up ? { top: 'auto', bottom: place.bottom } : { top: place.top, bottom: 'auto' }) }}>
           {!index && !failed && <li className="ps-note">Loading places…</li>}
           {failed && <li className="ps-note">Couldn&rsquo;t load the place list. Press Enter to search addresses.</li>}
+          {local.length > 8 && <li className="ps-note">{local.length >= 60 ? 'Over 60 places' : `${local.length} places`} · scroll for more</li>}
           {options.map((p, i) => (
             <li
-              key={`${p.kind}-${p.label}-${p.lat}-${p.lng}`}
+              key={`${i}-${p.kind}-${p.label}-${p.lat}-${p.lng}`}
               id={`${id}-o${i}`}
               role="option"
               aria-selected={i === active}

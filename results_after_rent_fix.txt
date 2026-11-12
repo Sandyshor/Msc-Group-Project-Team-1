@@ -1,0 +1,30 @@
+Trinity College Dublin | one_bed EUR1500 | public_transport
+   areas compared: 19
+   #1 D7   rent EUR  1,540  commute  20 min  match 76.6%
+   #2 D1   rent EUR  1,683  commute  17 min  match 72.9%
+   #3 D8   rent EUR  1,621  commute  22 min  match 72.9%
+
+University College Dublin - Belfield | private_room EUR1000 | public_transport
+   areas compared: 9
+   #1 D6   rent EUR  1,029  commute  26 min  match 75.8%
+   #2 D2   rent EUR  1,001  commute  37 min  match 67.3%
+   #3 D1   rent EUR  1,092  commute  51 min  match 66.4%
+
+DCU - St Patrick's Campus | private_room EUR1000 | cycle <= 10 min
+   areas compared: 3
+   #1 D7   rent EUR    891  commute  10 min  match 62.5%
+   #2 D1   rent EUR  1,092  commute  13 min  match 55.3%
+   #3 D3   rent EUR    773  commute  11 min  match 54.2%
+
+TU Dublin - Grangegorman | shared_room EUR800 | walk
+   areas compared: 8
+   #1 D1   rent EUR    677  commute  33 min  match 75.4%
+   #2 D2   rent EUR    703  commute  40 min  match 67.1%
+   #3 D6   rent EUR    661  commute  78 min  match 67.1%
+
+National College of Ireland - IFSC | two_bed EUR2200 | public_transport <= 30 min
+   areas compared: 9
+   #1 D1   rent EUR  2,262  commute  11 min  match 74.8%
+   #2 D8   rent EUR  1,982  commute  22 min  match 71.2%
+   #3 D7   rent EUR  2,257  commute  23 min  match 70.3%
+

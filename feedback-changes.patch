@@ -1,0 +1,184 @@
+diff --git a/Frontend/District Profile/DistrictProfile.jsx b/Frontend/District Profile/DistrictProfile.jsx
+index fa9d871..be28a10 100644
+--- a/Frontend/District Profile/DistrictProfile.jsx	
++++ b/Frontend/District Profile/DistrictProfile.jsx	
+@@ -355,12 +355,12 @@ function SafetySection({ code, data }) {
+             <span>{safetyPlain(s.score)}. Score {s.score.toFixed(1)} / 100, where 50 is the recorded-crime rate of Ireland’s towns and cities.</span>
+           </div>
+         </div>
+-        <div className="safety-meter" aria-hidden="true">
+-          <span className="safety-meter-fill" style={{ background: `linear-gradient(90deg, ${HEAT_STOPS.map(([v, c]) => `${c} ${v}%`).join(', ')})` }} />
+-          <span className="safety-meter-avg" style={{ left: '50%' }} title="Irish town and city average" />
+-          <span className="safety-meter-dot" style={{ left: `${Math.max(0, Math.min(100, s.score))}%` }} />
++        <div className="safety-scale" aria-hidden="true">
++          <span className="safety-scale-fill" style={{ background: `linear-gradient(90deg, ${HEAT_STOPS.map(([v, c]) => `${c} ${v}%`).join(', ')})` }} />
++          <span className="safety-scale-avg" style={{ left: '50%' }} title="Irish town and city average" />
++          <span className="safety-scale-dot" style={{ left: `${Math.max(0, Math.min(100, s.score))}%`, background: colour }} />
+         </div>
+-        <div className="safety-meter-labels"><span>More crime</span><span>Irish town average = 50</span><span>Less crime</span></div>
++        <div className="safety-scale-labels" aria-hidden="true"><span>← More crime</span><span>Irish town average = 50</span><span>Less crime →</span></div>
+         {s.checkShare > 0 && (
+           <p className="safety-check">⚠ {Math.round(s.checkShare * 100)}% of residents in {code} live in areas marked “check the specific street before choosing” (Pobal deprivation index). Crime figures cover whole Garda station areas and can hide local problems.</p>
+         )}
+@@ -395,7 +395,7 @@ function SafetySection({ code, data }) {
+         <SectionTitle eyebrow="ALSO WORTH KNOWING" title="Around the area" icon="village" />
+         <div className="rent-grid">
+           {s.garda != null && <div className="rent-tile"><span>Nearest Garda station</span><strong>{Number(s.garda).toFixed(1)} km</strong><small>average from homes in {code}</small></div>}
+-          {s.night != null && <div className="rent-tile"><span>Night transport</span><strong>{Math.round(s.night * 100)}%</strong><small>of streets near a stop served 23:00–05:00</small></div>}
++          {s.night != null && <div className="rent-tile"><span>Late-night public transport</span><strong>{Math.round(s.night * 100)}%</strong><small>of streets are near a bus, Luas or train stop used between 11pm and 5am</small></div>}
+           {s.lit != null && <div className="rent-tile"><span>Street lighting</span><strong>{Math.round(s.lit * 100)}%</strong><small>of mapped streets are lit</small></div>}
+         </div>
+       </section>
+@@ -403,15 +403,33 @@ function SafetySection({ code, data }) {
+       {s.hoods?.length > 0 && (
+         <section className="profile-section">
+           <SectionTitle eyebrow="NEIGHBOURHOODS" title={`Safety across ${code}`} extra={<span className="place-count">{s.hoods.length} areas</span>} />
+-          <div className="safety-hoods">
+-            {s.hoods.map(([name, score, check]) => (
+-              <div key={name}>
+-                <i style={{ background: heatColor(Number(score)) }} />
+-                <span>{name}</span>
+-                <b>{Number(score).toFixed(0)}{check && <em title="Check the specific street before choosing">⚠ check street</em>}</b>
+-              </div>
+-            ))}
++          {/* One line down the middle at 50 (the Irish town average): areas with more crime reach left, safer areas right */}
++          <div className="safety-diverge" role="list" aria-label={`Safety score of each area in ${code}; 50 is the Irish town average`}>
++            <div className="safety-diverge-head" aria-hidden="true">
++              <span />
++              <span className="safety-diverge-ends"><span>← More crime</span><span>50</span><span>Less crime →</span></span>
++              <span />
++            </div>
++            {s.hoods.map(([name, score, check]) => {
++              const value = Number(score);
++              const offset = Math.max(-50, Math.min(50, value - 50));  // score points from 50; 50 points = half the track
++              return (
++                <div key={name} className="safety-diverge-row" role="listitem" aria-label={`${name}: ${value.toFixed(0)}, ${safetyLabel(value)}${check ? ', check the specific street' : ''}`}>
++                  <span className="safety-diverge-name" title={name}>
++                    <span>{name}</span>
++                    {check && <em title="Check the specific street before choosing">⚠</em>}
++                  </span>
++                  <span className="safety-diverge-track">
++                    <i style={{ [offset < 0 ? 'right' : 'left']: '50%', width: `${Math.abs(offset)}%`, background: heatColor(value) }} />
++                  </span>
++                  <b>{value.toFixed(0)}</b>
++                </div>
++              );
++            })}
+           </div>
++          {s.hoods.some(([, , check]) => check) && (
++            <p className="safety-diverge-note">⚠ Check the specific street before choosing (Pobal deprivation index).</p>
++          )}
+         </section>
+       )}
+ 
+diff --git a/Frontend/District Profile/JourneyBaseMap.jsx b/Frontend/District Profile/JourneyBaseMap.jsx
+index 83a8e43..c4989e3 100644
+--- a/Frontend/District Profile/JourneyBaseMap.jsx	
++++ b/Frontend/District Profile/JourneyBaseMap.jsx	
+@@ -1014,9 +1014,9 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
+     const loading = trip.status === 'loading';
+     let html;
+     if (loading) html = 'Finding the best routes…';
+-    else if (!trip.from) html = 'Click the map or a university to set your <strong>start</strong> point';
+-    else if (!trip.to) html = 'Now click to set your <strong>destination</strong>';
+-    else html = `From <strong>${escapeHtml(trip.from.label || 'start')}</strong> to <strong>${escapeHtml(trip.to.label || 'destination')}</strong>`;
++    else if (!trip.from) html = 'Click the map to drop your <strong>start (A)</strong>, or type a place in box A';
++    else if (!trip.to) html = 'Now click the map to drop your <strong>destination (B)</strong>';
++    else html = '<strong>Drag the A or B pin</strong> on the map to change your route';
+     if (node.dataset.html === html) return;
+     node.dataset.html = html;
+     node.classList.toggle('jp-is-loading', loading);
+diff --git a/Frontend/District Profile/JourneyPlanner.css b/Frontend/District Profile/JourneyPlanner.css
+index fe0b4ec..7995a50 100644
+--- a/Frontend/District Profile/JourneyPlanner.css	
++++ b/Frontend/District Profile/JourneyPlanner.css	
+@@ -239,3 +239,14 @@
+ @media (max-width: 650px) {
+   .jp-amenity-status { top: 12px; left: 12px; max-width: min(250px, calc(100% - 72px)); }
+ }
++
++/* How to plan a journey: always shown at the top of the panel (people looked for a search bar and didn't know the pins can be dragged) */
++.jp-howto { margin: 0 0 12px; padding: 11px 13px; border: 1px solid #d9e6dc; border-radius: 14px; background: #f1f7f2; color: var(--ink); }
++.jp-howto > b { display: block; margin-bottom: 6px; color: var(--forest); font: 800 13px "Manrope", sans-serif; }
++.jp-howto ol { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
++.jp-howto li { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; line-height: 1.45; }
++.jp-howto li strong { color: var(--forest); }
++.jp-howto-pin, .jp-howto-drag { display: inline-grid; flex: none; place-items: center; width: 20px; height: 20px; border-radius: 50%; color: #fff; font-size: 10px; font-weight: 800; }
++.jp-howto-pin.is-a { color: #d9f17e; background: #173f37; }
++.jp-howto-pin.is-b { background: #c8352b; }
++.jp-howto-drag { color: var(--forest); background: #fff; border: 1px solid #cfdccf; font-size: 13px; }
+diff --git a/Frontend/District Profile/JourneyPlannerPanel.jsx b/Frontend/District Profile/JourneyPlannerPanel.jsx
+index d1116d3..a2707f6 100644
+--- a/Frontend/District Profile/JourneyPlannerPanel.jsx	
++++ b/Frontend/District Profile/JourneyPlannerPanel.jsx	
+@@ -44,6 +44,14 @@ export default function JourneyPlannerPanel({ trip, setTrip, onReset, quickStart
+ 
+   return (
+     <div className="jp-scope jp-panel">
++      {/* Evaluation feedback: people looked for a search bar and didn't know the pins can be dragged */}
++      <div className="jp-howto" aria-label="How to plan a journey">
++        <b>How to plan a journey</b>
++        <ol>
++          <li><span className="jp-howto-pin is-a">A</span><span className="jp-howto-pin is-b">B</span>Click the map to drop your start (A) and destination (B), or type a place in the boxes below.</li>
++          <li><span className="jp-howto-drag" aria-hidden="true">✥</span><span><strong>Drag the A or B pin on the map</strong> to move it. The route and times update straight away.</span></li>
++        </ol>
++      </div>
+       <div className="jp-route-controls">
+         <div className="jp-segmented" role="radiogroup" aria-label="Travel mode">
+           {TRAVEL_MODES.map(([value, label]) => (
+diff --git a/Frontend/District Profile/Safety.css b/Frontend/District Profile/Safety.css
+index 98236e0..12af99c 100644
+--- a/Frontend/District Profile/Safety.css	
++++ b/Frontend/District Profile/Safety.css	
+@@ -58,3 +58,36 @@
+   .profile-card .profile-banner { flex: 0 0 auto; }
+   .profile-card .profile-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c9d6c2 transparent; }
+ }
++
++/* Score bar under "How safe is it?" (own class names: Results.css also has a .safety-meter) */
++.safety-scale { position: relative; height: 10px; margin: 14px 0 6px; border-radius: 5px; }
++.safety-scale-fill { position: absolute; inset: 0; border-radius: 5px; }
++.safety-scale-avg { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: #173f32; }
++.safety-scale-dot { position: absolute; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border: 3px solid #fffefa; border-radius: 50%; box-shadow: 0 1px 4px rgba(23, 63, 50, 0.35); }
++.safety-scale-labels { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; color: #6c7d6c; font-size: 0.66rem; font-weight: 700; }
++.safety-scale-labels span:nth-child(2) { text-align: center; }
++.safety-scale-labels span:last-child { text-align: right; }
++
++/* "Safety across Dx": one line down the middle at 50; more crime reaches left, less crime right */
++.safety-diverge { --name-col: minmax(0, 10.5rem); display: flex; flex-direction: column; }
++.safety-diverge-head,
++.safety-diverge-row { display: grid; grid-template-columns: var(--name-col) minmax(0, 1fr) 2.2rem; align-items: center; column-gap: 10px; }
++.safety-diverge-head { padding-bottom: 6px; color: #8a9685; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
++.safety-diverge-ends { display: grid; grid-template-columns: 1fr auto 1fr; gap: 4px; }
++.safety-diverge-ends span:nth-child(2) { color: #173f32; text-align: center; }
++.safety-diverge-ends span:last-child { text-align: right; }
++.safety-diverge-row { min-height: 30px; border-top: 1px dotted #e3e8dc; }
++.safety-diverge-name { display: flex; align-items: center; gap: 5px; min-width: 0; color: #214b39; font-size: 0.74rem; font-weight: 700; }
++.safety-diverge-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
++.safety-diverge-name em { flex: none; color: #9a4a12; font-style: normal; font-size: 0.72rem; }
++.safety-diverge-track { position: relative; align-self: stretch; }
++.safety-diverge-track::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: #173f32; }
++.safety-diverge-head .safety-diverge-ends { position: relative; }
++.safety-diverge-track i { position: absolute; top: 50%; height: 12px; min-width: 3px; margin-top: -6px; border-radius: 3px; }
++.safety-diverge-row b { color: #214b39; font-size: 0.78rem; text-align: right; font-variant-numeric: tabular-nums; }
++.safety-diverge-note { margin: 10px 0 0; color: #9a4a12; font-size: 0.68rem; font-weight: 700; }
++.safety-diverge-ends span { white-space: nowrap; }
++@media (max-width: 650px) {
++  .safety-diverge { --name-col: minmax(0, 7rem); }
++  .safety-diverge-head { font-size: 0.52rem; letter-spacing: 0; }
++}
+diff --git a/Frontend/pages/HomeHero.jsx b/Frontend/pages/HomeHero.jsx
+index d1362aa..f16df29 100644
+--- a/Frontend/pages/HomeHero.jsx
++++ b/Frontend/pages/HomeHero.jsx
+@@ -81,8 +81,8 @@ export default function HomeHero() {
+           <h2>New to Dublin?</h2>
+         </div>
+         <ul>
+-          <li><span className="hx-tick amber"><Icon name="check" /></span>Find the right area to live</li>
+-          <li><span className="hx-tick amber"><Icon name="check" /></span>Compare rent and living costs</li>
++          <li><span className="hx-tick green"><Icon name="check" /></span>Find the right area to live</li>
++          <li><span className="hx-tick green"><Icon name="check" /></span>Compare rent and living costs</li>
+           <li><span className="hx-tick green"><Icon name="check" /></span>Check commute to your university</li>
+           <li><span className="hx-tick green"><Icon name="check" /></span>Explore amenities &amp; student life</li>
+         </ul>
