@@ -69,7 +69,7 @@ export default function HomeHero() {
         </h1>
         <p className="hx-lead">A personalised guide for international students to find the best area to live, study and explore in Dublin.</p>
         <div className="hx-cta">
-          <Link className="hx-btn hx-btn-primary" to="/questionnaire">Start the Questionnaire <span aria-hidden="true">→</span></Link>
+          <Link className="hx-btn hx-btn-primary" to="/questionnaire">Find my match <span aria-hidden="true">→</span></Link>
           <a className="hx-btn hx-btn-outline" href="#explore-dublin" onClick={watchIntro}><Icon name="play" /> Watch Intro</a>
         </div>
       </div>
