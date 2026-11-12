@@ -1,9 +1,12 @@
 // Place search for the district map and the journey planner's A / B boxes.
 // Local list (instant, as you type): districts, universities, famous places, neighbourhoods, train and
-// Luas stations, and the named shops, cafés, gyms etc. already shown on the map.
+// Luas stations, every supermarket-chain shop (dublin-chain-shops.json) and the named shops, cafés, gyms etc.
+// already shown on the map. Typing an Eircode routing key (D07, D7, D6W, A96, or a whole Eircode such as
+// D07 X2Y3) lists that area: on its own its supermarkets, with other words ("D07 gym") the matching places in it.
 // Streets and addresses: OpenStreetMap's Nominatim, only when the user presses Enter or picks
 // "Search streets and addresses" (its usage policy doesn't allow search-as-you-type), at most once a second.
-import { loadAmenityRecords } from './amenityData';
+import { loadAmenityRecords, loadVerifiedChainShops } from './amenityData';
+import { chainOf } from './shopChains';
 import { universities } from './cityPlaces';
 import { format as streetLabel, nominatimTurn } from './placeNames';
 
@@ -47,6 +50,27 @@ export const norm = (text) => (text || '').toLowerCase().normalize('NFD').replac
 let extra = []
 let built = null
 
+// How each map category reads under a place's name
+const CATEGORY = {
+  Supermarkets: 'Supermarket', Groceries: 'Grocery shop', Restaurants: 'Restaurant', Asian_Restaurants: 'Asian restaurant',
+  Cafes: 'Café', Parks: 'Park', Pharmacies: 'Pharmacy', Gyms: 'Gym', Shopping_Malls: 'Shopping centre', Hospitals: 'Hospital',
+}
+
+// D1 … D24 in number order, D6W after D6, then the County Dublin areas (A41 … K78)
+const areaOrder = (code) => {
+  const m = String(code || '').match(/^D(\d+)(W?)$/)
+  return m ? Number(m[1]) + (m[2] ? 0.5 : 0) : code ? 30 : 99
+}
+
+// An Eircode routing key in any usual spelling ("d07", "d7", "d6w", "a96") or a whole Eircode ("d07x2y3")
+// → the area code the site uses (D7, D6W, A96); anything else → null
+export function areaCode(term) {
+  const t = term.length === 7 && /\d/.test(term.slice(3)) ? term.slice(0, 3) : term
+  const d = t.match(/^d0?(\d{1,2})(w?)$/)
+  if (d && Number(d[1]) >= 1 && Number(d[1]) <= 24) return `D${Number(d[1])}${d[2] ? 'W' : ''}`
+  return /^[ak]\d{2}$/.test(t) ? t.toUpperCase() : null
+}
+
 // The district page adds its districts and neighbourhoods once its data has loaded
 export function addDistrictPlaces(data) {
   if (!data?.profiles) return
@@ -67,11 +91,12 @@ export function addDistrictPlaces(data) {
 const getJson = (url) => fetch(url, { headers: { Accept: 'application/json' } }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
 
 async function build() {
-  const [places, rail, records, housing] = await Promise.all([
+  const [places, rail, records, housing, chainShops] = await Promise.all([
     getJson(`${PLANNER}places.json`),
     getJson('/data/dublin-rail-stations.geojson'),
     loadAmenityRecords().catch(() => []),
     getJson('/data/student-residences.json'),
+    loadVerifiedChainShops().catch(() => []),
   ])
   const list = [...extra]
   universities.forEach((u) => {
@@ -81,12 +106,25 @@ async function build() {
   ;(places || []).forEach((p) => list.push({ kind: 'place', label: p.name, sub: p.category || 'Famous place', lat: p.lat, lng: p.lon }))
   ;(housing?.residences || []).forEach((r) => list.push({
     kind: 'housing', label: r.name, sub: [r.operator, r.address].filter(Boolean).join(' · ') || `Student residence in ${r.district}`,
-    lat: r.lat, lng: r.lon, keys: `${r.name} ${r.operator || ''} student residence accommodation housing ${r.district}`,
+    lat: r.lat, lng: r.lon, district: r.district, keys: `${r.name} ${r.operator || ''} student residence accommodation housing ${r.district}`,
   }))
   ;(rail?.features || []).forEach((f) => {
     const [lng, lat] = f.geometry.coordinates
     list.push({ kind: 'station', label: `${f.properties.name} station`, sub: f.properties.dart ? 'DART station' : 'Train station', lat, lng, keys: `${f.properties.name} station train rail ${f.properties.dart ? 'dart' : ''}` })
   })
+  // Every supermarket-chain shop in Dublin, each in the district it is actually in. The map's own list (the
+  // CSV) only covers the streets near each district's commute points, so on its own it misses many shops.
+  const shops = []
+  ;(chainShops || []).forEach((c) => {
+    if (!Number.isFinite(c.lat)) return
+    shops.push({ kind: 'amenity', label: c.name, cat: 'Supermarket', shop: true, chain: c.chain, district: c.district, lat: c.lat, lng: c.lng,
+      keys: `${c.name} supermarket supermarkets shop grocery ${c.district}` })
+  })
+  const nearChainShop = (name, lat, lng) => {
+    const chain = chainOf(name)
+    return chain && shops.some((c) => c.chain === chain && Math.abs(c.lat - lat) < 0.0011 && Math.abs(c.lng - lng) < 0.0016) // ~120 m
+  }
+  list.push(...shops)
   const seen = new Set()
   ;(records || []).forEach((r) => {
     const name = (r.name || '').trim()
@@ -94,9 +132,26 @@ async function build() {
     const id = `${norm(name)}|${r.latitude.toFixed(3)}|${r.longitude.toFixed(3)}` // one per ~100 m
     if (seen.has(id)) return
     seen.add(id)
-    list.push({ kind: 'amenity', label: name, sub: `${r.category} · ${r.area}`, lat: r.latitude, lng: r.longitude, keys: `${name} ${r.category}` })
+    const grocery = r.category === 'Supermarkets' || r.category === 'Groceries'
+    if (grocery && nearChainShop(name, r.latitude, r.longitude)) return // already listed from the chain-shop file
+    const cat = CATEGORY[r.category] || r.category
+    list.push({ kind: 'amenity', label: name, cat, shop: r.category === 'Supermarkets', district: r.area, lat: r.latitude, lng: r.longitude,
+      keys: `${name} ${r.category} ${cat}` })
   })
-  list.forEach((p) => { p.n = norm(p.label); p.words = norm(`${p.label} ${p.keys || ''}`).split(' ') })
+  // "Lidl · Supermarket · near Phibsborough, D7": the nearest neighbourhood tells shops of the same name apart
+  const hoods = list.filter((p) => p.kind === 'area')
+  list.forEach((p) => {
+    if (p.kind !== 'amenity') return
+    let best = null
+    let bestKm = 1.5
+    for (const h of hoods) {
+      if (p.district && h.district && h.district !== p.district) continue
+      const km = Math.hypot((h.lat - p.lat) * 111, (h.lng - p.lng) * 67)
+      if (km < bestKm) { best = h; bestKm = km }
+    }
+    p.sub = [p.cat, best ? `near ${best.label}${p.district ? `, ${p.district}` : ''}` : p.district].filter(Boolean).join(' · ')
+  })
+  list.forEach((p) => { p.n = norm(p.label); p.words = norm(`${p.label} ${p.keys || ''}`).split(' '); p.order = areaOrder(p.district || p.code) })
   return list
 }
 
@@ -105,13 +160,42 @@ export function loadPlaceIndex() {
   return built
 }
 
-// Every typed word must start a word of the place (so "tu grang" finds TU Dublin Grangegorman).
-export function searchPlaces(list, query, limit = 8) {
+// The same place mapped twice (a point and its building) shows once; shops of the same name each show
+function unique(places, limit) {
+  const seen = new Set()
+  const out = []
+  for (const p of places) {
+    const look = `${p.n}|${norm(p.sub)}|${p.lat.toFixed(3)}|${p.lng.toFixed(3)}`
+    if (seen.has(look)) continue
+    seen.add(look)
+    out.push(p)
+    if (out.length >= limit) break
+  }
+  return out
+}
+
+// Every typed word must start a word of the place (so "tu grang" finds TU Dublin Grangegorman). Every match is
+// listed (up to `limit`), so all of a chain's shops show, not just the first few.
+export function searchPlaces(list, query, limit = 60) {
   const q = norm(query)
   if (!q) return []
-  const terms = q.split(' ')
+  let area = null
+  let terms = q.split(' ').filter((t) => {
+    if (area) return true
+    area = areaCode(t)
+    return !area
+  })
+  if (area) terms = terms.filter((t) => !/^(?=.*\d)[a-z0-9]{4}$/.test(t)) // the second half of a whole Eircode
+  const inArea = (p) => p.district === area || (p.kind === 'district' && p.code === area)
+  if (area && !terms.length) {
+    // just a routing key ("D07"): that district, then its supermarkets
+    const district = list.filter((p) => p.kind === 'district' && p.code === area)
+    const shops = list.filter((p) => p.shop && p.district === area)
+      .sort((a, b) => a.label.localeCompare(b.label) || a.sub.localeCompare(b.sub))
+    return unique([...district, ...shops], limit)
+  }
   const hits = []
-  for (const p of list) {
+  for (const p of area ? list.filter(inArea) : list) {
     if (!terms.every((t) => p.words.some((w) => w.startsWith(t)))) continue
     let score = KINDS[p.kind][0] * 10
     // a university's own short name ("ucd", "dcu", "tcd", "trinity") puts it first, above places named after it
@@ -120,24 +204,11 @@ export function searchPlaces(list, query, limit = 8) {
     else if (p.n.startsWith(q)) score -= 25
     else if (p.words[0].startsWith(terms[0])) score -= 12
     score += Math.min(p.label.length, 60) / 20 // shorter names first
+    score += p.order / 1000 // then district by district: D1, D2 … D24, County Dublin
     hits.push([score, p])
   }
   hits.sort((a, b) => a[0] - b[0])
-  // rows that would look identical (e.g. three "Spar · Groceries · D1") show once; the same name in different
-  // areas stays (up to three)
-  const count = {}
-  const seen = new Set()
-  const out = []
-  for (const [, p] of hits) {
-    const look = `${p.n}|${norm(p.sub)}`
-    if (seen.has(look)) continue
-    seen.add(look)
-    count[p.n] = (count[p.n] || 0) + 1
-    if (count[p.n] > 3) continue
-    out.push(p)
-    if (out.length >= limit) break
-  }
-  return out
+  return unique(hits.map(([, p]) => p), limit)
 }
 
 const addressCache = new Map()
