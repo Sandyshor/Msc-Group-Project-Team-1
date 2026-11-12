@@ -18,6 +18,7 @@ import ChatWidget from './ChatWidget'
 import BrandLogo from './BrandLogo'
 import InfoPage from './pages/InfoPages'
 import ThingsToKnow from './pages/ThingsToKnow'
+import MySearches from './pages/MySearches'
 import { watchUser, logOut } from './firebase'
 
 // Fits the header to whatever room it has - window size, browser zoom, Windows display scaling, scrollbars,
@@ -83,7 +84,19 @@ function App() {
   // Who is logged in (Firebase), so the header can say so and offer Log out
   const [user, setUser] = useState(null)
   useEffect(() => watchUser(setUser), [])
-  const firstName = user ? (user.displayName || user.email || 'you').split(/[\s@]/)[0] : ''
+  const firstName = user ? (user.displayName || user.email || 'you').split(/[\s@]/)[0].slice(0, 14) : ''
+  // "Hi, name" opens a small menu: My recent searches, Log out
+  const [accountOpen, setAccountOpen] = useState(false)
+  const accountRef = useRef(null)
+  useEffect(() => { setAccountOpen(false) }, [location.pathname, user])
+  useEffect(() => {
+    if (!accountOpen) return undefined
+    const onKey = (e) => { if (e.key === 'Escape') setAccountOpen(false) }
+    const onClick = (e) => { if (!accountRef.current?.contains(e.target)) setAccountOpen(false) }
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('mousedown', onClick)
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('mousedown', onClick) }
+  }, [accountOpen])
   const headerRef = useRef(null)
   const headerLevel = useHeaderFit(headerRef, [location.pathname, firstName])
   const compact = headerLevel === 'nav-compact'
@@ -136,12 +149,21 @@ function App() {
   </button>
 
   {user ? (
-    // Same length as "Log in", so the header keeps its layout; who is logged in shows on hover
-    <button type="button" className="login-link login-user" onClick={logOut}
-      title={`Logged in as ${user.displayName || user.email}. Click to log out.`} aria-label={`Log out ${firstName}`}>
-      <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" /></svg>
-      Log out
-    </button>
+    <div className="account-menu" ref={accountRef}>
+      <button type="button" className="login-link login-user" aria-haspopup="menu" aria-expanded={accountOpen}
+        title={`Logged in as ${user.email}`} onClick={() => setAccountOpen((v) => !v)}>
+        <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" /></svg>
+        Hi, {firstName}
+        <span className="account-caret" aria-hidden="true">▾</span>
+      </button>
+      {accountOpen && (
+        <div className="account-dropdown" role="menu">
+          <p className="account-who">{user.email}</p>
+          <Link role="menuitem" to="/my-searches">My recent searches</Link>
+          <button role="menuitem" type="button" onClick={() => { setAccountOpen(false); logOut() }}>Log out</button>
+        </div>
+      )}
+    </div>
   ) : (
     <Link className="login-link" to="/login">
       <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5" /></svg>
@@ -165,9 +187,12 @@ function App() {
     <NavLink to="/how-it-works">How it works</NavLink>
     <div className="site-menu-row">
       <button type="button" onClick={() => { setMenuOpen(false); setTourOpen(true) }}>Take a tour</button>
-      {user
-        ? <button type="button" onClick={() => { setMenuOpen(false); logOut() }}>Log out ({firstName})</button>
-        : <Link to="/login">Log in</Link>}
+      {user ? (
+        <>
+          <Link to="/my-searches">My searches</Link>
+          <button type="button" onClick={() => { setMenuOpen(false); logOut() }}>Log out ({firstName})</button>
+        </>
+      ) : <Link to="/login">Log in</Link>}
     </div>
   </nav>
 )}
@@ -186,6 +211,7 @@ function App() {
           <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/my-searches" element={<MySearches />} />
           <Route path="/things-to-know" element={<ThingsToKnow />} />
           <Route path="/terms" element={<InfoPage page="terms" />} />
           <Route path="/privacy" element={<InfoPage page="privacy" />} />
