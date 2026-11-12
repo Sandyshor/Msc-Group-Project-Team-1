@@ -6,6 +6,7 @@ import { TRAVEL_MODES } from './CommuteFields'
 import { FlowChoices, FlowIcon, FlowSidebar } from './FlowLayout'
 import RouteMap from './RouteMap'
 import { setChatContext } from '../chatContext'
+import { saveSearch } from '../account'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
 const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
@@ -1045,6 +1046,18 @@ function Results() {
       controller.abort()
     }
   }, [answers, attempt])
+
+  // Logged-in students: save the search (answers + top 3 areas) to their history, once per set of answers
+  const savedSearch = useRef('')
+  useEffect(() => {
+    const list = data?.recommendations ?? []
+    if (!answers || !list.length) return
+    const key = JSON.stringify(answers)
+    if (savedSearch.current === key) return
+    savedSearch.current = key
+    const top = list.slice(0, 3).map((r) => (r.neighbourhood ? `${r.area} · ${r.neighbourhood.name}` : r.area))
+    saveSearch(answers, top).catch(() => {}) // the history must never get in the way of the results
+  }, [data, answers])
 
   // Share the student's matches with the AI assistant so it can answer about them
   useEffect(() => {
