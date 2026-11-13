@@ -146,7 +146,8 @@
   .map-card { position: sticky; top: 12px; display: flex; flex-direction: column; height: calc(100vh - 24px); min-height: 560px; }
   .map-card .district-map { flex: 1 1 auto; height: auto; min-height: 360px; max-height: none; }
   .profile-card { top: 12px; max-height: calc(100vh - 24px); }
-  .welcome-card { overflow-y: auto; }
+  /* The welcome card (journey planner before a district is picked) scrolls inside the screen-high card; .profile-card alone hides overflow */
+  .profile-card.welcome-card { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c9d6c2 transparent; }
 }
 
 /* Journey "From → To" with the place names */
