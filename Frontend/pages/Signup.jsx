@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { requireAuth, profileChanged } from '../firebase'
+import { requireAuth, profileChanged, expectWelcome } from '../firebase'
 import { recordLogin } from '../account'
 import { getAuthErrorMessage } from '../authErrors'
 
@@ -29,6 +29,7 @@ function Signup() {
     setLoading(true)
 
     try {
+      expectWelcome('new') // "Welcome to Find My Dublin, <name>!" once the account exists
       const { user } = await createUserWithEmailAndPassword(
         requireAuth(),
         email.trim(),
@@ -55,6 +56,7 @@ function Signup() {
       }
       navigate('/')
     } catch (error) {
+      expectWelcome(null)
       setError(getAuthErrorMessage(error, 'create your account'))
     } finally {
       setLoading(false)

@@ -1,4 +1,4 @@
-"""Logged-in students: their name and their recent searches, kept in PostgreSQL.
+"""Logged-in students: their name, their recent searches and their chat with the assistant, kept in PostgreSQL.
 
 Firebase does the logging in and keeps the passwords; this database never sees a password. The website sends
 the student's Firebase ID token with each request, and every request is checked against Google's public keys,
@@ -11,13 +11,15 @@ simply doesn't show history.
 Tables (created here; not data files, so datastore.sync never touches them):
     app_users       one row per student: Firebase user id, name, email, first and last login
     search_history  one row per search: the questionnaire answers and the top areas it found
+    chat_history    one row per student: their latest conversation with the AI assistant (so it's there next time,
+                    on any device); deleted when they start a new chat
 """
 import json
 import os
 import threading
 import time
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 import requests
 from fastapi import APIRouter, Header, HTTPException
@@ -32,6 +34,8 @@ CERTS_URL = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@syste
 HISTORY_KEPT = 20          # older searches are deleted
 HISTORY_SHOWN = 10
 MAX_ANSWERS_BYTES = 10_000  # a questionnaire is about 1 KB; anything far bigger isn't one
+CHAT_KEPT = 40              # messages of the latest conversation kept (the oldest are dropped)
+MAX_CHAT_MESSAGE = 8_000    # characters per message (the assistant's longest replies are well under this)
 
 _certs = {"keys": None, "until": 0.0}
 _certs_lock = threading.Lock()
@@ -94,6 +98,12 @@ def _engine():
                     top_areas  jsonb NOT NULL
                 )"""))
             conn.execute(text("CREATE INDEX IF NOT EXISTS search_history_uid_time ON search_history (uid, created_at DESC)"))
+            conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS chat_history (
+                    uid        text PRIMARY KEY REFERENCES app_users (uid) ON DELETE CASCADE,
+                    updated_at timestamptz NOT NULL,
+                    messages   jsonb NOT NULL
+                )"""))
         _tables_ready = True
     return engine
 
@@ -136,6 +146,15 @@ def _history(conn, uid, limit=HISTORY_SHOWN):
 
 class LoginRequest(BaseModel):
     name: Optional[str] = Field(None, max_length=80, description="Name typed at sign up (the token may not have it yet)")
+
+
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(..., max_length=MAX_CHAT_MESSAGE)
+
+
+class ChatRequest(BaseModel):
+    messages: List[ChatMessage] = Field(..., max_length=200)
 
 
 class SearchRequest(BaseModel):
@@ -219,4 +238,47 @@ def clear_history(authorization: Optional[str] = Header(None)):
     claims = _student(authorization)
     with engine.begin() as conn:
         conn.execute(text("DELETE FROM search_history WHERE uid = :uid"), {"uid": claims["sub"]})
+    return {"cleared": True}
+
+
+@router.get("/chat")
+def load_chat(authorization: Optional[str] = Header(None)):
+    """The student's saved conversation with the assistant (empty if there isn't one)."""
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    with engine.connect() as conn:
+        row = conn.execute(text("SELECT messages FROM chat_history WHERE uid = :uid"), {"uid": claims["sub"]}).first()
+    return {"messages": row.messages if row else []}
+
+
+@router.put("/chat")
+def save_chat(body: ChatRequest, authorization: Optional[str] = Header(None)):
+    """Replace the saved conversation with this one (its last CHAT_KEPT messages, without empty ones)."""
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    messages = [m.model_dump() for m in body.messages if m.content.strip()][-CHAT_KEPT:]
+    with engine.begin() as conn:
+        _upsert_user(conn, claims)
+        if not messages:
+            conn.execute(text("DELETE FROM chat_history WHERE uid = :uid"), {"uid": claims["sub"]})
+        else:
+            conn.execute(text("""
+                INSERT INTO chat_history (uid, updated_at, messages) VALUES (:uid, :now, CAST(:messages AS jsonb))
+                ON CONFLICT (uid) DO UPDATE SET updated_at = EXCLUDED.updated_at, messages = EXCLUDED.messages"""),
+                {"uid": claims["sub"], "now": datetime.now(timezone.utc), "messages": json.dumps(messages)})
+    return {"saved": len(messages)}
+
+
+@router.delete("/chat")
+def clear_chat(authorization: Optional[str] = Header(None)):
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    with engine.begin() as conn:
+        conn.execute(text("DELETE FROM chat_history WHERE uid = :uid"), {"uid": claims["sub"]})
     return {"cleared": True}

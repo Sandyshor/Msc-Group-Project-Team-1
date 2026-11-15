@@ -120,3 +120,27 @@
 
 /* Side padding grows smoothly with the window (no jump at 1600px), so zooming out never squeezes the header */
 .navbar:not(.navbar-home) { padding-inline: clamp(16px, 2.5vw, 56px); }
+
+/* "Welcome back, Vignesh!" right after logging in or signing up (App.jsx) */
+.welcome-toast {
+  position: fixed; z-index: 1200; top: 96px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: flex-start; gap: 12px;
+  width: min(440px, calc(100% - 32px)); padding: 14px 14px 14px 16px;
+  border: 1px solid #dfe8d8; border-left: 4px solid #2f7a5a; border-radius: 14px;
+  background: #fffdf8; box-shadow: 0 14px 40px rgba(15, 61, 42, 0.18);
+  color: #2f3a33; font-family: inherit;
+  animation: welcome-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.welcome-toast .welcome-wave { font-size: 26px; line-height: 1; transform-origin: 70% 80%; animation: welcome-wave 1.4s ease 0.35s 2; }
+.welcome-toast div { display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
+.welcome-toast strong { color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: 18px; line-height: 1.25; }
+.welcome-toast span { font-size: 14px; line-height: 1.45; color: #4f6158; }
+.welcome-toast button {
+  flex: none; width: 28px; height: 28px; border: 0; border-radius: 50%;
+  background: transparent; color: #6b766e; font-size: 20px; line-height: 1; cursor: pointer;
+}
+.welcome-toast button:hover, .welcome-toast button:focus-visible { background: #eef3ea; color: #173f32; }
+@keyframes welcome-in { from { opacity: 0; transform: translate(-50%, -14px) scale(0.97); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+@keyframes welcome-wave { 0%, 100% { transform: rotate(0); } 20%, 60% { transform: rotate(16deg); } 40%, 80% { transform: rotate(-8deg); } }
+@media (max-width: 640px) { .welcome-toast { top: 76px; } .welcome-toast strong { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { .welcome-toast, .welcome-toast .welcome-wave { animation: none; } }

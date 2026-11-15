@@ -1,8 +1,11 @@
 // "Crib Crew Assistant": the AI assistant in the bottom-right corner of every page.
-// Replies stream from the backend's POST /chat (Claude); the conversation lives in this tab only.
+// Replies stream from the backend's POST /chat (Claude). A guest's conversation lives in this tab only; a
+// logged-in student's is also saved to their account (Backend/accounts.py), so it's there next time on any device.
 import { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useChatContext } from './chatContext'
+import { firstNameOf, watchUser } from './firebase'
+import { clearSavedChat, loadSavedChat, saveChat } from './account'
 import './ChatWidget.css'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
@@ -11,7 +14,19 @@ const STORE_KEY = 'fmd-chat'
 const MAX_CHARS = 2000
 const LANGUAGE_NAMES = { es: 'Spanish', pt: 'Portuguese', hi: 'Hindi', 'zh-Hans': 'Chinese', ar: 'Arabic' } // the site's languages (LanguageSwitcher)
 
-const WELCOME = "Hi! I'm the Crib Crew Assistant. Ask me about neighbourhoods, renting, getting around or settling in Dublin."
+const welcomeText = (name) => `Hi${name ? ` ${name}` : ''}! 👋 I'm the Crib Crew Assistant. Ask me about neighbourhoods, renting, getting around or settling in Dublin.`
+const KEPT = 40 // messages kept in a saved conversation (Backend/accounts.py CHAT_KEPT)
+
+// The saved conversation and the one in this tab, put together: the same chat (e.g. after a reload) isn't doubled,
+// and a chat started before logging in goes after the saved one
+function combine(saved, here) {
+  if (!saved.length) return here
+  if (!here.length) return saved
+  const same = (a, b) => a.role === b.role && a.content === b.content
+  if (saved.length <= here.length && saved.every((m, i) => same(m, here[i]))) return here
+  if (here.length <= saved.length && here.every((m, i) => same(m, saved[i]))) return saved
+  return [...saved, ...here].slice(-KEPT)
+}
 const STARTERS = [
   'Which areas suit a tight budget?',
   'How do I avoid rental scams?',
@@ -136,6 +151,10 @@ export default function ChatWidget() {
   const context = useChatContext()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState(loadChat)
+  const [user, setUser] = useState(null)
+  useEffect(() => watchUser(setUser), [])
+  const firstName = firstNameOf(user)
+  const uid = user?.uid ?? null
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -183,6 +202,38 @@ export default function ChatWidget() {
   }, [pathname])
 
   useEffect(() => { try { sessionStorage.setItem(STORE_KEY, JSON.stringify(messages)) } catch { /* private mode */ } }, [messages])
+
+  // Logged in: bring back the saved conversation. Logged out: take the chat off the screen (shared computers).
+  const lastUid = useRef(undefined) // undefined until Firebase has said who is logged in
+  const [savedLoaded, setSavedLoaded] = useState(false)
+  useEffect(() => {
+    const before = lastUid.current
+    lastUid.current = uid
+    if (!uid) {
+      setSavedLoaded(false)
+      if (before) { abortRef.current?.abort(); setMessages([]); setError('') }
+      return undefined
+    }
+    let stale = false
+    loadSavedChat()
+      .then((data) => {
+        if (stale) return
+        const saved = (data?.messages || []).filter((m) => m.content)
+        setMessages((here) => combine(saved, here))
+      })
+      .catch(() => { /* saved chats unavailable right now: the chat still works for this visit */ })
+      .finally(() => { if (!stale) setSavedLoaded(true) })
+    return () => { stale = true }
+  }, [uid])
+
+  // Logged in: save the conversation once each reply has finished
+  useEffect(() => {
+    if (!uid || !savedLoaded || busy) return undefined
+    const done = messages.filter((m) => m.content)
+    if (!done.length || messages.at(-1)?.role !== 'assistant') return undefined
+    const t = setTimeout(() => { saveChat(done.slice(-KEPT)).catch(() => { /* not saved this time */ }) }, 600)
+    return () => clearTimeout(t)
+  }, [uid, savedLoaded, busy, messages])
   useEffect(() => { if (open) inputRef.current?.focus() }, [open])
   useEffect(() => { listRef.current?.scrollTo({ top: listRef.current.scrollHeight }) }, [messages, open, busy])
   useEffect(() => {
@@ -205,6 +256,7 @@ export default function ChatWidget() {
     try { lang = localStorage.getItem('language') || 'en' } catch { /* ignore */ }
     const pageContext = [
       `The student is on the page ${pathname}.`,
+      firstName ? `The student is logged in; their first name is ${firstName}. You may greet them by name now and then, but don't overdo it.` : '',
       lang !== 'en' && LANGUAGE_NAMES[lang] ? `The website is shown in ${LANGUAGE_NAMES[lang]}; reply in ${LANGUAGE_NAMES[lang]} unless they write in another language.` : '',
       context || '',
     ].filter(Boolean).join('\n')
@@ -269,6 +321,7 @@ export default function ChatWidget() {
     abortRef.current?.abort()
     setMessages([])
     setError('')
+    if (uid) clearSavedChat().catch(() => { /* will be replaced by the next saved chat anyway */ })
     inputRef.current?.focus()
   }
 
@@ -286,7 +339,8 @@ export default function ChatWidget() {
               <span><i aria-hidden="true" />AI assistant · can make mistakes</span>
             </div>
             {messages.length > 0 && (
-              <button type="button" className="chatw-icon-btn" onClick={reset} aria-label="Start a new chat" title="New chat">
+              <button type="button" className="chatw-icon-btn" onClick={reset} aria-label="Start a new chat"
+                title={uid ? 'New chat (deletes the saved one)' : 'New chat'}>
                 <Icon d={ICONS.reset} size={17} />
               </button>
             )}
@@ -300,7 +354,14 @@ export default function ChatWidget() {
           </header>
 
           <div className="chatw-body" ref={listRef} aria-live="polite" translate="no">
-            <div className="chatw-msg is-bot"><p>{WELCOME}</p></div>
+            <div className="chatw-msg is-bot"><p>{welcomeText(firstName)}</p></div>
+            {messages.length === 0 && (
+              <p className="chatw-note">
+                {uid
+                  ? 'Your chats are saved to your account, so you can pick up where you left off on any device.'
+                  : <><Link to="/login">Log in</Link> to keep your chats for next time.</>}
+              </p>
+            )}
             {messages.length === 0 && (
               <div className="chatw-starters">
                 {starters.map((s) => <button key={s} type="button" onClick={() => send(s)}>{s}</button>)}
