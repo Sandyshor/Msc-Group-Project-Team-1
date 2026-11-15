@@ -274,9 +274,8 @@ export default function App() {
   if (error) return <div className="district-page"><p className="empty-note">Could not load district data: {error}</p></div>;
   if (!data) return <div className="district-page"><p className="empty-note">Loading district map…</p></div>;
 
-  const teamName = districtProfiles?.[selectedId]?.name;
-  // Use the team's name unless it is just "Dublin N"
-  const team = teamName && !/^Dublin\s/i.test(teamName) ? { name: teamName } : null;
+  // The district's name is the one used everywhere else (search, map, Compare districts, the assistant)
+  const team = null;
   const places = placesByDistrict[selectedId] || [];
 
   const onPlaceClick = (code, i) => {

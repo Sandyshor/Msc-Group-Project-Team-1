@@ -160,7 +160,7 @@ function HowItWorks() {
         <div className="how-section-heading">
           <div>
             <p className="how-section-kicker">YOUR JOURNEY, STEP BY STEP</p>
-            <h2 id="how-process-title">From first choices to a Dublin routine.</h2>
+            <h1 id="how-process-title">From first choices to a Dublin routine.</h1>
           </div>
           <p>Start with your needs, compare neighbourhoods, then see how getting around could work.</p>
         </div>

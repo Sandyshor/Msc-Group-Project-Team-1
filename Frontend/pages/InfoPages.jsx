@@ -65,7 +65,11 @@ const PAGES = {
     title: 'Get in touch',
     intro: 'Spotted something that looks off, hit a bug or have a suggestion? Find My Dublin is built by a team of MSc students, and your feedback helps us make it better.',
     sections: [
-      { heading: 'Write to us', text: 'TBD' },
+      {
+        heading: 'Write to us',
+        text: 'Report a bug or suggest an idea on our project page on GitHub. You don’t need to write any code: just describe what you saw.',
+        link: ['Report a problem or idea', 'https://github.com/Sandyshor/Msc-Group-Project-Team-1/issues'],
+      },
       { heading: 'What helps us most', text: 'Tell us which page you were on and what you expected to see. A screenshot is always welcome.' },
     ],
   },
@@ -73,7 +77,7 @@ const PAGES = {
 
 export default function InfoPage({ page }) {
   const content = PAGES[page]
-  if (!content) return <h1>Page not found</h1>
+  if (!content) return <NotFound />
   return (
     <article className="info-page">
       <h1>{content.title}</h1>
@@ -82,8 +86,24 @@ export default function InfoPage({ page }) {
         <section key={s.heading}>
           <h2>{s.heading}</h2>
           <p>{s.text}</p>
+          {s.link && <p><a href={s.link[1]} target="_blank" rel="noopener noreferrer">{s.link[0]} ↗</a></p>}
         </section>
       ))}
+      <Link className="info-back" to="/">← Back to home</Link>
+    </article>
+  )
+}
+
+// Any address the site doesn't have
+export function NotFound() {
+  return (
+    <article className="info-page">
+      <h1>Page not found</h1>
+      <p className="info-intro">We couldn’t find that page. It may have moved, or the link may have a typo.</p>
+      <section>
+        <h2>Try one of these</h2>
+        <p><Link to="/questionnaire">Find my match</Link> · <Link to="/districts">Explore districts</Link> · <Link to="/things-to-know">Things to know</Link></p>
+      </section>
       <Link className="info-back" to="/">← Back to home</Link>
     </article>
   )

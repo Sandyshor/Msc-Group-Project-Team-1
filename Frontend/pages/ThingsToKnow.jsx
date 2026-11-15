@@ -37,7 +37,7 @@ const PHASES = [
         id: 'leap', icon: '🚋', title: 'Get a Student Leap Card',
         why: 'Student and Young Adult Leap Cards cut your fares on Dublin Bus, the Luas, DART and commuter rail.',
         how: ['Aged 19 to 25? The TFI Young Adult Leap Card gives the same discount and needs no college check.', 'Otherwise, apply online for a Student Leap Card with your student ID. Your college confirms you’re a full-time student.', 'Top up online, in shops, at Luas ticket machines or in the TFI Leap Top-Up app.', 'With the TFI 90-minute fare you can change between bus, Luas and DART for one fare.'],
-        link: ['Student Leap Card', 'https://www.studentleapcard.ie/'],
+        link: ['Student Leap Card', 'https://www.leapcard.ie/'],
       },
       {
         id: 'sim', icon: '📱', title: 'Get an Irish phone number',
@@ -99,7 +99,7 @@ const PHASES = [
         id: 'work', icon: '💼', title: 'Know your work rules',
         why: 'Students with a Stamp 2 permission can work part-time, within set limits.',
         how: ['Up to 20 hours a week at all other times, across all your jobs.', 'Up to 40 hours a week only in June, July, August and September, and from 15 December to 15 January. Easter and mid-term breaks don’t count.'],
-        link: ['Stamp 2 work rules', 'https://workplacerelations.ie/en/news-media/workplace_relations_notices/changes_to_employment_entitlements_of_non-eea_students_holding_immigration_stamp_2.html'],
+        link: ['Stamp 2 work rules', 'https://www.citizensinformation.ie/en/moving-country/moving-to-ireland/studying-in-ireland/immigration-nonEEA-students/'],
       },
       {
         id: 'irp-renew', icon: '🔁', title: 'Renew your IRP on time',
