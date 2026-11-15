@@ -185,6 +185,11 @@ def connect():
     return source
 
 
+def engine():
+    """The PostgreSQL connection, or None when reading the files (no DATABASE_URL, or the database is down)."""
+    return _engine
+
+
 def _from_db(path):
     return _engine is not None and _table(path) in _tables
 
