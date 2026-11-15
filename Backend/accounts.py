@@ -1,4 +1,4 @@
-"""Logged-in students: their name, their recent searches and their chat with the assistant, kept in PostgreSQL.
+"""Logged-in students: their name, their recent searches and their chats with the assistant, kept in PostgreSQL.
 
 Firebase does the logging in and keeps the passwords; this database never sees a password. The website sends
 the student's Firebase ID token with each request, and every request is checked against Google's public keys,
@@ -11,8 +11,9 @@ simply doesn't show history.
 Tables (created here; not data files, so datastore.sync never touches them):
     app_users       one row per student: Firebase user id, name, email, first and last login
     search_history  one row per search: the questionnaire answers and the top areas it found
-    chat_history    one row per student: their latest conversation with the AI assistant (so it's there next time,
-                    on any device); deleted when they start a new chat
+    chat_conversations  one row per conversation with the AI assistant: its title (the first question) and messages,
+                    so a student can pick any of their recent chats up again, on any device
+                    (replaces the older one-chat-per-student chat_history table, whose rows are moved over once)
 """
 import json
 import os
@@ -34,7 +35,8 @@ CERTS_URL = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@syste
 HISTORY_KEPT = 20          # older searches are deleted
 HISTORY_SHOWN = 10
 MAX_ANSWERS_BYTES = 10_000  # a questionnaire is about 1 KB; anything far bigger isn't one
-CHAT_KEPT = 40              # messages of the latest conversation kept (the oldest are dropped)
+CHAT_KEPT = 40              # messages kept per conversation (the oldest are dropped)
+CHATS_KEPT = 10             # conversations kept per student (the oldest are deleted)
 MAX_CHAT_MESSAGE = 8_000    # characters per message (the assistant's longest replies are well under this)
 
 _certs = {"keys": None, "until": 0.0}
@@ -99,11 +101,23 @@ def _engine():
                 )"""))
             conn.execute(text("CREATE INDEX IF NOT EXISTS search_history_uid_time ON search_history (uid, created_at DESC)"))
             conn.execute(text("""
-                CREATE TABLE IF NOT EXISTS chat_history (
-                    uid        text PRIMARY KEY REFERENCES app_users (uid) ON DELETE CASCADE,
+                CREATE TABLE IF NOT EXISTS chat_conversations (
+                    id         bigserial PRIMARY KEY,
+                    uid        text NOT NULL REFERENCES app_users (uid) ON DELETE CASCADE,
+                    title      text NOT NULL,
+                    created_at timestamptz NOT NULL,
                     updated_at timestamptz NOT NULL,
                     messages   jsonb NOT NULL
                 )"""))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS chat_conversations_uid_time ON chat_conversations (uid, updated_at DESC)"))
+            # The first version kept one chat per student in chat_history: move those chats over, once
+            conn.execute(text("SELECT pg_advisory_xact_lock(20261115)"))  # only one worker moves them
+            if conn.execute(text("SELECT to_regclass('chat_history')")).scalar() is not None:
+                conn.execute(text("""
+                    INSERT INTO chat_conversations (uid, title, created_at, updated_at, messages)
+                    SELECT uid, LEFT(COALESCE(messages -> 0 ->> 'content', 'Chat'), 60), updated_at, updated_at, messages
+                    FROM chat_history"""))
+                conn.execute(text("DROP TABLE chat_history"))
         _tables_ready = True
     return engine
 
@@ -241,44 +255,113 @@ def clear_history(authorization: Optional[str] = Header(None)):
     return {"cleared": True}
 
 
-@router.get("/chat")
-def load_chat(authorization: Optional[str] = Header(None)):
-    """The student's saved conversation with the assistant (empty if there isn't one)."""
+def _chat_title(messages):
+    """The conversation's first question, shortened: what the chat list shows."""
+    first = next((m["content"] for m in messages if m["role"] == "user"), "Chat")
+    first = " ".join(first.split())
+    return first if len(first) <= 60 else first[:59].rstrip() + "…"
+
+
+def _clean(messages):
+    return [m.model_dump() for m in messages if m.content.strip()][-CHAT_KEPT:]
+
+
+@router.get("/chats")
+def list_chats(authorization: Optional[str] = Header(None)):
+    """The student's recent conversations, newest first (titles only)."""
     from sqlalchemy import text
 
     engine = _engine()
     claims = _student(authorization)
     with engine.connect() as conn:
-        row = conn.execute(text("SELECT messages FROM chat_history WHERE uid = :uid"), {"uid": claims["sub"]}).first()
-    return {"messages": row.messages if row else []}
+        rows = conn.execute(text("""
+            SELECT id, title, updated_at, jsonb_array_length(messages) AS count FROM chat_conversations
+            WHERE uid = :uid ORDER BY updated_at DESC, id DESC LIMIT :limit"""),
+            {"uid": claims["sub"], "limit": CHATS_KEPT}).mappings()
+        return {"chats": [{"id": r["id"], "title": r["title"], "updated_at": r["updated_at"].isoformat(),
+                           "messages": r["count"]} for r in rows]}
 
 
-@router.put("/chat")
-def save_chat(body: ChatRequest, authorization: Optional[str] = Header(None)):
-    """Replace the saved conversation with this one (its last CHAT_KEPT messages, without empty ones)."""
+@router.get("/chats/{chat_id}")
+def load_chat(chat_id: int, authorization: Optional[str] = Header(None)):
     from sqlalchemy import text
 
     engine = _engine()
     claims = _student(authorization)
-    messages = [m.model_dump() for m in body.messages if m.content.strip()][-CHAT_KEPT:]
+    with engine.connect() as conn:
+        row = conn.execute(text("SELECT id, title, messages FROM chat_conversations WHERE id = :id AND uid = :uid"),
+                           {"id": chat_id, "uid": claims["sub"]}).first()
+    if row is None:
+        raise HTTPException(404, "That chat isn't there any more.")
+    return {"id": row.id, "title": row.title, "messages": row.messages}
+
+
+@router.post("/chats")
+def new_chat(body: ChatRequest, authorization: Optional[str] = Header(None)):
+    """Save a new conversation; returns its id. Only the student's most recent CHATS_KEPT chats are kept."""
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    messages = _clean(body.messages)
+    if not messages:
+        raise HTTPException(422, "There's nothing to save in that chat.")
+    now = datetime.now(timezone.utc)
     with engine.begin() as conn:
         _upsert_user(conn, claims)
+        chat_id = conn.execute(text("""
+            INSERT INTO chat_conversations (uid, title, created_at, updated_at, messages)
+            VALUES (:uid, :title, :now, :now, CAST(:messages AS jsonb)) RETURNING id"""),
+            {"uid": claims["sub"], "title": _chat_title(messages), "now": now,
+             "messages": json.dumps(messages)}).scalar_one()
+        conn.execute(text("""
+            DELETE FROM chat_conversations WHERE uid = :uid AND id NOT IN (
+                SELECT id FROM chat_conversations WHERE uid = :uid ORDER BY updated_at DESC, id DESC LIMIT :keep)"""),
+            {"uid": claims["sub"], "keep": CHATS_KEPT})
+    return {"id": chat_id}
+
+
+@router.put("/chats/{chat_id}")
+def save_chat(chat_id: int, body: ChatRequest, authorization: Optional[str] = Header(None)):
+    """Replace a conversation's messages (its last CHAT_KEPT, without empty ones)."""
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    messages = _clean(body.messages)
+    with engine.begin() as conn:
         if not messages:
-            conn.execute(text("DELETE FROM chat_history WHERE uid = :uid"), {"uid": claims["sub"]})
-        else:
-            conn.execute(text("""
-                INSERT INTO chat_history (uid, updated_at, messages) VALUES (:uid, :now, CAST(:messages AS jsonb))
-                ON CONFLICT (uid) DO UPDATE SET updated_at = EXCLUDED.updated_at, messages = EXCLUDED.messages"""),
-                {"uid": claims["sub"], "now": datetime.now(timezone.utc), "messages": json.dumps(messages)})
-    return {"saved": len(messages)}
+            conn.execute(text("DELETE FROM chat_conversations WHERE id = :id AND uid = :uid"),
+                         {"id": chat_id, "uid": claims["sub"]})
+            return {"id": chat_id}
+        found = conn.execute(text("""
+            UPDATE chat_conversations SET messages = CAST(:messages AS jsonb), title = :title, updated_at = :now
+            WHERE id = :id AND uid = :uid RETURNING id"""),
+            {"messages": json.dumps(messages), "title": _chat_title(messages), "now": datetime.now(timezone.utc),
+             "id": chat_id, "uid": claims["sub"]}).first()
+    if found is None:
+        raise HTTPException(404, "That chat isn't there any more.")
+    return {"id": chat_id}
 
 
-@router.delete("/chat")
-def clear_chat(authorization: Optional[str] = Header(None)):
+@router.delete("/chats/{chat_id}")
+def delete_chat(chat_id: int, authorization: Optional[str] = Header(None)):
     from sqlalchemy import text
 
     engine = _engine()
     claims = _student(authorization)
     with engine.begin() as conn:
-        conn.execute(text("DELETE FROM chat_history WHERE uid = :uid"), {"uid": claims["sub"]})
+        conn.execute(text("DELETE FROM chat_conversations WHERE id = :id AND uid = :uid"),
+                     {"id": chat_id, "uid": claims["sub"]})
+    return {"deleted": chat_id}
+
+
+@router.delete("/chats")
+def delete_all_chats(authorization: Optional[str] = Header(None)):
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    with engine.begin() as conn:
+        conn.execute(text("DELETE FROM chat_conversations WHERE uid = :uid"), {"uid": claims["sub"]})
     return {"cleared": True}

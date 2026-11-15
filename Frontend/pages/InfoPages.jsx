@@ -53,7 +53,7 @@ const PAGES = {
       },
       {
         heading: 'Services that help run the site',
-        text: 'Stadia Maps and OpenStreetMap supply the maps and Wikimedia Commons supplies the photos, so they receive your IP address like any website you visit. Switching language sends the page’s text to Microsoft Translator. Messages you type into the AI assistant, along with the page you are on and your current matches, are sent to Anthropic’s Claude to write the reply. If you are logged in, your latest chat is also saved to your account so you can carry on later; the new-chat button deletes it. If you aren’t logged in, we don’t store your chats.',
+        text: 'Stadia Maps and OpenStreetMap supply the maps and Wikimedia Commons supplies the photos, so they receive your IP address like any website you visit. Switching language sends the page’s text to Microsoft Translator. Messages you type into the AI assistant, along with the page you are on and your current matches, are sent to Anthropic’s Claude to write the reply. If you are logged in, your 10 most recent chats are also saved to your account so you can carry on later; you can delete any of them under Your chats. If you aren’t logged in, we don’t store your chats. If you ask by voice, your browser turns your speech into text (Chrome does this through Google) and we only receive the text.',
       },
       {
         heading: 'Deleting your data',

@@ -1,11 +1,14 @@
 // "Crib Crew Assistant": the AI assistant in the bottom-right corner of every page.
 // Replies stream from the backend's POST /chat (Claude). A guest's conversation lives in this tab only; a
-// logged-in student's is also saved to their account (Backend/accounts.py), so it's there next time on any device.
+// logged-in student's conversations are saved to their account (Backend/accounts.py): "Your chats" lists their
+// recent ones to pick up again on any device, and "New chat" starts another without losing the old one.
+// Voice: the microphone button turns speech into the question (the browser's speech recognition); it only shows
+// where the browser supports it.
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useChatContext } from './chatContext'
 import { firstNameOf, watchUser } from './firebase'
-import { clearSavedChat, loadSavedChat, saveChat } from './account'
+import { createChat, deleteChat, listChats, openChat, updateChat } from './account'
 import './ChatWidget.css'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
@@ -15,28 +18,33 @@ const MAX_CHARS = 2000
 const LANGUAGE_NAMES = { es: 'Spanish', pt: 'Portuguese', hi: 'Hindi', 'zh-Hans': 'Chinese', ar: 'Arabic' } // the site's languages (LanguageSwitcher)
 
 const welcomeText = (name) => `Hi${name ? ` ${name}` : ''}! 👋 I'm the Crib Crew Assistant. Ask me about neighbourhoods, renting, getting around or settling in Dublin.`
+const HELLO_TEXT = 'Ask me about neighbourhoods, rent, getting around or settling in Dublin. Type, or tap the microphone and just ask.'
 const KEPT = 40 // messages kept in a saved conversation (Backend/accounts.py CHAT_KEPT)
+const CHAT_ID_KEY = 'fmd-chat-id'
 
-// The saved conversation and the one in this tab, put together: the same chat (e.g. after a reload) isn't doubled,
-// and a chat started before logging in goes after the saved one
-function combine(saved, here) {
-  if (!saved.length) return here
-  if (!here.length) return saved
-  const same = (a, b) => a.role === b.role && a.content === b.content
-  if (saved.length <= here.length && saved.every((m, i) => same(m, here[i]))) return here
-  if (here.length <= saved.length && here.every((m, i) => same(m, saved[i]))) return saved
-  return [...saved, ...here].slice(-KEPT)
+// Voice input, where the browser has it. The recognition language follows the site's language.
+const Recognition = typeof window !== 'undefined' ? window.SpeechRecognition || window.webkitSpeechRecognition : null
+const SPEECH_LANG = { en: 'en-IE', es: 'es-ES', pt: 'pt-PT', hi: 'hi-IN', 'zh-Hans': 'zh-CN', ar: 'ar-SA' }
+const siteLanguage = () => { try { return localStorage.getItem('language') || 'en' } catch { return 'en' } }
+// "Today 14:05", "Yesterday", "12 Nov"
+function when(iso) {
+  const d = new Date(iso), now = new Date()
+  const days = Math.round((new Date(now.toDateString()) - new Date(d.toDateString())) / 86400000)
+  if (days === 0) return `Today ${d.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })}`
+  if (days === 1) return 'Yesterday'
+  return d.toLocaleDateString('en-IE', { day: 'numeric', month: 'short' })
 }
+// [icon, question]
 const STARTERS = [
-  'Which areas suit a tight budget?',
-  'How do I avoid rental scams?',
-  'How do I get a student Leap card?',
-  'What do I need before I rent?',
+  ['💶', 'Which areas suit a tight budget?'],
+  ['🛡️', 'How do I avoid rental scams?'],
+  ['🚋', 'How do I get a student Leap card?'],
+  ['🔑', 'What do I need before I rent?'],
 ]
 const RESULTS_STARTERS = [
-  'Which of my matches is cheapest?',
-  'Compare my top 3 matches',
-  'Which match is best for nightlife?',
+  ['💰', 'Which of my matches is cheapest?'],
+  ['⚖️', 'Compare my top 3 matches'],
+  ['🎶', 'Which match is best for nightlife?'],
 ]
 
 function loadChat() {
@@ -81,10 +89,13 @@ const ICONS = {
   close: 'M6 6l12 12M18 6 6 18',
   send: ['M5 12h13', 'm12 5 7 7-7 7'],
   stop: 'M8 8h8v8H8z',
-  reset: ['M4 12a8 8 0 1 0 2.4-5.7', 'M4 4v4.5h4.5'],
   expand: ['M14 4h6v6', 'M20 4l-7 7', 'M10 20H4v-6', 'M4 20l7-7'],
   shrink: ['M20 10h-6V4', 'M14 10l7-7', 'M4 14h6v6', 'M10 14l-7 7'],
   spark: ['M12 3v4M12 17v4M3 12h4M17 12h4', 'm6 6 2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18'],
+  plus: ['M12 5v14', 'M5 12h14'],
+  history: ['M3.5 12a8.5 8.5 0 1 0 2.5-6', 'M3.5 4v4h4', 'M12 8v4.5l3 2'],
+  mic: ['M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z', 'M5.5 11a6.5 6.5 0 0 0 13 0', 'M12 17.5V21'],
+  trash: ['M5 7h14', 'M10 7V5h4v2', 'M7 7l1 12h8l1-12'],
 }
 
 // The colour behind a point: the first element up the tree with a background colour (or a gradient's first colour)
@@ -151,6 +162,8 @@ export default function ChatWidget() {
   const context = useChatContext()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState(loadChat)
+  const messagesRef = useRef(messages)
+  messagesRef.current = messages
   const [user, setUser] = useState(null)
   useEffect(() => watchUser(setUser), [])
   const firstName = firstNameOf(user)
@@ -203,39 +216,70 @@ export default function ChatWidget() {
 
   useEffect(() => { try { sessionStorage.setItem(STORE_KEY, JSON.stringify(messages)) } catch { /* private mode */ } }, [messages])
 
-  // Logged in: bring back the saved conversation. Logged out: take the chat off the screen (shared computers).
+  // ---- saved conversations (logged-in students)
+  // chatId: which saved conversation this is (null = not saved yet); kept for the tab so a reload carries on with it
+  const [chatId, setChatId] = useState(() => { try { return JSON.parse(sessionStorage.getItem(CHAT_ID_KEY)) } catch { return null } })
+  useEffect(() => { try { sessionStorage.setItem(CHAT_ID_KEY, JSON.stringify(chatId)) } catch { /* private mode */ } }, [chatId])
+  const chatIdRef = useRef(chatId)
+  chatIdRef.current = chatId
+  const [chats, setChats] = useState([]) // their recent conversations: { id, title, updated_at }
+  const [view, setView] = useState('chat') // 'chat' | 'history' (the "Your chats" list)
+  const [ready, setReady] = useState(false) // the list has loaded, so saving can start
+  const refreshList = () => listChats().then((d) => setChats(d?.chats || [])).catch(() => {})
+
+  // Logged in: load their chats, and open the latest one if this tab has none. Logged out: take everything off
+  // the screen (shared computers).
   const lastUid = useRef(undefined) // undefined until Firebase has said who is logged in
-  const [savedLoaded, setSavedLoaded] = useState(false)
   useEffect(() => {
     const before = lastUid.current
     lastUid.current = uid
+    setReady(false)
     if (!uid) {
-      setSavedLoaded(false)
-      if (before) { abortRef.current?.abort(); setMessages([]); setError('') }
+      setChats([])
+      setView('chat')
+      if (before) { abortRef.current?.abort(); setMessages([]); setChatId(null); setError('') }
       return undefined
     }
     let stale = false
-    loadSavedChat()
-      .then((data) => {
+    listChats()
+      .then(async (data) => {
         if (stale) return
-        const saved = (data?.messages || []).filter((m) => m.content)
-        setMessages((here) => combine(saved, here))
+        const list = data?.chats || []
+        setChats(list)
+        if (!chatIdRef.current && list.length && !messagesRef.current.length) {
+          const latest = await openChat(list[0].id)
+          if (!stale && !messagesRef.current.length) { setMessages(latest.messages); setChatId(latest.id) }
+        }
       })
       .catch(() => { /* saved chats unavailable right now: the chat still works for this visit */ })
-      .finally(() => { if (!stale) setSavedLoaded(true) })
+      .finally(() => { if (!stale) setReady(true) })
     return () => { stale = true }
-  }, [uid])
+  }, [uid]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Logged in: save the conversation once each reply has finished
+  // Save the conversation once each reply has finished: a new chat is created the first time, then updated.
+  // Saves run one after another, so a quick second reply can't create the same chat twice.
+  const saving = useRef(Promise.resolve())
   useEffect(() => {
-    if (!uid || !savedLoaded || busy) return undefined
+    if (!uid || !ready || busy) return undefined
     const done = messages.filter((m) => m.content)
     if (!done.length || messages.at(-1)?.role !== 'assistant') return undefined
-    const t = setTimeout(() => { saveChat(done.slice(-KEPT)).catch(() => { /* not saved this time */ }) }, 600)
+    const t = setTimeout(() => {
+      saving.current = saving.current.then(async () => {
+        const id = chatIdRef.current
+        try {
+          if (id) await updateChat(id, done.slice(-KEPT))
+          else setChatId((await createChat(done.slice(-KEPT))).id)
+        } catch (err) {
+          if (err.status === 404) setChatId((await createChat(done.slice(-KEPT)).catch(() => ({ id: null }))).id)
+        }
+        refreshList()
+      })
+    }, 600)
     return () => clearTimeout(t)
-  }, [uid, savedLoaded, busy, messages])
+  }, [uid, ready, busy, messages]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (open) inputRef.current?.focus() }, [open])
-  useEffect(() => { listRef.current?.scrollTo({ top: listRef.current.scrollHeight }) }, [messages, open, busy])
+  // follow the conversation down; the welcome card (no messages yet) is read from the top
+  useEffect(() => { listRef.current?.scrollTo({ top: messages.length ? listRef.current.scrollHeight : 0 }) }, [messages, open, busy, view])
   useEffect(() => {
     if (!open) return undefined
     const onKey = (e) => { if (e.key === 'Escape') closePanel() }
@@ -300,6 +344,7 @@ export default function ChatWidget() {
 
   function closePanel() {
     if (!open || closing) return
+    stopVoice()
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     if (reduce) { setOpen(false); return }
     setClosing(true)
@@ -317,13 +362,71 @@ export default function ChatWidget() {
     return () => window.removeEventListener('chatw-open', onOpen)
   }, [])
 
-  function reset() {
+  // A fresh conversation; a logged-in student's previous one stays in "Your chats"
+  function newChat() {
     abortRef.current?.abort()
+    stopVoice()
     setMessages([])
+    setChatId(null)
     setError('')
-    if (uid) clearSavedChat().catch(() => { /* will be replaced by the next saved chat anyway */ })
-    inputRef.current?.focus()
+    setView('chat')
+    setTimeout(() => inputRef.current?.focus(), 0)
   }
+  async function pickChat(id) {
+    stopVoice()
+    if (id === chatId) { setView('chat'); return }
+    try {
+      const chat = await openChat(id)
+      abortRef.current?.abort()
+      setMessages(chat.messages)
+      setChatId(chat.id)
+      setError('')
+      setView('chat')
+    } catch {
+      setChats((list) => list.filter((c) => c.id !== id))
+      setError("That chat couldn't be opened. It may have been deleted.")
+    }
+  }
+  function removeChat(id) {
+    setChats((list) => list.filter((c) => c.id !== id))
+    deleteChat(id).catch(() => refreshList())
+    if (id === chatId) { setMessages([]); setChatId(null) }
+  }
+
+  // ---- voice input: speak the question instead of typing it
+  const [listening, setListening] = useState(false)
+  const recognition = useRef(null)
+  function stopVoice() {
+    recognition.current?.abort()
+    setListening(false)
+  }
+  function listen() {
+    if (listening) { recognition.current?.stop(); return }
+    setError('')
+    const rec = new Recognition()
+    rec.lang = SPEECH_LANG[siteLanguage()] || 'en-IE'
+    rec.interimResults = true
+    rec.continuous = false
+    let heard = ''
+    rec.onresult = (e) => {
+      heard = Array.from(e.results).map((r) => r[0].transcript).join(' ').trim()
+      setInput(heard)
+    }
+    rec.onerror = (e) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') setError('Microphone access is blocked. Allow it for this site in your browser to ask by voice.')
+      else if (e.error === 'no-speech') setError("I didn't hear anything. Tap the microphone and try again.")
+      else if (e.error !== 'aborted') setError("Voice input didn't work this time. You can type your question instead.")
+    }
+    rec.onend = () => {
+      setListening(false)
+      recognition.current = null
+      if (heard) send(heard) // asked out loud: send it straight away
+    }
+    recognition.current = rec
+    setListening(true)
+    try { rec.start() } catch { setListening(false) }
+  }
+  useEffect(() => () => recognition.current?.abort(), [])
 
   const starters = context && pathname.startsWith('/results') ? RESULTS_STARTERS : STARTERS
   const waiting = busy && !messages.at(-1)?.content
@@ -331,17 +434,24 @@ export default function ChatWidget() {
   return (
     <div className={`chatw${open && !closing ? ' is-open' : ''}${tucked && !open ? ' is-tucked' : ''}${onDark ? ' on-dark' : ''}${big ? ' is-big' : ''}`}>
       {open && (
-        <section className={`chatw-panel${closing ? ' is-closing' : ''}`} role="dialog" aria-label="Crib Crew Assistant, AI assistant">
+        <section className={`chatw-panel${closing ? ' is-closing' : ''}${busy ? ' is-thinking' : ''}${listening ? ' is-listening' : ''}`} role="dialog" aria-label="Crib Crew Assistant, AI assistant">
           <header className="chatw-head">
             <span className="chatw-avatar" aria-hidden="true"><Icon d={ICONS.spark} size={18} /></span>
             <div className="chatw-title">
               <strong>Crib Crew Assistant</strong>
               <span><i aria-hidden="true" />AI assistant · can make mistakes</span>
             </div>
-            {messages.length > 0 && (
-              <button type="button" className="chatw-icon-btn" onClick={reset} aria-label="Start a new chat"
-                title={uid ? 'New chat (deletes the saved one)' : 'New chat'}>
-                <Icon d={ICONS.reset} size={17} />
+            {uid && (
+              <button type="button" className={`chatw-icon-btn${view === 'history' ? ' is-on' : ''}`}
+                onClick={() => { stopVoice(); setView((v) => (v === 'history' ? 'chat' : 'history')); refreshList() }}
+                aria-pressed={view === 'history'} aria-label="Your chats" title="Your chats">
+                <Icon d={ICONS.history} size={17} />
+              </button>
+            )}
+            {(messages.length > 0 || view === 'history') && (
+              <button type="button" className="chatw-icon-btn" onClick={newChat} aria-label="New chat"
+                title={uid ? 'New chat (this one stays in Your chats)' : 'New chat'}>
+                <Icon d={ICONS.plus} size={18} />
               </button>
             )}
             <button type="button" className="chatw-icon-btn chatw-size-btn" onClick={() => setBig((v) => !v)}
@@ -353,23 +463,56 @@ export default function ChatWidget() {
             </button>
           </header>
 
-          <div className="chatw-body" ref={listRef} aria-live="polite" translate="no">
-            <div className="chatw-msg is-bot"><p>{welcomeText(firstName)}</p></div>
-            {messages.length === 0 && (
-              <p className="chatw-note">
-                {uid
-                  ? 'Your chats are saved to your account, so you can pick up where you left off on any device.'
-                  : <><Link to="/login">Log in</Link> to keep your chats for next time.</>}
-              </p>
-            )}
-            {messages.length === 0 && (
-              <div className="chatw-starters">
-                {starters.map((s) => <button key={s} type="button" onClick={() => send(s)}>{s}</button>)}
+          {view === 'history' ? (
+            <div className="chatw-body chatw-history" translate="no">
+              <div className="chatw-history-head">
+                <strong>Your chats</strong>
+                <button type="button" className="chatw-new" onClick={newChat}><Icon d={ICONS.plus} size={15} /> New chat</button>
               </div>
+              {chats.length ? (
+                <ul>
+                  {chats.map((c) => (
+                    <li key={c.id} className={c.id === chatId ? 'is-current' : ''}>
+                      <button type="button" className="chatw-history-open" onClick={() => pickChat(c.id)}>
+                        <span>{c.title}</span>
+                        <small>{c.id === chatId ? 'Open now · ' : ''}{when(c.updated_at)}</small>
+                      </button>
+                      <button type="button" className="chatw-icon-btn chatw-history-del" onClick={() => removeChat(c.id)}
+                        aria-label={`Delete the chat "${c.title}"`} title="Delete">
+                        <Icon d={ICONS.trash} size={15} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : <p className="chatw-note">No saved chats yet. Ask something and it will appear here.</p>}
+              <p className="chatw-note">Your 10 most recent chats are kept.</p>
+            </div>
+          ) : (
+          <div className="chatw-body" ref={listRef} aria-live="polite" translate="no">
+            {messages.length === 0 ? (
+              <div className="chatw-hello">
+                <span className="chatw-hello-wave" aria-hidden="true">👋</span>
+                <h3>Hi{firstName ? ` ${firstName}` : ' there'}!</h3>
+                <p>{HELLO_TEXT}</p>
+                <div className="chatw-starters">
+                  {starters.map(([icon, q], k) => (
+                    <button key={q} type="button" style={{ '--i': k }} onClick={() => send(q)}>
+                      <span aria-hidden="true">{icon}</span>{q}
+                    </button>
+                  ))}
+                </div>
+                <p className="chatw-note">
+                  {uid
+                    ? 'Your chats are saved to your account. Find older ones under Your chats (the clock button above).'
+                    : <><Link to="/login">Log in</Link> to keep your chats for next time.</>}
+                </p>
+              </div>
+            ) : (
+              <div className="chatw-msg is-bot"><p>{welcomeText(firstName)}</p></div>
             )}
             {messages.map((m, i) => (
               (m.content || !busy || i < messages.length - 1) && (
-                <div key={i} className={`chatw-msg ${m.role === 'user' ? 'is-user' : 'is-bot'}`}>
+                <div key={i} className={`chatw-msg ${m.role === 'user' ? 'is-user' : 'is-bot'}${busy && i === messages.length - 1 && m.content ? ' is-streaming' : ''}`}>
                   {m.role === 'user' ? <p>{m.content}</p> : <Formatted text={m.content} />}
                 </div>
               )
@@ -377,6 +520,7 @@ export default function ChatWidget() {
             {waiting && <div className="chatw-msg is-bot chatw-typing" aria-label="The assistant is typing"><span /><span /><span /></div>}
             {error && <p className="chatw-error" role="alert">{error}</p>}
           </div>
+          )}
 
           <form className="chatw-form" onSubmit={(e) => { e.preventDefault(); send(input) }}>
             <textarea
@@ -384,11 +528,19 @@ export default function ChatWidget() {
               rows={1}
               value={input}
               maxLength={MAX_CHARS}
-              placeholder="Ask about areas, rent, transport…"
+              placeholder={listening ? 'Listening… speak your question' : 'Ask about areas, rent, transport…'}
               aria-label="Your question"
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(input) } }}
             />
+            {Recognition && !busy && (
+              <button type="button" className={`chatw-mic${listening ? ' is-on' : ''}`} onClick={listen}
+                aria-pressed={listening} aria-label={listening ? 'Stop listening' : 'Ask by voice'} title={listening ? 'Stop listening' : 'Ask by voice'}>
+                {listening
+                  ? <span className="chatw-bars" aria-hidden="true"><i /><i /><i /><i /></span>
+                  : <Icon d={ICONS.mic} size={18} />}
+              </button>
+            )}
             {busy ? (
               <button type="button" className="chatw-send is-stop" onClick={() => abortRef.current?.abort()} aria-label="Stop the reply">
                 <Icon d={ICONS.stop} size={16} />

@@ -53,6 +53,7 @@ def db(client):
 
     engine = create_engine(TEST_DB)
     with engine.begin() as conn:
+        conn.execute(text("DROP TABLE IF EXISTS chat_conversations"))
         conn.execute(text("DROP TABLE IF EXISTS chat_history"))
         conn.execute(text("DROP TABLE IF EXISTS search_history"))
         conn.execute(text("DROP TABLE IF EXISTS app_users"))
@@ -64,7 +65,7 @@ def db(client):
 def test_without_the_database_history_is_unavailable(client):
     datastore._engine = None
     assert client.get("/account/history", headers=auth()).status_code == 503
-    assert client.get("/account/chat", headers=auth()).status_code == 503
+    assert client.get("/account/chats", headers=auth()).status_code == 503
 
 
 @pytest.mark.skipif(not TEST_DB, reason="set TEST_DATABASE_URL to run against PostgreSQL")
@@ -126,23 +127,59 @@ class TestWithDatabase:
         huge = {"notes": "x" * (accounts.MAX_ANSWERS_BYTES + 1)}
         assert db.post("/account/history", json={"answers": huge}, headers=auth()).status_code == 413
 
-    def test_the_chat_is_saved_per_student(self, db):
-        chat = [{"role": "user", "content": "Is D8 safe?"}, {"role": "assistant", "content": "Mostly, yes. A 1-bed is €2,200 · see D8."}]
-        assert db.get("/account/chat").status_code == 401
-        assert db.get("/account/chat", headers=auth()).json() == {"messages": []}
-        assert db.put("/account/chat", json={"messages": chat}, headers=auth()).json() == {"saved": 2}
-        assert db.get("/account/chat", headers=auth()).json() == {"messages": chat}
-        # another student never sees it
-        assert db.get("/account/chat", headers=auth(uid="student-2", email="kim@example.com")).json() == {"messages": []}
-        # saving again replaces it; empty messages are dropped and only the latest are kept
+    def test_chats_are_kept_per_student_newest_first(self, db):
+        first = [{"role": "user", "content": "Is   D8 safe?"}, {"role": "assistant", "content": "Mostly. A 1-bed is €2,200 · see D8."}]
+        assert db.get("/account/chats").status_code == 401
+        assert db.get("/account/chats", headers=auth()).json() == {"chats": []}
+        one = db.post("/account/chats", json={"messages": first}, headers=auth()).json()["id"]
+        two = db.post("/account/chats", json={"messages": [{"role": "user", "content": "Leap card?"}]}, headers=auth()).json()["id"]
+        chats = db.get("/account/chats", headers=auth()).json()["chats"]
+        assert [c["id"] for c in chats] == [two, one] and chats[1]["title"] == "Is D8 safe?" and chats[1]["messages"] == 2
+        assert db.get(f"/account/chats/{one}", headers=auth()).json()["messages"] == first
+        # carrying on with the older chat moves it to the top
+        more = first + [{"role": "user", "content": "And D7?"}]
+        assert db.put(f"/account/chats/{one}", json={"messages": more}, headers=auth()).status_code == 200
+        assert [c["id"] for c in db.get("/account/chats", headers=auth()).json()["chats"]] == [one, two]
+        # another student can't see, change or delete them
+        kim = auth(uid="student-2", email="kim@example.com")
+        assert db.get("/account/chats", headers=kim).json() == {"chats": []}
+        assert db.get(f"/account/chats/{one}", headers=kim).status_code == 404
+        assert db.put(f"/account/chats/{one}", json={"messages": first}, headers=kim).status_code == 404
+        db.delete(f"/account/chats/{one}", headers=kim)
+        assert db.get(f"/account/chats/{one}", headers=auth()).status_code == 200
+        # deleting one, then all
+        db.delete(f"/account/chats/{two}", headers=auth())
+        assert [c["id"] for c in db.get("/account/chats", headers=auth()).json()["chats"]] == [one]
+        assert db.delete("/account/chats", headers=auth()).json() == {"cleared": True}
+        assert db.get("/account/chats", headers=auth()).json() == {"chats": []}
+
+    def test_only_the_latest_chats_and_messages_are_kept(self, db):
         long = [{"role": "user" if i % 2 == 0 else "assistant", "content": f"m{i}"} for i in range(50)]
-        db.put("/account/chat", json={"messages": long + [{"role": "assistant", "content": "  "}]}, headers=auth())
-        saved = db.get("/account/chat", headers=auth()).json()["messages"]
+        chat = db.post("/account/chats", json={"messages": long + [{"role": "assistant", "content": "  "}]}, headers=auth()).json()["id"]
+        saved = db.get(f"/account/chats/{chat}", headers=auth()).json()["messages"]
         assert len(saved) == accounts.CHAT_KEPT and saved[-1]["content"] == "m49"
-        assert db.delete("/account/chat", headers=auth()).json() == {"cleared": True}
-        assert db.get("/account/chat", headers=auth()).json() == {"messages": []}
+        for i in range(accounts.CHATS_KEPT + 2):
+            db.post("/account/chats", json={"messages": [{"role": "user", "content": f"question {i}"}]}, headers=auth())
+        chats = db.get("/account/chats", headers=auth()).json()["chats"]
+        assert len(chats) == accounts.CHATS_KEPT and chats[0]["title"] == f"question {accounts.CHATS_KEPT + 1}"
 
     def test_a_chat_needs_real_messages(self, db):
-        assert db.put("/account/chat", json={"messages": [{"role": "system", "content": "x"}]}, headers=auth()).status_code == 422
+        assert db.post("/account/chats", json={"messages": [{"role": "system", "content": "x"}]}, headers=auth()).status_code == 422
         too_long = [{"role": "user", "content": "x" * (accounts.MAX_CHAT_MESSAGE + 1)}]
-        assert db.put("/account/chat", json={"messages": too_long}, headers=auth()).status_code == 422
+        assert db.post("/account/chats", json={"messages": too_long}, headers=auth()).status_code == 422
+        assert db.post("/account/chats", json={"messages": [{"role": "user", "content": "   "}]}, headers=auth()).status_code == 422
+
+    def test_chats_from_the_first_version_are_moved_over(self, db):
+        from sqlalchemy import text
+
+        db.post("/account/login", json={"name": "Sam"}, headers=auth())  # creates the tables and the student
+        engine = datastore._engine
+        with engine.begin() as conn:
+            conn.execute(text("CREATE TABLE chat_history (uid text PRIMARY KEY, updated_at timestamptz NOT NULL, messages jsonb NOT NULL)"))
+            conn.execute(text("""INSERT INTO chat_history VALUES ('student-1', now(),
+                '[{"role": "user", "content": "Where should I live?"}, {"role": "assistant", "content": "D7!"}]')"""))
+        accounts._tables_ready = False  # as after a new deploy
+        chats = db.get("/account/chats", headers=auth()).json()["chats"]
+        assert [c["title"] for c in chats] == ["Where should I live?"]
+        with engine.connect() as conn:
+            assert conn.execute(text("SELECT to_regclass('chat_history')")).scalar() is None

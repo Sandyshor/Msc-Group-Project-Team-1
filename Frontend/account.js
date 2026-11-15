@@ -28,7 +28,10 @@ export const saveSearch = (answers, topAreas) => call('POST', '/history', { answ
 export const deleteSearch = (id) => call('DELETE', `/history/${id}`)
 export const clearHistory = () => call('DELETE', '/history')
 
-// The logged-in student's conversation with the assistant, so it's there next time (on any device)
-export const loadSavedChat = () => call('GET', '/chat')
-export const saveChat = (messages) => call('PUT', '/chat', { messages })
-export const clearSavedChat = () => call('DELETE', '/chat')
+// The logged-in student's conversations with the assistant (their 10 most recent), so they can pick any of them up
+// again, on any device
+export const listChats = () => call('GET', '/chats')
+export const openChat = (id) => call('GET', `/chats/${id}`)
+export const createChat = (messages) => call('POST', '/chats', { messages })
+export const updateChat = (id, messages) => call('PUT', `/chats/${id}`, { messages })
+export const deleteChat = (id) => call('DELETE', `/chats/${id}`)
