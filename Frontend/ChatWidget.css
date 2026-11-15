@@ -86,7 +86,6 @@
 .chatw-title { display: flex; flex: 1; min-width: 0; flex-direction: column; line-height: 1.25; }
 .chatw-title strong { font-family: 'Fraunces', Georgia, serif; font-size: 17px; font-weight: 700; font-variation-settings: 'opsz' 36, 'WONK' 0; }
 .chatw-title span { display: flex; align-items: center; gap: 6px; color: rgba(255, 255, 255, 0.78); font-size: 12px; }
-.chatw-title i { width: 7px; height: 7px; border-radius: 50%; background: var(--cw-lime); box-shadow: 0 0 6px var(--cw-lime); }
 .chatw-icon-btn { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: #fff; cursor: pointer; transition: background .15s ease; }
 .chatw-icon-btn:hover { background: rgba(255, 255, 255, 0.12); }
 .chatw-icon-btn:focus-visible { outline: 2px solid var(--cw-lime); outline-offset: 1px; }
@@ -519,7 +518,6 @@
 .chatw-title { gap: 2px; }
 .chatw-title strong { overflow: hidden; font-size: 16.5px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
 .chatw-title span { overflow: hidden; line-height: 1.3; white-space: nowrap; }
-.chatw-title i { flex: none; }
 .chatw-head .chatw-icon-btn { width: 32px; height: 32px; flex: none; }
 /* room for the full name: a slightly smaller avatar and tighter buttons */
 .chatw-head { gap: 6px; padding: 12px 8px 12px 12px; }
