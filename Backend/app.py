@@ -9,6 +9,7 @@ import datastore
 import recommender
 import routing
 import chat
+import eircode
 import translator
 
 app = FastAPI(title="Crib Crew – Dublin Area Recommender API", version="1.0")
@@ -16,6 +17,7 @@ app = FastAPI(title="Crib Crew – Dublin Area Recommender API", version="1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.include_router(routing.router)  # GET /route - journey planner (OpenTripPlanner)
 app.include_router(chat.router)  # POST /chat - the site's AI assistant (Claude)
+app.include_router(eircode.router)  # GET /eircode/{code} - where any Eircode is (Google Geocoding)
 app.include_router(accounts.router)  # /account - logged-in students' saved searches
 
 datastore.connect()  # PostgreSQL if DATABASE_URL is set (copies changed data files first), else the files

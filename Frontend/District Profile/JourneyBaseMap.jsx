@@ -460,6 +460,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     const loadLandmarks = (file, layer, kind) => fetch(PLANNER + file, { headers: { Accept: 'application/json' } })
       .then((r) => { if (!r.ok) throw new Error(`${file} returned ${r.status}`); return r.json(); })
       .then((list) => {
+        if (st.gone) return; // the map was removed while the file loaded
         addLandmarks(list, layer, kind);
         if (kind === 'uni') st.renderHousing?.(); // residences step aside from the campus pins
         if (kind === 'place') {
@@ -916,6 +917,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     map.on('zoomend moveend overlayadd overlayremove layeradd', st.declutter);
 
     return () => {
+      st.gone = true;
       unsyncFullscreen?.();
       st.resizeObserver?.disconnect();
       clearTimeout(st.travelTimer);

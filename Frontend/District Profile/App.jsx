@@ -320,7 +320,7 @@ export default function App() {
 
   // The search box above the map: a district opens its profile; anything else gets a pin on the map
   const onSearchPick = (p) => {
-    if (p.kind === 'district' && data.profiles[p.code]) { mapApi.current?.clearSearchPin(); selectDistrict(p.code); return; }
+    if ((p.kind === 'district' || (p.kind === 'eircode' && p.approx)) && data.profiles[p.code]) { mapApi.current?.clearSearchPin(); selectDistrict(p.code); return; }
     mapApi.current?.showSearchResult(p);
   };
   // A student residence clicked on the map: it becomes the start (A), or the destination (B) once A is set
@@ -364,7 +364,7 @@ export default function App() {
               <PlaceSearch
                 className="ps-hero"
                 label="Search the map"
-                placeholder={typeof window !== 'undefined' && window.innerWidth < 560 ? 'University, place, street or D8…' : 'Search a university, place, street or district, e.g. UCD, Temple Bar, D8'}
+                placeholder={typeof window !== 'undefined' && window.innerWidth < 560 ? 'Place, street, D8 or Eircode…' : 'Search a university, place, street, district or Eircode, e.g. UCD, Temple Bar, D07 ED7R'}
                 onPick={onSearchPick}
                 onClear={() => mapApi.current?.clearSearchPin()}
               />

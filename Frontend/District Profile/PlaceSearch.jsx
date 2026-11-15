@@ -2,10 +2,10 @@
 // Enter). Used above the district map and for the journey planner's A and B.
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { KINDS, loadPlaceIndex, searchAddresses, searchPlaces } from './placeIndex';
+import { KINDS, loadPlaceIndex, parseEircode, searchAddresses, searchEircode, searchPlaces } from './placeIndex';
 import './PlaceSearch.css';
 
-const KIND_ICON = { district: '🗺️', uni: '🎓', place: '⭐', housing: '🏠', area: '🏘️', station: '🚉', amenity: '📍', address: '🏠' };
+const KIND_ICON = { district: '🗺️', uni: '🎓', place: '⭐', housing: '🏠', area: '🏘️', station: '🚉', amenity: '📍', address: '🏠', eircode: '📮' };
 
 export default function PlaceSearch({ value = '', onPick, onClear, placeholder, label, badge, className = '' }) {
   const id = useId();
@@ -45,12 +45,20 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
   async function lookUp() {
     const asked = typed;
     setLooking(true);
-    const found = await searchAddresses(asked);
+    const found = parseEircode(asked) ? await searchEircode(asked) : await searchAddresses(asked);
     setLooking(false);
     if (query.current.trim() !== asked) return; // typed something else meanwhile: these results are stale
     setAddresses(found);
     setActive(local.length);
   }
+
+  // an Eircode needs no Enter: look it up as soon as it is complete
+  const eircode = parseEircode(typed);
+  useEffect(() => {
+    if (!open || !eircode || typed === value || addresses !== null || looking) return undefined;
+    const t = setTimeout(lookUp, 300);
+    return () => clearTimeout(t);
+  }, [open, eircode, typed, value, addresses, looking]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function pick(place) {
     setText(place.label);
@@ -148,7 +156,7 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
               <em>{KINDS[p.kind][1]}</em>
             </li>
           ))}
-          {index && !local.length && addresses?.length === 0 && <li className="ps-note">No streets or places found for &ldquo;{typed}&rdquo;.</li>}
+          {index && !local.length && addresses?.length === 0 && <li className="ps-note">{eircode ? <>No Dublin place found for the Eircode {eircode}.</> : <>No streets or places found for &ldquo;{typed}&rdquo;.</>}</li>}
           {canLookUp && (
             <li
               id={`${id}-o${options.length}`}
@@ -160,7 +168,7 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
               onPointerEnter={() => setActive(options.length)}
             >
               <span className="ps-kind" aria-hidden="true">{looking ? '⏳' : '🔎'}</span>
-              <span className="ps-text"><strong>{looking ? 'Searching streets and addresses…' : `Search streets and addresses for “${typed}”`}</strong><small>{local.length ? 'From OpenStreetMap' : 'From OpenStreetMap · press Enter'}</small></span>
+              <span className="ps-text"><strong>{eircode ? `Finding Eircode ${eircode}…` : looking ? 'Searching streets and addresses…' : `Search streets and addresses for “${typed}”`}</strong><small>{eircode ? 'Eircode' : local.length ? 'From OpenStreetMap' : 'From OpenStreetMap · press Enter'}</small></span>
             </li>
           )}
         </ul>,

@@ -7,11 +7,11 @@ Same data, factors, scoring and explanations as the notebook/terminal script, bu
   * results are returned as JSON-friendly dicts instead of printed.
 """
 import os
-import re
 
 import numpy as np
 import pandas as pd
 
+import district_rent
 import datastore  # PostgreSQL when DATABASE_URL is set, otherwise the data files
 
 DATA_FOLDER = os.environ.get(
@@ -90,17 +90,9 @@ AREA_CODES_ROOMS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10",
 AREA_CODES_AMENITIES = AREA_CODES_ROOMS
 AREAS = AREA_CODES_AMENITIES
 
-# Room listings: one Daft file per district (Area, Neighbourhood, Address, Room type, Listing Type, Rent).
-# In every file a double is a private room with a double bed (it costs more than a single), so only the
-# twin/shared labels below are shared rooms. A district whose file is missing just has no room rent.
-ROOM_FILES = [f"{area}.xlsx" for area in AREA_CODES_ROOMS]
-PRIVATE_ROOM_LABELS = ["single", "double", "single & twin", "single & double"]
-# A room rent needs at least this many listings; fewer is too unreliable to compare districts on
-MIN_ROOM_LISTINGS = 3
-SHARED_ROOM_LABELS = ["twin", "shared", "double & twin", "twin & shared"]
-# Each listing's Neighbourhood is matched to a part of its district by name. The same rule as for districts
-# applies: a part with MIN_ROOM_LISTINGS or more listings uses its own average, otherwise its district's.
-RENT_NAME_ALIASES = {"ifsc": "international financial services centre"}
+# Rent (rooms and apartments) is the district profile's figure for each area, from district_rent.py, so the
+# results page, the district profile and the AI assistant always show the same rent. Every part of a
+# district uses its district's figure.
 
 # "group" factors are scored as one category by default (the average of their
 # amenities' 0-1 sub-scores). A student can instead rate a category's "items"
@@ -430,14 +422,32 @@ def student_room_kind(accommodation):
     return next((kind for kind, (key, _, _) in STUDENT_ROOM_TYPES.items() if key == accommodation), None)
 
 
-def student_part_prices(residences, kind=None):
+# A university's own residences are for its own students (Trinity Hall isn't offered to UCD students):
+# operator -> the universities (as named in the questionnaire) whose students can live there
+UNIVERSITY_RESIDENCES = {
+    "Trinity College Dublin": ("Trinity College Dublin",),
+    "University College Dublin": ("University College Dublin - Belfield",),
+    "Dublin City University": ("Dublin City University - Glasnevin", "DCU - St Patrick's Campus"),
+    "Royal College of Surgeons in Ireland": ("Royal College of Surgeons Ireland",),
+    "Griffith College": ("Griffith College Dublin",),
+}
+
+
+def open_to(residence, university):
+    """False for a residence that only takes another university's students."""
+    only = UNIVERSITY_RESIDENCES.get(residence.get("operator"))
+    return not only or not university or university in only
+
+
+def student_part_prices(residences, kind=None, university=None):
     """{(area, part): (cheapest starting monthly price, number of residences)} for the residences in each
-    neighbourhood that publish a price for this room type (any room when kind is None)."""
+    neighbourhood that publish a price for this room type (any room when kind is None) and that take students
+    of this university."""
     found = {}
     for area, items in residences.items():
         for x in items:
             price = x.get("rooms", {}).get(kind) if kind else x.get("price")
-            if not price or not x.get("part"):
+            if not price or not x.get("part") or not open_to(x, university):
                 continue
             key = (area, x["part"])
             low, n = found.get(key, (np.inf, 0))
@@ -484,13 +494,6 @@ def load_county(university_points):
     # only places with a public transport or walking time count (some rural places have no route in OTP's map)
     points = points[points["public_transport"].notna() | points["walk"].notna()]
     return points, areas[areas["Area"].isin(points["Area"])].reset_index(drop=True)
-
-
-def _home_source(source, region):
-    """Where a County Dublin area's 1- or 2-bed rent comes from (shown on the results page)."""
-    if source == "daft":
-        return f"Daft.ie report apartment average for {region}"
-    return "RTB average rent, all homes"
 
 
 def county_safety(county):
@@ -544,19 +547,6 @@ def search_links(area, accommodation, budget):
 def load_data():
     # Refreshed weekly from OpenStreetMap by refresh_amenities.py
     places = _clean_columns(datastore.read_csv(_path("amenities_osm.csv")))
-    room_files = [file for file in ROOM_FILES if datastore.exists(_path(file))]
-    missing = sorted(set(ROOM_FILES) - set(room_files))
-    if missing:
-        # a renamed or deleted upload shouldn't take the whole website down - those districts have no room rent
-        print(f"WARNING: rent files not found in Data/, skipping: {', '.join(missing)}")
-    room_data = pd.concat(
-        [_clean_columns(datastore.read_excel(_path(file))).rename(columns={"Room Type": "Room type"}) for file in room_files],
-        ignore_index=True,
-    )
-    room_data["Room type"] = room_data["Room type"].astype(str).str.strip().str.lower()
-
-    # Refreshed from the CSO (table RIA02) by refresh_rents.py
-    rtb = _clean_columns(datastore.read_csv(_path("RTB_latest.csv")))
     census = _clean_columns(datastore.read_excel(_path("Dublin_Census_Filled.xlsx")))
     ethnicity = _clean_columns(datastore.read_excel(_path("Dublin_Ethnicity_D1_D24.xlsx")))
 
@@ -629,38 +619,19 @@ def load_data():
     amenities = (_amenity_counts(landmarks, places).assign(Area=landmarks["Area"].to_numpy())
                  .groupby("Area").mean().reset_index())
 
-    # Rent tables
-    is_private = room_data["Room type"].isin(PRIVATE_ROOM_LABELS)
-    is_shared = room_data["Room type"].isin(SHARED_ROOM_LABELS)
-    shared_room_rent, shared_listings = _room_rent(room_data[is_shared])
-    private_room_rent, private_listings = _room_rent(room_data[is_private])
     neighbourhood_commute = _load_neighbourhood_commute()
     parts = _district_parts(commute_points, places, prefer_neighbourhoods=not neighbourhood_commute.empty)
-    room_data["Part"] = _listing_parts(room_data, parts)
 
-    rtb["Area"] = "D" + rtb["Location"].astype(str).str.extract(
-        r"Dublin\s*(\d+W?)", flags=re.IGNORECASE, expand=False
-    ).str.upper()
-    rtb["VALUE"] = pd.to_numeric(rtb["VALUE"], errors="coerce")
-    rtb = rtb[rtb["Property Type"].str.strip() == "Apartment"]  # same property type for every district
-    bedrooms = rtb["Number of Bedrooms"].astype(str).str.strip().str.lower()
-    one_bed_rent = rtb[bedrooms == "one bed"].groupby("Area")["VALUE"].mean()
-    two_bed_rent = rtb[bedrooms == "two bed"].groupby("Area")["VALUE"].mean()
-    # where each area's rent comes from, when it isn't the districts' usual sources (shown on the results page)
-    rent_sources = {}
-    if not county.empty:
-        c = county.set_index("Area")
-        shared_room_rent = pd.concat([shared_room_rent, c["Shared_Room_Rent"].dropna()])
-        private_room_rent = pd.concat([private_room_rent, c["Private_Room_Rent"].dropna()])
-        one_bed_rent = pd.concat([one_bed_rent, c["One_Bed_Rent"].dropna()])
-        two_bed_rent = pd.concat([two_bed_rent, c["Two_Bed_Rent"].dropna()])
-        for area, row in c.iterrows():
-            region = row.get("Room_Rent_Region")
-            rent_sources[area] = {
-                "private_room": f"Daft.ie report average for {region}",
-                "shared_room": f"estimate from the Daft.ie report for {region}",
-                "one_bed": _home_source(row.get("One_Bed_Source"), region),
-                "two_bed": _home_source(row.get("Two_Bed_Source"), region)}
+    # Rent tables: the district profile's figure for every area (district_rent.py), and where it comes from
+    profile_data = district_rent.load_profile_data()
+    room_rent, rent_listings, rent_sources = {}, {}, {}
+    for search in district_rent.SEARCH_KIND:
+        table = district_rent.rent_table(profile_data, search)
+        room_rent[search] = pd.Series({area: x["value"] for area, x in table.items()}, dtype=float)
+        rent_listings[search] = pd.Series({area: x["listings"] for area, x in table.items() if x["listings"]},
+                                          dtype=int)
+        for area, x in table.items():
+            rent_sources.setdefault(area, {})[search] = x["note"]
 
     area_data = (
         census
@@ -703,67 +674,24 @@ def load_data():
         # Parts of each district (neighbourhoods and commute points) that are scored individually
         "parts": parts,
         "neighbourhood_commute": neighbourhood_commute,
-        # for student accommodation: how many residences with a published price are behind the district's figure
-        "rent_listings": {"shared_room": shared_listings, "private_room": private_listings,
-                          "student_accommodation": student_counts,
+        # how many listings (rooms, homes) or residences (student accommodation) are behind each area's figure
+        "rent_listings": {**rent_listings, "student_accommodation": student_counts,
                           **{key: counts for key, (_, _, counts) in student_by_type.items()}},
-        # room rent of the parts with enough listings of their own: (Area, Part) -> mean, count
-        "part_rent": {"shared_room": _part_room_rent(room_data[is_shared]),
-                      "private_room": _part_room_rent(room_data[is_private])},
         "universities": sorted(set(commute_by_university["University"]) | set(commute_points["University"])),
         "safety": safety,
         "rent_sources": rent_sources,
         "safety_maps": load_safety_maps(),
         "residences": residences,
         "rent_tables": {
-            "shared_room": ("Shared Room", shared_room_rent),
-            "private_room": ("Private Room", private_room_rent),
-            "one_bed": ("One Bedroom Apartment", one_bed_rent),
-            "two_bed": ("Two Bedroom Apartment", two_bed_rent),
+            "shared_room": ("Shared Room", room_rent["shared_room"]),
+            "private_room": ("Private Room", room_rent["private_room"]),
+            "one_bed": ("One Bedroom Apartment", room_rent["one_bed"]),
+            "two_bed": ("Two Bedroom Apartment", room_rent["two_bed"]),
             # purpose-built student residences: typical starting price in each district that has them
             "student_accommodation": ("Student Accommodation", student_rent),
             **{key: (label, rent) for key, (label, rent, _) in student_by_type.items()},
         },
     }
-
-
-def _room_rent(rooms):
-    """Average room rent per district and its number of listings; districts with too few listings get no rent."""
-    stats = rooms.groupby("Area")["Rent"].agg(["mean", "count"])
-    reliable = stats[stats["count"] >= MIN_ROOM_LISTINGS]
-    return reliable["mean"], reliable["count"].astype(int)
-
-
-def _part_room_rent(rooms):
-    """Average room rent and number of listings for each part of a district with enough listings of its own."""
-    stats = rooms.dropna(subset=["Part"]).groupby(["Area", "Part"])["Rent"].agg(["mean", "count"])
-    return stats[stats["count"] >= MIN_ROOM_LISTINGS]
-
-
-def _place_key(name):
-    """'Grand Canal Dock (part)' and 'St Stephen\u2019s Green' compared like 'grand canal dock', 'st stephens green'."""
-    key = re.sub(r"\(part\)", "", str(name).lower()).replace("&", " and ")
-    key = re.sub(r"\s+", " ", re.sub(r"['\u2019.]", "", key)).strip()
-    return RENT_NAME_ALIASES.get(key, key)
-
-
-def _listing_parts(rooms, parts):
-    """The part of its district each listing is in, from the listing's Neighbourhood: the part with the same name,
-    or the only part whose name starts with it ('Blanchardstown' -> 'Blanchardstown Village'). None otherwise -
-    the listing then only counts towards its district's average."""
-    names = {area: {_place_key(part): part for part in group["Part"]} for area, group in parts.groupby("Area")}
-
-    def part_of(area, neighbourhood):
-        if pd.isna(neighbourhood):
-            return None
-        keys, key = names.get(area, {}), _place_key(neighbourhood)
-        if key in keys:
-            return keys[key]
-        starts = [part for name, part in keys.items() if name.startswith(key + " ")]
-        return starts[0] if len(starts) == 1 else None
-
-    neighbourhoods = rooms["Neighbourhood"] if "Neighbourhood" in rooms else pd.Series(None, index=rooms.index)
-    return [part_of(area, name) for area, name in zip(rooms["Area"], neighbourhoods)]
 
 
 def _km(lat, lon, lats, lons):
@@ -1075,21 +1003,13 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
     needed_columns = list(dict.fromkeys(needed_columns + ["Rent"]))
     candidates = parts.merge(area_data, on="Area")  # one row per part, with its district's figures
     candidates = candidates[candidates[needed_columns].notna().all(axis=1)].copy()
-    # A part with enough room listings of its own uses its own rent instead of its district's average
+    # Rooms and apartments: every part uses its district's figure, the one on the district profile
     candidates["Rent Is For"] = "district"
-    own = data["part_rent"].get(accommodation)
-    if own is not None and not own.empty:
-        key = pd.MultiIndex.from_frame(candidates[["Area", "Part"]])
-        own_rent = own["mean"].reindex(key).to_numpy(dtype=float)
-        found = ~np.isnan(own_rent)
-        candidates.loc[found, "Rent"] = own_rent[found]
-        candidates.loc[found, "Rent Listings"] = own["count"].reindex(key).to_numpy(dtype=float)[found]
-        candidates.loc[found, "Rent Is For"] = "neighbourhood"
     if accommodation.startswith("student"):
         # Student residences are scored where they are: each neighbourhood gets the cheapest starting price of
         # its own residences (for the chosen room type), and neighbourhoods without one are left out. So
         # residences right next to a campus are matched with that neighbourhood's short commute.
-        prices = student_part_prices(data.get("residences", {}), student_room_kind(accommodation))
+        prices = student_part_prices(data.get("residences", {}), student_room_kind(accommodation), university)
         keys = list(zip(candidates["Area"], candidates["Part"]))
         candidates["Rent"] = [prices.get(k, (np.nan, 0))[0] for k in keys]
         candidates["Rent Listings"] = [prices.get(k, (np.nan, np.nan))[1] for k in keys]
@@ -1105,6 +1025,12 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
         # Keep only the parts of each district within the student's limit
         candidates = candidates[candidates["Within Limit"]]
         if candidates.empty:
+            if accommodation.startswith("student"):
+                # areas are close enough, but none of their student residences (of this room type) is
+                raise RecommendationError(
+                    f"No student residence{' with this room type' if accommodation != 'student_accommodation' else ''} "
+                    f"is within {max_commute} minutes of {university} {mode_words}. "
+                    "Try a longer commute, another room type, or a shared or private room instead.")
             raise RecommendationError(
                 f"No area is within {max_commute} minutes of {university} {mode_words}. "
                 "Try a longer commute or another way to travel.")
@@ -1231,7 +1157,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             lines.append(sentence + ".")
 
         diff = row["Budget Difference"]
-        rent = f"The average rent is {_euros(row['Rent'])} a month"
+        rent = f"The typical rent is {_euros(row['Rent'])} a month"
         if abs(diff) < 5:
             lines.append(f"{rent}, about the same as your budget.")
         elif diff < 0:
@@ -1402,6 +1328,8 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
         whether they're in the matched neighbourhood (those first, then nearest to campus)."""
         items = []
         for x in data.get("residences", {}).get(row["Area"], []):
+            if not open_to(x, university):
+                continue  # another university's own residence
             item = {k: v for k, v in x.items()}
             if x.get("lat") is not None and x.get("lon") is not None:
                 km = float(_km(uni["lat"], uni["lon"], [x["lat"]], [x["lon"]])[0])
@@ -1438,11 +1366,11 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
             "area": row["Area"],
             "lea": _none_if_nan(row.get("LEA")),
             "rent": round(float(row["Rent"]), 2),
-            # number of room listings behind the rent (None for apartments, which use RTB averages)
+            # number of listings (or student residences) behind the rent; None for RTB / Daft report averages
             "rent_listings": None if pd.isna(row["Rent Listings"]) else int(row["Rent Listings"]),
-            # "neighbourhood": the place's own listings; "district": the district's average
+            # "district": the district profile's figure; "neighbourhood": student residences in that neighbourhood
             "rent_is_for": row["Rent Is For"],
-            # set for County Dublin areas, whose rent comes from the Daft.ie report or RTB (not listings)
+            # where the district profile's figure comes from, e.g. "median of 13 Daft listings", "RTB 2025 average"
             "rent_source": data.get("rent_sources", {}).get(row["Area"], {}).get(accommodation),
             "budget_status": row["Budget Status"],
             "budget_difference": round(float(row["Budget Difference"]), 2),
