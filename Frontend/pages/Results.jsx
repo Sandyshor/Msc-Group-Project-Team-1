@@ -533,17 +533,10 @@ function RentNote({ result, student }) {
     const where = result.neighbourhood?.name || result.area
     return <span className="rent-note">Cheapest starting price at {n} student residence{n === 1 ? '' : 's'} around {where}</span>
   }
-  const ownRent = result.rent_is_for === 'neighbourhood' && result.neighbourhood
-  // County Dublin areas: the rent is a Daft.ie report average (rooms) or an RTB average (homes)
-  if (result.rent_source) return <span className="rent-note">For all of {result.area} · {result.rent_source}</span>
-  // A place with enough room listings of its own shows their average; otherwise its district's
+  // Rooms and apartments: the district profile's figure for the whole district, and where it comes from
   return (
     <span className="rent-note">
-      {ownRent
-        ? `From ${result.rent_listings} listings in ${result.neighbourhood.name}`
-        : `For all of ${result.area}${result.rent_listings != null
-          ? ` · from ${result.rent_listings} listings`
-          : ' · registered rents (RTB)'}`}
+      For all of {result.area}{result.rent_source ? ` · ${result.rent_source}` : ''}
     </span>
   )
 }

@@ -39,6 +39,7 @@ export const KINDS = {
   station: [4, 'Station'],
   amenity: [5, 'Place'],
   address: [6, 'Address'],
+  eircode: [0, 'Eircode'],
 }
 
 export const norm = (text) => (text || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -55,7 +56,7 @@ export function addDistrictPlaces(data) {
     const at = data.labels?.[code]
     if (at) {
       const num = code.match(/^D(\d+)/)?.[1]
-      list.push({ kind: 'district', code, label: `${code} · ${p.name}`, sub: 'District profile', lat: at[0], lng: at[1], keys: `${code} ${num ? `dublin ${num} d ${num}` : ''} ${p.name}` })
+      list.push({ kind: 'district', code, label: `${code} · ${p.name}`, sub: 'District profile', lat: at[0], lng: at[1], keys: `${code} ${num ? `dublin ${num} d ${num} d${num.padStart(2, '0')}` : ''} ${p.name}` })
     }
     ;(p.areas || []).forEach(([name, lat, lng]) => list.push({ kind: 'area', label: name, sub: `Neighbourhood in ${code}`, lat, lng, district: code }))
   })
@@ -119,6 +120,8 @@ export function searchPlaces(list, query, limit = 8) {
     if (p.n === q) score -= 40
     else if (p.n.startsWith(q)) score -= 25
     else if (p.words[0].startsWith(terms[0])) score -= 12
+    // every typed word is a whole word of the place: "D1" and "Dublin 1" put D1 above D10, D11 and D13
+    if (terms.every((t) => p.words.includes(t))) score -= 15
     score += Math.min(p.label.length, 60) / 20 // shorter names first
     hits.push([score, p])
   }
@@ -169,4 +172,84 @@ export async function searchAddresses(query) {
   } catch {
     return []
   }
+}
+
+// ---------------- Eircodes: "D07 ED7R", "d07ed7r", "K78 X2Y3"…
+// A routing key (A, C-F, H, K, N, P, R, T, V-Y and two digits, or D6W) and a four-character identifier
+const EIRCODE = /^\s*([AC-FHKNPRTV-Y]\d{2}|D6W)\s*([0-9AC-FHKNPRTV-Y]{4})\s*$/i
+
+// The Eircode written the standard way ("D07 ED7R"), or null if the text isn't one
+export function parseEircode(text) {
+  const m = (text || '').match(EIRCODE)
+  return m ? `${m[1]} ${m[2]}`.toUpperCase() : null
+}
+
+const eircodeCache = new Map()
+const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
+
+// The place an Eircode belongs to: our server's exact lookup first (every Eircode), then OpenStreetMap (many
+// of them), and failing both, the area its routing key names (D07 → D7, K78 → Lucan), so that area opens.
+export async function searchEircode(text) {
+  const code = parseEircode(text)
+  if (!code) return []
+  if (eircodeCache.has(code)) return eircodeCache.get(code)
+  const flat = code.replace(' ', '')
+  let out = []
+  // 1. our server: every Eircode, from the Eircode address data (Google Geocoding)
+  try {
+    const r = await fetch(`${API_URL}/eircode/${encodeURIComponent(flat)}`, { headers: { Accept: 'application/json' } })
+    if (r.ok) {
+      const p = await r.json()
+      const title = p.name || p.street
+      out = [{
+        kind: 'eircode', label: title || `Eircode ${code}`,
+        sub: [title ? `Eircode ${code}` : null, p.name && p.street ? p.street : null, p.area].filter(Boolean).join(' · ') || 'Dublin',
+        lat: p.lat, lng: p.lng,
+      }]
+    }
+  } catch { /* server unreachable: try OpenStreetMap */ }
+  // 2. OpenStreetMap, which has many Eircodes (used when the server's lookup isn't set up or doesn't answer)
+  if (!out.length) await nominatimTurn()
+  if (!out.length) try {
+    const params = new URLSearchParams({ q: code, format: 'jsonv2', limit: '5', countrycodes: 'ie', addressdetails: '1', namedetails: '1', 'accept-language': 'en' })
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, { headers: { Accept: 'application/json' } })
+    const rows = r.ok ? await r.json() : []
+    const row = rows.find((x) => (x.address?.postcode || '').replace(/\s+/g, '').toUpperCase() === flat)
+    if (row) {
+      const a = row.address || {}
+      const isCode = (t) => (t || '').replace(/\s+/g, '').toUpperCase() === flat
+      const district = (a.postcode || code).match(/^D0?(\d{1,2})\b/i)?.[1]
+      const named = [row.name, row.namedetails?.name, a.building, a.amenity, a.tourism, a.shop, a.office, a.leisure, a.house_name]
+        .find((t) => t && !isCode(t) && !/\b(ED|ward)\b/i.test(t))
+      const street = [a.house_number, a.road].filter(Boolean).join(' ')
+      // electoral divisions and old wards ("Saint Kevin's ED", "Arran Quay B Ward 1986") aren't places people know
+      const admin = (t) => /\b(ED|ward)\b|\bward \d{4}/i.test(t || '')
+      const area = [a.suburb, a.neighbourhood, a.quarter, a.city_district, a.town, a.village].find((t) => t && !admin(t))
+        || (district ? `Dublin ${district}` : a.city)
+      // the building's name is often only in the display name, right after the Eircode itself
+      const fromName = row.display_name.split(',').map((t) => t.trim()).slice(0, 2)
+        .find((t) => t && !isCode(t) && !admin(t) && !/^\d+$/.test(t) && t !== a.road && t !== area && !/^(dublin|county|leinster|ireland|éire)/i.test(t))
+      const title = named || fromName
+      out = [{
+        kind: 'eircode', label: title || street || `Eircode ${code}`,
+        sub: [title || street ? `Eircode ${code}` : null, title && street ? street : null, area].filter(Boolean).join(' · ') || 'Dublin',
+        lat: Number(row.lat), lng: Number(row.lon),
+      }]
+    }
+  } catch { /* no network: fall back to the area below */ }
+  // 3. the Eircode's routing key still says which Dublin area it is in
+  if (!out.length) {
+    const key = code.slice(0, 3)
+    const district = key.startsWith('D') && key !== 'D6W' ? `D${Number(key.slice(1))}` : key
+    const hit = extra.find((p) => p.kind === 'district' && p.code === district)
+    if (hit) {
+      out = [{
+        kind: 'eircode', approx: true, code: district, label: code,
+        sub: `Exact address isn’t on the open map · shows ${hit.label.split(' · ')[1] || district} (${district})`,
+        lat: hit.lat, lng: hit.lng,
+      }]
+    }
+  }
+  eircodeCache.set(code, out)
+  return out
 }

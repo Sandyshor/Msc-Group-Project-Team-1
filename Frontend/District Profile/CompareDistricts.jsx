@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AMENITY_TYPES, COUNTY_AREAS, DUBLIN_DISTRICTS, heatColor, safetyLabel, strongColor, textOnHeat } from './mapShared';
+import { rentFor as sharedRentFor } from './rents';
 import './Compare.css';
 
 const eur = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
@@ -18,23 +19,14 @@ const PRIORITIES = [
   ['students', 'Student life', 'share of students, people aged 20–29 and people born outside Ireland'],
 ];
 
-// Rent for one size: the district's own listings first, then the RTB average, then the Daft.ie report
+// Rent for one size: the same figure as the district's Rent tab, the results page and the assistant (rents.js).
+// 'all' is the RTB average across all homes.
 function rentFor(data, code, kind) {
-  const r = data.rent?.[code] || {};
-  const rtb = data.rtb?.[code]?.district || {};
-  const report = data.roomReport?.areas?.[code] || {};
-  const pick = (listing, rtbValue, reportValue) => {
-    if (listing?.median) return { value: listing.median, note: `${listing.n} listing${listing.n > 1 ? 's' : ''}` };
-    if (rtbValue) return { value: rtbValue, note: 'RTB average' };
-    if (reportValue) return { value: reportValue, note: 'Daft.ie report' };
-    return null;
-  };
-  if (kind === 'single') return pick(r.rooms?.single, null, report.single);
-  if (kind === 'double') return pick(r.rooms?.double, null, report.double);
-  if (kind === '1 bed') return pick(r.homes?.['1 bed'], rtb['1 bed'], report.oneBed);
-  if (kind === '2 bed') return pick(r.homes?.['2 bed'], rtb['2 bed'], report.twoBed);
-  if (kind === 'all') return rtb.all ? { value: rtb.all, note: 'RTB 2025, all homes' } : null;
-  return null;
+  if (kind === 'all') {
+    const all = data.rtb?.[code]?.district?.all;
+    return all ? { value: all, note: 'RTB 2025, all homes' } : null;
+  }
+  return sharedRentFor(data, code, kind);
 }
 
 // Every row of the table. better: 'low' or 'high' wins the tick; null = just information.
@@ -48,6 +40,7 @@ function buildRows(data, counts, uni) {
   return [
     { group: 'Rent per month', key: 'single', label: 'Single room', better: 'low', get: rent('single'), priority: 'budget' },
     { group: 'Rent per month', key: 'double', label: 'Double room', better: 'low', get: rent('double'), priority: 'budget' },
+    { group: 'Rent per month', key: 'sharing', label: 'Double sharing (per person)', better: 'low', get: rent('sharing'), priority: 'budget' },
     { group: 'Rent per month', key: '1bed', label: '1-bed apartment', better: 'low', get: rent('1 bed'), priority: 'budget' },
     { group: 'Rent per month', key: '2bed', label: '2-bed apartment', better: 'low', get: rent('2 bed'), priority: 'budget' },
     { group: 'Rent per month', key: 'rtb', label: 'Official average (RTB)', better: 'low', get: rent('all'), priority: 'budget' },

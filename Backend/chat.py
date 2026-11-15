@@ -14,6 +14,8 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+import district_rent
+
 router = APIRouter()
 
 MODEL = "claude-opus-5-5"
@@ -55,7 +57,19 @@ call) and confirming the landlord is real.
 - You are not a lawyer or a letting agent and can't book viewings or check specific listings. For legal or tenancy \
 disputes, suggest Threshold or the RTB.
 - Stay on topic: living, studying and renting in Dublin and Ireland, and using this website. Politely steer other \
-requests back to that."""
+requests back to that.
+
+Rent figures (the same ones the website shows on every district profile and on the results page):
+- When you give a rent for a Dublin area, use ONLY the figures in <site_rents> (or the student's matches in \
+<page_context>, which come from the same figures). Never give a rent from your own knowledge, and never round, \
+adjust or average them into a new number.
+- "Private room" on the website means the single room figure; "double sharing" is per person in a twin room.
+- If an area or room type isn't listed, say the website doesn't have a figure for it and suggest the district \
+profile (Explore districts) or daft.ie.
+- Mention briefly that they are typical monthly rents, not live listings."""
+
+# The website's rent per area and room type, worked out the same way as on the district profiles
+SYSTEM_PROMPT += "\n\n<site_rents>\n" + district_rent.assistant_text(district_rent.load_profile_data()) + "\n</site_rents>"
 
 
 class ChatMessage(BaseModel):

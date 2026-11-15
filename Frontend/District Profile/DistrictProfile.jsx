@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import JourneyPlannerPanel from './JourneyPlannerPanel';
 import { CHAINS, chainInfo } from './shopChains';
 import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, SAFETY_BANDS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './mapShared';
+import { HOME_KINDS, RENT_KINDS, ROOM_KINDS, rentFor } from './rents';
 import './ProfileCard.css';
 
 export const TABS = [['places', 'Places'], ['journey', 'Journey'], ['rent', 'Rent'], ['amen', 'Amenities'], ['safety', 'Safety'], ['area', 'Area']];
@@ -171,67 +172,43 @@ function ResidencesSection({ code }) {
 }
 
 function RentSection({ code, data, rentMode, setRentMode }) {
-  const r = data.rent[code] || { rooms: {}, homes: {} };
   const rtb = data.rtb[code];
-  const listing = rentMode === 'rooms' ? r.rooms : r.homes;
-  const keys = rentMode === 'rooms' ? ['single', 'double'] : ['studio', '1 bed', '2 bed', '3 bed', '4+ bed'];
-  const have = keys.filter((k) => listing?.[k]);
-  // No listings of this kind here: fall back to report averages instead of an empty box.
-  // Rooms: the Daft.ie report's averages for the area's part of Dublin.
-  // Whole homes: RTB 2025 averages when RTB has both the 1- and 2-bed figure, else the Daft.ie report's.
-  const report = data.roomReport?.areas?.[code];
-  const rtbHomes = rtb?.district?.['1 bed'] && rtb?.district?.['2 bed'] ? rtb.district : null;
-  let fallback = null;
-  if (!have.length && rentMode === 'rooms' && report) {
-    fallback = {
-      eyebrow: 'DAFT REPORT 2026 Q1',
-      tiles: [['Single sharing', report.single, 'single room'], ['Double room', report.double, 'one person'], ['Double sharing · est.', report.sharing, 'per person · twin room']],
-    };
-  } else if (!have.length && rentMode === 'homes' && (rtbHomes || report?.oneBed)) {
-    fallback = rtbHomes
-      ? { eyebrow: 'RTB 2025', tiles: [['1 bed', rtbHomes['1 bed'], 'average'], ['2 bed', rtbHomes['2 bed'], 'average'], ...(rtbHomes['3 bed'] ? [['3 bed', rtbHomes['3 bed'], 'average']] : [])] }
-      : { eyebrow: 'DAFT REPORT 2026 Q1', tiles: [['1 bed apartment', report.oneBed, 'average'], ['2 bed apartment', report.twoBed, 'average']] };
-  }
+  // One figure per size, the same one the results page and the assistant use (rents.js)
+  const kinds = rentMode === 'rooms' ? ROOM_KINDS : HOME_KINDS;
+  const tiles = RENT_KINDS.filter(([k]) => kinds.includes(k))
+    .map(([k, label, what]) => ({ k, label, what, rent: rentFor(data, code, k) }))
+    .filter((t) => t.rent);
+  const sources = new Set(tiles.map((t) => t.rent.source));
+  const eyebrow = sources.size === 1
+    ? { listings: 'DAFT LISTINGS', rtb: 'RTB 2025', report: 'DAFT REPORT 2026 Q1' }[[...sources][0]]
+    : 'PER MONTH';
   const areas = Object.entries(rtb?.areas || {}).filter(([, v]) => v.all).sort((a, b) => a[1].all - b[1].all);
-  const hasRtb = rtb?.district && Object.keys(rtb.district).length > 0;
   return (
     <>
       <section className="profile-section">
-        <SectionTitle eyebrow={fallback ? fallback.eyebrow : 'DAFT LISTINGS'} title="Monthly rent" icon="village" />
+        <SectionTitle eyebrow={eyebrow} title="Monthly rent" icon="village" />
         <div className="seg-toggle" role="group" aria-label="Rent type">
           <button type="button" aria-pressed={rentMode === 'rooms'} onClick={() => setRentMode('rooms')}>Rooms</button>
           <button type="button" aria-pressed={rentMode === 'homes'} onClick={() => setRentMode('homes')}>Whole homes</button>
         </div>
-        {have.length > 0 && (
+        {tiles.length > 0 ? (
           <div className="rent-grid">
-            {have.map((k) => {
-              const x = listing[k];
-              return (
-                <div className="rent-tile" key={k}>
-                  <span>{k[0].toUpperCase() + k.slice(1)} · median</span>
-                  <strong>{eur(x.median)}</strong>
-                  <small>{x.n} listing{x.n > 1 ? 's' : ''} · {eur(x.min)}–{eur(x.max)}</small>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        {fallback && (
-          <div className="rent-grid">
-            {fallback.tiles.map(([label, value, note]) => (
-              <div className="rent-tile" key={label}><span>{label}</span><strong>{eur(value)}</strong><small>{note} · per month</small></div>
+            {tiles.map(({ k, label, what, rent }) => (
+              <div className="rent-tile" key={k}>
+                <span>{label}{what ? ` · ${what}` : ''}</span>
+                <strong>{eur(rent.value)}</strong>
+                <small>{rent.note}{rent.listing ? ` · ${eur(rent.listing.min)}–${eur(rent.listing.max)}` : ''}</small>
+              </div>
             ))}
           </div>
-        )}
+        ) : <p className="section-description">No rent figures for this area yet.</p>}
       </section>
-      {hasRtb && (
+      {rtb?.district?.all && (
         <section className="profile-section">
           <SectionTitle eyebrow="RTB 2025" title="Official average rent" icon="landmark" />
           <div className="rent-grid">
-            {/* sizes already shown above (whole homes from RTB) aren't repeated */}
-            {[['all', 'All homes'], ['1 bed', '1 bed'], ['2 bed', '2 bed'], ['3 bed', '3 bed']].filter(([k]) => rtb.district[k] && !(fallback?.eyebrow === 'RTB 2025' && k !== 'all')).map(([k, l]) => (
-              <div className="rent-tile" key={k}><span>{l}</span><strong>{eur(rtb.district[k])}</strong><small>per month</small></div>
-            ))}
+            {/* each size's figure is shown once, above; this is the RTB average across all homes */}
+            <div className="rent-tile"><span>All homes</span><strong>{eur(rtb.district.all)}</strong><small>per month</small></div>
           </div>
           {areas.length > 0 && (
             <div className="rtb-areas">
@@ -496,12 +473,11 @@ export default function DistrictProfile({
   const sc = data.safety?.[selectedId]?.score;
   const accent = strongColor(profile.hue);
   // At-a-glance figures for the banner
-  const rooms = data.rent?.[selectedId]?.rooms || {};
-  const roomMedians = [rooms.single?.median, rooms.double?.median].filter(Boolean);
-  const rtbAll = data.rtb?.[selectedId]?.district?.all;
-  const reportRoom = data.roomReport?.areas?.[selectedId]?.single;
-  const rentStat = roomMedians.length ? [eur(Math.min(...roomMedians)), 'room, per month']
-    : reportRoom ? [eur(reportRoom), 'room, per month'] : rtbAll ? [eur(rtbAll), 'home, per month'] : ['—', 'not collected yet'];
+  // the private room figure from the Rent tab (the one a 'Private room' search uses), else a 1-bed's
+  const roomRent = rentFor(data, selectedId, 'single');
+  const homeRent = !roomRent && rentFor(data, selectedId, '1 bed');
+  const rentStat = roomRent ? [eur(roomRent.value), 'single room, per month']
+    : homeRent ? [eur(homeRent.value), '1 bed, per month'] : ['—', 'not collected yet'];
   // Switching tab while scrolled down: bring the new tab's start up to just under the tab bar, instead of
   // leaving it half-way down (the card scrolls on laptops, the page on phones)
   const tabsRef = useRef(null);
