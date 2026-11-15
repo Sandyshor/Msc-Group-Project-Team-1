@@ -439,7 +439,7 @@ export default function ChatWidget() {
             <span className="chatw-avatar" aria-hidden="true"><Icon d={ICONS.spark} size={18} /></span>
             <div className="chatw-title">
               <strong>Crib Crew Assistant</strong>
-              <span><i aria-hidden="true" />AI assistant · can make mistakes</span>
+              <span><i aria-hidden="true" />AI · can make mistakes</span>
             </div>
             {uid && (
               <button type="button" className={`chatw-icon-btn${view === 'history' ? ' is-on' : ''}`}
