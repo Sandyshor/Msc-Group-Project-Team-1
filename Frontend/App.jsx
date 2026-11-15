@@ -16,7 +16,7 @@ import FloatingMatch from './FloatingMatch'
 import SiteFooter from './SiteFooter'
 import ChatWidget from './ChatWidget'
 import BrandLogo from './BrandLogo'
-import InfoPage from './pages/InfoPages'
+import InfoPage, { NotFound } from './pages/InfoPages'
 import ThingsToKnow from './pages/ThingsToKnow'
 import MySearches from './pages/MySearches'
 import { watchUser, logOut } from './firebase'
@@ -67,8 +67,20 @@ function useHeaderFit(headerRef, deps) {
   return level
 }
 
+// The browser tab's title for each page (the home page keeps the site's full title from index.html)
+const PAGE_TITLES = {
+  '/districts': 'Explore districts', '/campuses': 'Universities', '/attractions': 'Famous attractions',
+  '/results': 'Your matches', '/how-it-works': 'How it works', '/questionnaire': 'Find my match',
+  '/login': 'Log in', '/signup': 'Sign up', '/things-to-know': 'Things to know', '/terms': 'Terms of use',
+  '/privacy': 'Privacy policy', '/contact': 'Contact',
+}
+
 function App() {
   const location = useLocation()
+  useEffect(() => {
+    const page = location.pathname === '/' ? null : (PAGE_TITLES[location.pathname] || 'Page not found')
+    document.title = page ? `${page} · Find My Dublin` : 'Find My Dublin · Student housing guide'
+  }, [location.pathname])
   const [tourOpen, setTourOpen] = useState(false)
   // The tour opens by itself every time someone opens (or reloads) the website on the home page.
   // Pages opened from a link (a district, the results...) are left alone so the tour doesn't pull people away.
@@ -216,10 +228,7 @@ function App() {
           <Route path="/terms" element={<InfoPage page="terms" />} />
           <Route path="/privacy" element={<InfoPage page="privacy" />} />
           <Route path="/contact" element={<InfoPage page="contact" />} />
-          <Route
-            path="*"
-            element={<h1>Page not found</h1>}
-          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

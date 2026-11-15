@@ -83,9 +83,11 @@ def test_every_recommendation_has_places_to_live(data):
     out = recommender.recommend(data, UNIVERSITY, 900, "private_room", RATINGS)
     for r in out["recommendations"]:
         places = r["places_to_live"]
-        # every residence of the district, each with its distance to campus; the matched neighbourhood's come first
+        # every residence of the district that takes this university's students, each with its distance to
+        # campus; the matched neighbourhood's come first
         names = [x["name"] for x in places["residences"]]
-        assert sorted(names) == sorted(x["name"] for x in data["residences"].get(r["area"], []))
+        assert sorted(names) == sorted(x["name"] for x in data["residences"].get(r["area"], [])
+                                       if recommender.open_to(x, UNIVERSITY))
         for x in places["residences"]:
             if x.get("lat") is not None:
                 assert x["km_to_university"] >= 0 and x["walk_minutes"] >= 0

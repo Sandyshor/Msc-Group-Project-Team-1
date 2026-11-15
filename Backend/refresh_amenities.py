@@ -8,8 +8,9 @@ which is much faster and kinder to the free Overpass servers than one request pe
 Run from the repo root:  python Backend/refresh_amenities.py
 Writes Data/amenities_osm.csv (one row per place) and Data/amenity_counts_osm.csv.
 
-Add --county to download only the County Dublin areas (A and K Eircodes, from the District Profile's
-county-dublin-areas.geojson) and add them to Data/amenities_osm.csv, leaving the D1-D24 places as they are.
+A normal run downloads the districts, then the County Dublin areas (A and K Eircodes, from the District
+Profile's county-dublin-areas.geojson). Add --county to download only the county areas and add them to
+Data/amenities_osm.csv, leaving the D1-D24 places as they are.
 """
 import sys
 import json
@@ -177,6 +178,10 @@ def main():
     for area, total in unique_places.groupby("Area").size().items():
         print(f"{area}: {total} places")
     print(f"Saved {len(unique_places)} places for {unique_places['Area'].nunique()} districts")
+
+    # The file above only has D1-D24, so add County Dublin again; otherwise every weekly refresh would leave the
+    # county areas with no shops or restaurants at all, and the recommender would rank them unfairly low
+    add_county()
 
 
 if __name__ == "__main__":

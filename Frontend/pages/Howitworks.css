@@ -5,6 +5,8 @@
 /* kickers and headings */
 .how-page .how-section-kicker,
 .how-page .how-ready .how-section-kicker { margin: 0 0 10px; color: #a8753f; font-size: 12.5px; font-weight: 800; letter-spacing: .12em; }
+.how-page .how-section-heading h1 { max-width: none; margin: 0; } /* the page title, styled like the section headings */
+.how-page .how-section-heading h1,
 .how-page .how-section-heading h2,
 .how-page .how-ready h2,
 .how-page .how-cta h2 { color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: clamp(30px, 3.4vw, 44px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; font-variation-settings: 'opsz' 72; }

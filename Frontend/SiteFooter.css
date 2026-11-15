@@ -69,6 +69,8 @@
 }
 .info-page p { margin: 0; color: #2f3a33; font-size: 19px; line-height: 1.75; }
 .info-page .info-intro { margin-bottom: 8px; }
+.info-page section p + p { margin-top: 10px; }
+.info-page section a { color: #0f3d2a; font-weight: 700; text-underline-offset: 4px; }
 .info-back { display: inline-block; margin-top: 48px; color: #0f3d2a; font-weight: 700; text-decoration: none; }
 .info-back:hover { text-decoration: underline; text-underline-offset: 4px; }
 @media (max-width: 640px) { .info-page { padding: 40px 20px 64px; } .info-page p { font-size: 17px; } }

@@ -4,7 +4,6 @@
 // wrap-up. The page shows each district on the map and its full profile on the right.
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { districtProfiles } from './districtProfiles';
 import './DistrictTour.css';
 
 const INTRO_MS = 8000;
@@ -42,8 +41,7 @@ function whereItIs(code) {
 // one simple sentence to picture the district (the profile card on the right has all the numbers)
 function outline(code, data) {
   const p = data.profiles[code];
-  const team = districtProfiles?.[code]?.name;
-  const name = team && !/^Dublin\s/i.test(team) ? team : p.name;
+  const name = p.name; // the same name as in the search, on the map and on the profile
   const areas = parse(p.areas).map((a) => a[0]).slice(0, 2);
   const north = p.side === 'Northside';
   return {

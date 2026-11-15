@@ -374,7 +374,7 @@ const attractions = [
     icon: 'fountain',
     image: '/images/attraction-iveagh-gardens.jpg',
     imageCredit: { author: 'Oliver Gargan', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', url: 'https://commons.wikimedia.org/wiki/File:Iveagh_Gardens,_Dublin_City_Park.jpg' },
-    url: 'https://www.gov.ie/en/office-of-public-works/services/iveagh-gardens/',
+    url: 'https://www.iveaghgardens.ie/',
   },
   {
     id: 'blessington-basin',
