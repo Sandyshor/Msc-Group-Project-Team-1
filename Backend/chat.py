@@ -18,7 +18,8 @@ import district_rent
 
 router = APIRouter()
 
-MODEL = "claude-opus-5-5"
+# Haiku is fast and cheap enough for a public chat box; set CHAT_MODEL (e.g. claude-sonnet-5-5) to use another model
+MODEL = os.environ.get("CHAT_MODEL", "claude-haiku-5-5")
 MAX_TURNS = 20             # only the most recent messages are sent to the model
 MAX_CHARS = 2000           # per message
 MAX_CONTEXT_CHARS = 4000   # page context
