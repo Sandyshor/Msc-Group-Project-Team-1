@@ -503,14 +503,15 @@
 .chatw-panel.is-listening .chatw-form { border-color: #c8412f; box-shadow: 0 0 0 4px rgba(200, 65, 47, 0.12); }
 .chatw-panel.is-listening .chatw-form textarea::placeholder { color: #c8412f; }
 
-/* the closed button: bobs gently every few seconds so it's noticed, without being in the way */
-.chatw:not(.is-open) .chatw-fab { animation: chatw-in .45s cubic-bezier(.3, 1.4, .5, 1) both, chatw-bob 6s ease-in-out 2s infinite; }
+/* the closed button: bobs gently every few seconds so it's noticed, without being in the way. Not while it's
+   tucked into the screen edge: that has its own peeking animation, which this would otherwise replace */
+.chatw:not(.is-open):not(.is-tucked) .chatw-fab { animation: chatw-in .45s cubic-bezier(.3, 1.4, .5, 1) both, chatw-bob 6s ease-in-out 2s infinite; }
 @keyframes chatw-bob { 0%, 86%, 100% { transform: none; } 90% { transform: translateY(-5px); } 94% { transform: translateY(0); } 97% { transform: translateY(-2px); } }
 
 @media (prefers-reduced-motion: reduce) {
   .chatw-head, .chatw-head::after, .chatw-avatar, .chatw-panel.is-thinking .chatw-avatar svg, .chatw-hello-wave, .chatw-hello h3,
   .chatw-hello > p, .chatw-hello .chatw-note, .chatw-starters button, .chatw-msg.is-user, .chatw-msg.is-bot, .chatw-typing.chatw-msg.is-bot::before,
-  .chatw-msg.is-streaming > :last-child::after, .chatw-send:not(:disabled), .chatw-bars i, .chatw:not(.is-open) .chatw-fab { animation: none; }
+  .chatw-msg.is-streaming > :last-child::after, .chatw-send:not(:disabled), .chatw-bars i, .chatw:not(.is-open):not(.is-tucked) .chatw-fab { animation: none; }
 }
 
 /* header title: always one tidy line each, even with all four buttons showing (logged in) */
