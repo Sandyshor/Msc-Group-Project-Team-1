@@ -39,8 +39,11 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
   const typed = text.trim();
   const local = index && typed && typed !== value ? searchPlaces(index, typed) : [];
   const canLookUp = typed.length >= 3 && typed !== value && addresses === null;
-  const options = [...local, ...(addresses || [])];
-  const total = options.length + (canLookUp ? 1 : 0);
+  // A whole Eircode ("D07 ED7R") is one exact place: its result goes first, above the places in its area
+  const eircode = parseEircode(typed);
+  const options = eircode ? [...(addresses || []), ...local] : [...local, ...(addresses || [])];
+  const moreRow = canLookUp && !eircode; // an Eircode is looked up by itself, without the "search" row
+  const total = options.length + (moreRow ? 1 : 0);
 
   async function lookUp() {
     const asked = typed;
@@ -49,11 +52,10 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
     setLooking(false);
     if (query.current.trim() !== asked) return; // typed something else meanwhile: these results are stale
     setAddresses(found);
-    setActive(local.length);
+    setActive(parseEircode(asked) ? 0 : local.length);
   }
 
   // an Eircode needs no Enter: look it up as soon as it is complete
-  const eircode = parseEircode(typed);
   useEffect(() => {
     if (!open || !eircode || typed === value || addresses !== null || looking) return undefined;
     const t = setTimeout(lookUp, 300);
@@ -70,7 +72,7 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
 
   function choose(i) {
     if (i < options.length) pick(options[i]);
-    else if (canLookUp) lookUp();
+    else if (moreRow) lookUp();
   }
 
   function onKeyDown(e) {
@@ -79,7 +81,7 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
     else if (e.key === 'Enter') {
       e.preventDefault();
       if (active >= 0 && active < total) choose(active);
-      else if (local.length) pick(local[0]);
+      else if (options.length) pick(options[0]);
       else if (canLookUp) lookUp();
     } else if (e.key === 'Escape') { leave(); input.current?.blur(); }
   }
@@ -139,7 +141,9 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
           style={{ left: place.left, width: place.width, maxHeight: place.max, ...(place.up ? { top: 'auto', bottom: place.bottom } : { top: place.top, bottom: 'auto' }) }}>
           {!index && !failed && <li className="ps-note">Loading places…</li>}
           {failed && <li className="ps-note">Couldn&rsquo;t load the place list. Press Enter to search addresses.</li>}
-          {local.length > 8 && <li className="ps-note">{local.length >= 60 ? 'Over 60 places' : `${local.length} places`} · scroll for more</li>}
+          {eircode && addresses === null && <li className="ps-note">⏳ Finding Eircode {eircode}…</li>}
+          {eircode && addresses?.length === 0 && <li className="ps-note">No exact place found for the Eircode {eircode}.</li>}
+          {!eircode && local.length > 8 && <li className="ps-note">{local.length >= 60 ? 'Over 60 places' : `${local.length} places`} · scroll for more</li>}
           {options.map((p, i) => (
             <li
               key={`${i}-${p.kind}-${p.label}-${p.lat}-${p.lng}`}
@@ -156,8 +160,8 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
               <em>{KINDS[p.kind][1]}</em>
             </li>
           ))}
-          {index && !local.length && addresses?.length === 0 && <li className="ps-note">{eircode ? <>No Dublin place found for the Eircode {eircode}.</> : <>No streets or places found for &ldquo;{typed}&rdquo;.</>}</li>}
-          {canLookUp && (
+          {index && !eircode && !local.length && addresses?.length === 0 && <li className="ps-note">No streets or places found for &ldquo;{typed}&rdquo;.</li>}
+          {moreRow && (
             <li
               id={`${id}-o${options.length}`}
               role="option"
@@ -168,7 +172,7 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
               onPointerEnter={() => setActive(options.length)}
             >
               <span className="ps-kind" aria-hidden="true">{looking ? '⏳' : '🔎'}</span>
-              <span className="ps-text"><strong>{eircode ? `Finding Eircode ${eircode}…` : looking ? 'Searching streets and addresses…' : `Search streets and addresses for “${typed}”`}</strong><small>{eircode ? 'Eircode' : local.length ? 'From OpenStreetMap' : 'From OpenStreetMap · press Enter'}</small></span>
+              <span className="ps-text"><strong>{looking ? 'Searching streets and addresses…' : `Search streets and addresses for “${typed}”`}</strong><small>{local.length ? 'From OpenStreetMap' : 'From OpenStreetMap · press Enter'}</small></span>
             </li>
           )}
         </ul>,
