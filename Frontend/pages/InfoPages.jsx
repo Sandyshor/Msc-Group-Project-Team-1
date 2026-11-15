@@ -41,7 +41,7 @@ const PAGES = {
       },
       {
         heading: 'If you create an account',
-        text: 'We keep your name, email address and anything you save, only so you can sign in and pick up where you left off. Passwords are kept securely and never in readable form, and we will never email you asking for yours.',
+        text: 'We keep your name, email address, your recent searches and your latest chat with the assistant, only so you can sign in and pick up where you left off. Passwords are kept securely and never in readable form, and we will never email you asking for yours.',
       },
       {
         heading: 'Your search answers',
@@ -53,7 +53,7 @@ const PAGES = {
       },
       {
         heading: 'Services that help run the site',
-        text: 'Stadia Maps and OpenStreetMap supply the maps and Wikimedia Commons supplies the photos, so they receive your IP address like any website you visit. Switching language sends the page’s text to Microsoft Translator. Messages you type into the AI assistant, along with the page you are on and your current matches, are sent to Anthropic’s Claude to write the reply; we don’t store your chats.',
+        text: 'Stadia Maps and OpenStreetMap supply the maps and Wikimedia Commons supplies the photos, so they receive your IP address like any website you visit. Switching language sends the page’s text to Microsoft Translator. Messages you type into the AI assistant, along with the page you are on and your current matches, are sent to Anthropic’s Claude to write the reply. If you are logged in, your latest chat is also saved to your account so you can carry on later; the new-chat button deletes it. If you aren’t logged in, we don’t store your chats.',
       },
       {
         heading: 'Deleting your data',

@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { signInWithEmailAndPassword } from 'firebase/auth'
-import { requireAuth } from '../firebase'
+import { requireAuth, expectWelcome } from '../firebase'
 import { getAuthErrorMessage } from '../authErrors'
 import { recordLogin } from '../account'
 
@@ -23,6 +23,7 @@ function Login() {
     setLoading(true)
 
     try {
+      expectWelcome('back') // the site says "Welcome back, <name>!" once they're in
       await signInWithEmailAndPassword(requireAuth(), email.trim(), password)
       // Back again: show their recent searches if they have any
       let history = []
@@ -33,6 +34,7 @@ function Login() {
       }
       navigate(history.length ? '/my-searches' : '/')
     } catch (error) {
+      expectWelcome(null)
       setShowSignupPrompt([
         'auth/invalid-credential',
         'auth/wrong-password',

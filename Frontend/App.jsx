@@ -19,7 +19,7 @@ import BrandLogo from './BrandLogo'
 import InfoPage, { NotFound } from './pages/InfoPages'
 import ThingsToKnow from './pages/ThingsToKnow'
 import MySearches from './pages/MySearches'
-import { watchUser, logOut } from './firebase'
+import { watchUser, logOut, firstNameOf, WELCOME_KEY } from './firebase'
 
 // Fits the header to whatever room it has - window size, browser zoom, Windows display scaling, scrollbars,
 // fonts loading late or longer translations. It tries the full header, then two tighter versions, and only
@@ -96,7 +96,18 @@ function App() {
   // Who is logged in (Firebase), so the header can say so and offer Log out
   const [user, setUser] = useState(null)
   useEffect(() => watchUser(setUser), [])
-  const firstName = user ? (user.displayName || user.email || 'you').split(/[\s@]/)[0].slice(0, 14) : ''
+  const firstName = user ? firstNameOf(user) || 'there' : ''
+  // Right after logging in or signing up: "Welcome back, Vignesh!" for a few seconds (Login/Signup set the flag)
+  const [welcome, setWelcome] = useState(null) // 'back' | 'new'
+  useEffect(() => {
+    if (!user) return undefined
+    let kind = null
+    try { kind = sessionStorage.getItem(WELCOME_KEY); sessionStorage.removeItem(WELCOME_KEY) } catch { /* private mode */ }
+    if (kind !== 'back' && kind !== 'new') return undefined
+    setWelcome(kind)
+    const t = setTimeout(() => setWelcome(null), 7000)
+    return () => clearTimeout(t)
+  }, [user?.uid]) // eslint-disable-line react-hooks/exhaustive-deps
   // "Hi, name" opens a small menu: My recent searches, Log out
   const [accountOpen, setAccountOpen] = useState(false)
   const accountRef = useRef(null)
@@ -210,6 +221,19 @@ function App() {
 )}
 
       </header>
+
+      {welcome && user && (
+        <div className="welcome-toast" role="status">
+          <span className="welcome-wave" aria-hidden="true">{welcome === 'new' ? '🎉' : '👋'}</span>
+          <div>
+            <strong>{welcome === 'new' ? 'Welcome to Find My Dublin' : 'Welcome back'}{firstNameOf(user) ? `, ${firstNameOf(user)}` : ''}!</strong>
+            <span>{welcome === 'new'
+              ? 'Your searches and chats with the assistant are now saved to your account.'
+              : 'Your saved searches and your chat with the assistant are right where you left them.'}</span>
+          </div>
+          <button type="button" aria-label="Close" onClick={() => setWelcome(null)}>×</button>
+        </div>
+      )}
 
       <main>
         <Routes>

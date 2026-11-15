@@ -27,3 +27,8 @@ export const loadHistory = () => call('GET', '/history')
 export const saveSearch = (answers, topAreas) => call('POST', '/history', { answers, top_areas: topAreas })
 export const deleteSearch = (id) => call('DELETE', `/history/${id}`)
 export const clearHistory = () => call('DELETE', '/history')
+
+// The logged-in student's conversation with the assistant, so it's there next time (on any device)
+export const loadSavedChat = () => call('GET', '/chat')
+export const saveChat = (messages) => call('PUT', '/chat', { messages })
+export const clearSavedChat = () => call('DELETE', '/chat')
