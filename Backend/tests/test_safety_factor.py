@@ -1,4 +1,4 @@
-"""Safety as a factor the student rates: each place's relative crime score, scored from 30 (0) to 60 (1)."""
+"""Safety as a factor the student rates: each place's relative crime score, scored from 20 (0) to 80 (1)."""
 import pytest
 
 import recommender

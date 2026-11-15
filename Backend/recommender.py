@@ -144,8 +144,12 @@ AMENITY_ENOUGH = {"Supermarkets": 2, "Groceries": 3, "Shopping_Malls": 1, "Resta
                   "Hospitals": 1, "Pharmacies": 2, "Gyms": 1, "Parks": 2}
 COMMUTE_BEST_MIN = 10         # 10 minutes or less scores 1 ...
 COMMUTE_WORST_MIN = 60        # ... falling to 0 at an hour (or at the student's own limit, if lower)
-SAFETY_WORST = 30             # a safety score of 30 or less scores 0 ...
-SAFETY_BEST = 60              # ... rising to 1 at 60 (the "lower recorded crime" band starts at 57)
+# Safety is scored against the benchmark the safety score itself uses (50 = the recorded-crime rate of Ireland's
+# towns and cities), the same distance either side: 20 (four times that rate) scores 0, 80 (a quarter of it)
+# scores 1. The old 30-60 scale was fitted to Dublin's own lowest and highest districts, so the areas around the
+# city-centre campuses scored close to 0 and safety outweighed a 20-minute difference in commute.
+SAFETY_WORST = 20
+SAFETY_BEST = 80
 RENT_COMFORT = 0.75           # rent at 75% of the budget or less scores 1 ...
 RENT_LIMIT = 1.5              # ... falling to 0 at 150% of the budget
 # A commute point this close to a named neighbourhood is the same place, so only the neighbourhood is kept
@@ -161,6 +165,18 @@ LONG_COMMUTE_KEEP = 0.5
 # 1/3 otherwise - the budget is still a limit even when cheap rent isn't a priority).
 OVER_BUDGET_LIMIT = 1.5
 OVER_BUDGET_KEEP = 0.4
+
+
+# How the importance sliders become weights: the slider value to this power, as a share of the total. With 2,
+# a factor rated 10 counts four times one rated 5 (not twice), so the student's top priorities decide the
+# ranking. Slider ratings on their own are too even: moving one from 5 to 10 barely changed the top 3
+# (Docs/RECOMMENDATION_LOGIC.md has the measurements and the references).
+IMPORTANCE_POWER = 2
+# Straight-line km a neighbourhood is further from (or nearer to) the university than the commute point whose
+# time it borrows, turned into minutes at these speeds. Each is the speed that best predicts the 4,765
+# neighbourhood journeys that do have their own OpenTripPlanner time from their nearest commute point's time.
+ESTIMATE_KMH = {"walk": 3.7, "cycle": 12.0, "public_transport": 20.0}
+ESTIMATE_DETOUR = 1.3  # route km per straight-line km
 
 
 RATING_LABELS = {1: "Very important", 2: "Important", 3: "Slightly important", 4: "Not important"}
@@ -875,6 +891,20 @@ def _part_commutes(data, university, mode):
             columns={"Landmark": "Commute Point", distance_column: "Distance_km"}),
         on=["Area", "Commute Point"], how="left")
     parts["Commute Estimated"] = parts["Kind"] == "neighbourhood"
+    # A neighbourhood that borrows its nearest commute point's time is rarely the same distance from the
+    # university as that point (it can be 2 km nearer or further), so the borrowed time is adjusted for the
+    # difference (ESTIMATE_KMH). Neighbourhoods with their own OpenTripPlanner time (below) replace it.
+    where = points.drop_duplicates(["Area", "Landmark"]).set_index(["Area", "Landmark"])
+    if len(where):
+        place = where.iloc[0]
+        key = pd.MultiIndex.from_frame(parts[["Area", "Commute Point"]])
+        point_km = _km(place["Destination_Latitude"], place["Destination_Longitude"],
+                       where["Origin_Latitude"].reindex(key), where["Origin_Longitude"].reindex(key))
+        part_km = _km(place["Destination_Latitude"], place["Destination_Longitude"],
+                      parts["Origin_Latitude"], parts["Origin_Longitude"])
+        further = np.where(parts["Commute Estimated"] & ~np.isnan(point_km), part_km - point_km, 0.0)
+        parts["Minutes"] = (parts["Minutes"] + further / ESTIMATE_KMH[mode] * 60).clip(lower=1)
+        parts["Distance_km"] = np.maximum(parts["Distance_km"] + further * ESTIMATE_DETOUR, part_km)
     own = data["neighbourhood_commute"]
     own = own[(own["University"] == university) & (own["Mode"] == mode)].set_index(["Area", "Part"])
     if not own.empty:
@@ -945,8 +975,9 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
     student_phrases = {key: phrase for key, _, phrase in STUDENT_ROOM_TYPES.values()}
     accommodation_phrase = ("a room in student accommodation" if accommodation == "student_accommodation"
                             else student_phrases.get(accommodation, f"a {accommodation_name.lower()}"))
-    weights = importance
-    active_factors = [name for name, w in weights.items() if w > 0]
+    active_factors = [name for name, value in importance.items() if value > 0]
+    # Weights: each slider value to the power IMPORTANCE_POWER (their shares of the total are what count)
+    weights = {name: (importance[name] / MAX_IMPORTANCE) ** IMPORTANCE_POWER for name in active_factors}
     if not active_factors:
         raise RecommendationError("You rated every factor as 'Not important', so there is nothing to rank on.")
 
@@ -1061,11 +1092,11 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
     candidates["Match Score"] = candidates[[f"{n} Contribution" for n in active_factors]].sum(axis=1)
     if "Commute" in active_factors:
         long_commute = 1 - _scale(candidates["Commute Minutes"], worst=LONG_COMMUTE_TO_MIN, best=LONG_COMMUTE_FROM_MIN)
-        strength = weights["Commute"] / MAX_IMPORTANCE
+        strength = importance["Commute"] / MAX_IMPORTANCE
         candidates["Commute Penalty"] = 1 - (1 - LONG_COMMUTE_KEEP) * long_commute * strength
         candidates["Match Score"] *= candidates["Commute Penalty"]
     over_budget = 1 - _scale(candidates["Rent"], worst=OVER_BUDGET_LIMIT * budget, best=budget)
-    strength = max(weights.get("Rent", 0), MAX_IMPORTANCE / 3) / MAX_IMPORTANCE
+    strength = max(importance.get("Rent", 0), MAX_IMPORTANCE / 3) / MAX_IMPORTANCE
     candidates["Budget Penalty"] = 1 - (1 - OVER_BUDGET_KEEP) * over_budget * strength
     candidates["Match Score"] *= candidates["Budget Penalty"]
     # One result per district, shown as its best place for this search: changing the commute limit or the
