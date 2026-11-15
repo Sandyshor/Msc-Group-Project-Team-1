@@ -25,13 +25,34 @@ export function requireAuth() {
   return auth
 }
 
+// A plain copy of the user: Firebase reuses one object, so React wouldn't notice a new name
+const snapshot = (u) => (u ? { uid: u.uid, email: u.email, displayName: u.displayName } : null)
+
 // Calls back with the signed-in user (or null) now and whenever it changes; returns a function to stop.
 export function watchUser(callback) {
   if (!auth) {
     callback(null)
     return () => {}
   }
-  return onAuthStateChanged(auth, callback)
+  const stop = onAuthStateChanged(auth, (u) => callback(snapshot(u)))
+  const onProfile = () => callback(snapshot(auth.currentUser))
+  window.addEventListener('fmd-profile-changed', onProfile)
+  return () => {
+    stop()
+    window.removeEventListener('fmd-profile-changed', onProfile)
+  }
+}
+
+// Call after updateProfile (the name typed at sign up): Firebase doesn't announce profile changes
+export function profileChanged() {
+  window.dispatchEvent(new Event('fmd-profile-changed'))
+}
+
+// The logged-in student's ID token for the backend (it proves who they are), or null if nobody is logged in
+export async function idToken() {
+  if (!auth) return null
+  await auth.authStateReady()
+  return auth.currentUser ? auth.currentUser.getIdToken() : null
 }
 
 export function logOut() {

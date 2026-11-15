@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { requireAuth } from '../firebase'
+import { requireAuth, profileChanged } from '../firebase'
+import { recordLogin } from '../account'
 import { getAuthErrorMessage } from '../authErrors'
 
 function Signup() {
@@ -46,6 +47,12 @@ function Signup() {
         return
       }
 
+      profileChanged() // the header greets them by the name they just typed
+      try {
+        await recordLogin(name.trim())
+      } catch {
+        // saved searches unavailable right now: the account still works
+      }
       navigate('/')
     } catch (error) {
       setError(getAuthErrorMessage(error, 'create your account'))

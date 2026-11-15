@@ -1,0 +1,29 @@
+.my-searches { max-width: 1040px; margin: 0 auto; padding: 48px 20px 72px; color: #123d31; }
+.ms-intro { margin-bottom: 28px; }
+.ms-eyebrow { margin: 0 0 8px; color: #a14d30; font-size: 12px; font-weight: 800; letter-spacing: 0.14em; }
+.ms-intro h1 { margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 600; line-height: 1.05; }
+.ms-intro h1 em { color: #a14d30; font-style: normal; }
+.ms-intro > p:last-child { max-width: 560px; margin: 10px 0 0; color: #4f6c57; line-height: 1.55; }
+.ms-note { color: #4f6c57; }
+
+.ms-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.ms-card { display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 1px solid #e6dfcf; border-radius: 18px; background: #fffdf7; box-shadow: 0 6px 20px rgba(18, 61, 49, 0.06); }
+.ms-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ms-card time { color: #7a8579; font-size: 12.5px; font-weight: 700; }
+.ms-remove { padding: 4px 8px; border: 0; border-radius: 8px; background: none; color: #9a4a12; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.ms-remove:hover { background: #fdf0e3; }
+.ms-card h3 { margin: 0; font-size: 1.05rem; line-height: 1.3; }
+.ms-facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.ms-facts span { padding: 4px 9px; border-radius: 999px; background: #eef3ea; color: #2d5a45; font-size: 12.5px; font-weight: 700; }
+.ms-areas { margin: 2px 0 0; color: #4f6c57; font-size: 13px; line-height: 1.6; }
+.ms-areas b { color: #123d31; }
+.ms-areas span:not(:last-child)::after { content: ' · '; color: #a9b3a5; }
+.ms-open { align-self: flex-start; margin-top: auto; padding: 9px 14px; border: 0; border-radius: 999px; background: #123d31; color: #fffaf1; font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+.ms-open:hover { background: #1d5443; }
+.ms-clear { margin-top: 22px; padding: 8px 12px; border: 1px solid #e3c9b4; border-radius: 999px; background: none; color: #9a4a12; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+.ms-empty { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 22px; border: 1px dashed #d9d2c1; border-radius: 18px; background: #fffdf7; }
+.ms-empty p { margin: 0; color: #4f6c57; }
+.ms-cta { padding: 10px 16px; border-radius: 999px; background: #123d31; color: #fffaf1; font-weight: 700; text-decoration: none; }
+
+@media (max-width: 650px) { .my-searches { padding: 28px 16px 56px; } }

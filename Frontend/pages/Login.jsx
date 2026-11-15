@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { requireAuth } from '../firebase'
 import { getAuthErrorMessage } from '../authErrors'
+import { recordLogin } from '../account'
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -23,7 +24,14 @@ function Login() {
 
     try {
       await signInWithEmailAndPassword(requireAuth(), email.trim(), password)
-      navigate('/')
+      // Back again: show their recent searches if they have any
+      let history = []
+      try {
+        history = (await recordLogin())?.history ?? []
+      } catch {
+        // saved searches unavailable right now: they're still logged in
+      }
+      navigate(history.length ? '/my-searches' : '/')
     } catch (error) {
       setShowSignupPrompt([
         'auth/invalid-credential',
