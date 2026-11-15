@@ -2,8 +2,8 @@
 // Replies stream from the backend's POST /chat (Claude). A guest's conversation lives in this tab only; a
 // logged-in student's conversations are saved to their account (Backend/accounts.py): "Your chats" lists their
 // recent ones to pick up again on any device, and "New chat" starts another without losing the old one.
-// Voice: the microphone button turns speech into the question (the browser's speech recognition); it only shows
-// where the browser supports it.
+// Voice: the microphone button turns speech into text in the question box (the browser's speech recognition), for
+// the student to check and send; it only shows where the browser supports it.
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useChatContext } from './chatContext'
@@ -18,7 +18,7 @@ const MAX_CHARS = 2000
 const LANGUAGE_NAMES = { es: 'Spanish', pt: 'Portuguese', hi: 'Hindi', 'zh-Hans': 'Chinese', ar: 'Arabic' } // the site's languages (LanguageSwitcher)
 
 const welcomeText = (name) => `Hi${name ? ` ${name}` : ''}! 👋 I'm the Crib Crew Assistant. Ask me about neighbourhoods, renting, getting around or settling in Dublin.`
-const HELLO_TEXT = 'Ask me about neighbourhoods, rent, getting around or settling in Dublin. Type, or tap the microphone and just ask.'
+const HELLO_TEXT = 'Ask me about neighbourhoods, rent, getting around or settling in Dublin. Type, or tap the microphone to say your question.'
 const KEPT = 40 // messages kept in a saved conversation (Backend/accounts.py CHAT_KEPT)
 const CHAT_ID_KEY = 'fmd-chat-id'
 
@@ -420,7 +420,14 @@ export default function ChatWidget() {
     rec.onend = () => {
       setListening(false)
       recognition.current = null
-      if (heard) send(heard) // asked out loud: send it straight away
+      // the words stay in the box for the student to check (and fix) before they press send
+      if (heard) {
+        setInput(heard)
+        requestAnimationFrame(() => {
+          const box = inputRef.current
+          if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length) }
+        })
+      }
     }
     recognition.current = rec
     setListening(true)
