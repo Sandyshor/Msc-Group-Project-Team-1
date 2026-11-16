@@ -147,6 +147,8 @@ export default function App() {
   const [showHousing, setShowHousing] = useState(true); // student residences, shown from the start
   const [showSafety, setShowSafety] = useState(false);
   const [countyOpen, setCountyOpen] = useState(false); // County Dublin areas row, opened with its button
+  const [layersOpen, setLayersOpen] = useState(false); // the Layers menu over the map
+  const layersRef = useRef(null);
   // A saved tab that no longer exists (Commute, Universities) falls back to Places
   const [tab, setTabState] = useState(() => { const t = storage.get('district-tab', 'places'); return TABS.some(([k]) => k === t) ? t : 'places'; });
   const [rentMode, setRentMode] = useState('rooms');
@@ -270,7 +272,18 @@ export default function App() {
     const end = trip.to && !trip.from ? trip.to : trip.from && !trip.to ? trip.from : null;
     if (end) mapApi.current?.reveal(end.lat, end.lng);
   }, [trip.from?.lat, trip.from?.lng, trip.to?.lat, trip.to?.lng]); // eslint-disable-line react-hooks/exhaustive-deps
-
+  // Close the Layers menu when clicking outside it or pressing Escape
+  useEffect(() => {
+    if (!layersOpen) return undefined;
+    const onClick = (e) => { if (!layersRef.current?.contains(e.target)) setLayersOpen(false); };
+    const onKey = (e) => { if (e.key === 'Escape') setLayersOpen(false); };
+    document.addEventListener('mousedown', onClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [layersOpen]);
   if (error) return <div className="district-page"><p className="empty-note">Could not load district data: {error}</p></div>;
   if (!data) return <div className="district-page"><p className="empty-note">Loading district map…</p></div>;
 
@@ -368,42 +381,54 @@ export default function App() {
                 onClear={() => mapApi.current?.clearSearchPin()}
               />
             </div>
-            <div className="district-controls">
+                       <div className="district-controls">
+              <select className="district-select" aria-label="Choose a district" value={selectedId || ''}
+                onChange={(e) => (e.target.value ? selectDistrict(e.target.value) : clearDistrict())}>
+                <option value="">All districts</option>
+                <optgroup label="Dublin districts">
+                  {DUBLIN_DISTRICTS.filter((c) => data.profiles[c] && isVisible(c)).map((c) => (
+                    <option key={c} value={c}>{c} · {data.profiles[c].name}</option>
+                  ))}
+                </optgroup>
+                {hasCounty && (
+                  <optgroup label="County Dublin">
+                    {COUNTY_AREAS.filter((c) => data.profiles[c]).map((c) => (
+                      <option key={c} value={c}>{c} · {data.profiles[c].name}</option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
               <div className="seg-toggle" role="group" aria-label="Filter by side of the Liffey">
                 {[['all', 'All'], ['Northside', 'Northside'], ['Southside', 'Southside']].map(([v, l]) => (
                   <button type="button" key={v} aria-pressed={filter === v} onClick={() => setFilter(v)}>{l}</button>
                 ))}
               </div>
-              <button type="button" className="tour-button" aria-pressed={touring} onClick={() => setTouring((t) => !t)}>
+              <span className="toolbar-spacer" aria-hidden="true" />
+              <button type="button" className="tour-button tour-link" aria-pressed={touring} onClick={() => setTouring((t) => !t)}>
                 {touring ? '■ Stop tour' : '▶ Take the tour'}
               </button>
-              <button type="button" className="tour-button compare-button" onClick={() => setComparing(true)}>⇄ Compare districts</button>
-              <span className="toolbar-divider" aria-hidden="true" />
-              <button type="button" className="luas-toggle tr-toggle" aria-pressed={showLuas} onClick={() => setShowLuas((v) => !v)}><i className="tr-luas" /> Luas lines</button>
-              <button type="button" className="luas-toggle tr-toggle" aria-pressed={showBus} onClick={() => setShowBus((v) => !v)}><i className="tr-bus" /> Bus stops</button>
-              <button type="button" className="luas-toggle tr-toggle" aria-pressed={showBikes} onClick={() => setShowBikes((v) => !v)}><i className="tr-bikes" /> Dublin Bikes</button>
-              <button type="button" className="luas-toggle tr-toggle" aria-pressed={showRail} onClick={() => setShowRail((v) => !v)}><i className="tr-rail" /> DART &amp; rail</button>
-              <button type="button" className="luas-toggle tr-toggle" aria-pressed={showHousing} onClick={() => setShowHousing((v) => !v)}><i className="tr-housing" aria-hidden="true">🏠</i> Student housing</button>
-              <button type="button" className="luas-toggle tr-toggle" aria-pressed={showSafety} onClick={() => setShowSafety((v) => !v)}><i className="tr-safety" /> Safety map</button>
-            </div>
-            {[['Districts', DUBLIN_DISTRICTS, ''], ['County Dublin', COUNTY_AREAS, ' county-chips']].map(([group, codes, cls]) => ((!cls || showCountyRow) && (
-              <div key={group} id={cls ? 'county-areas' : undefined} className={`district-chips${cls}${filter !== 'all' ? ' is-filtered' : ''}`} role="toolbar" aria-label={group}>
-                {cls && <span className="chips-label">County Dublin</span>}
-                {codes.filter((c) => data.profiles[c]).map((c) => (
-                  <button type="button" key={c} className={isVisible(c) ? '' : 'is-dim'} aria-pressed={c === selectedId}
-                    style={c === selectedId ? { background: strongColor(data.profiles[c].hue), borderColor: 'transparent' } : undefined}
-                    title={c === selectedId ? `${data.profiles[c].name} (click again to clear)` : data.profiles[c].name}
-                    aria-label={c === selectedId ? `${c} selected, click to clear` : `${c} · ${data.profiles[c].name}`}
-                    onClick={() => toggleDistrict(c)}>{c}{cls && <small>{data.profiles[c].name.split(' & ')[0]}</small>}{c === selectedId && <span className="chip-clear" aria-hidden="true">×</span>}</button>
-                ))}
-                {!cls && hasCounty && (
-                  <button type="button" className={`county-toggle${countyIsSelected ? ' has-selection' : ''}`} aria-expanded={showCountyRow} aria-controls="county-areas"
-                    title="Areas in County Dublin outside D1–D24 (A and K Eircodes)" onClick={() => setCountyOpen((v) => !v)}>
-                    County Dublin <span aria-hidden="true">{showCountyRow ? '▴' : '▾'}</span>
-                  </button>
+              <div className="layers-wrap" ref={layersRef}>
+                <button type="button" className="layers-button" aria-expanded={layersOpen} onClick={() => setLayersOpen((o) => !o)}>
+                  Layers
+                  {[showLuas, showBus, showBikes, showRail, showHousing, showSafety].filter(Boolean).length > 0 && (
+                    <span className="layers-count">{[showLuas, showBus, showBikes, showRail, showHousing, showSafety].filter(Boolean).length}</span>
+                  )}
+                  <span aria-hidden="true">▾</span>
+                </button>
+                {layersOpen && (
+                  <div className="layers-menu">
+                    <p className="layers-title">Show on map</p>
+                    <button type="button" className="luas-toggle tr-toggle" aria-pressed={showLuas} onClick={() => setShowLuas((v) => !v)}><i className="tr-luas" /> Luas lines</button>
+                    <button type="button" className="luas-toggle tr-toggle" aria-pressed={showBus} onClick={() => setShowBus((v) => !v)}><i className="tr-bus" /> Bus stops</button>
+                    <button type="button" className="luas-toggle tr-toggle" aria-pressed={showBikes} onClick={() => setShowBikes((v) => !v)}><i className="tr-bikes" /> Dublin Bikes</button>
+                    <button type="button" className="luas-toggle tr-toggle" aria-pressed={showRail} onClick={() => setShowRail((v) => !v)}><i className="tr-rail" /> DART &amp; rail</button>
+                    <button type="button" className="luas-toggle tr-toggle" aria-pressed={showHousing} onClick={() => setShowHousing((v) => !v)}><i className="tr-housing" aria-hidden="true">🏠</i> Student housing</button>
+                    <button type="button" className="luas-toggle tr-toggle" aria-pressed={showSafety} onClick={() => setShowSafety((v) => !v)}><i className="tr-safety" /> Safety map</button>
+                  </div>
                 )}
               </div>
-            )))}
+              <button type="button" className="tour-button compare-button" onClick={() => setComparing(true)}>⇄ Compare districts</button>
+            </div>
             <p className="district-hint">
               <span aria-hidden="true">💡</span>
               <span><b>D1 &amp; D2</b> are the city centre. <span className="dh-n">Odd numbers</span> are north of the River Liffey, <span className="dh-s">even numbers</span> are south.</span>
