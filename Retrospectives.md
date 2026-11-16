@@ -300,23 +300,23 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Shreyash re-evaluated the county dublin rent data and made changes in district profile ui
 - santosh fixed recommendation engine.
 - Discussed the Presentation feedback and reworked on it.
-- 
+  
   **Week 9:**
   **Meeting Saturday 9pm-10pm**
-  -Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
-  -Discussed the user evaluation feedback and website feedback that was given by the mentors.
-  -Tasks have been assigned to each one of us .
-  -Shreyas agreed to work on Data verification , crime data.
-  -Sowmiya agreed to work on the Recommendation page frontend.
-  -Santhosh agreed to work on the backend.
-  -Vignesh agreed to work on AI Integration.
-  -Catherine Agreed to work on Explore Dublin video and other Frontend corrections.
+- Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
+- Discussed the user evaluation feedback and website feedback that was given by the mentors.
+- Tasks have been assigned to each one of us .
+- Shreyas agreed to work on Data verification , crime data.
+- Sowmiya agreed to work on the Recommendation page frontend.
+- Santhosh agreed to work on the backend.
+- Vignesh agreed to work on AI Integration.
+- Catherine Agreed to work on Explore Dublin video and other Frontend corrections.
 
   **Meeting Sunday 9.30pm -10.30pm**
-  -Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
-  -Vignesh started building AI chatbot.
-  -Santhosh started working to fix the recommendation engine.
-  -Catherine started to work on improvising the video by adding the district and language correction.
-  -Sowmiya started working on the corrections on the recommendation page.
-  -Shreyas started working on District profile page corrections.
+- Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
+- Vignesh started building AI chatbot.
+- Santhosh started working to fix the recommendation engine.
+- Catherine started to work on improvising the video by adding the district and language correction.
+- Sowmiya started working on the corrections on the recommendation page.
+- Shreyas started working on District profile page corrections.
   
