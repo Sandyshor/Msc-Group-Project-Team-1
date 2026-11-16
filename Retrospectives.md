@@ -301,7 +301,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - santosh fixed recommendation engine.
 - Discussed the Presentation feedback and reworked on it.
   
-  **Week 9:**
+**Week 9:**
   **Meeting Saturday 9pm-10pm**
 - Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
 - Discussed the user evaluation feedback and website feedback that was given by the mentors.
@@ -312,6 +312,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Vignesh agreed to work on AI Integration.
 - Catherine Agreed to work on Explore Dublin video and other Frontend corrections.
 
+**Week 9**
   **Meeting Sunday 9.30pm -10.30pm**
 - Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
 - Vignesh started building AI chatbot.
