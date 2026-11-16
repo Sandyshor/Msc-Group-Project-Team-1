@@ -320,4 +320,12 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Catherine started to work on improvising the video by adding the district and language correction.
 - Sowmiya started working on the corrections on the recommendation page.
 - Shreyas started working on District profile page corrections.
-  
+
+**Week 9**
+**Meeting Monday 9.30pm -10.30pm**
+- Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
+- Shreyas re-evaluated rental data on the district profile
+- Vikesh worked Ollama
+- Catherine is working on adding district to the explore dublin video.
+- Santhosh is working on recommendation engine.
+- Sowmiya is working on recommendation page. 
