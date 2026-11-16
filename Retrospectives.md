@@ -272,4 +272,30 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - we each made efforts to collect users feedback
 - vignesh came up with interesting questionaries
 - santosh worked on the feedback received
-- postgresql has been deployed 
+- postgresql has been deployed
+
+**meeting 5 Tuesday (4:30 to 7 pm)**
+- attendees: Shreyash, sowmya, vignesh, catherine, santosh
+- Santosh was fixing postgresql
+- Sowmya was working on login page
+- catherine was working on map
+
+**meeting 6 Wednesday (9 to 9:30 pm)**
+- attendees: Shreyash, sowmya, vignesh, catherine, santosh
+- Each one of us were working on user evaluation
+
+**meeting 7 Thursday (9 to 9:30 pm)**
+- attendees: Shreyash, sowmya, vignesh, catherine, santosh
+- Today we worked on user evaluation report and ppt
+- we discussed the order to present the ppt for tomorrows presentation
+
+**meeting 8 Friday (10 pm to 12 am)**
+- attendees: Shreyash, sowmya, vignesh, catherine, santosh
+- We got a feedback that our documentation is not glued together well
+- so we fixed it by making a virtual presentation on what we did according to the timeline so professors can get more clear idea
+
+**Week 9 lead catherinie**
+**meeting 9 Friday (8:57 to 9:20 pm)**
+- attendees: Shreyash, Santosh
+- Shreyash re-evaluated the county dublin rent data and made changes in district profile ui
+- santosh fixed recommendation engine  
