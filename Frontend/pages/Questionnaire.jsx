@@ -7,20 +7,20 @@ import PrioritySlider, { DEFAULT_IMPORTANCE } from './PrioritySlider'
 
 // Values match the university names in the backend's commute data.
 const UNIVERSITIES = [
-  ['TU Dublin - Aungier Street', 'Technological University Dublin — Aungier Street Campus'],
-  ['TU Dublin - Bolton Street', 'Technological University Dublin — Bolton Street Campus'],
-  ['TU Dublin - Grangegorman', 'Technological University Dublin — Grangegorman Campus'],
-  ['TU Dublin - Blanchardstown', 'Technological University Dublin — Blanchardstown Campus'],
-  ['TU Dublin - Tallaght', 'Technological University Dublin — Tallaght Campus'],
-  ['University College Dublin - Belfield', 'University College Dublin — Belfield'],
-  ['Dublin City University - Glasnevin', 'Dublin City University — Glasnevin Campus'],
-  ["DCU - St Patrick's Campus", "Dublin City University — St Patrick's Campus"],
-  ['Trinity College Dublin', 'Trinity College Dublin'],
-  ['Royal College of Surgeons Ireland', 'Royal College of Surgeons in Ireland'],
-  ['National College of Art and Design', 'National College of Art and Design'],
-  ['National College of Ireland - IFSC', 'National College of Ireland — IFSC'],
-  ['Griffith College Dublin', 'Griffith College Dublin'],
-  ['Dublin Business School', 'Dublin Business School'],
+  ['TU Dublin - Aungier Street', 'Technological University Dublin — Aungier Street Campus, Dublin 2'],
+  ['TU Dublin - Bolton Street', 'Technological University Dublin — Bolton Street Campus, Dublin 1'],
+  ['TU Dublin - Grangegorman', 'Technological University Dublin — Grangegorman Campus, Dublin 7'],
+  ['TU Dublin - Blanchardstown', 'Technological University Dublin — Blanchardstown Campus, Dublin 15'],
+  ['TU Dublin - Tallaght', 'Technological University Dublin — Tallaght Campus, Dublin 24'],
+  ['University College Dublin - Belfield', 'University College Dublin — Belfield, Dublin 4'],
+  ['Dublin City University - Glasnevin', 'Dublin City University — Glasnevin Campus, Dublin 9'],
+  ["DCU - St Patrick's Campus", "Dublin City University — St Patrick's Campus, Dublin 9"],
+  ['Trinity College Dublin', 'Trinity College Dublin, Dublin 2'],
+  ['Royal College of Surgeons Ireland', 'Royal College of Surgeons in Ireland, Dublin 2'],
+  ['National College of Art and Design', 'National College of Art and Design, Dublin 8'],
+  ['National College of Ireland - IFSC', 'National College of Ireland — IFSC, Dublin 1'],
+  ['Griffith College Dublin', 'Griffith College Dublin, Dublin 8'],
+  ['Dublin Business School', 'Dublin Business School, Dublin 2'],
   ['IADT - Dun Laoghaire', 'IADT — Dún Laoghaire'],
   ['Maynooth University', 'Maynooth University'],
 ]
@@ -39,8 +39,8 @@ const STUDENT_ROOMS = [
 const STUDENT_KEYS = { any: 'student_accommodation', shared: 'student_shared', private: 'student_private', studio: 'student_studio' }
 
 const ROOM_TYPES = [
-  ['1 BHK apartment', 'one_bed'],
-  ['2 BHK apartment', 'two_bed'],
+  ['1 bed apartment', 'one_bed'],
+  ['2 bed apartment', 'two_bed'],
   ['Private room', 'private_room'],
   ['Double sharing', 'shared_room'],
   ['Student accommodation', 'student_accommodation'],
@@ -198,7 +198,7 @@ function Questionnaire() {
           />
 
           <form className="flow-rows" onSubmit={handleContinue}>
-            <FlowRow icon="euro" title="Budget" question="What's your monthly accommodation budget?" htmlFor="budget">
+            <FlowRow icon="euro" title="Budget" question="Set up your monthly accommodation budget first." htmlFor="budget">
               <div className="flow-value">
                 <span>Monthly budget</span>
                 <strong>€{budget.toLocaleString('en-IE')}</strong>
@@ -259,7 +259,7 @@ function Questionnaire() {
               />
             </FlowRow>
 
-            <FlowRow icon="clock" title="Commute" question="What's the longest commute you'd accept?" htmlFor="max-commute">
+            <FlowRow icon="clock" title="Commute time to university" question="What's the longest commute you'd accept?" htmlFor="max-commute">
               <div className="flow-value">
                 <span>One way</span>
                 <strong>{commute.maxCommute ? `${commute.maxCommute} min` : 'No limit'}</strong>
@@ -302,6 +302,13 @@ function Questionnaire() {
           />
 
           <form className="flow-rows" onSubmit={handleSubmit}>
+            <aside className="flow-priority-hint">
+              <span className="flow-priority-hint-icon"><FlowIcon name="sliders" /></span>
+              <span className="flow-priority-hint-copy">
+                <strong>Make these matches yours</strong>
+                <span>Adjust the sliders to show what matters most, or keep the suggested ratings and continue.</span>
+              </span>
+            </aside>
             {FACTORS.map(([name, icon, hint, items]) => (
               <FlowRow
                 key={name}
