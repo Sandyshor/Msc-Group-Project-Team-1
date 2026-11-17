@@ -137,10 +137,9 @@ fieldset.question-group {
 
 .priority-value {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   color: #617067;
   font-size: 14px;
 }
@@ -160,8 +159,29 @@ fieldset.question-group {
 
 .priority-slider input[type="range"] {
   width: 100%;
+  margin: 0;
   accent-color: #173f32;
   cursor: pointer;
+}
+
+.priority-slider .range-labels {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  height: auto;
+  margin: 0;
+  color: #718075;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.priority-slider .range-labels span {
+  width: auto;
+}
+
+.priority-slider input[type="range"] {
+  position: relative;
+  z-index: 1;
 }
 
 .priority-controls {
