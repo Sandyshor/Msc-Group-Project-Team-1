@@ -15,6 +15,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 import district_rent
+import site_facts
 
 router = APIRouter()
 
@@ -34,11 +35,20 @@ About the website (mention a page only as a short extra after you have answered)
 - "Find my match" questionnaire: the student enters their university, budget, room type, how they travel and what \
 matters most (rent, safety, commute, shops, restaurants, healthcare, parks and gyms). The results page ranks Dublin \
 neighbourhoods for them, with rent, commute time, a safety section, census facts, student residences and letting agents.
-- "Explore districts": an interactive map of every Dublin postal district (D1-D24) and County Dublin areas, with rent, \
-safety, amenities, supermarkets and a journey planner to any campus.
-- "Universities" and "Famous attractions" pages, and "How it works", which explains how matches are calculated.
+- "Explore districts": an interactive map of every Dublin postal district (D1-D24) and County Dublin areas. Each \
+district profile has tabs for places, journey, rent, amenities, safety and the area (census). The search box finds \
+colleges, places, streets, districts and any Eircode (e.g. D07 ED7R pins that address). Layers show Luas, bus stops, \
+DART and rail, Dublin Bikes, supermarkets and the safety map. Student residences are pinned too: hover for the price, \
+click to make one point A or B of the journey planner, which gives door-to-door times to any campus. "Compare \
+districts" puts two side by side.
+- The results page also has a "Compare" tab for the student's matches and a "Letting agents" tab with licensed agents \
+(PSRA register).
+- Logging in (free) saves the student's recent searches ("My recent searches" under their name) and their chats with \
+this assistant ("Your chats", the clock button in the chat). The microphone button in the chat lets them say their \
+question instead of typing it.
+- "Universities" (the colleges in <site_colleges>) and "Famous attractions" pages, and "How it works", which explains \
+how matches are calculated.
 - "Things to know": an arrival checklist (medical insurance, IRP registration and renewal, PPS number, Student Leap Card, SIM, bank account, Revenue, work rules, GP, renting safely) with links to the official sites. The home page also has an FAQ.
-- IRP (Stamp 2) first-time registration: book online at Burgh Quay only after arriving in Ireland, using the date on the passport landing stamp; booking is free, the €300 fee is paid by card at the appointment, and students must register before the date on their landing stamp.
 - The site's figures come from public sources such as RTB rents, Garda crime statistics, NTA transport data, the \
 Census and OpenStreetMap. They are estimates, not live listings.
 
@@ -76,10 +86,56 @@ profile (Explore districts) or daft.ie.
 # The website's rent per area and room type, worked out the same way as on the district profiles
 SYSTEM_PROMPT += """
 
+The website's own data is below, in blocks such as <site_places>, <site_safety>, <site_commute>, <site_areas>, \
+<site_residences>, <site_colleges>, <site_checklist> and <site_rents>. These are the same figures the website shows.
+- Before saying you don't have something, check every block. Answer from them first, with the actual names and \
+numbers. Only when the site doesn't cover a question, answer from your general knowledge and say figures may have \
+changed.
+- Never contradict the site's figures with your own."""
+
+_profile = district_rent.load_profile_data()
+SYSTEM_PROMPT += """
+
+Commute (typical weekday-morning public transport times from each area to each college, from the same timetable data \
+as the results page): "UCD 32 (18-37)" means about 32 minutes from the middle of the area, 18 to 37 depending on \
+where in the area you start. "Walkable" lists colleges within a 30-minute walk.
+- For commute questions, give the time from <site_commute> and the range, and say the exact time depends on the \
+street: the journey planner on Explore districts gives door-to-door times."""
+SYSTEM_PROMPT += "\n\n<site_commute>\n" + site_facts.commute_text(_profile) + "\n</site_commute>"
+SYSTEM_PROMPT += """
+
+Areas (Census 2022 figures, the amenities each district profile counts, and Luas stops):
+- Use <site_areas> for who lives in an area (students, people in their 20s, people born outside Ireland), how many \
+supermarkets, cafés, gyms, parks or pharmacies it has, and whether it's on the Luas."""
+SYSTEM_PROMPT += "\n\n<site_areas>\n" + site_facts.area_facts_text(_profile) + "\n</site_areas>"
+SYSTEM_PROMPT += """
+
+Student residences (the purpose-built ones on the map, with their published 2026/27 starting prices a month):
+- Use <site_residences> for student accommodation questions: name the residences in or near the area with their \
+prices and room types. A university's own residences (Trinity, UCD, DCU, RCSI, Griffith) are for its own students. \
+Prices are starting prices and rooms sell out, so suggest checking the residence's website."""
+SYSTEM_PROMPT += "\n\n<site_residences>\n" + site_facts.residences_text() + "\n</site_residences>"
+SYSTEM_PROMPT += "\n\n<site_colleges>\n" + site_facts.colleges_text() + "\n</site_colleges>"
+SYSTEM_PROMPT += """
+
+Arrival checklist (the Things to know page: each step, why, how, and the official link):
+- For questions about IRP, PPS number, Leap card, phone, bank account, Revenue, work rules, GP, insurance or renting \
+safely, give the steps from <site_checklist> and the official link, and mention the Things to know page."""
+SYSTEM_PROMPT += "\n\n<site_checklist>\n" + site_facts.things_to_know_text() + "\n</site_checklist>"
+SYSTEM_PROMPT += """
+
 Places (the neighbourhoods and places each district profile on the website shows):
 - For places to visit, explore, eat, shop or relax in an area, or which neighbourhoods an area has, start with \
 <site_places>. You may add other well-known places in that area that you are sure of; keep it to a short list."""
-SYSTEM_PROMPT += "\n\n<site_places>\n" + district_rent.places_text(district_rent.load_profile_data()) + "\n</site_places>"
+SYSTEM_PROMPT += """
+
+Safety (the scores and crime figures each district profile's Safety tab shows):
+- When asked how safe an area is, answer from <site_safety>: give its score out of 100 (50 = the average of Ireland's \
+towns and cities, higher is safer) and what that means, mention one or two crime types that stand out against \
+Ireland's figures, and its safer and less safe parts when listed. Then add short practical tips. Never say you don't \
+have safety figures for an area that is listed. The figures are recorded crime, not a guarantee."""
+SYSTEM_PROMPT += "\n\n<site_safety>\n" + district_rent.safety_text(_profile) + "\n</site_safety>"
+SYSTEM_PROMPT += "\n\n<site_places>\n" + district_rent.places_text(_profile) + "\n</site_places>"
 SYSTEM_PROMPT += "\n\n<site_rents>\n" + district_rent.assistant_text(district_rent.load_profile_data()) + "\n</site_rents>"
 
 

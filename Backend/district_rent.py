@@ -38,7 +38,7 @@ def load_profile_data(profiles_file=PROFILES_FILE, county_file=COUNTY_FILE):
     """The district profile's data, with County Dublin merged in the way the district map merges it."""
     data = _read(profiles_file)
     county = _read(county_file)
-    for key in ("profiles", "labels", "rtb"):
+    for key in ("profiles", "labels", "rtb", "safety"):
         data[key] = {**data.get(key, {}), **county.get(key, {})}
     data["roomReport"] = county.get("roomReport", data.get("roomReport", {}))
     return data
@@ -101,4 +101,44 @@ def places_text(data):
         places = "; ".join(f"{p[0]} ({p[1]}): {p[2].rstrip('.')}" for p in profile.get("places", []) if len(p) >= 3)
         if hoods or places:
             lines.append(f"- {code} {profile.get('name', '')}: neighbourhoods {hoods or 'n/a'}. Places: {places or 'none listed'}.")
+    return "\n".join(lines)
+
+
+# The same bands as the district profile's Safety tab (Frontend/District Profile/mapShared.js SAFETY_BANDS)
+SAFETY_BANDS = [(57, "Lower recorded crime", "safer than Irish towns"),
+                (50, "Below-benchmark crime", "a little safer than Irish towns"),
+                (40, "Above-benchmark crime", "more crime than Irish towns"),
+                (0, "Higher recorded crime", "much more crime than Irish towns")]
+CRIME_NAMES = [("violent", "violent crime"), ("robbery", "robbery"), ("burglary_theft", "burglary and theft"),
+               ("public_order", "public order"), ("damage", "criminal damage")]
+
+
+def safety_text(data):
+    """Each area's safety score, band, recorded crime against Ireland's and its safest and least safe neighbourhoods,
+    as shown on its district profile, as short lines for the AI assistant."""
+    lines = []
+    for code in areas(data):
+        s = data.get("safety", {}).get(code)
+        if not s or not isinstance(s.get("score"), (int, float)):
+            continue
+        band, plain = next((b, p) for floor, b, p in SAFETY_BANDS if s["score"] >= floor)
+        name = data.get("profiles", {}).get(code, {}).get("name", "")
+        rates, ireland = s.get("rates") or {}, s.get("ireland") or {}
+        crime = ", ".join(f"{label} {rates[k]:.1f} vs Ireland {ireland[k]:.1f}" for k, label in CRIME_NAMES
+                          if rates.get(k) is not None and ireland.get(k) is not None)
+        hoods = sorted(s.get("hoods") or [], key=lambda h: -h[1])
+        parts = ""
+        if len(hoods) > 1 and hoods[0][1] != hoods[-1][1]:
+            top = [h for h in hoods if h[1] == hoods[0][1]][:3]
+            low = [h for h in hoods if h[1] == hoods[-1][1]][:3]
+            parts = (f" Safer parts: {', '.join(h[0] for h in top)} ({top[0][1]:.0f})."
+                     f" Less safe parts: {', '.join(h[0] for h in low)} ({low[0][1]:.0f}).")
+        extra = []
+        if isinstance(s.get("lit"), (int, float)):
+            extra.append(f"{s['lit'] * 100:.0f}% of mapped streets lit")
+        if s.get("nightStops"):
+            extra.append(f"{s['nightStops']} night transport stops")
+        lines.append(f"- {code} {name}: safety score {s['score']:.0f}/100, {band} ({plain})."
+                     + (f" Crimes per 1,000 people a year ({s.get('period', 'recent years')}): {crime}." if crime else "")
+                     + parts + (f" {'; '.join(extra).capitalize()}." if extra else ""))
     return "\n".join(lines)
