@@ -22,6 +22,13 @@
   grid-template-rows: auto minmax(0, 1fr);
 }
 
+@media (min-width: 761px) {
+  .flow-q {
+    height: calc(100vh - 121px);
+    height: calc(100svh - 121px);
+  }
+}
+
 .flow-q .flow-sidebar {
   grid-column: 1 / -1;
   grid-row: 1;
@@ -384,6 +391,79 @@
   line-height: 1.2;
 }
 
+.flow-priorities {
+  gap: 4px;
+}
+
+.flow-priorities .flow-priority-hint {
+  gap: 10px;
+  padding: 9px 14px;
+  border-left-width: 4px;
+}
+
+.flow-priorities .flow-priority-hint-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.flow-priorities .flow-priority-hint-copy {
+  gap: 2px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.flow-priorities .flow-priority-hint-copy strong {
+  font-size: 16px;
+}
+
+.flow-priorities .flow-row {
+  gap: 12px;
+  padding: 1px 12px;
+}
+
+.flow-priorities .flow-row-control {
+  gap: 2px;
+}
+
+.flow-priorities .priority-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.flow-priorities .range-labels {
+  margin-top: 0;
+  font-size: 10px;
+  line-height: 1.1;
+}
+
+.flow-priorities .flow-row-icon {
+  width: 38px;
+  height: 38px;
+}
+
+.flow-priorities .flow-row-text h2 {
+  font-size: 17px;
+}
+
+.flow-priorities .flow-row-text p {
+  font-size: 12px;
+}
+
+.flow-priorities .flow-separate {
+  gap: 6px;
+  font-size: 11px;
+}
+
+.flow-priorities .flow-actions {
+  padding-top: 0;
+}
+
+.flow-priorities .flow-next,
+.flow-priorities .flow-back {
+  min-height: 40px;
+}
+
 .flow-row {
   display: grid;
   grid-template-columns: 46px minmax(0, 1fr) minmax(0, 1.25fr);
@@ -524,7 +604,7 @@
   font-weight: 700;
 }
 
-/* Priority sliders inside rows: the words and number on one line, no end labels */
+/* Priority sliders inside rows */
 .flow-row .priority-value {
   margin-bottom: 2px;
   font-size: 12px;
@@ -532,10 +612,6 @@
 
 .flow-row .priority-value strong {
   font-size: 18px;
-}
-
-.flow-row .range-labels {
-  display: none;
 }
 
 .flow-item-sliders {
