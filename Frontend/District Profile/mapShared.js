@@ -36,7 +36,7 @@ export { ALL_DISTRICTS };
 
 export const AMENITY_TYPES = [
   ['supermarket', 'Supermarkets', 'cart', '#2f7fd0'],
-  ['grocery', 'Groceries', 'basket', '#3aa38a'],
+  ['grocery', 'Convenience & groceries', 'basket', '#3aa38a'],
   ['restaurant', 'Restaurants', 'fork', '#e0682e'],
   ['cafe', 'Cafés', 'cup', '#9a6a3c'],
   ['gym', 'Gyms', 'gym', '#7b4fd6'],

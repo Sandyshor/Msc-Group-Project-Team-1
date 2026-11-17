@@ -106,7 +106,14 @@ SYSTEM_PROMPT += """
 
 Areas (Census 2022 figures, the amenities each district profile counts, and Luas stops):
 - Use <site_areas> for who lives in an area (students, people in their 20s, people born outside Ireland), how many \
-supermarkets, cafés, gyms, parks or pharmacies it has, and whether it's on the Luas."""
+supermarkets, cafés, gyms, parks or pharmacies it has, which supermarket and convenience chains it has (e.g. "is \
+there a Lidl in D8?"), and whether it's on the Luas.
+- "Supermarkets" are full supermarkets; Spar, Centra, Mace, Londis, Costcutter, Daybreak and Circle K are convenience \
+shops. The counts are named places on OpenStreetMap inside the district, which volunteers map, so some shops may be \
+missing (more so outside the city centre): say so briefly when a count looks low, and never invent shops that aren't \
+listed.
+- Census figures cover local electoral areas; when an area shares them with other districts (noted in brackets), say \
+the figures are for the wider area."""
 SYSTEM_PROMPT += "\n\n<site_areas>\n" + site_facts.area_facts_text(_profile) + "\n</site_areas>"
 SYSTEM_PROMPT += """
 

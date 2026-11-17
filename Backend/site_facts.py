@@ -36,7 +36,7 @@ COLLEGE_SHORT = {
     "IADT - Dun Laoghaire": "IADT",
     "Maynooth University": "Maynooth",
 }
-AMENITY_NAMES = [("supermarket", "supermarkets"), ("grocery", "grocery shops"), ("restaurant", "restaurants"),
+AMENITY_NAMES = [("supermarket", "supermarkets"), ("grocery", "convenience and grocery shops"), ("restaurant", "restaurants"),
                  ("cafe", "cafés"), ("gym", "gyms"), ("park", "parks"), ("pharmacy", "pharmacies"),
                  ("hospital", "hospitals")]
 
@@ -84,12 +84,44 @@ def commute_text(data):
     return "\n".join(lines)
 
 
+# The chain buttons on the district profile's Amenities tab, in the same groups (shopChains.js CHAIN_GROUPS)
+CHAIN_GROUPS = [
+    ("supermarkets", [("tesco", "Tesco"), ("lidl", "Lidl"), ("aldi", "Aldi"), ("dunnes", "Dunnes Stores"),
+                      ("supervalu", "SuperValu"), ("ms", "M&S Food")]),
+    ("convenience shops", [("spar", "Spar"), ("centra", "Centra"), ("mace", "Mace"), ("londis", "Londis"),
+                           ("costcutter", "Costcutter"), ("daybreak", "Daybreak"), ("circlek", "Circle K")]),
+    ("international food", [("polonez", "Polonez (Polish)"), ("asian", "Asian markets")]),
+]
+
+
+def chain_counts():
+    """{area: {chain: shops}} from the map's chain shop file, counting one shop where OpenStreetMap maps the same
+    chain twice within about 40 m (as amenityData.js does), so the numbers match the Amenities tab."""
+    found = _read_json(FRONTEND / "public" / "data" / "dublin-chain-shops.json") or {}
+    kept = []
+    for shop in found.get("shops", []):
+        if not any(k["chain"] == shop["chain"] and abs(k["lat"] - shop["lat"]) < 0.0004 and abs(k["lng"] - shop["lng"]) < 0.0006
+                   for k in kept):
+            kept.append(shop)
+    counts = defaultdict(lambda: defaultdict(int))
+    for shop in kept:
+        counts[shop["district"]][shop["chain"]] += 1
+    return counts
+
+
 def area_facts_text(data):
-    """Each area's people (Census 2022), the amenities the district profile counts, and its Luas stops."""
+    """Each area's people (Census 2022), the amenities and shop chains the district profile counts, and its Luas
+    stops."""
     census = dict(data.get("census", {}))
     county = _read_json(FRONTEND / "public" / "data" / "county-dublin-profiles.json") or {}
     census.update(county.get("census", {}))
     counts = (_read_json(FRONTEND / "public" / "data" / "dublin-amenity-counts.json") or {}).get("counts", {})
+    chains = chain_counts()
+    # Census figures are for local electoral areas, and some cover more than one district (e.g. D10, D12 and D20)
+    sharing = defaultdict(list)
+    for code, c in census.items():
+        if c.get("LEA"):
+            sharing[c["LEA"]].append(code)
     luas = defaultdict(list)
     for stop in data.get("stops", []):
         if stop.get("d"):
@@ -109,10 +141,19 @@ def area_facts_text(data):
                 people += f", {c['Non_Irish_%']}% born outside Ireland"
             if c.get("Apartments_%") is not None:
                 people += f", {c['Apartments_%']}% of homes are apartments"
+            others = [d for d in sharing.get(c.get("LEA"), []) if d != code]
+            if others:
+                people += f" (Census figures for the whole {c['LEA']} electoral area, which it shares with {', '.join(others)})"
             bits.append(people)
         n = counts.get(code) or {}
         if n:
             bits.append("amenities: " + ", ".join(f"{n[k]} {label}" for k, label in AMENITY_NAMES if n.get(k) is not None))
+        here = chains.get(code, {})
+        groups = []
+        for group, names in CHAIN_GROUPS:
+            listed = [f"{label} {here[key]}" for key, label in names if here.get(key)]
+            groups.append(f"{group}: {', '.join(listed) if listed else 'none'}")
+        bits.append("shop chains (" + "; ".join(groups) + ")")
         if luas.get(code):
             bits.append("Luas stops: " + ", ".join(luas[code]))
         if bits:

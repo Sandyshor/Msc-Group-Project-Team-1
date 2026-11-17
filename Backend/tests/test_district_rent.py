@@ -129,3 +129,23 @@ def test_the_assistant_has_all_the_sites_data():
     assert "UCD " in site_facts.commute_text(profile)
     assert "Beckett House (Aparto)" in prompt and "Book your IRP appointment" in prompt
     assert "Before saying you don't have something, check every block" in prompt
+
+
+def test_amenity_groups_say_what_is_near_and_how_far():
+    shops = recommender.FACTOR_LOOKUP["Shopping & Groceries"]
+    row = {"Supermarkets": 1, "Groceries": 20, "Shopping_Malls": 2}
+    assert recommender._group_detail(shops, row) == (
+        "1 supermarket and 20 convenience and grocery shops within 1 km, 2 shopping centres within 2 km")
+    health = recommender.FACTOR_LOOKUP["Healthcare"]
+    assert recommender._group_detail(health, {"Hospitals": 1, "Pharmacies": 1}) == "1 pharmacy within 1 km, 1 hospital within 3 km"
+
+
+def test_the_assistant_knows_each_areas_shop_chains():
+    import site_facts
+
+    counts = site_facts.chain_counts()
+    facts = site_facts.area_facts_text(district_rent.load_profile_data())
+    d1 = next(line for line in facts.splitlines() if line.startswith("- D1 "))
+    assert f"Tesco {counts['D1']['tesco']}" in d1 and "convenience shops:" in d1
+    d10 = next(line for line in facts.splitlines() if line.startswith("- D10 "))
+    assert "shares with D12, D20" in d10  # census figures cover the whole electoral area

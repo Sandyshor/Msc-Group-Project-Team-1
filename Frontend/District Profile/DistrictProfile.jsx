@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import JourneyPlannerPanel from './JourneyPlannerPanel';
-import { CHAINS, chainInfo } from './shopChains';
+import { CHAIN_GROUPS, chainInfo } from './shopChains';
 import { ACTIVE_DISTRICTS, AMENITY_TYPES, HEAT_STOPS, SAFETY_BANDS, ICONS, iconFor, strongColor, bannerColor, safetyLabel, safetyPlain, heatColor, textOnHeat } from './mapShared';
 import { HOME_KINDS, RENT_KINDS, ROOM_KINDS, rentFor } from './rents';
 import './ProfileCard.css';
@@ -233,22 +233,27 @@ function AmenitiesSection({ code, data, chain, setChain, shops, verifiedCounts }
   return (
     <>
       <section className="profile-section">
-        <SectionTitle eyebrow="SUPERMARKETS" title="Find a chain on the map" icon="cart" />
+        <SectionTitle eyebrow="SHOPS" title="Find a shop chain on the map" icon="cart" />
         <p className="section-description">Pick a chain to see its shops in {code} on the map. The number is how many there are in {code}.</p>
-        <div className="chain-picker top-gap">
-          {CHAINS.map(([k, label, colour]) => (
-            <button
-              type="button"
-              key={k}
-              aria-pressed={chain === k}
-              disabled={!inHere(k) && chain !== k}
-              style={chain === k ? { background: colour } : undefined}
-              onClick={() => setChain(chain === k ? null : k)}
-            >
-              <i style={{ background: colour }} />{label}<small>{inHere(k)}</small>
-            </button>
-          ))}
-        </div>
+        {CHAIN_GROUPS.map(([group, keys]) => (
+          <div key={group} className="chain-group top-gap">
+            <p className="chain-group-name">{group}<small>{keys.reduce((n, k) => n + inHere(k), 0)} in {code}</small></p>
+            <div className="chain-picker">
+              {keys.map((k) => chainInfo(k)).map(([k, label, colour]) => (
+                <button
+                  type="button"
+                  key={k}
+                  aria-pressed={chain === k}
+                  disabled={!inHere(k) && chain !== k}
+                  style={chain === k ? { background: colour } : undefined}
+                  onClick={() => setChain(chain === k ? null : k)}
+                >
+                  <i style={{ background: colour }} />{label}<small>{inHere(k)}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
         {picked && (
           <p className="chain-result">
             {inHere(chain)
@@ -272,8 +277,11 @@ function AmenitiesSection({ code, data, chain, setChain, shops, verifiedCounts }
                 </div>
               ))}
             </div>
-            {counts.asian != null && <p className="section-description top-gap">Includes {counts.asian} Asian restaurants.</p>}
-            {verifiedCounts?.[code] && <p className="section-description">Named places from OpenStreetMap, counted by where they are inside {code}.</p>}
+            <p className="section-description top-gap">
+              Supermarkets and convenience shops include independent shops as well as the chains above.
+              {counts.asian != null && <> Restaurants include {counts.asian} Asian restaurants.</>}
+            </p>
+            {verifiedCounts?.[code] && <p className="section-description">Named places from OpenStreetMap, counted by where they are inside {code}. OpenStreetMap is mapped by volunteers, so some shops and restaurants may be missing, especially outside the city centre.</p>}
           </>
         ) : <EmptyNote>amenity data for {code}</EmptyNote>}
       </section>
