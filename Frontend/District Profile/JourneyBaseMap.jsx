@@ -588,6 +588,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     const row = (emoji, label, ring) => `<span class="pm-row"><span class="pm-row-dot" style="--ring:${ring}">${emoji}</span>${label}</span>`;
     const overlays = {
       [row('🎓', 'Universities', RING.uni)]: universityLayer,
+      [row('🏠', 'Student housing', RING.housing)]: st.housing,
       [row('📍', 'Famous places', RING.place)]: st.placeLayer,
       [row('🏷️', 'District names', '#7a8a7e')]: st.names,
       ...Object.fromEntries(Object.entries(AMENITY_CATEGORIES).map(([key, c]) => [
@@ -600,8 +601,9 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     const layersControl = L.control.layers(null, overlays, { position: 'topright', collapsed: true }).addTo(map);
     // A labelled "Layers" button instead of the bare icon
     const toggle = layersControl.getContainer().querySelector('.leaflet-control-layers-toggle');
-    if (toggle) { toggle.innerHTML = '<span>Layers</span>'; toggle.title = 'Show more on the map'; }
-
+    if (toggle) { toggle.innerHTML = '<span>Explore</span>'; toggle.title = 'Show student housing, universities, famous places and supermarkets on the map'; }
+    // Student housing is ticked here, so tell the page (its legend) when it is turned on or off
+    map.on('overlayadd overlayremove', (e) => { if (e.layer === st.housing) latest.current.onHousingChange?.(e.type === 'overlayadd'); });
     const loadAmenityRecords = () => loadCsv().then((records) => { st.amenityRecords = records; return records; });
     loadAmenityRecords().catch(() => { /* reported when a layer needs it */ }); // also names clicked points
 
