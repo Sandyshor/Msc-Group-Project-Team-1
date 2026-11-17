@@ -301,12 +301,12 @@ function Questionnaire() {
             description="Move each slider to show how important it is. We'll weigh them to rank the neighbourhoods that suit you best."
           />
 
-          <form className="flow-rows" onSubmit={handleSubmit}>
+          <form className="flow-rows flow-priorities" onSubmit={handleSubmit}>
             <aside className="flow-priority-hint">
               <span className="flow-priority-hint-icon"><FlowIcon name="sliders" /></span>
               <span className="flow-priority-hint-copy">
                 <strong>Make these matches yours</strong>
-                <span>Adjust the sliders to show what matters most, or keep the suggested ratings and continue.</span>
+                <span>Set what matters most—or keep the suggested ratings and continue.</span>
               </span>
             </aside>
             {FACTORS.map(([name, icon, hint, items]) => (
@@ -326,8 +326,6 @@ function Questionnaire() {
                         value={importance[item]}
                         showName
                         onChange={(value) => setFactorImportance(item, value)}
-                        lowLabel="Lower"
-                        highLabel="Higher"
                       />
                     ))}
                   </div>
@@ -336,8 +334,6 @@ function Questionnaire() {
                     name={name}
                     value={importance[name]}
                     onChange={(value) => setFactorImportance(name, value)}
-                    lowLabel="Lower"
-                    highLabel="Higher"
                   />
                 )}
                 {items && (
