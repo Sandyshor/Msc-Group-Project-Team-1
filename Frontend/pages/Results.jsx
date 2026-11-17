@@ -3,14 +3,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Results.css'
 import { districts } from '../District Profile/districtData.js'
 import { TRAVEL_MODES } from './CommuteFields'
-import { FlowChoices, FlowIcon, FlowSidebar } from './FlowLayout'
+import { FlowIcon, FlowSidebar } from './FlowLayout'
 import RouteMap from './RouteMap'
 import { setChatContext } from '../chatContext'
 import { saveSearch } from '../account'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
-const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
-
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
 const ANSWERS_KEY = 'questionnaireAnswers'
 
@@ -560,20 +558,13 @@ function commuteText(result, modeWords) {
 
 // The selected match's commute by the way of travelling the student picks, with the route on a map.
 // The matches themselves stay as searched (to change them, go back to "About you").
-function GettingThere({ result, university, universityLocation, mode, onMode }) {
+function GettingThere({ result, university, universityLocation, mode }) {
   const commute = result.commute_by_mode?.[mode]
   const place = result.neighbourhood
-  const [, label, words] = TRAVEL_MODES.find(([value]) => value === mode)
+  const [, , words] = TRAVEL_MODES.find(([value]) => value === mode)
 
   return (
-    <div className="flow-panel-group">
-      <h2>Getting there</h2>
-      <FlowChoices
-        label="Travel mode"
-        options={TRAVEL_MODES.map(([value, optionLabel]) => [value, optionLabel, MODE_ICONS[value]])}
-        value={mode}
-        onChange={onMode}
-      />
+    <div className="results-map-only">
       {place && universityLocation ? (
         <RouteMap
           fromLat={place.lat}
@@ -589,13 +580,13 @@ function GettingThere({ result, university, universityLocation, mode, onMode }) 
           defaultWords={commute?.walk_faster ? 'on foot - quicker than public transport from here' : words}
         />
       ) : (
-        <p className="route-summary">{commute ? `${commute.minutes} min ${words}` : `No ${label.toLowerCase()} time for this place yet.`}</p>
+        <p className="route-summary">{commute ? `${commute.minutes} min ${words}` : 'Route details are not available for this match yet.'}</p>
       )}
     </div>
   )
 }
 
-// One of the top matches, as a card the student clicks to see its details
+// One of the top matches, opened on its own detail view when selected.
 function MatchCard({ result, modeWords, selected, onSelect }) {
   return (
     <button
@@ -618,6 +609,7 @@ function MatchCard({ result, modeWords, selected, onSelect }) {
       <span className="flow-match-line">
         <FlowIcon name="clock" /> {commuteText(result, modeWords)}
       </span>
+      <span className="flow-match-open">See why it matches <span aria-hidden="true">→</span></span>
     </button>
   )
 }
@@ -980,18 +972,29 @@ function Results() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [attempt, setAttempt] = useState(0)
-  const [selected, setSelected] = useState(0) 
+  const [selected, setSelected] = useState(() => {
+    const index = Number(new URLSearchParams(location.search).get('match'))
+    return Number.isInteger(index) && index >= 0 ? index : 0
+  })
+  const detailView = new URLSearchParams(location.search).get('view') === 'detail'
   const [tab, setTab] = useState(() => (String(answers?.accommodation).startsWith('student') ? 'Places to live' : DETAIL_TABS[0]))
   
   useEffect(() => {
-    if (answers) navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}`, { replace: true })
-  }, [answers, navigate])
+    if (answers) {
+      const params = new URLSearchParams(location.search)
+      const encodedAnswers = answersToLink(answers)
+      if (params.get('a') !== encodedAnswers) {
+        params.set('a', encodedAnswers)
+        navigate(`/results?${params}`, { replace: true })
+      }
+    }
+  }, [answers, location.search, navigate])
 
   const travelMode = answers?.travelMode ?? 'public_transport'
   const maxCommute = answers?.maxCommute ?? null
   const modeWords = TRAVEL_MODES.find(([value]) => value === travelMode)[2]
 
-  const [routeMode, setRouteMode] = useState(travelMode) // "Getting there": only changes the map, not the matches
+  const routeMode = travelMode
 
   useEffect(() => {
     if (!answers) return
@@ -1087,6 +1090,8 @@ function Results() {
 
   const results = data?.recommendations ?? []
   const shown = results[Math.min(selected, results.length - 1)]
+  const student = String(answers.accommodation).startsWith('student')
+  const room = answers.studentRoom && answers.studentRoom !== 'any' ? answers.studentRoom : null
 
   return (
     <section className="flow-page flow-page-results" data-site-tour="results">
@@ -1095,82 +1100,105 @@ function Results() {
         // back to the questionnaire with these answers filled in
         onStep={(n) => navigate('/questionnaire', { state: { answers, step: n } })}
       />
-
-      {/* The search: change anything here and the matches update straight away */}
-      <aside className="flow-panel">
-        <p className="flow-eyebrow">YOUR MATCHES</p>
-        <div className="flow-progress-info">
-          <span>YOUR RESULTS</span>
-          <span>STEP 3 OF 3</span>
-        </div>
-        <div className="flow-progress" aria-hidden="true"><span style={{ width: '100%' }} /></div>
-        <h1>Your top Dublin <em>neighbourhoods.</em></h1>
-        <p className="flow-summary">
-          {answers.accommodationLabel}{answers.studentRoom && answers.studentRoom !== 'any' ? ` · ${STUDENT_ROOM_NAMES[answers.studentRoom]}` : ''} · {euro(answers.budget)}/month · {answers.university}
-          {data && <> · compared {data.areas_compared} areas</>}
-        </p>
-        
-        {data && <ShareResults />}
-
-        {shown && (
-          <GettingThere
-            result={shown}
-            university={data.university}
-            universityLocation={data.university_location}
-            mode={routeMode}
-            onMode={setRouteMode}
-          />
-        )}
-      </aside>
-
-      <div className={loading ? 'flow-results results-updating' : 'flow-results'}>
-        {!data && !error && (
-          <div className="results-status" role="status">
-            <span className="results-spinner" aria-hidden="true" />
-            <p>
-              Finding your matches… If this is the first search in a while, it can take
-              up to a minute while our server wakes up.
-            </p>
-          </div>
-        )}
-
-        {error && (
-          <div className="results-status results-error" role="alert">
-            <p>{error}</p>
-            <div className="results-error-actions">
-              <button type="button" className="flow-next" onClick={() => setAttempt(attempt + 1)}>
-                Try again <span>↻</span>
-              </button>
-              <button type="button" className="flow-back-link" onClick={() => navigate('/questionnaire', { state: { answers, step: 1 } })}>
-                Change my answers
-              </button>
-            </div>
-          </div>
-        )}
-
-        {data && shown && (
+      <div className={loading ? 'results-page-body results-updating' : 'results-page-body'}>
+        {detailView && shown ? (
           <>
-            {data.warning && <p className="results-warning">{data.warning}</p>}
-            <div className="flow-matches">
-              {results.map((result, index) => (
-                <MatchCard
-                  key={`${result.area}-${result.neighbourhood?.name ?? result.rank}`}
-                  result={result}
-                  modeWords={modeWords}
-                  selected={result === shown}
-                  onSelect={() => setSelected(index)}
-                />
-              ))}
+            <div className="results-detail-column">
+              <button
+                type="button"
+                className="flow-back results-back"
+                onClick={() => navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}`)}
+              >
+                ← Back to your matches
+              </button>
+              <MatchDetail
+                result={shown}
+                results={results}
+                budget={data?.budget ?? answers.budget}
+                tab={tab}
+                onTab={setTab}
+                student={student}
+                room={room}
+              />
             </div>
-            <MatchDetail
-              result={shown}
-              results={results}
-              budget={data.budget}
-              tab={tab}
-              onTab={setTab}
-              student={String(answers.accommodation).startsWith('student')}
-              room={answers.studentRoom && answers.studentRoom !== 'any' ? answers.studentRoom : null}
-            />
+            <div className="results-map-column">
+              <GettingThere
+                result={shown}
+                university={data.university}
+                universityLocation={data.university_location}
+                mode={routeMode}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <aside className="flow-panel results-summary-panel">
+              <p className="flow-eyebrow">YOUR MATCHES</p>
+              <div className="flow-progress-info">
+                <span>YOUR RESULTS</span>
+                <span>STEP 3 OF 3</span>
+              </div>
+              <div className="flow-progress" aria-hidden="true"><span style={{ width: '100%' }} /></div>
+              <h1>Your top Dublin <em>neighbourhoods.</em></h1>
+              <p className="flow-summary">
+                {answers.accommodationLabel}{answers.studentRoom && answers.studentRoom !== 'any' ? ` · ${STUDENT_ROOM_NAMES[answers.studentRoom]}` : ''} · {euro(answers.budget)}/month · {answers.university}
+                {data && <> · compared {data.areas_compared} areas</>}
+              </p>
+
+              {data?.warning && <p className="results-warning">{data.warning}</p>}
+              {data && results.length > 0 && (
+                <div className="flow-matches results-match-list">
+                  {results.slice(0, 3).map((result, index) => (
+                    <MatchCard
+                      key={`${result.area}-${result.neighbourhood?.name ?? result.rank}`}
+                      result={result}
+                      modeWords={modeWords}
+                      selected={result === shown}
+                      onSelect={() => {
+                        setSelected(index)
+                        setTab(student ? 'Places to live' : DETAIL_TABS[0])
+                        navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}&view=detail&match=${index}`)
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+              {data && <ShareResults />}
+              {!data && !error && (
+                <div className="results-status" role="status">
+                  <span className="results-spinner" aria-hidden="true" />
+                  <p>
+                    Finding your matches… If this is the first search in a while, it can take
+                    up to a minute while our server wakes up.
+                  </p>
+                </div>
+              )}
+              {error && (
+                <div className="results-status results-error" role="alert">
+                  <p>{error}</p>
+                  <div className="results-error-actions">
+                    <button type="button" className="flow-next" onClick={() => setAttempt(attempt + 1)}>
+                      Try again <span>↻</span>
+                    </button>
+                    <button type="button" className="flow-back-link" onClick={() => navigate('/questionnaire', { state: { answers, step: 1 } })}>
+                      Change my answers
+                    </button>
+                  </div>
+                </div>
+              )}
+            </aside>
+            <div className="results-map-column">
+              {shown && data?.university_location ? (
+                <GettingThere
+                  result={shown}
+                  university={data.university}
+                  universityLocation={data.university_location}
+                  mode={routeMode}
+                />
+              ) : (
+                <div className="results-map-placeholder" aria-hidden="true" />
+              )}
+            </div>
           </>
         )}
       </div>
