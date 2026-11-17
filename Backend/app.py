@@ -22,6 +22,7 @@ app.include_router(accounts.router)  # /account - logged-in students' saved sear
 
 datastore.connect()  # PostgreSQL if DATABASE_URL is set (copies changed data files first), else the files
 DATA = recommender.load_data()
+chat.use_recommender_data(DATA)  # the assistant's commute times = the results page's
 
 
 class RecommendRequest(BaseModel):

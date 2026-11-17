@@ -149,3 +149,39 @@ def test_the_assistant_knows_each_areas_shop_chains():
     assert f"Tesco {counts['D1']['tesco']}" in d1 and "convenience shops:" in d1
     d10 = next(line for line in facts.splitlines() if line.startswith("- D10 "))
     assert "shares with D12, D20" in d10  # census figures cover the whole electoral area
+
+
+def test_the_assistant_agrees_with_the_website_everywhere(data, profile):
+    """Every figure the assistant is given matches what the site shows, for every area."""
+    import json
+    import re
+
+    import site_facts
+
+    prompt = chat.SYSTEM_PROMPT
+    # safety: every area's score
+    for code, s in profile["safety"].items():
+        if isinstance(s.get("score"), (int, float)):
+            assert f"- {code} " in prompt and f"safety score {s['score']:.0f}/100" in prompt, code
+    # amenities: the district profile's tiles
+    counts = json.loads((site_facts.FRONTEND / "public" / "data" / "dublin-amenity-counts.json").read_text())["counts"]
+    facts = {line.split(" ")[1]: line for line in site_facts.area_facts_text(profile).splitlines()}
+    for code, n in counts.items():
+        assert f"{n['supermarket']} supermarkets" in facts[code] and f"{n['restaurant']} restaurants" in facts[code], code
+    # commute: every result the results page can show lies inside the assistant's range for that area and college
+    chat.use_recommender_data(data)  # as app.py does once the data has loaded
+    block = re.search(r"<site_commute>\n(.*?)\n</site_commute>", chat.SYSTEM_PROMPT, re.S).group(1)
+    assert block == site_facts.commute_text(profile, data)
+    commute = {line.split(" ")[1]: line for line in block.splitlines()}
+    importance = {**IMPORTANCE, "Commute": 7}
+    for college, short in site_facts.COLLEGE_SHORT.items():
+        if college not in data["universities"]:
+            continue
+        out = recommender.recommend(data, college, 3000, "one_bed", importance=importance, top_n=60)
+        for rec in out["recommendations"]:
+            m = re.search(rf"{re.escape(short)} \d+ \((\d+)-(\d+),", commute[rec["area"]])
+            assert m, (college, rec["area"])
+            low, high = int(m.group(1)), int(m.group(2))
+            places = [rec["neighbourhood"]] + rec["neighbourhood"]["others"]
+            for place in places:
+                assert low - 1 <= place["commute_minutes"] <= high + 1, (college, rec["area"], place["name"], low, high)

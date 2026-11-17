@@ -11,6 +11,7 @@ import { addDistrictPlaces } from './placeIndex';
 import { districtProfiles } from './districtProfiles';
 import DistrictTour from './DistrictTour';
 import CompareDistricts from './CompareDistricts';
+import { setChatContext } from '../chatContext';
 import './App.css';
 import './Safety.css';
 import './Chains.css';
@@ -249,6 +250,19 @@ export default function App() {
   }, []);
 
   const setTab = (t) => { setTabState(t); storage.set('district-tab', t); };
+
+  // Tell the AI assistant which district the student is looking at (and the journey they planned), so "is it safe
+  // here?" or "how long to college from here?" are about this district
+  useEffect(() => {
+    const profile = data?.profiles?.[selectedId];
+    if (!profile) { setChatContext(null); return undefined; }
+    const tabName = (TABS.find(([k]) => k === tab) || [])[1];
+    setChatContext([
+      `The student is looking at the district profile for ${selectedId} ${profile.name}${tabName ? ` (the ${tabName} tab)` : ''} on Explore districts.`,
+      trip.from && trip.to ? `They planned a journey from ${trip.from.label || 'a point on the map'} to ${trip.to.label || 'a point on the map'}.` : '',
+    ].filter(Boolean).join('\n'));
+    return () => setChatContext(null);
+  }, [data, selectedId, tab, trip.from?.label, trip.to?.label]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Leaving the Amenities tab (to Rent, Journey...) clears the chosen chain, so its shops leave the map
   useEffect(() => { if (tab !== 'amen') setChain(null); }, [tab]);
