@@ -18,6 +18,14 @@ export const CHAINS = [
 ];
 
 const byKey = Object.fromEntries(CHAINS.map((c) => [c[0], c]));
+
+// How the Amenities tab groups the chains: full supermarkets, convenience shops (which the "Convenience & groceries"
+// count includes, not "Supermarkets"), and international food shops
+export const CHAIN_GROUPS = [
+  ['Supermarkets', ['tesco', 'lidl', 'aldi', 'dunnes', 'supervalu', 'ms']],
+  ['Convenience shops', ['spar', 'centra', 'mace', 'londis', 'costcutter', 'daybreak', 'circlek']],
+  ['International food', ['polonez', 'asian']],
+];
 export const chainInfo = (key) => byKey[key];
 
 

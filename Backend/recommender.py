@@ -104,8 +104,8 @@ FACTORS = [
     {"name": "Shopping & Groceries",   "column": "Shopping & Groceries",
      "kind": "group", "noun": "shopping and grocery options",
      "items": [{"name": "Supermarkets",   "column": "Supermarkets",   "noun": "supermarkets"},
-               {"name": "Grocery Shops",  "column": "Groceries",      "noun": "grocery shops"},
-               {"name": "Shopping Malls", "column": "Shopping_Malls", "noun": "shopping malls"}]},
+               {"name": "Grocery Shops",  "column": "Groceries",      "noun": "convenience and grocery shops"},
+               {"name": "Shopping Malls", "column": "Shopping_Malls", "noun": "shopping centres"}]},
     {"name": "Restaurants",            "column": "Restaurants",        "kind": "count", "noun": "restaurants"},
     {"name": "Healthcare",             "column": "Healthcare",
      "kind": "group", "noun": "healthcare amenities",
@@ -741,6 +741,26 @@ def _nearby(column, value):
     return f"{value:.0f} nearby"
 
 
+def _singular(noun):
+    """'pharmacies' -> 'pharmacy', 'shopping centres' -> 'shopping centre', 'gyms' -> 'gym'."""
+    return noun[:-3] + "y" if noun.endswith("ies") else noun[:-1] if noun.endswith("s") else noun
+
+
+def _group_detail(factor, row):
+    """What a group's count is made of, by distance: '5 supermarkets and 20 convenience and grocery shops within
+    1 km, 1 shopping centre within 2 km' (the same names as the district profile's Amenities tab)."""
+    by_radius = {}
+    for item in factor["items"]:
+        n = row.get(item["column"])
+        if n is None or pd.isna(n):
+            continue
+        n = round(float(n))
+        noun = item["noun"] if n != 1 else _singular(item["noun"])
+        by_radius.setdefault(_radius(item["column"]), []).append(f"{n} {noun}")
+    parts = [f"{_join_words(things)} within {radius:g} km" for radius, things in sorted(by_radius.items())]
+    return ", ".join(parts)
+
+
 def _same_name(neighbourhood, point):
     """'Phibsborough' is the commute point 'Phibsborough Village', but 'Cabra West' is not the point 'Cabra'."""
     neighbourhood, point = neighbourhood.lower().strip(), point.lower().strip()
@@ -1282,6 +1302,8 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
                 shown = f"Safety score {value:.0f}/100"
             else:
                 shown = _nearby(factor["column"], value)
+            # what a group's count is made of, e.g. "11 supermarkets and 10 convenience and grocery shops within 1 km"
+            detail = _group_detail(factor, row) if factor["kind"] == "group" else None
             items.append({
                 "factor": name,
                 "importance": importance[name],
@@ -1289,6 +1311,7 @@ def recommend(data, university, budget, accommodation, ratings=None, top_n=3,
                 "score": round(float(row[_score_column(name)]) * 100),  # 0-100: how well it meets the need
                 "compared": better_or_worse(name, row),  # 1 better than most areas, 0 about average, -1 worse
                 "value": shown,
+                "detail": detail or None,
             })
         return items
 

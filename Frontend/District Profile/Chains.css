@@ -19,3 +19,7 @@
 .chain-result b { color: #214b39; }
 .chain-clear { margin-left: 6px; padding: 0; border: 0; background: none; color: #214b39; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
 div.amenity-tile:hover { transform: none; background: #fffefa; }
+
+/* the chain buttons in three groups: supermarkets, convenience shops, international food */
+.chain-group-name { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0 0 7px; color: #2f4a3a; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.chain-group-name small { color: #8a9685; font-size: 0.7rem; font-weight: 700; letter-spacing: 0; text-transform: none; }

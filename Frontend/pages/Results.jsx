@@ -376,6 +376,7 @@ function WhyThisPlace({ result, place }) {
                 <ImportanceDots value={item.importance} label={item.importance_label} />
               </div>
               <p className="why-card-value">{item.value}</p>
+              {item.detail && <p className="why-card-detail">{item.detail}</p>}
               <p className={`why-card-compare ${tone}`}>
                 <span aria-hidden="true">{tone === 'better' ? '▲' : tone === 'worse' ? '▼' : '●'}</span>
                 {comparedWords(item.factor, item.compared)}
@@ -1062,7 +1063,7 @@ function Results() {
     const word = { 1: 'better than most areas', 0: 'about average', [-1]: 'worse than most areas' }
     const lines = list.slice(0, 8).map((r) => {
       const name = r.neighbourhood ? `${r.neighbourhood.name} (${r.area})` : r.area
-      const facts = (r.breakdown ?? []).map((b) => `${b.factor}: ${b.value} (${word[b.compared] ?? 'about average'})`).join('; ')
+      const facts = (r.breakdown ?? []).map((b) => `${b.factor}: ${b.value}${b.detail ? ` [${b.detail}]` : ''} (${word[b.compared] ?? 'about average'})`).join('; ')
       return `#${r.rank} ${name}: ${r.match_score.toFixed(1)}% match, ${euro(r.rent)}/month${r.commute_minutes != null ? `, ${r.commute_minutes} min commute` : ''}. ${facts}`
     })
     const open = list[Math.min(selected, list.length - 1)]

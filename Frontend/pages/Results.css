@@ -1320,6 +1320,7 @@
 .why-dots i { width: 7px; height: 7px; border-radius: 50%; background: #e2d9c6; }
 .why-dots i.on { background: #173f32; }
 
+.why-card-detail { margin: 4px 0 0; color: #4f6158; font-size: 13px; line-height: 1.45; }
 .why-card-value { margin: 4px 0 0; color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: 24px; font-weight: 700; line-height: 1.15; font-variation-settings: 'opsz' 36; }
 .why-card-compare { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13.5px; font-weight: 700; }
 .why-card-compare.better { color: #245b48; }
