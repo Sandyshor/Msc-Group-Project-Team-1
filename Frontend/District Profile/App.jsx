@@ -272,16 +272,23 @@ export default function App() {
     const end = trip.to && !trip.from ? trip.to : trip.from && !trip.to ? trip.from : null;
     if (end) mapApi.current?.reveal(end.lat, end.lng);
   }, [trip.from?.lat, trip.from?.lng, trip.to?.lat, trip.to?.lng]); // eslint-disable-line react-hooks/exhaustive-deps
-  // Close the Layers menu when clicking outside it or pressing Escape
+    // Close the Layers menu when clicking outside it or pressing Escape.
+  // Only one list at a time: opening this one closes the map's "Explore" list,
+  // and pointing at the map's list closes this one.
   useEffect(() => {
     if (!layersOpen) return undefined;
-    const onClick = (e) => { if (!layersRef.current?.contains(e.target)) setLayersOpen(false); };
-    const onKey = (e) => { if (e.key === 'Escape') setLayersOpen(false); };
+    document.querySelectorAll('.leaflet-control-layers-expanded').forEach((el) => el.classList.remove('leaflet-control-layers-expanded'));
+    const close = () => setLayersOpen(false);
+    const onClick = (e) => { if (!layersRef.current?.contains(e.target)) close(); };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    const mapList = document.querySelector('.leaflet-control-layers');
     document.addEventListener('mousedown', onClick);
     document.addEventListener('keydown', onKey);
+    mapList?.addEventListener('mouseenter', close);
     return () => {
       document.removeEventListener('mousedown', onClick);
       document.removeEventListener('keydown', onKey);
+      mapList?.removeEventListener('mouseenter', close);
     };
   }, [layersOpen]);
   if (error) return <div className="district-page"><p className="empty-note">Could not load district data: {error}</p></div>;
@@ -410,8 +417,8 @@ export default function App() {
               <div className="layers-wrap" ref={layersRef}>
                 <button type="button" className="layers-button" aria-expanded={layersOpen} onClick={() => setLayersOpen((o) => !o)}>
                   Layers
-                  {[showLuas, showBus, showBikes, showRail, showHousing, showSafety].filter(Boolean).length > 0 && (
-                    <span className="layers-count">{[showLuas, showBus, showBikes, showRail, showHousing, showSafety].filter(Boolean).length}</span>
+                  {[showLuas, showBus, showBikes, showRail, showSafety].filter(Boolean).length > 0 && (
+                    <span className="layers-count">{[showLuas, showBus, showBikes, showRail, showSafety].filter(Boolean).length}</span>
                   )}
                   <span aria-hidden="true">▾</span>
                 </button>
@@ -422,7 +429,6 @@ export default function App() {
                     <button type="button" className="luas-toggle tr-toggle" aria-pressed={showBus} onClick={() => setShowBus((v) => !v)}><i className="tr-bus" /> Bus stops</button>
                     <button type="button" className="luas-toggle tr-toggle" aria-pressed={showBikes} onClick={() => setShowBikes((v) => !v)}><i className="tr-bikes" /> Dublin Bikes</button>
                     <button type="button" className="luas-toggle tr-toggle" aria-pressed={showRail} onClick={() => setShowRail((v) => !v)}><i className="tr-rail" /> DART &amp; rail</button>
-                    <button type="button" className="luas-toggle tr-toggle" aria-pressed={showHousing} onClick={() => setShowHousing((v) => !v)}><i className="tr-housing" aria-hidden="true">🏠</i> Student housing</button>
                     <button type="button" className="luas-toggle tr-toggle" aria-pressed={showSafety} onClick={() => setShowSafety((v) => !v)}><i className="tr-safety" /> Safety map</button>
                   </div>
                 )}
@@ -450,6 +456,7 @@ export default function App() {
             showBikes={showBikes}
             showRail={showRail}
             showHousing={showHousing}
+            onHousingChange={setShowHousing}
             showSafety={showSafety}
             hoverPlace={hoverPlace}
             onHoverPlace={setHoverPlace}
