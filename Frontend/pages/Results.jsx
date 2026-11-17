@@ -614,9 +614,9 @@ function MatchCard({ result, modeWords, selected, onSelect }) {
   )
 }
 
-const DETAIL_TABS = ['Why it fits', 'About the area', 'Safety', 'Places to live', 'Compare', 'Letting agents']
+const DETAIL_TABS = ['Why it fits', 'About the area', 'Safety', 'Places to live', 'Letting agents']
 
-function MatchDetail({ result, results, budget, tab, onTab, student, room }) {
+function MatchDetail({ result, budget, tab, onTab, student, room }) {
   const navigate = useNavigate()
   const isCounty = /^[AK]\d{2}$/.test(result.area) // County Dublin areas have profiles on the same page
   const hasProfile = isCounty || districts.some((d) => d.id === result.area)
@@ -666,7 +666,6 @@ function MatchDetail({ result, results, budget, tab, onTab, student, room }) {
             : <p className="result-muted">No safety data for {result.area} yet.</p>
         )}
         {tab === 'Places to live' && <PlacesToLive area={result.area} places={result.places_to_live} budget={budget} student={student} room={room} />}
-        {tab === 'Compare' && <CompareAreas results={results} budget={budget} />}
         {tab === 'Letting agents' && <LettingAgents />}
       </div>
     </article>
@@ -977,6 +976,7 @@ function Results() {
     return Number.isInteger(index) && index >= 0 ? index : 0
   })
   const detailView = new URLSearchParams(location.search).get('view') === 'detail'
+  const compareView = new URLSearchParams(location.search).get('view') === 'compare'
   const [tab, setTab] = useState(() => (String(answers?.accommodation).startsWith('student') ? 'Places to live' : DETAIL_TABS[0]))
   
   useEffect(() => {
@@ -1093,43 +1093,79 @@ function Results() {
   const student = String(answers.accommodation).startsWith('student')
   const room = answers.studentRoom && answers.studentRoom !== 'any' ? answers.studentRoom : null
 
+  function goToResultStep(number) {
+    const resultUrl = `/results?a=${encodeURIComponent(answersToLink(answers))}`
+    if (number === 4) navigate(`${resultUrl}&view=compare`)
+    else if (number === 3) navigate(resultUrl)
+    else navigate('/questionnaire', { state: { answers, step: number } })
+  }
+
   return (
     <section className="flow-page flow-page-results" data-site-tour="results">
       <FlowSidebar
-        step={3}
+        step={compareView ? 4 : 3}
+        includeCompare
         // back to the questionnaire with these answers filled in
-        onStep={(n) => navigate('/questionnaire', { state: { answers, step: n } })}
+        onStep={goToResultStep}
       />
-      <div className={loading ? 'results-page-body results-updating' : 'results-page-body'}>
-        {detailView && shown ? (
-          <>
-            <div className="results-detail-column">
-              <button
-                type="button"
-                className="flow-back results-back"
-                onClick={() => navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}`)}
-              >
-                ← Back to your matches
-              </button>
-              <MatchDetail
-                result={shown}
-                results={results}
-                budget={data?.budget ?? answers.budget}
-                tab={tab}
-                onTab={setTab}
-                student={student}
-                room={room}
-              />
-            </div>
-            <div className="results-map-column">
-              <GettingThere
-                result={shown}
-                university={data.university}
-                universityLocation={data.university_location}
-                mode={routeMode}
-              />
-            </div>
-          </>
+      <div className={[
+        'results-page-body',
+        (detailView || compareView) && shown ? 'results-detail-page' : '',
+        loading ? 'results-updating' : '',
+      ].filter(Boolean).join(' ')}>
+        {compareView ? (
+          <div className="results-detail-column">
+            <button
+              type="button"
+              className="flow-back results-back"
+              onClick={() => navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}`)}
+            >
+              ← Back to your matches
+            </button>
+            <article className="flow-detail result-card">
+              <header className="flow-detail-head">
+                <div>
+                  <h2>Compare your top matches</h2>
+                  <p className="result-muted">See how your matched neighbourhoods compare side by side.</p>
+                </div>
+              </header>
+              <div className="flow-tab-body">
+                {data && <CompareAreas results={results} budget={data?.budget ?? answers.budget} />}
+                {!data && !error && (
+                  <div className="results-status" role="status">
+                    <span className="results-spinner" aria-hidden="true" />
+                    <p>Finding your matches so we can compare them…</p>
+                  </div>
+                )}
+                {error && (
+                  <div className="results-status results-error" role="alert">
+                    <p>{error}</p>
+                    <button type="button" className="flow-next" onClick={() => setAttempt(attempt + 1)}>
+                      Try again <span>↻</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </article>
+          </div>
+        ) : detailView && shown ? (
+          <div className="results-detail-column">
+            <button
+              type="button"
+              className="flow-back results-back"
+              onClick={() => navigate(`/results?a=${encodeURIComponent(answersToLink(answers))}`)}
+            >
+              ← Back to your matches
+            </button>
+            <MatchDetail
+              result={shown}
+              budget={data?.budget ?? answers.budget}
+              tab={tab}
+              onTab={setTab}
+              student={student}
+              room={room}
+            />
+          </div>
         ) : (
           <>
             <aside className="flow-panel results-summary-panel">
