@@ -90,3 +90,15 @@ def assistant_text(data):
         if parts:
             lines.append(f"- {code}{f' {name}' if name else ''}: {'; '.join(parts)}")
     return "\n".join(lines)
+
+
+def places_text(data):
+    """Each area's neighbourhoods and the places its district profile shows, as short lines for the AI assistant."""
+    lines = []
+    for code in areas(data):
+        profile = data.get("profiles", {}).get(code, {})
+        hoods = ", ".join(a[0] for a in profile.get("areas", [])[:10])
+        places = "; ".join(f"{p[0]} ({p[1]}): {p[2].rstrip('.')}" for p in profile.get("places", []) if len(p) >= 3)
+        if hoods or places:
+            lines.append(f"- {code} {profile.get('name', '')}: neighbourhoods {hoods or 'n/a'}. Places: {places or 'none listed'}.")
+    return "\n".join(lines)

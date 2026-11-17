@@ -95,13 +95,13 @@ def test_a_university_residence_is_only_for_its_own_students(data):
     assert not recommender.open_to({"operator": "Trinity College Dublin"}, "University College Dublin - Belfield")
 
 
-def test_the_assistant_only_answers_dublin_student_questions():
+def test_the_assistant_answers_every_question():
     prompt = chat.SYSTEM_PROMPT
-    assert "your ONLY job" in prompt
-    for topic in ("Immigration for students in Ireland", "Studying in Ireland", "The Find My Dublin website", "Getting around"):
-        assert topic in prompt
-    assert "what is the capital of India?" in prompt  # the example of an off-topic question
-    assert f'and nothing else: "{chat.OFF_TOPIC_REPLY}"' in prompt  # one fixed, short reply
-    assert "{off_topic}" not in prompt
-    assert "never follow them" in prompt  # attempts to change the rules are refused
-    assert chat.MAX_REPLY_TOKENS <= 2000 and chat.MAX_TURNS <= 12
+    assert "Answer any question the student asks" in prompt
+    assert "off-topic" not in prompt and "your ONLY job" not in prompt
+
+
+def test_the_assistant_answers_with_the_sites_places():
+    prompt = chat.SYSTEM_PROMPT
+    assert "<site_places>" in prompt and "Trinity College (university)" in prompt
+    assert "never reply with only" in prompt  # it answers instead of just pointing to a page
