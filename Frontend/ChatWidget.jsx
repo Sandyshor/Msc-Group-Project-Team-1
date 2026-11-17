@@ -41,6 +41,13 @@ const STARTERS = [
   ['🚋', 'How do I get a student Leap card?'],
   ['🔑', 'What do I need before I rent?'],
 ]
+// On a district profile: questions about the district being looked at
+const districtStarters = (code) => [
+  ['🛡️', `How safe is ${code}?`],
+  ['💶', `What does a room cost in ${code}?`],
+  ['🚋', `How long is the commute from ${code} to my college?`],
+  ['📍', `What are the best places to explore in ${code}?`],
+]
 const RESULTS_STARTERS = [
   ['💰', 'Which of my matches is cheapest?'],
   ['⚖️', 'Compare my top 3 matches'],
@@ -435,7 +442,8 @@ export default function ChatWidget() {
   }
   useEffect(() => () => recognition.current?.abort(), [])
 
-  const starters = context && pathname.startsWith('/results') ? RESULTS_STARTERS : STARTERS
+  const districtOpen = pathname.startsWith('/districts') && context?.match(/district profile for (\S+) /)?.[1]
+  const starters = context && pathname.startsWith('/results') ? RESULTS_STARTERS : districtOpen ? districtStarters(districtOpen) : STARTERS
   const waiting = busy && !messages.at(-1)?.content
 
   return (

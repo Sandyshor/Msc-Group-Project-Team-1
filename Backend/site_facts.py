@@ -52,35 +52,79 @@ def _name(data, code):
     return data.get("profiles", {}).get(code, {}).get("name", "")
 
 
-def commute_text(data):
-    """Typical public transport minutes from each area to each college (the middle of the area's starting points,
-    weekday morning, from the same timetable data as the results page), plus colleges within a 30-minute walk."""
-    times = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))  # area -> college -> mode -> [minutes]
-    for name in ("commute_otp.csv", "commute_otp_county.csv"):
-        try:
-            with open(DATA / name, encoding="utf-8") as f:
-                for row in csv.DictReader(f):
-                    try:
-                        times[row["Area"]][row["University"]][row["Mode"]].append(float(row["Minutes"]))
-                    except (KeyError, ValueError):
-                        continue
-        except OSError:
-            continue
+def commute_text(data, rec_data=None):
+    """Public transport minutes from each area to each college: the middle and range over all the places in the area
+    the results page scores, and the quickest one. With the recommender's data (rec_data, as app.py loads it) these
+    are exactly the results page's figures, worked out by the recommender itself, including its rule that a walk is
+    used when it's quicker. Without it (tests, or before the data loads) they come from the timetable files."""
+    door = defaultdict(lambda: defaultdict(dict))   # area -> college -> place -> minutes the results page shows
+    walking = defaultdict(lambda: defaultdict(list))  # area -> college -> walking minutes
+    cycling = defaultdict(lambda: defaultdict(list))  # area -> college -> cycling minutes
+    if rec_data is not None:
+        import recommender
+
+        for college in COLLEGE_SHORT:
+            if college not in rec_data.get("universities", []):
+                continue
+            pt = recommender._part_commutes(rec_data, college, "public_transport").set_index(["Area", "Part"])["Minutes"]
+            walk = recommender._part_commutes(rec_data, college, "walk").set_index(["Area", "Part"])["Minutes"]
+            bike = recommender._part_commutes(rec_data, college, "cycle").set_index(["Area", "Part"])["Minutes"]
+            for (area, part), m in bike.items():
+                if m == m:
+                    cycling[area][college].append(float(m))
+            for (area, part) in pt.index.union(walk.index):
+                options = [float(m) for m in (pt.get((area, part)), walk.get((area, part)))
+                           if m is not None and m == m]  # m == m: not NaN
+                if options:
+                    door[area][college][part] = min(options)
+                w = walk.get((area, part))
+                if w is not None and w == w:
+                    walking[area][college].append(float(w))
+    else:
+        sources = [("commute_otp.csv", "Landmark"), ("commute_otp_county.csv", "Landmark"),
+                   ("commute_otp_neighbourhoods.csv", "Neighbourhood")]
+        raw = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+        for name, place_column in sources:
+            try:
+                with open(DATA / name, encoding="utf-8") as f:
+                    for row in csv.DictReader(f):
+                        try:
+                            raw[row["Area"]][row["University"]][row[place_column]][row["Mode"]] = float(row["Minutes"])
+                        except (KeyError, ValueError):
+                            continue
+            except OSError:
+                continue
+        for area, colleges in raw.items():
+            for college, places in colleges.items():
+                for place, modes in places.items():
+                    options = [m for m in (modes.get("public_transport"), modes.get("walk")) if m is not None]
+                    if options:
+                        door[area][college][place] = min(options)
+                    if modes.get("walk") is not None:
+                        walking[area][college].append(modes["walk"])
+                    if modes.get("cycle") is not None:
+                        cycling[area][college].append(modes["cycle"])
     lines = []
     for code in district_rent.areas(data):
-        if code not in times:
+        if code not in door:
             continue
-        bus, walk = [], []
+        bus, walk, bike = [], [], []
         for college, short in COLLEGE_SHORT.items():
-            modes = times[code].get(college, {})
-            if modes.get("public_transport"):
-                pt = sorted(modes["public_transport"])
-                bus.append(f"{short} {statistics.median(pt):.0f} ({pt[0]:.0f}-{pt[-1]:.0f})")
-            if modes.get("walk") and statistics.median(modes["walk"]) <= 30:
-                walk.append(f"{short} {statistics.median(modes['walk']):.0f}")
+            places = door[code].get(college, {})
+            if places:
+                values = sorted(places.values())
+                quickest = min(places, key=places.get)
+                bus.append(f"{short} {statistics.median(values):.0f} ({values[0]:.0f}-{values[-1]:.0f}, quickest from {quickest})")
+            rides = cycling[code].get(college, [])
+            if rides:
+                bike.append(f"{short} {statistics.median(rides):.0f}")
+            walks = walking[code].get(college, [])
+            if walks and statistics.median(walks) <= 30:
+                walk.append(f"{short} {statistics.median(walks):.0f}")
         if bus:
             lines.append(f"- {code} {_name(data, code)}: " + ", ".join(bus)
-                         + (f". Walkable: {', '.join(walk)} min." if walk else "."))
+                         + (f". Walkable: {', '.join(walk)} min." if walk else ".")
+                         + (f" By bike (typical): {', '.join(bike)} min." if bike else ""))
     return "\n".join(lines)
 
 
@@ -141,6 +185,8 @@ def area_facts_text(data):
                 people += f", {c['Non_Irish_%']}% born outside Ireland"
             if c.get("Apartments_%") is not None:
                 people += f", {c['Apartments_%']}% of homes are apartments"
+            if c.get("Internet_Access_%") is not None:
+                people += f", {c['Internet_Access_%']}% have internet at home"
             others = [d for d in sharing.get(c.get("LEA"), []) if d != code]
             if others:
                 people += f" (Census figures for the whole {c['LEA']} electoral area, which it shares with {', '.join(others)})"
@@ -171,20 +217,84 @@ def residences_text():
             price = f", from €{r['from']:,}" + (f" to €{r['to']:,}" if r.get("to") else "") + " a month"
         rooms = f", {r['rooms']}" if r.get("rooms") else ""
         operator = f" ({r['operator']})" if r.get("operator") else ""
-        by_area[r.get("district") or "?"].append(f"{r['name']}{operator}{price}{rooms}")
+        where = f", {r['address']}" if r.get("address") else ""
+        site = f", {r['website']}" if r.get("website") else ""
+        by_area[r.get("district") or "?"].append(f"{r['name']}{operator}{where}{price}{rooms}{site}")
     order = {code: i for i, code in enumerate(district_rent.areas(district_rent.load_profile_data()))}
     return "\n".join(f"- {area}: " + "; ".join(items) for area, items in sorted(by_area.items(), key=lambda kv: order.get(kv[0], 99)))
 
 
-def colleges_text():
-    """The colleges on the Universities page and where they are."""
+def _js_objects(source, array_name):
+    """The objects of a simple JS array of string fields in a page file ([{name: '...', location: "..."}, ...]), as
+    dicts of their string fields. Only quoted strings are read; anything else is skipped."""
     try:
-        source = (FRONTEND / "District Profile" / "cityPlaces.js").read_text(encoding="utf-8")
-        block = source[source.index("export const universities"):]
-        block = block[:block.index("];")]
-    except (OSError, ValueError):
+        start = source.index(f"const {array_name} = [")
+    except ValueError:
+        return []
+    block = source[start:source.index("\n]", start)]
+    objects = []
+    for chunk in re.split(r"\n  \{", block)[1:]:
+        fields = {m.group(1): m.group(3).replace("\\'", "'") for m in
+                  re.finditer(r"\b(\w+): (['\"])((?:\\.|(?!\2).)*)\2", chunk)}
+        if fields.get("name"):
+            objects.append(fields)
+    return objects
+
+
+def _city_guide():
+    try:
+        return (FRONTEND / "pages" / "CityGuide.jsx").read_text(encoding="utf-8")
+    except OSError:
         return ""
-    return "\n".join(f"- {name}: {where}" for name, where in re.findall(r"name: '([^']+)', location: '([^']+)'", block))
+
+
+def colleges_text():
+    """The colleges on the Universities page: where each is and its website."""
+    return "\n".join(f"- {c['name']}: {c.get('location', '')}" + (f", {c['url']}" if c.get("url") else "")
+                     for c in _js_objects(_city_guide(), "universities"))
+
+
+def attractions_text():
+    """The Famous attractions page: each place, what it is, where, and its website."""
+    return "\n".join(f"- {a['name']} ({a.get('category', '').lower()}), {a.get('location', '')}: {a.get('detail', '')}"
+                     + (f" {a['url']}" if a.get("url") else "") for a in _js_objects(_city_guide(), "attractions"))
+
+
+def letting_agents_text():
+    """The letting agents on the results page, with the areas they cover and their PSRA licence."""
+    try:
+        with open(DATA / "letting_agencies.csv", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+    except OSError:
+        return ""
+    return "\n".join(f"- {r['Name']} ({r.get('Areas', '').strip()}): {r.get('Address', '').strip()}, {r.get('Website', '').strip()}"
+                     + (f", PSRA licence {r['PSRA_Licence'].strip().zfill(6)}" if r.get("PSRA_Licence", "").strip() else "")
+                     for r in rows if r.get("Name"))
+
+
+def faq_text():
+    """The questions and answers in the home page FAQ, as plain text."""
+    try:
+        source = (FRONTEND / "pages" / "HomeFaq.jsx").read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    lines = []
+    for q, a in re.findall(r"q: '((?:\\'|[^'])*)',\s*a: <>(.*?)</>,?\s*\n\s*\}", source, re.S):
+        answer = re.sub(r"<[^>]+>", "", a)  # links keep their words
+        lines.append(f"- {q.replace(chr(92) + chr(39), chr(39))} {' '.join(answer.split())}")
+    return "\n".join(lines)
+
+
+def luas_text(data):
+    """How often the Luas lines run (the district profile's journey information)."""
+    lines = data.get("lines") or {}
+    out = []
+    for line, info in lines.items():
+        every = info.get("interval")
+        peak = info.get("peak")
+        if every:
+            out.append(f"{line.title()} line about every {every} minutes" + (f" ({peak} at peak times)" if peak else ""))
+    return "; ".join(out)
 
 
 def things_to_know_text():

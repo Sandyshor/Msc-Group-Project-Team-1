@@ -81,12 +81,21 @@ def rent_table(data, search):
 
 
 def assistant_text(data):
-    """The rent figures as short lines for the AI assistant's instructions."""
+    """The rent figures as short lines for the AI assistant's instructions: every size the district profile's Rent
+    tab shows (with where each figure comes from), the RTB average across all homes, and the RTB average for each
+    of its neighbourhoods."""
     lines = []
     for code in areas(data):
         name = data.get("profiles", {}).get(code, {}).get("name", "")
-        parts = [f"{KIND_LABEL[k]} €{x['value']:,.0f}" for k in ("single", "double", "sharing", "1 bed", "2 bed")
+        parts = [f"{KIND_LABEL[k]} €{x['value']:,.0f} ({x['note']})"
+                 for k in ("single", "double", "sharing", "studio", "1 bed", "2 bed", "3 bed", "4+ bed")
                  if (x := rent_for(data, code, k))]
+        rtb = data.get("rtb", {}).get(code, {})
+        if (rtb.get("district") or {}).get("all"):
+            parts.append(f"RTB 2025 average across all homes €{rtb['district']['all']:,.0f}")
+        hoods = sorted(((n, v["all"]) for n, v in (rtb.get("areas") or {}).items() if v.get("all")), key=lambda x: x[1])
+        if hoods:
+            parts.append("RTB average by neighbourhood (all homes): " + ", ".join(f"{n} €{v:,.0f}" for n, v in hoods))
         if parts:
             lines.append(f"- {code}{f' {name}' if name else ''}: {'; '.join(parts)}")
     return "\n".join(lines)
@@ -128,11 +137,15 @@ def safety_text(data):
                           if rates.get(k) is not None and ireland.get(k) is not None)
         hoods = sorted(s.get("hoods") or [], key=lambda h: -h[1])
         parts = ""
-        if len(hoods) > 1 and hoods[0][1] != hoods[-1][1]:
-            top = [h for h in hoods if h[1] == hoods[0][1]][:3]
-            low = [h for h in hoods if h[1] == hoods[-1][1]][:3]
-            parts = (f" Safer parts: {', '.join(h[0] for h in top)} ({top[0][1]:.0f})."
-                     f" Less safe parts: {', '.join(h[0] for h in low)} ({low[0][1]:.0f}).")
+        if hoods:
+            # neighbourhoods with the same score are listed together, safest first (the Safety tab's list)
+            groups = []
+            for name_, score, *_ in hoods:
+                if groups and groups[-1][1] == round(score):
+                    groups[-1][0].append(name_)
+                else:
+                    groups.append(([name_], round(score)))
+            parts = " Neighbourhood scores: " + "; ".join(f"{', '.join(n)} {v}" for n, v in groups) + "."
         extra = []
         if isinstance(s.get("lit"), (int, float)):
             extra.append(f"{s['lit'] * 100:.0f}% of mapped streets lit")
