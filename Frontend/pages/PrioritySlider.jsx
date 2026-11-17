@@ -11,17 +11,19 @@ export function importanceLabel(value) {
   return 'Very important'
 }
 
-function PrioritySlider({ name, value, onChange, showName = false, lowLabel = 'Not important', highLabel = 'Very important' }) {
+function PrioritySlider({ name, value, onChange, showName = false }) {
   const words = importanceLabel(value)
 
   return (
     <div className="priority-slider">
-      <div className="priority-value">
-        <span>
-          {showName && <strong className="priority-name">{name}</strong>}
-          {words}
-        </span>
-        <strong>{value}/10</strong>
+      {showName && (
+        <div className="priority-value">
+          <strong className="priority-name">{name}</strong>
+        </div>
+      )}
+      <div className="range-labels">
+        <span>Least important</span>
+        <span>Most important</span>
       </div>
       <input
         type="range"
@@ -34,10 +36,6 @@ function PrioritySlider({ name, value, onChange, showName = false, lowLabel = 'N
         aria-valuetext={`${value} out of 10, ${words}`}
         onChange={(event) => onChange(Number(event.target.value))}
       />
-      <div className="range-labels">
-        <span>{lowLabel}</span>
-        <span>{highLabel}</span>
-      </div>
     </div>
   )
 }

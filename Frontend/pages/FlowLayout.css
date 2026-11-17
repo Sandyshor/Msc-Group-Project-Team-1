@@ -428,13 +428,12 @@
 .flow-priorities .priority-slider {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
 }
 
 .flow-priorities .range-labels {
-  margin-top: 0;
-  font-size: 10px;
-  line-height: 1.1;
+  font-size: 12px;
+  line-height: 1.2;
 }
 
 .flow-priorities .flow-row-icon {
