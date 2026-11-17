@@ -22,6 +22,7 @@ const ICON_PATHS = {
   tree: ['M12 3 7 10h3l-5 7h6v4h2v-4h6l-5-7h3l-5-7Z'],
   lock: ['M7 11V8a5 5 0 0 1 10 0v3', 'M5 11h14v10H5z', 'M12 15v2'],
   check: ['m5 12.5 4.5 4.5L19 7'],
+  compare: ['M4 5h6v14H4z', 'M14 5h6v14h-6z'],
 }
 
 export function FlowIcon({ name }) {
@@ -39,13 +40,16 @@ const STEPS = [
   ['Your matches', 'pin'],
 ]
 
-// step: 1-3 (the current one); onStep(n) when another step is clicked - every step can be clicked, so students
+// step: 1-3 (the current one); includeCompare adds the results-only fourth step.
+// onStep(n) when another step is clicked - every step can be clicked, so students
 // can go back and forth (the page decides what to do if a step isn't ready yet). Steps listed in `locked`
 // show a padlock until the earlier steps are done.
-export function FlowSidebar({ step, onStep, locked = [] }) {
+export function FlowSidebar({ step, onStep, locked = [], includeCompare = false }) {
+  const steps = includeCompare ? [...STEPS, ['Compare', 'compare']] : STEPS
+
   return (
     <nav className="flow-sidebar" aria-label="Steps">
-      {STEPS.map(([label, icon], index) => {
+      {steps.map(([label, icon], index) => {
         const number = index + 1
         const current = number === step
         const isLocked = locked.includes(number) && !current
