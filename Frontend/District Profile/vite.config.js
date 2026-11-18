@@ -6,4 +6,5 @@ export default defineConfig({
   plugins: [react()],
   // Shares the main site's public folder (map boundaries, icons).
   publicDir: '../public',
+  resolve: { dedupe: ['react', 'react-dom'] },
 })
