@@ -95,10 +95,15 @@ def test_a_university_residence_is_only_for_its_own_students(data):
     assert not recommender.open_to({"operator": "Trinity College Dublin"}, "University College Dublin - Belfield")
 
 
-def test_the_assistant_answers_every_question():
+def test_the_assistant_keeps_to_dublin_but_answers_in_full():
     prompt = chat.SYSTEM_PROMPT
-    assert "Answer any question the student asks" in prompt
-    assert "off-topic" not in prompt and "your ONLY job" not in prompt
+    assert "Which questions you answer:" in prompt and "Be generous" in prompt
+    assert f'reply with only this one \nsentence' not in prompt  # (sanity: the sentence is filled in below)
+    assert chat.OFF_TOPIC_REPLY in prompt and "{off_topic}" not in prompt
+    assert "only decides WHICH questions you answer, never HOW MUCH" in prompt
+    assert "Give full, detailed, useful answers" in prompt and "120-300 words" in prompt
+    assert "Never answer with only" in prompt
+    assert "2-5 short sentences" not in prompt and "Answer any question the student asks" not in prompt
 
 
 def test_the_assistant_answers_with_the_sites_places():
