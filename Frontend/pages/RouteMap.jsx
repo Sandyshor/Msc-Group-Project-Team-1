@@ -143,6 +143,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
   const [start, setStart] = useState(null) // null = the neighbourhood centre; else { lat, lng, name }
   const [plans, setPlans] = useState(null) // { fastest, bus } itineraries from the journey planner, or null
   const [choice, setChoice] = useState('fastest')
+  const [showAllNearbyRoutes, setShowAllNearbyRoutes] = useState(false)
   const [trip, setTrip] = useState({ status: 'idle' }) // route for a picked start: minutes, km, estimate?
   const [near, setNear] = useState(null) // nearby transport: stations, bus stops (both ends), bike docks
   const [homes, setHomes] = useState([]) // student residences around the start
@@ -244,6 +245,13 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
   // the map, once
   useEffect(() => {
     const map = L.map(boxRef.current, { scrollWheelZoom: false, zoomControl: false, attributionControl: false })
+    let resizeFrame = 0
+    const resizeObserver = new ResizeObserver(() => {
+      cancelAnimationFrame(resizeFrame)
+      resizeFrame = requestAnimationFrame(() => map.invalidateSize({ pan: false }))
+    })
+    resizeObserver.observe(boxRef.current)
+    resizeFrame = requestAnimationFrame(() => map.invalidateSize({ pan: false }))
     L.control.zoom({ position: 'bottomright' }).addTo(map)
     let base = null
     let fallback = false
@@ -278,7 +286,13 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     map.on('zoomend', () => arrangeHomes())
     ctxRef.current = L.layerGroup().addTo(map)
     layerRef.current = L.layerGroup().addTo(map)
-    return () => { stopTraveller(); map.remove(); mapRef.current = null }
+    return () => {
+      resizeObserver.disconnect()
+      cancelAnimationFrame(resizeFrame)
+      stopTraveller()
+      map.remove()
+      mapRef.current = null
+    }
   }, [])
 
   // a new match: back to its centre
@@ -357,7 +371,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     draw([{ points: [from, to], colour: '#9aa79f', dashed: true }], { animate: false })
     setPlans(null)
     setChoice('fastest')
-    if (start) setTrip({ status: 'loading' })
+      setTrip({ status: 'loading' })
     const ask = (routeMode) => fetch(`${API_URL}/route?${new URLSearchParams({
       from_lat: from[0], from_lon: from[1], to_lat: to[0], to_lon: to[1],
       mode: routeMode, when: nextWeekdayNine(), arrive_by: 'true',
@@ -379,7 +393,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
         // no route service: straight-line distance and an estimated time
         const road = straightKm * 1.3
         if (start) setTrip({ status: 'estimate', km: straightKm, minutes: Math.max(1, Math.round((road / SPEED_KMH[mode]) * 60 + (mode === 'public_transport' ? 8 : 0))) })
-        else setTrip({ status: 'idle', routeShown: false })
+        else setTrip({ status: 'unavailable' })
       })
     return () => controller.abort()
   }, [start?.lat, start?.lng, fromLat, fromLon, toLat, toLon, mode]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -445,6 +459,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
         setNear({
           kind: 'transit', busRoutes: direct,
           busStops: nearStart, uniStops: nearUni,
+          busDataAvailable: Array.isArray(bus?.features),
           luas: luas && luas.m <= STATION_M ? luas : null,
           rail: rail && rail.m <= STATION_M ? rail : null,
           station: sorted[0],
@@ -517,6 +532,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
   const placeName = start ? start.name : fromName
   const rides = chosen ? chosen.legs.filter((leg) => leg.mode !== 'WALK' && leg.mode !== 'BICYCLE') : []
   const chosenBuses = [...new Set(rides.filter((leg) => leg.mode === 'BUS' && leg.line).map((leg) => leg.line))]
+  const routeLegs = chosen?.legs ?? []
   // direct buses: from the stop data, plus the planner's bus when its trip needs no change
   // (newer BusConnects lines such as E1 aren't in the stop data yet)
   const directBuses = near?.kind === 'transit'
@@ -524,6 +540,11 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     : []
   const showPlanned = start || choice === 'bus'
   const nearestBus = near?.kind === 'transit' ? near.busStops[0] : null
+  const otherNearbyBuses = nearestBus && near?.kind === 'transit'
+    ? near.busRoutes.filter((route) => !nearestBus.direct.includes(route))
+    : []
+
+  useEffect(() => { setShowAllNearbyRoutes(false) }, [start?.lat, start?.lng, mode])
 
   return (
     <div className="route-map-wrap">
@@ -585,6 +606,89 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
         <div ref={boxRef} className="route-map" aria-label={`Map of the trip from ${placeName} to ${toName}. Click the map to start from another place.`} />
         <span className="route-map-hint">Click anywhere to see the trip from there</span>
       </div>
+      {mode === 'public_transport' && (
+        <section className="route-bus-details" aria-live="polite">
+          <div className="route-bus-details-heading">
+            <h3>Bus routes from point A to point B</h3>
+            {plans?.bus && (
+              <div className="route-bus-plan-options" role="group" aria-label="Public transport route">
+                {[['fastest', plans.fastest, 'Fastest'], ['bus', plans.bus, 'By bus']].map(([key, itinerary, label]) => (
+                  <button key={key} type="button" aria-pressed={choice === key} onClick={() => setChoice(key)}>
+                    {label} · {Math.round(itinerary.total_minutes)} min
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {chosen && routeLegs.length > 0 ? (
+            <ol className="route-bus-itinerary">
+              {routeLegs.map((leg, index) => (
+                <li key={`${leg.line ?? 'bus'}-${index}`}>
+                  <strong>{leg.mode === 'WALK' ? 'Walk' : rideName(leg)}</strong>
+                  <span>{leg.mode === 'WALK'
+                    ? `From ${leg.from?.name || placeName} to ${leg.to?.name || toName}`
+                    : `Board at ${leg.from?.name || 'the stop shown on the map'}; get off at ${leg.to?.name || toName}`}</span>
+                </li>
+              ))}
+            </ol>
+          ) : chosen ? (
+            <p>No route steps were returned for this trip.</p>
+          ) : trip.status === 'loading' ? (
+            <p role="status">Finding a public transport route…</p>
+          ) : (
+            <p role="status">Live bus directions are unavailable right now.</p>
+          )}
+
+          <h4>Nearby bus stops</h4>
+          {near?.kind !== 'transit' ? (
+            <p role="status">Finding bus stops near point A…</p>
+          ) : !near.busDataAvailable ? (
+            <p>Nearby bus-stop data is currently unavailable.</p>
+          ) : nearestBus ? (
+            <>
+              <div className="route-bus-stop">
+                <strong>{nearestBus.name}{nearestBus.ref ? ` · Stop ${nearestBus.ref}` : ''}</strong>
+                <span>{fmtKm(nearestBus.m / 1000)} from point A</span>
+              </div>
+              <p>
+                <b>Routes from this stop serving near point B:</b>
+                {nearestBus.direct.length
+                  ? <span className="route-bus-chips">{nearestBus.direct.map((route) => <span className="route-bus-chip is-direct" key={route}>{route}</span>)}</span>
+                  : <span>No direct route from this stop was found.</span>}
+              </p>
+              {nearestBus.routes.some((route) => !nearestBus.direct.includes(route)) && (
+                <p>
+                  <b>Other buses at this stop:</b>
+                  <span className="route-bus-chips">{nearestBus.routes.filter((route) => !nearestBus.direct.includes(route)).map((route) => (
+                    <span className="route-bus-chip" key={route}>{route}</span>
+                  ))}</span>
+                </p>
+              )}
+              {otherNearbyBuses.length > 0 && (
+                <p>
+                  <b>Direct routes from other nearby stops:</b>
+                  <span className="route-bus-chips" id="nearby-bus-routes">{(showAllNearbyRoutes ? otherNearbyBuses : otherNearbyBuses.slice(0, 3)).map((route) => (
+                    <span className="route-bus-chip is-direct" key={route}>{route}</span>
+                  ))}</span>
+                  {otherNearbyBuses.length > 3 && (
+                    <button
+                      type="button"
+                      className="route-bus-more"
+                      aria-expanded={showAllNearbyRoutes}
+                      aria-controls="nearby-bus-routes"
+                      onClick={() => setShowAllNearbyRoutes((shown) => !shown)}
+                    >
+                      {showAllNearbyRoutes ? 'Show fewer' : `View all ${otherNearbyBuses.length} routes`}
+                    </button>
+                  )}
+                </p>
+              )}
+            </>
+          ) : (
+            <p>No bus stops were found within 450 m of point A.</p>
+          )}
+        </section>
+      )}
       <p className="route-legend rm-legend" aria-label="Map key">
         <span><i className="rm-key-a">A</i>Start</span>
         <span><i className="rm-key-b">B</i>University</span>
