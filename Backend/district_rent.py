@@ -10,8 +10,9 @@ Frontend/District Profile/rents.js:
 Search choices on the questionnaire map to the district profile's sizes like this:
   private_room -> single room,  shared_room -> double sharing (per person),  one_bed -> 1 bed,  two_bed -> 2 bed.
 """
-import json
 from pathlib import Path
+
+import datastore  # PostgreSQL when it is in use, otherwise the files
 
 FRONTEND = Path(__file__).resolve().parent.parent / "Frontend"
 PROFILES_FILE = FRONTEND / "District Profile" / "district-profiles.json"
@@ -29,7 +30,7 @@ KIND_LABEL = {"single": "single room", "double": "double room (one person)", "sh
 
 def _read(path):
     try:
-        return json.loads(Path(path).read_text(encoding="utf-8"))
+        return datastore.read_json(str(path))
     except (OSError, ValueError):
         return {}
 

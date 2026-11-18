@@ -41,6 +41,21 @@ def test_without_a_database_the_files_are_read(monkeypatch):
     pd.testing.assert_frame_equal(datastore.read_csv(path), pd.read_csv(path))
 
 
+def test_json_files_are_read_the_same_without_a_database(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    datastore.connect()
+    for name, path in datastore.data_files().items():
+        if name.endswith(".json"):
+            with open(path, encoding="utf-8") as f:
+                assert datastore.read_json(path) == json.load(f), name
+
+
+def test_health_says_where_the_data_comes_from(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    datastore.connect()
+    assert datastore.status() == {"data_source": "files", "database_tables": 0}
+
+
 def test_an_unreachable_database_falls_back_to_the_files(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "postgresql://nobody:wrong@127.0.0.1:1/none")
     assert datastore.connect() == "files"
@@ -54,6 +69,9 @@ def test_postgresql_returns_exactly_what_the_files_hold(monkeypatch):
         if name.endswith(".geojson"):
             with open(path) as f:
                 assert datastore.read_geojson(path)["features"] == json.load(f)["features"], name
+        elif name.endswith(".json"):
+            with open(path, encoding="utf-8") as f:
+                assert datastore.read_json(path) == json.load(f), name
         else:
             pd.testing.assert_frame_equal(datastore._select(path), datastore._read_file(path), obj=name)
     # a second start copies nothing

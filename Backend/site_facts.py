@@ -5,12 +5,12 @@ student residences, the colleges and the Things to know checklist. (Rent, places
 Every function returns "" if its file is missing, so the assistant still starts without it.
 """
 import csv
-import json
 import re
 import statistics
 from collections import defaultdict
 from pathlib import Path
 
+import datastore  # PostgreSQL when it is in use, otherwise the files
 import district_rent
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -43,7 +43,7 @@ AMENITY_NAMES = [("supermarket", "supermarkets"), ("grocery", "convenience and g
 
 def _read_json(path):
     try:
-        return json.loads(Path(path).read_text(encoding="utf-8"))
+        return datastore.read_json(str(path))
     except (OSError, ValueError):
         return None
 
