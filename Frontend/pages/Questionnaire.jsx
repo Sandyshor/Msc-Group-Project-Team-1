@@ -56,9 +56,9 @@ const FACTORS = [
   ['Commute', 'clock', 'A short commute to your university'],
   ['Shopping & Groceries', 'basket', 'Supermarkets, grocery shops and shopping centres',
     ['Supermarkets', 'Grocery Shops', 'Shopping Malls']],
-  ['Restaurants', 'fork', 'Places to eat out'],
-  ['Healthcare', 'heart', 'Hospitals and pharmacies', ['Hospitals', 'Pharmacies']],
   ['Recreation & Wellness', 'tree', 'Gyms and parks', ['Gyms', 'Parks']],
+  ['Healthcare', 'heart', 'Hospitals and pharmacies', ['Hospitals', 'Pharmacies']],
+  ['Restaurants', 'fork', 'Places to eat out'],
 ]
 
 function joinWords(items) {
@@ -158,7 +158,7 @@ function Questionnaire() {
 
   return (
     <section className="flow-page flow-q" data-site-tour="questionnaire">
-      <FlowSidebar step={step} onStep={goToStep} locked={matchesReady ? [] : [3]} />
+      <FlowSidebar step={step} onStep={goToStep} locked={matchesReady ? [4] : [3, 4]} />
 
       {lockedOpen && (
         <FlowDialog
