@@ -38,18 +38,17 @@ const STEPS = [
   ['About you', 'person'],
   ['Your priorities', 'sliders'],
   ['Your matches', 'pin'],
+  ['Compare', 'compare'],
 ]
 
-// step: 1-3 (the current one); includeCompare adds the results-only fourth step.
+// Step 4 is shown throughout the flow, but is only available from results.
 // onStep(n) when another step is clicked - every step can be clicked, so students
 // can go back and forth (the page decides what to do if a step isn't ready yet). Steps listed in `locked`
-// show a padlock until the earlier steps are done.
-export function FlowSidebar({ step, onStep, locked = [], includeCompare = false }) {
-  const steps = includeCompare ? [...STEPS, ['Compare', 'compare']] : STEPS
-
+// show a padlock while they are unavailable.
+export function FlowSidebar({ step, onStep, locked = [] }) {
   return (
     <nav className="flow-sidebar" aria-label="Steps">
-      {steps.map(([label, icon], index) => {
+      {STEPS.map(([label, icon], index) => {
         const number = index + 1
         const current = number === step
         const isLocked = locked.includes(number) && !current
@@ -125,10 +124,10 @@ export function FlowPhoto({ step, label, title, accent, description, photos = FL
         <p className="flow-eyebrow">LET'S FIND YOUR PLACE</p>
         <div className="flow-progress-info">
           <span>{label}</span>
-          <span>STEP {step} OF 3</span>
+          <span>STEP {step} OF 4</span>
         </div>
         <div className="flow-progress" aria-hidden="true">
-          <span style={{ width: `${(step / 3) * 100}%` }} />
+          <span style={{ width: `${(step / 4) * 100}%` }} />
         </div>
         <h1>
           {title} <em>{accent}</em>

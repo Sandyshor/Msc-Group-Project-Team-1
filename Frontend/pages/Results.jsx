@@ -376,7 +376,6 @@ function WhyThisPlace({ result, place }) {
                 <ImportanceDots value={item.importance} label={item.importance_label} />
               </div>
               <p className="why-card-value">{item.value}</p>
-              {item.detail && <p className="why-card-detail">{item.detail}</p>}
               <p className={`why-card-compare ${tone}`}>
                 <span aria-hidden="true">{tone === 'better' ? '▲' : tone === 'worse' ? '▼' : '●'}</span>
                 {comparedWords(item.factor, item.compared)}
@@ -559,13 +558,36 @@ function commuteText(result, modeWords) {
 
 // The selected match's commute by the way of travelling the student picks, with the route on a map.
 // The matches themselves stay as searched (to change them, go back to "About you").
-function GettingThere({ result, university, universityLocation, mode }) {
+function GettingThere({ result, university, universityLocation, mode, onModeChange }) {
   const commute = result.commute_by_mode?.[mode]
   const place = result.neighbourhood
   const [, , words] = TRAVEL_MODES.find(([value]) => value === mode)
+  const mapModes = ['public_transport', 'cycle', 'walk'].map((value) => TRAVEL_MODES.find(([key]) => key === value))
+  const modeIcons = { public_transport: 'bus', cycle: 'bike', walk: 'walk' }
 
   return (
     <div className="results-map-only">
+      <div className="results-route-controls">
+        <div className="results-route-mode-row">
+          <h2>How do you want to get there?</h2>
+          <div className="results-route-modes" role="group" aria-label="How do you want to get there?">
+            {mapModes.map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={`results-route-mode${mode === value ? ' is-selected' : ''}`}
+                aria-pressed={mode === value}
+                onClick={() => onModeChange(value)}
+              >
+                <FlowIcon name={modeIcons[value]} />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p>Choose a place on the map for point A. Your route to the university (point B) will update.</p>
+      </div>
+      <div className="results-route-map">
       {place && universityLocation ? (
         <RouteMap
           fromLat={place.lat}
@@ -583,6 +605,7 @@ function GettingThere({ result, university, universityLocation, mode }) {
       ) : (
         <p className="route-summary">{commute ? `${commute.minutes} min ${words}` : 'Route details are not available for this match yet.'}</p>
       )}
+      </div>
     </div>
   )
 }
@@ -601,8 +624,9 @@ function MatchCard({ result, modeWords, selected, onSelect }) {
         <span className="flow-match-score">{result.match_score.toFixed(1)}%<small>match</small></span>
       </span>
       <strong className="flow-match-name">
-        {result.area}
-        {result.neighbourhood && <span> · {result.neighbourhood.name}</span>}
+        {result.neighbourhood
+          ? <>{result.neighbourhood.name}<span> · {result.area}</span></>
+          : result.area}
       </strong>
       <span className="flow-match-line">
         <FlowIcon name="euro" /> {euro(result.rent)}/month <BudgetTag result={result} />
@@ -995,7 +1019,7 @@ function Results() {
   const maxCommute = answers?.maxCommute ?? null
   const modeWords = TRAVEL_MODES.find(([value]) => value === travelMode)[2]
 
-  const routeMode = travelMode
+  const [routeMode, setRouteMode] = useState(travelMode)
 
   useEffect(() => {
     if (!answers) return
@@ -1063,7 +1087,7 @@ function Results() {
     const word = { 1: 'better than most areas', 0: 'about average', [-1]: 'worse than most areas' }
     const lines = list.slice(0, 8).map((r) => {
       const name = r.neighbourhood ? `${r.neighbourhood.name} (${r.area})` : r.area
-      const facts = (r.breakdown ?? []).map((b) => `${b.factor}: ${b.value}${b.detail ? ` [${b.detail}]` : ''} (${word[b.compared] ?? 'about average'})`).join('; ')
+      const facts = (r.breakdown ?? []).map((b) => `${b.factor}: ${b.value} (${word[b.compared] ?? 'about average'})`).join('; ')
       return `#${r.rank} ${name}: ${r.match_score.toFixed(1)}% match, ${euro(r.rent)}/month${r.commute_minutes != null ? `, ${r.commute_minutes} min commute` : ''}. ${facts}`
     })
     const open = list[Math.min(selected, list.length - 1)]
@@ -1079,7 +1103,7 @@ function Results() {
   if (!answers) {
     return (
       <section className="flow-page flow-page-results" data-site-tour="results">
-        <FlowSidebar step={3} onStep={(n) => navigate('/questionnaire', { state: { step: n } })} />
+        <FlowSidebar step={3} locked={[4]} onStep={(n) => navigate('/questionnaire', { state: { step: n } })} />
         <div className="flow-empty">
           <h1>No answers yet.</h1>
           <p className="result-muted">Answer a few questions and we'll match you with Dublin neighbourhoods.</p>
@@ -1105,7 +1129,6 @@ function Results() {
     <section className="flow-page flow-page-results" data-site-tour="results">
       <FlowSidebar
         step={compareView ? 4 : 3}
-        includeCompare
         // back to the questionnaire with these answers filled in
         onStep={goToResultStep}
       />
@@ -1170,12 +1193,10 @@ function Results() {
         ) : (
           <>
             <aside className="flow-panel results-summary-panel">
-              <p className="flow-eyebrow">YOUR MATCHES</p>
-              <div className="flow-progress-info">
-                <span>YOUR RESULTS</span>
-                <span>STEP 3 OF 3</span>
+              <div className="results-summary-heading">
+                <p className="flow-eyebrow">YOUR MATCHES</p>
+                <span>STEP 3 OF 4</span>
               </div>
-              <div className="flow-progress" aria-hidden="true"><span style={{ width: '100%' }} /></div>
               <h1>Your top Dublin <em>neighbourhoods.</em></h1>
               <p className="flow-summary">
                 {answers.accommodationLabel}{answers.studentRoom && answers.studentRoom !== 'any' ? ` · ${STUDENT_ROOM_NAMES[answers.studentRoom]}` : ''} · {euro(answers.budget)}/month · {answers.university}
@@ -1231,6 +1252,7 @@ function Results() {
                   university={data.university}
                   universityLocation={data.university_location}
                   mode={routeMode}
+                  onModeChange={setRouteMode}
                 />
               ) : (
                 <div className="results-map-placeholder" aria-hidden="true" />
