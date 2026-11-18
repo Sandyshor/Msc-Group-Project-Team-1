@@ -328,4 +328,25 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Vikesh worked Ollama
 - Catherine is working on adding district to the explore dublin video.
 - Santhosh is working on recommendation engine.
-- Sowmiya is working on recommendation page. 
+- Sowmiya is working on recommendation page.
+
+**Week 9**
+**Meeting Tuesday 11am-1pm**
+- Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
+- Connected on a call and discussed the progress.
+- Discussed what queries to ask the mentor
+
+**Week 9**
+**Meeting Tuesday 4pm-6pm**
+- Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
+- Discussed the feedback given by the mentor.
+- Discussed how the testing could be done.
+
+**Week 9**
+**Meeting Wednesday 9.30pm -10.30pm**
+- Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
+- Shreyas is working on crime data.
+- Santhosh fixed the recommendation engine
+- Sowmiya is working on the recommendation page frontend.
+- Catherine is working on the Explore Dublin frontend.
+- Viknesh fine-tuned the chatbot. 
