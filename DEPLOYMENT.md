@@ -22,7 +22,8 @@ App Service settings: Python **3.12** (not the 3.15 preview), startup command
 ## Database (Azure Database for PostgreSQL)
 
 The API reads its data from PostgreSQL (`Backend/datastore.py`). Each data file the website uses is one table
-(`FILE_TABLES` in datastore.py), and the `data_files` table lists every table with its source file, SHA-256
+(`FILE_TABLES` in datastore.py; a JSON file such as the district profiles is one row holding the whole
+document), and the `data_files` table lists every table with its source file, SHA-256
 and when it was loaded. The files in the repository stay the source: on every start the API copies any file
 that changed into its table, so a data refresh reaches the database with the next deploy.
 

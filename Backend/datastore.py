@@ -1,6 +1,7 @@
 """Where the backend reads its data from: PostgreSQL when DATABASE_URL is set, otherwise the data files.
 
-Each data file the website uses is one table in the database (FILE_TABLES below). The files in the repository
+Each data file the website uses is one table in the database (FILE_TABLES below). A JSON file (the district
+profile's data, which the recommender's rents and the assistant also read) is one row holding the whole document. The files in the repository
 stay the source: they are versioned in Git and refreshed by the weekly jobs. On startup, connect() copies any
 file that changed since the last copy into its table (a file's SHA-256 is kept in the data_files table), then
 every read comes from the database.
@@ -38,6 +39,8 @@ FILE_TABLES = {
     "commute_otp.csv": "commute_otp",
     "commute_otp_neighbourhoods.csv": "commute_otp_neighbourhoods",
     "letting_agencies.csv": "letting_agencies",
+    "commute_otp_county.csv": "commute_otp_county",
+    "county_dublin_areas.csv": "county_areas",
     **{f"{area}.xlsx": f"room_listings_{area.lower()}" for area in
        ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15", "D16",
         "D17", "D18", "D20", "D22", "D24"]},
@@ -54,6 +57,13 @@ FILE_TABLES = {
     "student_residences.csv": "student_residences",
     "student_residence_prices.csv": "student_residence_prices",
     "student_residence_rooms.csv": "student_residence_rooms",
+    # Frontend/: the district profile's data (rents for the recommender) and what the assistant knows
+    "district-profiles.json": "district_profiles",
+    "county-dublin-profiles.json": "county_profiles",
+    "dublin-amenity-counts.json": "amenity_counts",
+    "dublin-chain-shops.json": "chain_shops",
+    "student-residences.json": "student_residences_map",
+    "things-to-know.json": "things_to_know",
 }
 # How each file is read, the same with or without the database
 READ_OPTIONS = {
@@ -65,7 +75,12 @@ FOLDERS = [
     os.environ.get("DATA_FOLDER", os.path.join(BACKEND, "..", "Data")),
     os.path.join(BACKEND, "data", "safety"),
     os.path.join(BACKEND, "data", "accommodation"),
+    os.path.join(BACKEND, "..", "Frontend", "District Profile"),
+    os.path.join(BACKEND, "..", "Frontend", "public", "data"),
+    os.path.join(BACKEND, "..", "Frontend", "pages"),
 ]
+# A JSON file's table holds the document in this one column
+CONTENT = "content"
 LOCK_ID = 7_310_442  # any fixed number: lets only one worker copy files at a time
 # Raise when the way files are copied changes, so every table is copied again
 FORMAT = "1"
@@ -99,8 +114,12 @@ def _sha256(path):
 
 
 def _read_file(path):
-    """The file as a table. A GeoJSON file becomes one row per feature (properties and geometry as JSON)."""
+    """The file as a table. A GeoJSON file becomes one row per feature (properties and geometry as JSON); any
+    other JSON file is one row holding the whole document."""
     name = os.path.basename(path)
+    if name.endswith(".json"):
+        with open(path, encoding="utf-8") as f:
+            return pd.DataFrame({CONTENT: [json.load(f)]})
     if name.endswith(".geojson"):
         with open(path) as f:
             features = json.load(f)["features"]
@@ -147,7 +166,8 @@ def sync(engine, files):
             too_long = [c for c in df.columns if len(str(c).encode()) > 63]
             if too_long:  # PostgreSQL would shorten these names and the website wouldn't find them
                 raise ValueError(f"{name}: column names longer than 63 bytes: {too_long}")
-            json_columns = {c: JSONB for c in ("properties", "geometry")} if name.endswith(".geojson") else None
+            json_columns = ({c: JSONB for c in ("properties", "geometry")} if name.endswith(".geojson")
+                            else {CONTENT: JSONB} if name.endswith(".json") else None)
             df.insert(0, ROW, range(len(df)))
             df.to_sql(table, conn, if_exists="replace", index=False, dtype=json_columns)
             conn.execute(text(f'ALTER TABLE "{table}" ADD PRIMARY KEY ("{ROW}")'))
@@ -229,6 +249,22 @@ def read_geojson(path):
                              for p, g in zip(df["properties"], df["geometry"])]}
     with open(path) as f:
         return json.load(f)
+
+
+def read_json(path):
+    """A JSON file's document: from its table when the database is in use, else from the file."""
+    if _from_db(path):
+        from sqlalchemy import text
+
+        with _engine.connect() as conn:
+            return conn.execute(text(f'SELECT "{CONTENT}" FROM "{_table(path)}" ORDER BY "{ROW}" LIMIT 1')).scalar()
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def status():
+    """Where the data comes from, for /health."""
+    return {"data_source": source, "database_tables": len(_tables)}
 
 
 if __name__ == "__main__":

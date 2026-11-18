@@ -490,10 +490,10 @@ def load_county(university_points):
     """County Dublin areas that have commute times: (commute points in the same columns as the districts',
     area figures). Both are empty when the files aren't there, so the recommender still works without them."""
     commute_path, areas_path = _path(COUNTY_COMMUTE_FILE), _path(COUNTY_AREAS_FILE)
-    if not (os.path.exists(commute_path) and os.path.exists(areas_path)):
+    if not (datastore.exists(commute_path) and datastore.exists(areas_path)):
         return pd.DataFrame(), pd.DataFrame()
-    areas = pd.read_csv(areas_path)
-    otp = pd.read_csv(commute_path)
+    areas = datastore.read_csv(areas_path)
+    otp = datastore.read_csv(commute_path)
     otp = otp[otp["Area"].isin(areas["Area"])]
     keys = ["Area", "Direction", "Landmark", "University"]
     coords = otp.groupby(keys)[["Origin_Latitude", "Origin_Longitude"]].first()

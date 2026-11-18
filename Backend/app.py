@@ -4,8 +4,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
-import accounts
 import datastore
+
+# PostgreSQL if DATABASE_URL is set (copies changed data files first), else the files. Done before the other modules
+# are imported, because the assistant (chat.py) reads its data when it is imported.
+datastore.connect()
+
+import accounts
 import recommender
 import routing
 import chat
@@ -20,7 +25,6 @@ app.include_router(chat.router)  # POST /chat - the site's AI assistant (Claude)
 app.include_router(eircode.router)  # GET /eircode/{code} - where any Eircode is (Google Geocoding)
 app.include_router(accounts.router)  # /account - logged-in students' saved searches
 
-datastore.connect()  # PostgreSQL if DATABASE_URL is set (copies changed data files first), else the files
 DATA = recommender.load_data()
 chat.use_recommender_data(DATA)  # the assistant's commute times = the results page's
 
@@ -51,7 +55,7 @@ class RecommendRequest(BaseModel):
 @app.get("/health")
 def health():
     county = sorted(set(DATA["commute_points"]["Area"]) - set(recommender.AREAS))
-    return {"status": "ok", "areas": recommender.AREAS + county}
+    return {"status": "ok", **datastore.status(), "areas": recommender.AREAS + county}
 
 
 @app.get("/options")
