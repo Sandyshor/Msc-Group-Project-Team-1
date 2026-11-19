@@ -2,6 +2,7 @@ Area,name,category,cuisine,latitude,longitude
 A41,Giddy Up Cup,Cafes,coffee_shop,53.5224728,-6.2681298
 A41,Mace,Groceries,,53.5176175,-6.2662988
 A41,,Parks,,53.5202959,-6.2673119
+A41,Red Velvet,Salons,,53.5217399,-6.2676322
 A42,Daybreak,Groceries,,53.5674208,-6.3827293
 A94,3 Leaves,Asian_Restaurants,indian,53.3010381,-6.1781227
 A94,Akash,Asian_Restaurants,indian,53.3016267,-6.1787677
@@ -196,6 +197,71 @@ A94,The Merrion Tree,Restaurants,coffee_shop,53.2992539,-6.2090401
 A94,Un' Altra Pasta Bar,Restaurants,pizza;italian,53.3007424,-6.175963
 A94,Volpe Nera,Restaurants,regional,53.2877559,-6.1780559
 A94,Woodfire & Wings,Restaurants,pizza;chicken,53.2886044,-6.2051618
+A94,,Salons,,53.2870445,-6.1768658
+A94,Aidan Fitzgerald,Salons,,53.3016159,-6.1775629
+A94,Aqua Beauty,Salons,,53.2885311,-6.1976768
+A94,Bernie Coiffeur,Salons,,53.300828,-6.1775108
+A94,Blackrock's Barber Shop,Salons,,53.2881317,-6.1759649
+A94,Blush,Salons,,53.3006777,-6.1757235
+A94,Boston Barber Bars,Salons,,53.3019001,-6.179504
+A94,Brian Roberts,Salons,,53.3008219,-6.1767342
+A94,Brown Sugar,Salons,,53.3010972,-6.1766401
+A94,Burgundy Beauty,Salons,,53.2871301,-6.1772874
+A94,Bushra's Beauty Express,Salons,,53.3019187,-6.1795709
+A94,C Beauty Studio,Salons,,53.3006125,-6.175592
+A94,Clara Hand & Foot Spa,Salons,,53.3015946,-6.1774617
+A94,Cult Barbers,Salons,,53.2742961,-6.193749
+A94,Dapper Don,Salons,,53.2896152,-6.1746272
+A94,Eddie Doyle,Salons,,53.3009261,-6.1766259
+A94,Elaine's Beauty Spot,Salons,,53.288333,-6.19987
+A94,Gloss House,Salons,,53.3067634,-6.1972476
+A94,Golden Nails,Salons,,53.2909136,-6.2005355
+A94,Grafton Barber,Salons,,53.2935659,-6.1543283
+A94,Grafton Barber,Salons,,53.289684,-6.2010171
+A94,Hair Creations,Salons,,53.3018738,-6.1796808
+A94,Hair Flair,Salons,,53.3017473,-6.1785601
+A94,Hair Salon,Salons,,53.2975805,-6.179486
+A94,In Vogue,Salons,,53.3012984,-6.1774807
+A94,Jesters,Salons,,53.291902,-6.2159936
+A94,Jordan's Barbers,Salons,,53.3086729,-6.1963557
+A94,Kiddies Kutz,Salons,,53.3012537,-6.1818021
+A94,Leopardstown Beauty Salon,Salons,,53.2796901,-6.1964909
+A94,Lotus Nails,Salons,,53.2742664,-6.1938576
+A94,Men's Grooming,Salons,,53.2911557,-6.200774
+A94,Midas & Pzazz,Salons,,53.2888595,-6.2060071
+A94,Mink,Salons,,53.2937593,-6.1554038
+A94,Mount Merrion Barbers,Salons,,53.2961796,-6.2130999
+A94,Nail & Spa,Salons,,53.2881372,-6.1759989
+A94,Natural Beauty Corner,Salons,,53.3012394,-6.1779082
+A94,New Image,Salons,,53.2890016,-6.2047008
+A94,Newderm,Salons,,53.2875381,-6.192992
+A94,Newtown Park Barber,Salons,,53.2870611,-6.1767709
+A94,Niall's Barber Shop,Salons,,53.287863,-6.1781362
+A94,Nipper's Barber Shop,Salons,,53.2883052,-6.2016441
+A94,Noel Higgins Hairdressing,Salons,,53.3006636,-6.1774559
+A94,Ooh Lah Lah,Salons,,53.279812,-6.1642776
+A94,Oslo,Salons,,53.2897875,-6.2012181
+A94,Peaches and Lime,Salons,,53.2890176,-6.2045126
+A94,Peter Mark,Salons,,53.2896929,-6.2010697
+A94,Peter Marks,Salons,,53.3008143,-6.1819688
+A94,Pure Elegance,Salons,,53.2817272,-6.1600471
+A94,Queen Hairdressing,Salons,,53.2883762,-6.1972916
+A94,Richard Reddin,Salons,,53.2919793,-6.2152579
+A94,Sakura Hair Salon,Salons,,53.2798036,-6.1643272
+A94,Shiraz Barbers and Rugs,Salons,,53.2884193,-6.197351
+A94,TC Barbers,Salons,,53.2795626,-6.1642192
+A94,The Absolute Beauty Clinic,Salons,,53.2885442,-6.2166443
+A94,The Barber Shop,Salons,,53.3006668,-6.1756788
+A94,The Barbers Den,Salons,,53.2908344,-6.2004609
+A94,The Barbers Lounge,Salons,,53.301202,-6.1778359
+A94,The Grafton Barber,Salons,,53.3008803,-6.1773896
+A94,The Hill Barbers Shop,Salons,,53.2886107,-6.1978985
+A94,Tiffany Nails,Salons,,53.3021307,-6.1785175
+A94,Toni & Guy,Salons,,53.3015744,-6.1775026
+A94,Trends Hair Salon,Salons,,53.2907237,-6.2004234
+A94,Turkish Barbers,Salons,,53.2884897,-6.2166182
+A94,Urban Escape,Salons,,53.2796537,-6.164236
+A94,Zero,Salons,,53.289469,-6.1984374
 A94,,Shopping_Malls,,53.2795043,-6.1967982
 A94,Blackrock Village Centre,Shopping_Malls,,53.3017477,-6.179683
 A94,Frascati Shopping Centre,Shopping_Malls,,53.3010061,-6.1818986
@@ -469,6 +535,65 @@ A96,Victoria,Restaurants,chinese,53.2940277,-6.1531243
 A96,WS Burgers & Wings Monkstown,Restaurants,american,53.2865088,-6.1455802
 A96,Zero Zero Pizza,Restaurants,pizza;anti_pasti,53.2912822,-6.1376349
 A96,Zi Qi Chinese Restaurant (Nunki Tea House),Restaurants,chinese,53.2950115,-6.142456
+A96,Ace of Fades,Salons,,53.2768395,-6.1435946
+A96,Acupunture And Beauty,Salons,,53.2927027,-6.1386927
+A96,Amia Beauty,Salons,,53.2763003,-6.1031735
+A96,Beauty Time,Salons,,53.2900374,-6.1311964
+A96,Beauty at Eden,Salons,,53.2874027,-6.1249785
+A96,Beauty_K_Lab,Salons,,53.2835336,-6.1473791
+A96,Bloomfield Barber Shop,Salons,,53.292524,-6.1378799
+A96,Cabello Hair Design,Salons,,53.2859765,-6.1172576
+A96,Champs Barbers & Hair Studio,Salons,,53.2800506,-6.1576927
+A96,Coast Barbershop,Salons,,53.2917736,-6.1367959
+A96,Conlemany by Organic Italian Hairdressing,Salons,,53.2895186,-6.1298638
+A96,Daniella Hair Salon,Salons,,53.2918341,-6.1370002
+A96,Eden Hair Design,Salons,,53.2914626,-6.1371329
+A96,Essence of Beauty,Salons,,53.2939809,-6.1397882
+A96,Eva Nails and Beauty,Salons,,53.2939019,-6.1396104
+A96,Fox & Wolf,Salons,,53.2562603,-6.1336503
+A96,Fusion,Salons,,53.2898833,-6.1307153
+A96,Glo Nail Studio & Training Academy,Salons,,53.2826422,-6.1527853
+A96,HARPERSalon,Salons,,53.2869278,-6.1235124
+A96,Hair Box,Salons,,53.2916726,-6.1371378
+A96,Hair at No9,Salons,,53.2940141,-6.1525543
+A96,Head,Salons,,53.2774862,-6.1037716
+A96,Headquarters Barber,Salons,,53.252418,-6.1236435
+A96,Killiney Barbers,Salons,,53.2674524,-6.1359259
+A96,Kingstown Turkish Barber Shop,Salons,,53.2937865,-6.139724
+A96,Lavish Nail Spa & Beauty,Salons,,53.2753021,-6.137795
+A96,Lily Lee Beauty Clinic,Salons,,53.2917031,-6.1350126
+A96,Looks Beauty & Nails,Salons,,53.2779986,-6.1632147
+A96,Maja Nails & Beauty,Salons,,53.2943949,-6.1425443
+A96,Mise Hair & Beauty Salon,Salons,,53.2779721,-6.1416149
+A96,Monkstown Barbers,Salons,,53.2835483,-6.1473458
+A96,Méche,Salons,,53.2783171,-6.1634299
+A96,New YorKi Nails,Salons,,53.2899399,-6.1308475
+A96,Only,Salons,,53.2909483,-6.1332266
+A96,P.K. Connolly,Salons,,53.2873306,-6.12376
+A96,Paddy the Turk,Salons,,53.2900066,-6.1310033
+A96,Pandora Hair Salon,Salons,,53.2931533,-6.1378967
+A96,Peter Mark,Salons,,53.2673907,-6.1357838
+A96,Peter Mark,Salons,,53.2927768,-6.1387631
+A96,Replenish Spa,Salons,,53.2694512,-6.1417986
+A96,Reputations Hair Design,Salons,,53.2684085,-6.1461143
+A96,Salon 71,Salons,,53.2924991,-6.1367326
+A96,Salon Sia,Salons,,53.2778021,-6.1414861
+A96,Senso Studio,Salons,,53.2768059,-6.1032345
+A96,Silk Beauty Spa,Salons,,53.27824,-6.1073524
+A96,Simply The Best Barbers,Salons,,53.2950192,-6.143321
+A96,Skinwise Aesthetics,Salons,,53.2905085,-6.1322353
+A96,Snow Nail and Beauty,Salons,,53.2923725,-6.1373308
+A96,Sunita's Beauty,Salons,,53.2917622,-6.1370754
+A96,Tanning Salon.ie,Salons,,53.2766995,-6.1390588
+A96,The Barber Shop,Salons,,53.2925117,-6.1349731
+A96,The Best Barber,Salons,,53.2913991,-6.1375029
+A96,The Colour Bar,Salons,,53.2562491,-6.1335276
+A96,The Cutting Hut,Salons,,53.2925176,-6.1371443
+A96,The Upper Room Barber Shop,Salons,,53.2779789,-6.1415619
+A96,Trim Bin Barbers,Salons,,53.2777171,-6.1414311
+A96,Turkish Barbers,Salons,,53.2467099,-6.1292394
+A96,Urban Beauty Salon,Salons,,53.2854971,-6.15361
+A96,l'Ombre,Salons,,53.2822196,-6.1438555
 A96,Ballybrack Shopping Centre,Shopping_Malls,,53.2565342,-6.1339854
 A96,Bloomfields Shopping Centre,Shopping_Malls,,53.292916,-6.1392837
 A96,Dún Laoghaire Shopping Centre,Shopping_Malls,,53.2923902,-6.1349944
@@ -885,6 +1010,90 @@ D1,Zucconi Sushi Bar,Restaurants,sushi,53.3499811,-6.2535396
 D1,the ribs - Gaucho BBQ,Restaurants,brazilian,53.3469615,-6.2654094
 D1,,Restaurants,indian,53.3496467,-6.2435929
 D1,,Restaurants,,53.351808,-6.2500964
+D1,+35 barber shop,Salons,,53.3485289,-6.2678518
+D1,Abelia,Salons,,53.3572659,-6.2638088
+D1,Aleksa,Salons,,53.3601595,-6.2606173
+D1,Artisan,Salons,,53.3526561,-6.2609694
+D1,Boss Barbers,Salons,,53.3573718,-6.2494067
+D1,Boxx Barbers,Salons,,53.3495232,-6.2437506
+D1,Brooklyn Barbers,Salons,,53.3598202,-6.240091
+D1,Carlos Barber,Salons,,53.3468307,-6.2653484
+D1,Carlos Barbers,Salons,,53.3488373,-6.2644295
+D1,City Barber East Wall,Salons,,53.3558039,-6.2333102
+D1,Classic Barber's,Salons,,53.3485541,-6.2686195
+D1,Comforts Salon,Salons,,53.3496111,-6.2624743
+D1,Cool Look,Salons,,53.360959,-6.2428471
+D1,Cult,Salons,,53.3470082,-6.2620517
+D1,Cømfrt,Salons,,53.3488006,-6.2644104
+D1,Dora Jean Stylist,Salons,,53.3595377,-6.2407291
+D1,Dry & Fly,Salons,,53.3473577,-6.2333897
+D1,Ed's Barber Shop,Salons,,53.347402,-6.266842
+D1,Enigma of Beauty,Salons,,53.3543043,-6.2591456
+D1,Gatim du Corte,Salons,,53.3576552,-6.2633828
+D1,H&T,Salons,,53.3486957,-6.2643558
+D1,HC Barber,Salons,,53.3556135,-6.264565
+D1,Hair Lift,Salons,,53.3512556,-6.2519083
+D1,Harp and Shear,Salons,,53.3500352,-6.2607755
+D1,Havana,Salons,,53.3495268,-6.2455903
+D1,Heaven Face & Body Clinic,Salons,,53.3476241,-6.2597451
+D1,Hermanns Barber Shop,Salons,,53.3555211,-6.2654398
+D1,JBar Studio,Salons,,53.3477333,-6.2683775
+D1,JC's,Salons,,53.3545164,-6.2501145
+D1,Jaqueline Eyebrows,Salons,,53.3495646,-6.2623944
+D1,Jimmy's Barber,Salons,,53.3572775,-6.2488886
+D1,K- Nails Luxury,Salons,,53.3478632,-6.2684255
+D1,Kameleon,Salons,,53.3507625,-6.2536718
+D1,Ken's Barber,Salons,,53.3550552,-6.2352706
+D1,Klass Cut,Salons,,53.3542305,-6.2573754
+D1,LA Nails Studio,Salons,,53.3590749,-6.2615934
+D1,La Punk Beauty,Salons,,53.3531077,-6.2606563
+D1,Latorre Beauty spa,Salons,,53.3586106,-6.2621329
+D1,Lineup,Salons,,53.3609883,-6.2597839
+D1,Lucky Barber's,Salons,,53.3531024,-6.2606678
+D1,Master Barbers,Salons,,53.3531291,-6.2599126
+D1,Mighty Caesar,Salons,,53.3540088,-6.2583065
+D1,Naturals's,Salons,,53.3577743,-6.2632224
+D1,Neelu's,Salons,,53.3471177,-6.2632622
+D1,New York Hair,Salons,,53.3482219,-6.2567408
+D1,North Strand Barbers,Salons,,53.3594718,-6.2407443
+D1,Only Beauty,Salons,,53.3507891,-6.250639
+D1,PS Wig and Hair Therapy,Salons,,53.3576908,-6.2420631
+D1,Paul's Barber Shop,Salons,,53.3520049,-6.2498523
+D1,Peaky Blades,Salons,,53.3568635,-6.2642026
+D1,Perfect Lady,Salons,,53.351541,-6.2532668
+D1,Peter Mark,Salons,,53.3505936,-6.2602019
+D1,Peter Mark,Salons,,53.3501912,-6.2586769
+D1,Q&M Hair and Beauty Salon,Salons,,53.3462874,-6.2677258
+D1,Queer Hawk,Salons,,53.348588,-6.2643186
+D1,Rick's Hair,Salons,,53.350759,-6.265848
+D1,SAKS,Salons,,53.3488986,-6.2589828
+D1,SH's Turkish Barbers,Salons,,53.3581528,-6.2547981
+D1,Salon 14,Salons,,53.3500373,-6.258322
+D1,Salon Image,Salons,,53.3497764,-6.2689677
+D1,Sam's Barber,Salons,,53.3464227,-6.2647918
+D1,Scissors Sisters,Salons,,53.357004,-6.2502202
+D1,Scruples,Salons,,53.3512583,-6.2506522
+D1,Sophie's,Salons,,53.3485803,-6.2685512
+D1,Studio Zoffoli,Salons,,53.3476816,-6.2687189
+D1,Sunset Hair Salon,Salons,,53.3475976,-6.2636481
+D1,Sunset Hair Salon,Salons,,53.34679,-6.2630084
+D1,Tan City,Salons,,53.3487289,-6.2644729
+D1,The Beauty Spot,Salons,,53.3603459,-6.2441089
+D1,The Capel Barber,Salons,,53.3476412,-6.2687024
+D1,The Grafton Barber,Salons,,53.34912,-6.2448431
+D1,The Grafton Barber,Salons,,53.3472925,-6.2334
+D1,The Men's Room,Salons,,53.3507143,-6.2506743
+D1,Thérapie Clinic,Salons,,53.3494402,-6.263265
+D1,Thérapie Clinic,Salons,,53.3494538,-6.2631953
+D1,Top Fade Barbers,Salons,,53.3506874,-6.2528408
+D1,V Daisy,Salons,,53.351251,-6.2519422
+D1,Vacant,Salons,,53.3491072,-6.24465
+D1,Violet Hair and Beauty Salon,Salons,,53.3486243,-6.2684059
+D1,Viva Luxy,Salons,,53.3499502,-6.2696327
+D1,Zero,Salons,,53.3481575,-6.2640759
+D1,,Salons,,53.3525737,-6.2590933
+D1,,Salons,,53.3601068,-6.2606663
+D1,,Salons,,53.3534026,-6.2593718
 D1,CHQ,Shopping_Malls,,53.3488159,-6.2478353
 D1,ILAC Centre,Shopping_Malls,,53.3499978,-6.264375
 D1,Jervis Shopping Centre,Shopping_Malls,,53.3482728,-6.2657141
@@ -975,6 +1184,18 @@ D10,,Pharmacies,,53.3418406,-6.3567111
 D10,Bel Cibo,Restaurants,,53.3311232,-6.372034
 D10,Bula café,Restaurants,,53.3313257,-6.3710747
 D10,,Restaurants,,53.3268496,-6.3705596
+D10,Bijou Hair Salon,Salons,,53.3391493,-6.3448373
+D10,Hair Trends,Salons,,53.3424606,-6.3514519
+D10,Headmaster's,Salons,,53.3423836,-6.3578815
+D10,Headrush,Salons,,53.342443,-6.352617
+D10,Lee's Barbers,Salons,,53.3423712,-6.3576729
+D10,Pat's Barber Shop,Salons,,53.3391359,-6.3449021
+D10,Pauline's Hairdresses,Salons,,53.34245,-6.3508566
+D10,Power Cuts,Salons,,53.341104,-6.3348709
+D10,Rainbow Salon,Salons,,53.343327,-6.3560552
+D10,Rum Toffee,Salons,,53.3421734,-6.3566723
+D10,Wayne's Barbers,Salons,,53.3425195,-6.3539531
+D10,Willies Gents Hairdressers,Salons,,53.3424522,-6.3513287
 D10,Spar,Supermarkets,,53.331499,-6.3711052
 D10,Tesco,Supermarkets,,53.3414462,-6.3529042
 D11,Chef Garden,Asian_Restaurants,chinese,53.4202277,-6.3822347
@@ -1025,6 +1246,11 @@ D11,Java Republic,Restaurants,,53.4128592,-6.3465885
 D11,Macari's,Restaurants,,53.3891999,-6.311297
 D11,Maxol,Restaurants,,53.4152753,-6.3620999
 D11,Tyrrelstown Asian Restaurant and Takeaway,Restaurants,asian,53.4199001,-6.3825774
+D11,Barber,Salons,,53.3952338,-6.3113395
+D11,Chrissie Marie Nails,Salons,,53.4209113,-6.3821608
+D11,Elite Hair Extansions,Salons,,53.3966743,-6.3158472
+D11,Emerald Barber,Salons,,53.4209699,-6.3821513
+D11,,Salons,,53.3892793,-6.3112039
 D11,Cardiffsbridge SC,Shopping_Malls,,53.3847812,-6.311867
 D11,Cardiffsbridge Shopping Centre,Shopping_Malls,,53.3848321,-6.31196
 D11,Clearwater Shopping Centre,Shopping_Malls,,53.3837199,-6.2960933
@@ -1143,6 +1369,43 @@ D12,Lisle Three,Restaurants,,53.3206959,-6.3170158
 D12,Red Cow Inn,Restaurants,,53.3193994,-6.3628902
 D12,Thindi,Restaurants,asian;indian,53.3211267,-6.3312737
 D12,Wok & Roll Bistro,Restaurants,asian,53.3241543,-6.3291298
+D12,Angelina,Salons,,53.3120895,-6.3270403
+D12,Barbers,Salons,,53.3159767,-6.3182784
+D12,Beautiful,Salons,,53.3209439,-6.3313931
+D12,Beautilux,Salons,,53.3273469,-6.3052042
+D12,Cosmetic & Teeth Whitening Fairies,Salons,,53.3281264,-6.3059879
+D12,DJ Nails & Beauty,Salons,,53.3241351,-6.3294226
+D12,Dave's Barber Shop,Salons,,53.3304606,-6.2978545
+D12,David Jones Barber Shop,Salons,,53.3284913,-6.3057163
+D12,Ellen's Nails and Beauty,Salons,,53.3341579,-6.319735
+D12,Errigal Unisex Hair & Beauty,Salons,,53.3255467,-6.3212797
+D12,Fifi's Nail Bar,Salons,,53.3275879,-6.3041537
+D12,Frank's,Salons,,53.320364,-6.3167679
+D12,Frank's Barber Shop,Salons,,53.3211493,-6.3171818
+D12,Gents Barbers - Ross Brown,Salons,,53.3275274,-6.3044852
+D12,Golden Scissor Barber Shop,Salons,,53.3345477,-6.3190948
+D12,Grafton Barber,Salons,,53.3175715,-6.3331616
+D12,Hair & Beauty Worx,Salons,,53.3199592,-6.3154721
+D12,Hair Design & Beauty Salon,Salons,,53.3148629,-6.3186972
+D12,Hair Salon,Salons,,53.3316264,-6.2949818
+D12,Halo Hair and Beauty,Salons,,53.3274111,-6.3044931
+D12,Hidden Gem Hair Salon,Salons,,53.3342208,-6.3196478
+D12,Image,Salons,,53.3296237,-6.3345671
+D12,L'ombré Hair And Beauty,Salons,,53.315962,-6.3182504
+D12,Nails & Beauty by Jen,Salons,,53.320647,-6.3170446
+D12,Old County Barber Shop,Salons,,53.3273857,-6.3055746
+D12,Old County Barbershop,Salons,,53.3274623,-6.3055789
+D12,Pamela's,Salons,,53.3208722,-6.3172878
+D12,Revive Hair and Beauty Clinic,Salons,,53.3240485,-6.3267395
+D12,Sally Beauty,Salons,,53.3192736,-6.3593562
+D12,Salon Nova,Salons,,53.3273706,-6.3094979
+D12,Sammy's Turkish Barber,Salons,,53.324137,-6.329354
+D12,Shape-n-Style,Salons,,53.3283056,-6.3049318
+D12,Smiley's Turkish Barber Shop,Salons,,53.3233684,-6.2956652
+D12,Spraoi Pamper Parlour,Salons,,53.3249108,-6.3360269
+D12,Studio Dolls,Salons,,53.3205318,-6.3170225
+D12,Zinck Hair,Salons,,53.3058005,-6.3396923
+D12,,Salons,,53.3113475,-6.3152067
 D12,Walkinstown Shopping Centre,Shopping_Malls,,53.3217112,-6.3296087
 D12,,Shopping_Malls,,53.320278,-6.3163396
 D12,Aldi,Supermarkets,,53.324274,-6.3360334
@@ -1273,6 +1536,23 @@ D13,The Dog House Blues Tea Rooms,Restaurants,italian,53.3889305,-6.0748254
 D13,The House,Restaurants,,53.3858122,-6.0652671
 D13,The Pier House,Restaurants,,53.3905146,-6.0717123
 D13,Wright’s Findlater,Restaurants,fish_and_chips;regional,53.3885738,-6.0723998
+D13,Bedford Stuy Barber,Salons,,53.3866644,-6.1472786
+D13,Gerry Campbell,Salons,,53.3897171,-6.123704
+D13,Howth Haven,Salons,,53.3876598,-6.0670513
+D13,Lana's Beauty,Salons,,53.4029657,-6.1577954
+D13,Nail Nirvana,Salons,,53.3894399,-6.1090512
+D13,O'Boyles Barber Shop,Salons,,53.3897637,-6.1082649
+D13,Peter Mark,Salons,,53.3894335,-6.1090941
+D13,REVV Barbers,Salons,,53.4029677,-6.1575757
+D13,Rennaisance Hair,Salons,,53.3858121,-6.1744554
+D13,Roches Barbers,Salons,,53.3894827,-6.1237507
+D13,Storm,Salons,,53.3878171,-6.0657322
+D13,The Abbey Barber,Salons,,53.3871818,-6.0656403
+D13,The Grafton Barber,Salons,,53.3896297,-6.10943
+D13,The Luxe Room,Salons,,53.3851329,-6.0651826
+D13,Xophers Barber Shop,Salons,,53.3882138,-6.154403
+D13,,Salons,,53.3966819,-6.1375638
+D13,,Salons,,53.3970052,-6.1372293
 D13,Greendale Shopping Centre,Shopping_Malls,,53.3854996,-6.155075
 D13,Kilbarrack Shopping Centre,Shopping_Malls,,53.3886892,-6.1674412
 D13,Racecourse Shopping Centre,Shopping_Malls,,53.3966459,-6.1376821
@@ -1371,6 +1651,34 @@ D14,The Elephant's Ear,Restaurants,european,53.2998507,-6.2680243
 D14,The Mango Tree,Restaurants,thai,53.299048,-6.2850501
 D14,Thindi,Restaurants,indian,53.2931944,-6.2454489
 D14,Yalla Dublin,Restaurants,lebanese,53.2892889,-6.2436037
+D14,Balally Barbers,Salons,,53.2861943,-6.2371434
+D14,Barber Shop,Salons,,53.3048634,-6.2453911
+D14,Bare Beauty,Salons,,53.2905599,-6.2984691
+D14,Best Barber,Salons,,53.2900663,-6.244618
+D14,Crystal barbers,Salons,,53.3010609,-6.2460967
+D14,Cut & Sew,Salons,,53.2897007,-6.2436355
+D14,Ely Beauty Clinic,Salons,,53.2945498,-6.2790533
+D14,Frankies Barbershop,Salons,,53.2988835,-6.2851729
+D14,GerardPaul,Salons,,53.2921773,-6.229628
+D14,Hair Quarters,Salons,,53.2860861,-6.2364398
+D14,Havana,Salons,,53.2901288,-6.2446944
+D14,L'OmBré,Salons,,53.2909992,-6.2460473
+D14,Light Waves,Salons,,53.2922026,-6.2719649
+D14,Michelle Montgomery Studios,Salons,,53.3011612,-6.2459655
+D14,Morgan's Hair Salon,Salons,,53.3050918,-6.2370072
+D14,New Man Barber,Salons,,53.2892239,-6.2431115
+D14,Peter Gregory Hair Studio,Salons,,53.3006099,-6.2636963
+D14,Peter Mark,Salons,,53.2916019,-6.2454031
+D14,Rathfarnham Beauty Clinic,Salons,,53.2994117,-6.2847995
+D14,Spoil Pamper Yourself,Salons,,53.2924083,-6.2723978
+D14,TanningSalon.ie,Salons,,53.2939062,-6.2464423
+D14,The Barber Cabinet,Salons,,53.2913273,-6.2460933
+D14,The Granite Barbers,Salons,,53.2985161,-6.2854223
+D14,The Hair Room,Salons,,53.2880612,-6.2566652
+D14,,Salons,,53.2891103,-6.2834247
+D14,,Salons,,53.2922707,-6.304056
+D14,,Salons,,53.3004576,-6.2633989
+D14,,Salons,,53.2954757,-6.2568528
 D14,Dundrum Shopping Centre,Shopping_Malls,,53.2910624,-6.2459491
 D14,Nutgrove Shopping Centre,Shopping_Malls,,53.2901636,-6.2673097
 D14,Rathfarnham Shopping Centre,Shopping_Malls,,53.2969094,-6.2975234
@@ -1539,6 +1847,28 @@ D15,W Factor,Restaurants,chicken,53.3858019,-6.3734551
 D15,Wagamama,Restaurants,asian,53.3949263,-6.3910222
 D15,Zouq,Restaurants,,53.3834229,-6.4014489
 D15,,Restaurants,,53.3719609,-6.3892095
+D15,Academy Barbers,Salons,,53.3961993,-6.4399414
+D15,Annes Design in Hair,Salons,,53.3826664,-6.4073428
+D15,Body Treatments,Salons,,53.402349,-6.3971656
+D15,Bougie Maison,Salons,,53.3845178,-6.4001705
+D15,Brow Bar,Salons,,53.3910017,-6.3858513
+D15,"Cuts, Coffee & Product",Salons,,53.3734545,-6.361788
+D15,Dawson Barber,Salons,,53.3934575,-6.3908915
+D15,Easilocks,Salons,,53.393568,-6.3908992
+D15,Influence,Salons,,53.3955968,-6.4407809
+D15,Joe's Barber Shop,Salons,,53.3826511,-6.4074207
+D15,Lovely Lashes,Salons,,53.3955275,-6.4394227
+D15,Ms Skin Care,Salons,,53.3878561,-6.38256
+D15,Nails,Salons,,53.3961473,-6.4399387
+D15,Sam's Barbers,Salons,,53.3860014,-6.374849
+D15,Scissor Sisters,Salons,,53.4025233,-6.3975679
+D15,So Belle,Salons,,53.3726177,-6.3610148
+D15,The Grafton Barber,Salons,,53.3876301,-6.4408267
+D15,Thomas Kendall Hair,Salons,,53.3726742,-6.3611696
+D15,We Hairdressing & Beauty,Salons,,53.3859988,-6.3748063
+D15,West End Barbers,Salons,,53.3889926,-6.3891868
+D15,de vogue,Salons,,53.374726,-6.3629146
+D15,,Salons,,53.3855276,-6.374758
 D15,Laurel Lodge Shopping Centre,Shopping_Malls,,53.3776877,-6.3769383
 D15,Roselawn Shopping Centre,Shopping_Malls,,53.3831972,-6.3816901
 D15,,Shopping_Malls,,53.3862704,-6.3785103
@@ -1664,6 +1994,17 @@ D16,Vida's,Restaurants,mexican,53.2886566,-6.2439992
 D16,Wagamama,Restaurants,asian,53.2884302,-6.2437598
 D16,Zizzi,Restaurants,italian,53.2887023,-6.2440504
 D16,,Restaurants,,53.2882337,-6.2432599
+D16,Brown Cow,Salons,,53.2686718,-6.2426676
+D16,College Barbers,Salons,,53.2792476,-6.2453048
+D16,Edvard & Pink,Salons,,53.2863826,-6.2411282
+D16,Gillians Beauty Clinic,Salons,,53.2784355,-6.3169635
+D16,HALO Urban Hair and Beauty,Salons,,53.2829287,-6.3176314
+D16,Light Waves,Salons,,53.2889208,-6.24347
+D16,Red Apple Hair & Beauty Salon,Salons,,53.2756924,-6.330083
+D16,Sporting Cuts,Salons,,53.2846128,-6.2950934
+D16,The Grafton Barber,Salons,,53.2889813,-6.2437519
+D16,The Hair Zone,Salons,,53.2650791,-6.2295895
+D16,Total Haircare,Salons,,53.2770141,-6.264933
 D16,Dundrum Town Centre,Shopping_Malls,,53.2870352,-6.2420082
 D16,,Shopping_Malls,,53.2828855,-6.3173709
 D16,,Shopping_Malls,,53.2757735,-6.330426
@@ -1725,6 +2066,14 @@ D17,,Pharmacies,,53.3947861,-6.1617566
 D17,Roberto's,Restaurants,pizza;pasta,53.4034799,-6.1711292
 D17,Romayo's,Restaurants,diner,53.4034787,-6.1710791
 D17,Yan,Restaurants,chinese,53.4038755,-6.1705798
+D17,Happy Nails,Salons,,53.39278,-6.2188665
+D17,Minaal,Salons,,53.3906179,-6.1966738
+D17,Radiance,Salons,,53.4034844,-6.1714135
+D17,Salon 15,Salons,,53.3928008,-6.2189926
+D17,Tanning Shop,Salons,,53.4022413,-6.1789273
+D17,The Glam Pad,Salons,,53.3999774,-6.1712163
+D17,hair rocks,Salons,,53.39416,-6.2242707
+D17,,Salons,,53.39461,-6.1643768
 D17,Clarehall Shopping Centre,Shopping_Malls,,53.4012928,-6.1796812
 D17,Clarehall Shopping Centre,Shopping_Malls,,53.4013908,-6.179494
 D17,Donaghmede Shopping Centre,Shopping_Malls,,53.394961,-6.1625596
@@ -1872,6 +2221,26 @@ D18,Veda,Restaurants,indian,53.2610928,-6.1500733
 D18,Woodfire & Green,Restaurants,,53.2774167,-6.2144599
 D18,Woodruff,Restaurants,,53.2524744,-6.2133519
 D18,Zaytoon,Restaurants,persian,53.2764029,-6.2164326
+D18,Ballance,Salons,,53.2592075,-6.1971508
+D18,Beacon Barber,Salons,,53.2770898,-6.2161404
+D18,Beautilicious by Thomasina,Salons,,53.2303522,-6.1242477
+D18,Brazilia,Salons,,53.2767911,-6.2046774
+D18,Ceira Lambert,Salons,,53.2309956,-6.1241803
+D18,Champs Barbers & Hair Salon,Salons,,53.2303371,-6.1242524
+D18,Elegance,Salons,,53.2608003,-6.1500024
+D18,Gents Barbershop,Salons,,53.2605503,-6.2207499
+D18,Gold Fever HQ,Salons,,53.2312289,-6.1241754
+D18,Gold Forever Nails,Salons,,53.2771506,-6.2053369
+D18,Grafton Barber,Salons,,53.2449619,-6.144758
+D18,La Belle,Salons,,53.2527867,-6.2146243
+D18,Paddy the Turk,Salons,,53.2311011,-6.1241761
+D18,Rimand Hairdressing,Salons,,53.2611227,-6.1500303
+D18,Romina Daniel,Salons,,53.2640352,-6.2152585
+D18,Simply Beauty,Salons,,53.2765882,-6.214961
+D18,The Sitting Room,Salons,,53.270065,-6.2247746
+D18,Thérapie Clinc,Salons,,53.2518164,-6.1848264
+D18,U Nails,Salons,,53.245026,-6.1448307
+D18,Vanity Rooms,Salons,,53.2529204,-6.2139289
 D18,Leopardstown Shopping Centre,Shopping_Malls,,53.2594924,-6.1974402
 D18,Sandyford Hall Shopping Centre,Shopping_Malls,,53.2641191,-6.2150671
 D18,,Shopping_Malls,,53.2739186,-6.2062506
@@ -2487,6 +2856,125 @@ D2,,Restaurants,,53.3342328,-6.2660701
 D2,,Restaurants,,53.3452946,-6.2616436
 D2,,Restaurants,,53.3433079,-6.2620947
 D2,,Restaurants,,53.3455917,-6.2644292
+D2,3 concept Studio,Salons,,53.3470242,-6.2580325
+D2,5th Avenue,Salons,,53.3429856,-6.26175
+D2,5th Avenue,Salons,,53.3418681,-6.2615878
+D2,Ali's Turkish Barber,Salons,,53.3400352,-6.2655352
+D2,Autonomy Hair Studio,Salons,,53.3451727,-6.2620182
+D2,Avant Beauty Studio by Richard Correia,Salons,,53.3458352,-6.2555398
+D2,Babylon Barber Shop,Salons,,53.3310456,-6.2642523
+D2,Baggot Pure Escape,Salons,,53.338015,-6.2533093
+D2,Barbiere,Salons,,53.3350678,-6.2649771
+D2,Barenzo Sarek,Salons,,53.3381997,-6.2540808
+D2,Beards and Barnets,Salons,,53.3448666,-6.264196
+D2,Beauty Takeaway,Salons,,53.3428743,-6.2498431
+D2,Benefit Brow Bar,Salons,,53.3459965,-6.2578087
+D2,Blink & Wink,Salons,,53.3397781,-6.2585291
+D2,Bowie Aesthetics Bar,Salons,,53.344378,-6.2498604
+D2,Bowlers Barber Shop,Salons,,53.338018,-6.252682
+D2,Bowlers Barber shop,Salons,,53.3334667,-6.2648616
+D2,Butcher Otoko,Salons,,53.3410756,-6.2598877
+D2,Cats,Salons,,53.3416669,-6.2614702
+D2,Cesellato,Salons,,53.3371505,-6.265788
+D2,Cezanne,Salons,,53.3427258,-6.2632275
+D2,Claudine King,Salons,,53.341871,-6.2628659
+D2,College Barbers,Salons,,53.3458283,-6.2555511
+D2,Coogan Bergin Clinic & College of Beauty Therapy,Salons,,53.3428882,-6.2604769
+D2,Cru,Salons,,53.3452571,-6.2629283
+D2,Cut and Sew Barbers,Salons,,53.3457794,-6.2640751
+D2,Davey,Salons,,53.3412675,-6.264797
+D2,David Marshall Hair Salon and School of Hairdressing,Salons,,53.3421632,-6.26441
+D2,Dry & Fly,Salons,,53.3431656,-6.261017
+D2,Dublin Barber,Salons,,53.3464,-6.2608907
+D2,Dylan Bradshaw,Salons,,53.3418545,-6.2625831
+D2,Easilocks,Salons,,53.346008,-6.2627344
+D2,Elysian Brows,Salons,,53.3410755,-6.2634488
+D2,Fade,Salons,,53.3430431,-6.2592891
+D2,Flatiron,Salons,,53.3429869,-6.261807
+D2,Foundation Hair,Salons,,53.3414729,-6.2657197
+D2,Gillian Edgeworth Hair Studio,Salons,,53.3442284,-6.2686879
+D2,Glam Nail & Beauty Salon,Salons,,53.3440026,-6.2624452
+D2,Grafton Barbers,Salons,,53.3374053,-6.2517999
+D2,Great Barbers,Salons,,53.3457369,-6.2553346
+D2,Hollywood Nails,Salons,,53.3386939,-6.2658963
+D2,K Nails,Salons,,53.3443096,-6.2640808
+D2,K-Nails,Salons,,53.3431128,-6.2616692
+D2,Kazumi Hair,Salons,,53.3410276,-6.2569872
+D2,Lunatic Fringe,Salons,,53.3410491,-6.2607232
+D2,MB Glow,Salons,,53.3434245,-6.2690028
+D2,Maru Hair Tokyo,Salons,,53.3404061,-6.2658921
+D2,Maru Hair Tokyo,Salons,,53.3444769,-6.2695568
+D2,Menina Bonita Beauty Salon,Salons,,53.346333,-6.2584174
+D2,Menspire,Salons,,53.3391992,-6.2661428
+D2,Mint Nails & Spa,Salons,,53.3323997,-6.2646438
+D2,Moyo Hairdressing,Salons,,53.3334635,-6.2643312
+D2,Nails,Salons,,53.3428197,-6.260785
+D2,Nails & Brows,Salons,,53.3411456,-6.2633619
+D2,New Hair Order,Salons,,53.3416419,-6.2631229
+D2,Paul Hair Studio,Salons,,53.3408922,-6.2571844
+D2,Perola Padilha,Salons,,53.3456142,-6.2553386
+D2,Peter Mark,Salons,,53.3414754,-6.2604197
+D2,Platinum Luxury Hair Extensions,Salons,,53.3463131,-6.2583053
+D2,Queer Hawk,Salons,,53.3462844,-6.2607387
+D2,Reds,Salons,,53.3397724,-6.2584691
+D2,Regent Barber Shop,Salons,,53.3457028,-6.2633584
+D2,Roches,Salons,,53.3309675,-6.2646711
+D2,Sally,Salons,,53.3431235,-6.2624856
+D2,Sam's Barbers,Salons,,53.343901,-6.2636607
+D2,Sankiev,Salons,,53.3438909,-6.2620829
+D2,Scissors Barbershop,Salons,,53.3374314,-6.2664226
+D2,Shine,Salons,,53.3431012,-6.2610284
+D2,SitStil,Salons,coffee_shop,53.3419713,-6.2637159
+D2,Solar Spa,Salons,,53.3437185,-6.2617803
+D2,South William Clinic & Spa,Salons,,53.3414509,-6.2628689
+D2,Studio M,Salons,,53.3385261,-6.265932
+D2,Style Club,Salons,,53.3424256,-6.2624893
+D2,Sugar Daddy,Salons,,53.3429238,-6.263974
+D2,TN Beauty Salon,Salons,,53.3368424,-6.2657187
+D2,Tan n Glo,Salons,,53.3456367,-6.2514916
+D2,TanningSalon.ie,Salons,,53.3464485,-6.2585176
+D2,TanningSalon.ie,Salons,,53.3459332,-6.2631696
+D2,The Barbers Room & Tattoo Studio,Salons,,53.3456899,-6.2577593
+D2,The Beauty Temple,Salons,,53.3456529,-6.2628394
+D2,The Best Barber,Salons,,53.346088,-6.2619492
+D2,The Buff,Salons,,53.34023,-6.2612954
+D2,The Dawson Spa,Salons,,53.3404001,-6.2587843
+D2,The Grafton Barber,Salons,,53.3382907,-6.2661786
+D2,The Grafton Barber,Salons,,53.335764,-6.2572548
+D2,The Grafton Barber,Salons,,53.3401202,-6.260575
+D2,The Grafton Barber,Salons,,53.3403208,-6.2628031
+D2,The Grafton Barber,Salons,,53.3412155,-6.2597547
+D2,The Grafton Barber,Salons,,53.3421006,-6.2636265
+D2,The Grafton Barber School of Excellence,Salons,,53.3401573,-6.261004
+D2,The Grooming Rooms,Salons,,53.3421879,-6.2627413
+D2,The Hairdressing Academy & School of Hairdressing @ Robert Chambers,Salons,,53.3410623,-6.260768
+D2,The Hive,Salons,,53.3438656,-6.2624397
+D2,The Kingdom,Salons,,53.3396272,-6.2670299
+D2,The Natural Cut,Salons,,53.3428568,-6.261027
+D2,The Spa at The Shelbourne,Salons,,53.3387816,-6.2554231
+D2,The Square Barbers,Salons,,53.3419268,-6.2507271
+D2,The Trinity Barbers,Salons,,53.3436858,-6.2617449
+D2,Thérapie Clinic,Salons,,53.3425156,-6.2621534
+D2,Tian Du,Salons,,53.3456406,-6.2595227
+D2,Toni & Guy,Salons,,53.3417821,-6.2616735
+D2,Tropical Popical,Salons,,53.3415437,-6.2631052
+D2,Urbana,Salons,,53.3413963,-6.2620593
+D2,Waldorf Barbers,Salons,,53.3461842,-6.2594807
+D2,Wax in the City,Salons,,53.3416267,-6.2630665
+D2,Wayward Hair Saloon,Salons,,53.3313148,-6.2677589
+D2,Whetstone,Salons,,53.3445008,-6.2672037
+D2,Wow Barbers,Salons,,53.3428337,-6.2602759
+D2,Zenergy,Salons,,53.3421229,-6.2643013
+D2,cut+sew,Salons,,53.343682,-6.269198
+D2,the Loft,Salons,,53.3431129,-6.2639723
+D2,zeba,Salons,,53.342559,-6.262121
+D2,,Salons,,53.3446943,-6.2636991
+D2,,Salons,,53.3415275,-6.2619118
+D2,,Salons,,53.3413237,-6.2621274
+D2,,Salons,,53.341578,-6.2630757
+D2,,Salons,,53.3418427,-6.2628828
+D2,,Salons,,53.3435941,-6.2460966
+D2,,Salons,,53.3417045,-6.2631451
 D2,Royal Hibernian Way,Shopping_Malls,,53.3414051,-6.2588242
 D2,Stephen's Green Shopping Centre,Shopping_Malls,,53.3400145,-6.2623738
 D2,Asia Market,Supermarkets,,53.342023,-6.2636804
@@ -2561,6 +3049,22 @@ D20,James Joyce Bistro,Restaurants,,53.3483357,-6.3422578
 D20,Mad Egg,Restaurants,chicken,53.3527966,-6.3927121
 D20,Nando's,Restaurants,chicken;portuguese,53.3526547,-6.3926602
 D20,The Old Beehive,Restaurants,,53.3580516,-6.379219
+D20,Boston Barber Bars,Salons,,53.3528849,-6.3903453
+D20,Dermot's Barber Shop,Salons,,53.3501828,-6.3790805
+D20,Hairlough,Salons,,53.3446847,-6.3970537
+D20,King Barber,Salons,,53.3442444,-6.3707044
+D20,Manor Hair Studio,Salons,,53.351479,-6.3684457
+D20,Nail Kandi,Salons,,53.3446761,-6.3968041
+D20,Peter Mark,Salons,,53.3524422,-6.3921533
+D20,Romina Daniel,Salons,,53.3501952,-6.3788544
+D20,Salon D10,Salons,,53.3443575,-6.3706659
+D20,Skye Nails,Salons,,53.3442931,-6.3706905
+D20,Sugar Dolls,Salons,,53.3528919,-6.3902619
+D20,Sunny Island,Salons,,53.3443382,-6.3706751
+D20,The Granite Barbers,Salons,,53.3501696,-6.3770921
+D20,The Village Barbers,Salons,,53.347712,-6.3462937
+D20,W Beauty,Salons,,53.3524471,-6.392454
+D20,X-Motion Barber,Salons,,53.3514515,-6.3685974
 D20,Liffey Valley Retail Park,Shopping_Malls,,53.3490128,-6.3921594
 D20,Liffey Valley Shopping Centre,Shopping_Malls,,53.3530639,-6.3909448
 D20,Palmerstown Shopping Centre,Shopping_Malls,,53.3504851,-6.3792167
@@ -2732,6 +3236,34 @@ D22,Pandini's,Restaurants,,53.3143216,-6.3921932
 D22,Pizza Hut,Restaurants,pizza,53.340405,-6.432378
 D22,The Happy Pear,Restaurants,,53.3226108,-6.3956666
 D22,Victoria Chinese Restaurant,Restaurants,,53.3209172,-6.3938013
+D22,Artisan,Salons,,53.3211824,-6.3948206
+D22,Be Unique,Salons,,53.358497,-6.4488351
+D22,Buzz Barber Shop,Salons,,53.2961981,-6.4962093
+D22,Carmel's Beauty Clinic,Salons,,53.3595069,-6.4302243
+D22,Charlie's Barbers,Salons,,53.3564649,-6.4508301
+D22,Concept Male Grooming,Salons,,53.3202047,-6.3950229
+D22,Confessions Male Grooming,Salons,,53.3261158,-6.3948754
+D22,Elite Barbershop,Salons,,53.3141868,-6.3921007
+D22,HB Nail and Beauty,Salons,,53.3563539,-6.4492432
+D22,House Of Hair,Salons,,53.3525216,-6.459861
+D22,House of Colour,Salons,,53.3403504,-6.4323815
+D22,Lucan Village Barber,Salons,,53.3563713,-6.4490022
+D22,Lush Beauty,Salons,,53.3205292,-6.3933453
+D22,Mane Attraction,Salons,,53.3176537,-6.3951923
+D22,Midas Touch,Salons,,53.3143934,-6.3919678
+D22,Monroes,Salons,,53.3246338,-6.3962487
+D22,Newcastle Hair and Beauty,Salons,,53.3000575,-6.4995278
+D22,Paddys Barber Shop,Salons,,53.358699,-6.4474652
+D22,Rainbow,Salons,,53.3193338,-6.3946109
+D22,Salon Anu,Salons,,53.3564029,-6.4487291
+D22,Salon Anu Boutique,Salons,,53.3563936,-6.4489196
+D22,Salon Aurora,Salons,,53.3140169,-6.3917927
+D22,Shell's Styles,Salons,,53.3210774,-6.3947726
+D22,Short Cuts,Salons,,53.3242142,-6.3962158
+D22,The Grafton Barber (Adamstown),Salons,,53.3372228,-6.4701956
+D22,The Hair Crew,Salons,,53.3518272,-6.4622429
+D22,Venus,Salons,,53.3209138,-6.3948847
+D22,Wonderland,Salons,,53.3206927,-6.3948064
 D22,Fonthill Retail Park,Shopping_Malls,,53.3470873,-6.407157
 D22,Lucan Shopping Centre,Shopping_Malls,,53.348078,-6.4528242
 D22,Neilstown Shopping Centre,Shopping_Malls,,53.3381148,-6.4008642
@@ -2959,6 +3491,53 @@ D24,,Restaurants,,53.2870532,-6.3756332
 D24,,Restaurants,japanese;sushi;ramen,53.2881885,-6.3701018
 D24,,Restaurants,chinese,53.2881818,-6.3629582
 D24,,Restaurants,,53.2919746,-6.4312444
+D24,Academy Barbers,Salons,,53.2855626,-6.3778849
+D24,Alex's Classic Barber Shop & Shave,Salons,,53.2876621,-6.3571072
+D24,Ali's Barbers,Salons,,53.2813899,-6.4698308
+D24,Boho Hair Design,Salons,,53.2868701,-6.3897068
+D24,Bubble Nails,Salons,,53.2803132,-6.4450847
+D24,Carizma Barbers,Salons,,53.286413,-6.3324955
+D24,Castle Hair And Beauty,Salons,,53.2954933,-6.3421495
+D24,Copper Gold Unisex Salon,Salons,,53.2996185,-6.3794146
+D24,Core Beauty,Salons,,53.2758267,-6.3531017
+D24,Couture Beauty,Salons,,53.2876986,-6.3649797
+D24,David's Barber Shop Saggart,Salons,,53.2804119,-6.4435444
+D24,Dk Barbers Tallaght,Salons,,53.2954198,-6.3420758
+D24,Empowering Beauty,Salons,,53.281352,-6.4707039
+D24,Fashion Nail & Beauty,Salons,,53.2858909,-6.3756993
+D24,Hair by Suzanne,Salons,,53.2816852,-6.3403519
+D24,Hair to Dye For,Salons,,53.2813404,-6.4681376
+D24,Justina Lashes,Salons,,53.2813925,-6.4715327
+D24,L'Ombré,Salons,,53.2876316,-6.3570906
+D24,La Chic,Salons,,53.2769791,-6.3796192
+D24,La Chic,Salons,,53.2813588,-6.4704993
+D24,League Barbers,Salons,,53.3021215,-6.3777384
+D24,Mane Barbershop,Salons,,53.2813656,-6.470435
+D24,Men's Zone,Salons,,53.2813705,-6.4679497
+D24,Mohawks,Salons,,53.2720666,-6.3722855
+D24,Nua,Salons,,53.2721084,-6.3722909
+D24,Peri Upton,Salons,,53.2887511,-6.3437852
+D24,Salon Diva,Salons,,53.2855969,-6.3778013
+D24,Sharpe Hair Studio,Salons,,53.2877235,-6.3648604
+D24,SophistiKate's Hair Studio,Salons,,53.2813488,-6.4707427
+D24,Tanning Shop,Salons,,53.2939061,-6.3551707
+D24,The Salt Clinic,Salons,,53.2812678,-6.4744791
+D24,Turkish Barber,Salons,,53.3169483,-6.3335565
+D24,Turkish Barbers,Salons,,53.2868767,-6.3896238
+D24,VIP,Salons,,53.287879,-6.3641885
+D24,Wild Tanning,Salons,,53.2816047,-6.4654832
+D24,Your Hair is Lovely,Salons,,53.2815921,-6.4655522
+D24,,Salons,,53.2884641,-6.3700218
+D24,,Salons,,53.2850315,-6.3606937
+D24,,Salons,,53.2871892,-6.3609443
+D24,,Salons,,53.2991989,-6.35986
+D24,,Salons,,53.2993096,-6.3598806
+D24,,Salons,,53.299419,-6.359905
+D24,,Salons,,53.2876477,-6.3666794
+D24,,Salons,,53.2865446,-6.3751799
+D24,,Salons,,53.2877506,-6.3743747
+D24,,Salons,,53.2880846,-6.3590299
+D24,,Salons,,53.287354,-6.3622816
 D24,Citywest Shopping Centre,Shopping_Malls,,53.2827967,-6.4228609
 D24,Firhouse Mall,Shopping_Malls,,53.2816081,-6.3402899
 D24,Kilnamanagh Shopping Centre,Shopping_Malls,,53.2990638,-6.3597728
@@ -3124,6 +3703,36 @@ D3,The Pigeon House,Restaurants,,53.3599497,-6.1956467
 D3,Tuk Asian Street Food,Restaurants,asian,53.3629082,-6.2373581
 D3,Yang's,Restaurants,chinese,53.3668872,-6.1734991
 D3,Yummy Oriental,Restaurants,,53.3691937,-6.254402
+D3,Barber Shop,Salons,,53.3610638,-6.1822632
+D3,Beauty Boutique,Salons,,53.3626717,-6.2399181
+D3,Capri,Salons,,53.3650844,-6.1839157
+D3,Clontarf Barber Shop,Salons,,53.3629189,-6.2188689
+D3,Cooltanning Salons,Salons,,53.364171,-6.2329892
+D3,DK Hair Design,Salons,,53.3706456,-6.206524
+D3,Gigi's,Salons,,53.3718452,-6.2526652
+D3,Grafton Barber,Salons,,53.3629313,-6.2369708
+D3,Hair Nails Beauty,Salons,,53.370744,-6.2388809
+D3,Hession Hairdressing,Salons,,53.3597298,-6.1960891
+D3,Hession's Hairdressing,Salons,,53.3721844,-6.2524311
+D3,Jabert,Salons,,53.3672765,-6.255086
+D3,Killester Barbers,Salons,,53.3711621,-6.2073262
+D3,Kris Morton,Salons,,53.3706441,-6.206885
+D3,Main Street Barber Shop,Salons,,53.3676411,-6.2270206
+D3,Marino Hair Salon,Salons,,53.3644779,-6.2307044
+D3,Razzmataz,Salons,,53.3709107,-6.2048844
+D3,Take Time,Salons,,53.3674511,-6.2551687
+D3,The Barber Shop,Salons,,53.3651929,-6.2290648
+D3,The Grafton Barber,Salons,,53.372039,-6.2525314
+D3,Tres Chic,Salons,,53.3630883,-6.178412
+D3,Vogue Hair,Salons,,53.3649376,-6.2399805
+D3,Wonderful Barber,Salons,,53.3638541,-6.2342708
+D3,lemons.ie,Salons,,53.362954,-6.2192615
+D3,,Salons,,53.3646812,-6.2299269
+D3,,Salons,,53.3598451,-6.1960819
+D3,,Salons,,53.3715612,-6.2529516
+D3,,Salons,,53.3660409,-6.2481015
+D3,,Salons,,53.3708958,-6.2388278
+D3,,Salons,,53.3675802,-6.2272973
 D3,Eurospar,Supermarkets,,53.3625768,-6.2376374
 D3,Nolan's,Supermarkets,,53.3615992,-6.1946941
 D3,SuperValu,Supermarkets,,53.3705019,-6.2066829
@@ -3368,6 +3977,32 @@ D4,Yoi Izakaya,Restaurants,japanese,53.3336583,-6.2457256
 D4,Yoi Ramen,Restaurants,japanese,53.340774,-6.2361364
 D4,Zakura Izakaya,Restaurants,sushi,53.3337459,-6.2450163
 D4,,Restaurants,,53.3226705,-6.2367405
+D4,BK Barbers,Salons,,53.3419491,-6.2268395
+D4,Beauty Bar,Salons,,53.3335062,-6.2415014
+D4,Blow Hair & Beauty,Salons,,53.3311169,-6.2516775
+D4,Bowlers Gentlemens Barbershop,Salons,,53.336402,-6.248689
+D4,Central Hair,Salons,,53.3329203,-6.2162802
+D4,Di Milo Hair Design,Salons,,53.3217426,-6.2353851
+D4,Don’t Kill My Vibe Salon,Salons,,53.3413783,-6.2373401
+D4,Fantasy Hair & Nails Beauty,Salons,,53.3429039,-6.2414362
+D4,Grafton Barber,Salons,,53.3431868,-6.238942
+D4,Grand Barbers,Salons,,53.3423133,-6.238708
+D4,Hair Club,Salons,,53.3220594,-6.2358636
+D4,Hair Loss Rehan,Salons,,53.3455436,-6.238275
+D4,Helga Schworer,Salons,,53.3309581,-6.2519227
+D4,Jaz Hair Co,Salons,,53.3318701,-6.2159903
+D4,Lux Nails Spa And Lash,Salons,,53.3335081,-6.2445714
+D4,McAuley Scanlon,Salons,,53.3336962,-6.2449208
+D4,Oslo,Salons,,53.3336707,-6.2459727
+D4,SKIN by Olga,Salons,,53.3220726,-6.2359061
+D4,Sandymount Barbers,Salons,,53.3321741,-6.2148891
+D4,The Crew,Salons,,53.3375418,-6.2341632
+D4,The Dublin Barber,Salons,,53.3403849,-6.2245902
+D4,The Grafton Barber,Salons,,53.333803,-6.2450949
+D4,The Room,Salons,,53.3326359,-6.2151358
+D4,Trim,Salons,,53.330467,-6.2320771
+D4,Xanadu Hair Design,Salons,,53.3106113,-6.2086091
+D4,Zeba Hairdressing,Salons,,53.3328054,-6.215803
 D4,The Merrion,Shopping_Malls,,53.3189297,-6.214178
 D4,Centra,Supermarkets,,53.3432637,-6.2441791
 D4,Eurospar,Supermarkets,,53.3402787,-6.2362398
@@ -3486,6 +4121,27 @@ D5,Raheny Takeaway,Restaurants,chinese,53.3799201,-6.1767952
 D5,Taza,Restaurants,pakistani,53.3840713,-6.2070752
 D5,Taza,Restaurants,pakistani,53.3798765,-6.1771687
 D5,The Bell Pepper,Restaurants,thai,53.3873961,-6.2009266
+D5,B's Hair Salon,Salons,,53.3802244,-6.2104004
+D5,Barber Lounge Coolock Village,Salons,,53.3897816,-6.2012082
+D5,"Beautify, hair and beauty",Salons,,53.3791933,-6.2265322
+D5,Coco Hair Design,Salons,,53.3770654,-6.2231468
+D5,Cool Tanning Co,Salons,,53.3876337,-6.2008287
+D5,Gem,Salons,,53.3821558,-6.2054214
+D5,Gorgeous,Salons,,53.3864623,-6.2116684
+D5,Hair by Ashleigh,Salons,,53.3887825,-6.1951678
+D5,Headquarters,Salons,,53.3883976,-6.18263
+D5,Heaven Hair & Beauty,Salons,,53.3747058,-6.2041932
+D5,Lady K's,Salons,,53.3793168,-6.2264092
+D5,NT Nail & Beauty,Salons,,53.3896984,-6.2009058
+D5,Nail Craft,Salons,,53.3770654,-6.2231635
+D5,Raheny Barber Shop,Salons,,53.3796165,-6.1776518
+D5,Roots by Ruth,Salons,,53.3886843,-6.2011627
+D5,Rouge Hair & Beauty Salon,Salons,,53.3762839,-6.2178299
+D5,Rouge Hair & Beauty Salon,Salons,,53.3763168,-6.217929
+D5,Studio 55,Salons,,53.3764614,-6.1785372
+D5,The Avenue,Salons,,53.3729904,-6.2101772
+D5,Wink Organic Hair Studio,Salons,,53.3811646,-6.165426
+D5,Wonderful Hand and Foot Spa,Salons,,53.3797818,-6.2101412
 D5,Artaine Castle Shopping Centre,Shopping_Malls,,53.3833609,-6.2153779
 D5,Edenmore Shopping Centre,Shopping_Malls,,53.3884262,-6.1822803
 D5,,Shopping_Malls,,53.3765724,-6.1783564
@@ -3687,6 +4343,62 @@ D6,,Restaurants,italian,53.3257418,-6.2556243
 D6,,Restaurants,thai,53.3254068,-6.2547586
 D6,,Restaurants,,53.3239748,-6.2510657
 D6,,Restaurants,,53.3231234,-6.2499401
+D6,Abbie Nail & Beauty,Salons,,53.3234562,-6.2653499
+D6,Aristokats Hair Salon,Salons,,53.3182631,-6.2788364
+D6,Bespoke Beauty,Salons,,53.3241602,-6.2400715
+D6,Blitz It Beauty Express,Salons,,53.3212393,-6.2655368
+D6,Brown Sugar,Salons,,53.3249791,-6.2538646
+D6,Ciaran Nevin,Salons,,53.3096326,-6.283388
+D6,City Look,Salons,,53.3269474,-6.2774214
+D6,Cut and Blow,Salons,,53.322153,-6.2662282
+D6,Daniel & Andrew,Salons,,53.3225698,-6.2658041
+D6,Dr. Ali Istanbul Barber,Salons,,53.3227438,-6.2657613
+D6,Dragon Hair Salon,Salons,,53.3149129,-6.2759762
+D6,Grafton Barbers,Salons,,53.3253083,-6.2546922
+D6,Greene's Barber Shop,Salons,,53.3262069,-6.264788
+D6,Headcases,Salons,,53.3244064,-6.2526025
+D6,Headquarters Hair Salon,Salons,,53.3216646,-6.2670856
+D6,Heaven Face and Body Clinic,Salons,,53.322697,-6.2658498
+D6,Iconic Beauty,Salons,,53.3134014,-6.273282
+D6,Infinite Beauty Boutique,Salons,,53.318245,-6.2788099
+D6,Ivy Nails and Beauty,Salons,,53.3216355,-6.2669627
+D6,JH Hair Care,Salons,,53.3132341,-6.2648852
+D6,Jim Hatton,Salons,,53.3211482,-6.2569762
+D6,John Adam,Salons,,53.3229196,-6.2648553
+D6,Kuts and Kurls,Salons,,53.3164959,-6.2654034
+D6,L'Ombre,Salons,,53.3230111,-6.2650686
+D6,Lily's Beauty Salon,Salons,,53.3260403,-6.2647295
+D6,Mademoiselle @ The Beauty Boudoir,Salons,,53.3265716,-6.2646335
+D6,Marina's Beauty Salon,Salons,,53.3124754,-6.2740502
+D6,Men's Grooming Ireland,Salons,,53.3099875,-6.2826712
+D6,Men's Grooming Ireland,Salons,,53.324183,-6.2400671
+D6,Mink,Salons,,53.3214676,-6.2353627
+D6,Mint Nail & Beauty Spa,Salons,,53.3217424,-6.2665595
+D6,Miss World,Salons,,53.3292859,-6.275516
+D6,Monica Hairstylist,Salons,,53.3223377,-6.2791495
+D6,Natural Beauty,Salons,,53.3269799,-6.2774451
+D6,Origin,Salons,,53.3248526,-6.2544233
+D6,Peter Marks,Salons,,53.3242278,-6.2651508
+D6,Poise,Salons,,53.3135407,-6.2465623
+D6,Rathgar Studio,Salons,,53.3117038,-6.2746202
+D6,Rhea Hair Salon,Salons,,53.3266233,-6.2646112
+D6,Rosanna Crothers,Salons,,53.3241737,-6.2400861
+D6,Rosanna Crothers,Salons,,53.3243105,-6.2403145
+D6,SISU Clinic,Salons,,53.3252812,-6.2554094
+D6,SK Hand & Foot Spa,Salons,,53.3123012,-6.274715
+D6,Sandy Nails,Salons,,53.3262436,-6.2651617
+D6,Sarah O'Brien Hair Design,Salons,,53.3144432,-6.282262
+D6,Scalps,Salons,,53.3107235,-6.28295
+D6,TK Barbers,Salons,,53.3126701,-6.2748011
+D6,Tanning Hub,Salons,,53.3265235,-6.2646335
+D6,The Bridge Barbers,Salons,,53.3292626,-6.2755454
+D6,The Grafton Barber,Salons,,53.3115676,-6.2745541
+D6,The Grafton Barber,Salons,,53.3240874,-6.2399578
+D6,The Lane Beauty Salon,Salons,,53.3162149,-6.2755631
+D6,The Studio,Salons,,53.3258732,-6.2575688
+D6,Thomas Collins,Salons,,53.3124583,-6.2739978
+D6,V.Claire,Salons,,53.3181899,-6.2792475
+D6,Vanilla,Salons,,53.322137,-6.2667009
 D6,Milltown Shopping Centre,Shopping_Malls,,53.3135773,-6.2464701
 D6,Swan Centre,Shopping_Malls,,53.3232863,-6.2647012
 D6,,Shopping_Malls,,53.313262,-6.246515
@@ -3781,6 +4493,7 @@ D6W,Brambles,Restaurants,,53.3111738,-6.2833015
 D6W,Fifty50,Restaurants,,53.2984542,-6.3043133
 D6W,Guzto,Restaurants,pizza,53.298267,-6.3035813
 D6W,Honkuku,Restaurants,thai;sushi,53.3190163,-6.2914429
+D6W,Lark Café,Restaurants,breakfast;irish;pancake,53.3096275,-6.2857473
 D6W,Meghna Tandoori,Restaurants,indian,53.3092835,-6.2847855
 D6W,Rea's Bistro,Restaurants,,53.3194498,-6.2917621
 D6W,Reeves,Restaurants,,53.2983839,-6.3029831
@@ -3790,6 +4503,41 @@ D6W,The Joshua Tree,Restaurants,pizza,53.3217541,-6.27947
 D6W,Vermillion,Restaurants,indian,53.3113995,-6.2830184
 D6W,Yew Tree,Restaurants,coffee_shop,53.3115144,-6.2829472
 D6W,Zero Zero Pizza - Kimmage,Restaurants,pizza,53.3196094,-6.2910603
+D6W,Color Therapy,Salons,,53.3187459,-6.2917444
+D6W,Elegance Nail Studio,Salons,,53.3138314,-6.2825184
+D6W,Element Male Grooming,Salons,,53.3202893,-6.2916531
+D6W,Envy Nails Beauty Spa,Salons,,53.3196871,-6.290389
+D6W,Esmers Hair Studio,Salons,,53.3194404,-6.2789977
+D6W,Garrett Stevens,Salons,,53.322788,-6.2795058
+D6W,Glossy & Beauty Nails,Salons,,53.3196604,-6.2911567
+D6W,Glossy Nail & Beauty,Salons,,53.3196571,-6.2911763
+D6W,Hair Control,Salons,,53.3209127,-6.2932551
+D6W,Medusa Hair Works,Salons,,53.321116,-6.2934813
+D6W,Misty's,Salons,,53.3138224,-6.2824782
+D6W,Modern Nails Spa,Salons,japanese,53.3197143,-6.289896
+D6W,Neville Russell,Salons,,53.309009,-6.2840994
+D6W,Perceptions,Salons,,53.3100223,-6.2836381
+D6W,Precious,Salons,,53.2990684,-6.3211504
+D6W,Raluca,Salons,,53.3194914,-6.2790254
+D6W,Residence Day Spa,Salons,,53.3196987,-6.2905232
+D6W,Rickyna,Salons,,53.3197775,-6.2907702
+D6W,Roche,Salons,,53.3106673,-6.2832901
+D6W,Roches,Salons,,53.3197319,-6.2897602
+D6W,Spawell Barber,Salons,,53.2936648,-6.3237664
+D6W,Steven An Nail Spa,Salons,,53.3218017,-6.2794803
+D6W,Studio 6,Salons,,53.3125123,-6.2826455
+D6W,Sunny Hair Salon,Salons,,53.319635,-6.2911096
+D6W,Sydney Nails,Salons,,53.3190687,-6.2914131
+D6W,Templeogue Barbers,Salons,,53.2981834,-6.3038521
+D6W,The Barber Room of Terenure,Salons,,53.3096752,-6.2844942
+D6W,The Choppers Barbershop,Salons,,53.3101417,-6.2836292
+D6W,The Regal Barbers,Salons,,53.3191098,-6.2913613
+D6W,The Temple Hair & Beauty Lounge,Salons,,53.2984292,-6.3043126
+D6W,The Turkish Barbers,Salons,,53.3194873,-6.2789743
+D6W,The Works,Salons,,53.3238447,-6.2800105
+D6W,The Works (Moved),Salons,,53.3200675,-6.2789556
+D6W,Venus Hair Salon,Salons,,53.319709,-6.2906318
+D6W,be U. Nail & Bauty Clinic,Salons,,53.319406,-6.2910089
 D6W,SuperValu,Supermarkets,,53.3191675,-6.292572
 D6W,SuperValu,Supermarkets,,53.2990522,-6.3214495
 D6W,Tesco Metro,Supermarkets,,53.3136133,-6.282925
@@ -4100,6 +4848,87 @@ D7,Wood Fire Cafe,Restaurants,pizza,53.3563112,-6.2656732
 D7,chive,Restaurants,breakfast;coffee_shop;sandwich,53.3474932,-6.2824553
 D7,khana,Restaurants,,53.3523584,-6.284233
 D7,,Restaurants,spanish,53.3470683,-6.2800426
+D7,4Hundred,Salons,,53.3630008,-6.2899499
+D7,8999 Nails Spa,Salons,,53.3761169,-6.3325506
+D7,Alchemy,Salons,,53.3512694,-6.2826904
+D7,Anna Maria Beauty,Salons,,53.3602893,-6.2698274
+D7,Arshia's,Salons,,53.3598593,-6.2728439
+D7,Barber Cafe,Salons,,53.3486087,-6.2799804
+D7,Barber Pro,Salons,,53.3613457,-6.2849887
+D7,Barbers,Salons,,53.3669652,-6.2926176
+D7,Barbers,Salons,,53.3581082,-6.3003413
+D7,Beauty Bee Salon,Salons,,53.3507744,-6.282406
+D7,Blossom,Salons,,53.3593587,-6.2875432
+D7,Blush,Salons,,53.3725356,-6.3211708
+D7,Brazilian Aesthetics,Salons,,53.3563759,-6.2678192
+D7,Cabra Barbers,Salons,,53.3613385,-6.2830703
+D7,Classic Barber,Salons,,53.3506293,-6.2711831
+D7,Coco Kiss,Salons,,53.3614058,-6.2834044
+D7,Concept,Salons,,53.3457549,-6.2715852
+D7,D15 Barbers,Salons,,53.3630597,-6.2585397
+D7,Define,Salons,,53.3627309,-6.2589391
+D7,Diamond,Salons,,53.3588351,-6.2699166
+D7,Diamond Beauty Clinic,Salons,,53.3587869,-6.2698736
+D7,Dublin Hairdressers,Salons,,53.3578655,-6.2690433
+D7,Eden Therapy,Salons,,53.3646916,-6.2866864
+D7,Eden Therapy,Salons,,53.364769,-6.2866389
+D7,Fades & Blades,Salons,,53.3597573,-6.261538
+D7,Flawless Aesthetics,Salons,,53.3753509,-6.3063227
+D7,Florina's Hair Design,Salons,,53.3583579,-6.2694746
+D7,Gabi Beauty Salon,Salons,,53.3506892,-6.2710096
+D7,Gents of Dublin,Salons,,53.3607185,-6.2729302
+D7,Hair Affair,Salons,,53.3632339,-6.3041089
+D7,Hair Cafe Salon,Salons,,53.3491824,-6.2794951
+D7,Head to Toe,Salons,,53.367485,-6.2982773
+D7,Imagine Ladies Hair Studio,Salons,,53.3572099,-6.2643224
+D7,Iron Blades,Salons,,53.3518984,-6.269521
+D7,JK Hair Replacement,Salons,,53.3655053,-6.2714042
+D7,Karen Ryan Hairdressing,Salons,,53.3614572,-6.2858174
+D7,Karisma Barber,Salons,,53.3554081,-6.266015
+D7,Karisma Barber,Salons,,53.3554294,-6.2660778
+D7,Kate's,Salons,,53.3513078,-6.2827045
+D7,Khans Gentleman Barbers,Salons,,53.3563001,-6.2652331
+D7,Kisses,Salons,,53.3615716,-6.2858123
+D7,La Mode,Salons,,53.3612797,-6.2725009
+D7,Ladies Hair and Beauty + Bolton Barbers,Salons,,53.3510935,-6.2702414
+D7,Laser Express Beauty,Salons,,53.3512525,-6.2700729
+D7,Lia Thompson,Salons,,53.3633054,-6.2583385
+D7,Mark's Barber Shop,Salons,,53.3514576,-6.2831947
+D7,Nail & Beauty,Salons,,53.3608997,-6.273356
+D7,Nail Art Lana,Salons,,53.3600372,-6.2771335
+D7,Navan Barber,Salons,,53.3607323,-6.2737611
+D7,New,Salons,,53.3541297,-6.2866757
+D7,New Age,Salons,,53.3627035,-6.2732136
+D7,Orchid's Hair Nail & Beauty Salon,Salons,,53.3605553,-6.2706624
+D7,PM Beauty Master,Salons,,53.3616077,-6.2858116
+D7,Pheonix Skincare & Laser Clinic,Salons,,53.3764251,-6.3325557
+D7,Prince Barbers,Salons,,53.35954,-6.2729455
+D7,R&B Hair Studio,Salons,,53.3725093,-6.321192
+D7,Reba Hair & Beauty,Salons,,53.376236,-6.3325292
+D7,Richies Barbers,Salons,,53.3632452,-6.3041278
+D7,Rickyna,Salons,,53.3608254,-6.2864491
+D7,Sam's Barbers,Salons,,53.3562349,-6.2868283
+D7,Saoirse Health and Beauty Store,Salons,,53.3674834,-6.2990092
+D7,Shades,Salons,,53.354414,-6.2670668
+D7,Sharp Edge Barber Shop,Salons,,53.3574373,-6.2682655
+D7,Spy Hair & Beauty,Salons,,53.360056,-6.2627384
+D7,Studio One,Salons,,53.361808,-6.2908824
+D7,T2 Barber Rooms,Salons,,53.3759676,-6.3325443
+D7,Tan Me,Salons,,53.3613135,-6.2837791
+D7,The Barber Shop,Salons,,53.360359,-6.2729112
+D7,The Curly Look,Salons,,53.3581283,-6.2692781
+D7,The Hair Company,Salons,,53.3561651,-6.273392
+D7,The Lads Room,Salons,,53.3635685,-6.3111367
+D7,The Space,Salons,,53.3623925,-6.2590365
+D7,Tia Brown,Salons,,53.3637837,-6.3105958
+D7,Top To Toe Beauty,Salons,,53.3533566,-6.2861774
+D7,Urban Locks,Salons,,53.3613704,-6.2830585
+D7,Whizzer Hairdressing & Beauty,Salons,,53.3547377,-6.2929784
+D7,Wow,Salons,,53.3604164,-6.2728167
+D7,art barbers,Salons,,53.3602015,-6.276388
+D7,darlo,Salons,,53.3608862,-6.2714089
+D7,,Salons,,53.351594,-6.2829425
+D7,,Salons,,53.3670484,-6.2932533
 D7,Phibsborough Shopping Centre,Shopping_Malls,,53.3619308,-6.2732287
 D7,River Centre,Shopping_Malls,,53.3782054,-6.3267391
 D7,Aldi,Supermarkets,,53.3632505,-6.2926971
@@ -4363,6 +5192,52 @@ D8,The Electric Vegan,Restaurants,burger;cafe;breakfast;lunch;diner,53.339224,-6
 D8,The Riddler,Restaurants,irish;coffee_shop,53.3431753,-6.2747683
 D8,Variety Jones,Restaurants,,53.3429332,-6.2762104
 D8,,Restaurants,,53.3434917,-6.2757132
+D8,5 O'Clock Shadow,Salons,,53.3319106,-6.2753663
+D8,Anna Nails & Beauty,Salons,,53.340735,-6.2809415
+D8,Barber Loco,Salons,,53.342499,-6.2792887
+D8,Barbershop,Salons,,53.3355485,-6.3265393
+D8,Branch Hair Stidio,Salons,,53.3378167,-6.3232349
+D8,Claude Barber Shop,Salons,,53.3424626,-6.2790044
+D8,Clifford's,Salons,,53.3367861,-6.2878194
+D8,Cutting Edge Barber,Salons,,53.3404202,-6.3078271
+D8,Effies,Salons,,53.3410391,-6.2725569
+D8,Fades & Blades,Salons,,53.3432811,-6.2810039
+D8,Flair,Salons,,53.3408008,-6.3039469
+D8,GS Hair & Nail Salon,Salons,,53.3390748,-6.3077451
+D8,Galaxy Nails and Beauty Salon,Salons,,53.3370864,-6.2989291
+D8,Hair & Beauty Bar,Salons,,53.335208,-6.2735274
+D8,Hair Beauty & Massage Centre,Salons,,53.3426982,-6.2774036
+D8,Hair Says,Salons,,53.3424635,-6.2943041
+D8,Headstart,Salons,,53.3359466,-6.3268633
+D8,Kurdish Barbers,Salons,,53.3390336,-6.3077547
+D8,Morgan4men,Salons,,53.3345664,-6.2747293
+D8,Move Male Grooming,Salons,,53.3397272,-6.3143973
+D8,New Image Hair & Beauty Salon,Salons,,53.3331347,-6.2753978
+D8,Pattern Barber Shop,Salons,,53.3407158,-6.2745259
+D8,Peace of Mind Hair Salon,Salons,,53.3340002,-6.2923105
+D8,Plaza Barber,Salons,,53.330714,-6.2750592
+D8,Pretty Nails & Beauty Spa,Salons,,53.3390444,-6.3213583
+D8,Proper Fresh,Salons,,53.3406711,-6.2867175
+D8,Reflections,Salons,,53.3401081,-6.3172254
+D8,Rose Royal Beauty,Salons,,53.335971,-6.3269056
+D8,Salon Rouge,Salons,,53.339727,-6.3144709
+D8,Seven Beauties,Salons,,53.346595,-6.3080538
+D8,Shay's Village Barber,Salons,,53.339159,-6.3211947
+D8,Smart Style,Salons,,53.3317232,-6.2748768
+D8,Studio 22,Salons,,53.3428712,-6.2913725
+D8,Studio Re Fontes,Salons,,53.3334128,-6.2917434
+D8,Studio X,Salons,,53.3426017,-6.2792808
+D8,Sun City,Salons,,53.3403054,-6.3165503
+D8,Sunny Sky Solarium,Salons,,53.3364656,-6.287406
+D8,The Buddha Rooms,Salons,,53.3323321,-6.2925701
+D8,The Hair Store,Salons,,53.3381702,-6.2703466
+D8,The Mad Barber,Salons,,53.3346602,-6.2901062
+D8,The Salon,Salons,,53.3414242,-6.272075
+D8,Thea,Salons,,53.3323541,-6.2749686
+D8,Tribe Male Grooming,Salons,,53.3350092,-6.3278755
+D8,Ziggy's Hair Studio,Salons,,53.3335371,-6.2908636
+D8,Zinc Hair Spa,Salons,,53.340226,-6.307839
+D8,,Salons,,53.3408681,-6.3014652
 D8,Aldi,Supermarkets,,53.3354506,-6.3458346
 D8,Balkan,Supermarkets,,53.3339315,-6.2922067
 D8,Dublin Food Co-op,Supermarkets,,53.3423695,-6.3101919
@@ -4588,6 +5463,92 @@ D9,The Lovely Food Company,Restaurants,,53.3652799,-6.2566892
 D9,The Washerwoman,Restaurants,regional,53.3753711,-6.2697361
 D9,,Restaurants,chinese,53.390647,-6.2885471
 D9,,Restaurants,italian,53.3934434,-6.2861316
+D9,ACTIVE,Salons,,53.3989325,-6.256248
+D9,Allure,Salons,,53.3651941,-6.2567382
+D9,Arkon Lettings,Salons,,53.3662234,-6.2714037
+D9,Barber Shop,Salons,,53.387698,-6.2383961
+D9,Barber Shop,Salons,,53.3725713,-6.2683416
+D9,Barbers,Salons,,53.3953297,-6.2449173
+D9,Bea Beauty,Salons,,53.3968348,-6.2450182
+D9,Bea Beauty,Salons,,53.3968411,-6.2449303
+D9,Beauty Salon,Salons,,53.390673,-6.286749
+D9,Berkley Barber,Salons,,53.3913926,-6.2466269
+D9,Bill's Barber,Salons,,53.3661482,-6.2714508
+D9,Carmel's,Salons,,53.3899318,-6.2489422
+D9,Catherines Hair Salon,Salons,,53.3902031,-6.2863923
+D9,Centrepoint,Salons,,53.3969957,-6.2638506
+D9,Cheek 2 Cheek Beauty Salon,Salons,,53.3813608,-6.2453977
+D9,Cheryl Lyons Makeup Academy,Salons,,53.3669309,-6.2721147
+D9,Clifton Hair Salon,Salons,,53.393226,-6.2856042
+D9,Create,Salons,,53.3885064,-6.2453478
+D9,Dream,Salons,,53.3896388,-6.2986306
+D9,Ebano,Salons,,53.3724436,-6.2686318
+D9,Fedez Barber,Salons,,53.3823733,-6.2773568
+D9,Finglas Hair and Beauty Spot,Salons,,53.3878071,-6.2979231
+D9,Fire Barbers,Salons,,53.3921148,-6.2479745
+D9,Flair Hair Fashions,Salons,,53.390908,-6.2877871
+D9,Flair Hair Fashions,Salons,,53.3908999,-6.2878957
+D9,Fran's,Salons,,53.387733,-6.2376305
+D9,Fringe,Salons,,53.3706892,-6.2682033
+D9,Gold Hair & Beauty,Salons,,53.3904704,-6.2885723
+D9,Golden Hands Barber,Salons,,53.3882224,-6.297847
+D9,HIM Barbershop,Salons,,53.3794702,-6.2658324
+D9,Hair Candy,Salons,,53.3856553,-6.2339643
+D9,Harte's Barber,Salons,,53.3858116,-6.2662189
+D9,Harts Barber Shop,Salons,,53.3663099,-6.2718117
+D9,Haven,Salons,,53.3906942,-6.2982486
+D9,Headlites,Salons,,53.3662245,-6.2715821
+D9,Iris,Salons,,53.3794927,-6.2660887
+D9,Jack of All Fades,Salons,,53.3966748,-6.2449691
+D9,K2 Hair Salon,Salons,,53.3902274,-6.2865568
+D9,Karizma,Salons,,53.3877212,-6.2378886
+D9,Kate Elizabeth,Salons,,53.3885059,-6.2453433
+D9,Leonard,Salons,,53.3734601,-6.2214275
+D9,Linda's,Salons,,53.3886628,-6.2454607
+D9,Linda's,Salons,,53.3886732,-6.2454098
+D9,Lower Nail Salon,Salons,,53.3817367,-6.2413868
+D9,Luxury Nails and Lashes,Salons,,53.3882485,-6.2978752
+D9,Master Barber,Salons,,53.3908409,-6.2877941
+D9,Master Barber,Salons,,53.3908296,-6.2879137
+D9,Miami Sun,Salons,,53.3942744,-6.2646682
+D9,Miami Sun,Salons,,53.3942377,-6.2646611
+D9,Nail It,Salons,,53.4008019,-6.2653158
+D9,New Image Hair Design,Salons,,53.3743592,-6.2554546
+D9,New Top Nails,Salons,,53.3894114,-6.2995592
+D9,O l’Ombre,Salons,,53.3916533,-6.2484339
+D9,"Orchid's Hair, Nail and Beauty Salon",Salons,,53.3892301,-6.245708
+D9,Polished,Salons,,53.3828145,-6.2769557
+D9,Pop In Beauty,Salons,,53.3998329,-6.2764568
+D9,Pretty Woman,Salons,,53.3897118,-6.2985871
+D9,Ridgeway's Barber Shop,Salons,,53.3942168,-6.2647588
+D9,Ripple,Salons,,53.3858412,-6.2662619
+D9,Robert Anthony,Salons,,53.3899275,-6.2490505
+D9,Savvi Beauty Salon,Salons,,53.39153,-6.246606
+D9,Sculpture Barber Shop,Salons,,53.3724686,-6.2225324
+D9,Shanard Black & White,Salons,,53.3908545,-6.2571538
+D9,Slender Health,Salons,,53.3724941,-6.2685402
+D9,Sofia Borza Hair Studio,Salons,,53.3726294,-6.2224104
+D9,Studio Two,Salons,,53.3708034,-6.2680888
+D9,Take Time,Salons,,53.3661107,-6.2714767
+D9,TanningSalon.ie,Salons,,53.3965143,-6.2450078
+D9,Tanzone,Salons,,53.3991558,-6.3047097
+D9,Tariks Barber,Salons,,53.4045692,-6.2838997
+D9,The B Club,Salons,,53.3684612,-6.2592041
+D9,The Barber Shop,Salons,,53.3904258,-6.2980691
+D9,The Beauty Room,Salons,,53.3922467,-6.23456
+D9,The Hair Bureau,Salons,,53.3907626,-6.2982156
+D9,The Pink Scisssors,Salons,,53.3942355,-6.2647088
+D9,Trends,Salons,,53.392171,-6.2346122
+D9,Turning Heads,Salons,,53.3897604,-6.2720452
+D9,Urban Co Barbers,Salons,,53.4006926,-6.2645798
+D9,no5,Salons,,53.3880272,-6.2982327
+D9,,Salons,,53.3958901,-6.2486453
+D9,,Salons,,53.3884123,-6.245236
+D9,,Salons,,53.3743678,-6.255454
+D9,,Salons,,53.379179,-6.2621747
+D9,,Salons,,53.3813929,-6.2454975
+D9,,Salons,,53.3892727,-6.2992415
+D9,,Salons,,53.386579,-6.2157135
 D9,Aldi,Supermarkets,,53.3983963,-6.2505881
 D9,Aldi,Supermarkets,,53.3986065,-6.3047489
 D9,Eurospar,Supermarkets,,53.3856137,-6.2656762
@@ -4656,6 +5617,15 @@ K32,Fei's Garden,Restaurants,,53.6136252,-6.2068409
 K32,Harveys,Restaurants,,53.610969,-6.1856003
 K32,La Cocina Cuevas,Restaurants,mexican,53.5643741,-6.2757879
 K32,The La-La,Restaurants,,53.6085285,-6.180046
+K32,,Salons,,53.6106922,-6.185407
+K32,,Salons,,53.6056867,-6.1837562
+K32,101 Barbershop,Salons,,53.6119066,-6.1868541
+K32,Balbriggan Nails & Spa,Salons,,53.606702,-6.1837802
+K32,Boston Belle,Salons,,53.6073167,-6.1968837
+K32,Mairead's,Salons,,53.6067805,-6.1834207
+K32,Sammy's Barber,Salons,,53.6063524,-6.1830689
+K32,Serenity Beauty,Salons,,53.5850984,-6.2892243
+K32,Snip & Set,Salons,,53.5858152,-6.2895858
 K32,Castlemill Shopping Centre,Shopping_Malls,,53.6133406,-6.2062591
 K32,Millfield Shopping Centre,Shopping_Malls,,53.6071839,-6.1969477
 K32,Costcutter,Supermarkets,,53.6062991,-6.1774099
@@ -4712,6 +5682,8 @@ K34,Stoop Your Head,Restaurants,,53.584343,-6.1045208
 K34,Sunrise Garden,Restaurants,chinese,53.5772764,-6.1064331
 K34,The Brick House,Restaurants,,53.584893,-6.1048741
 K34,The Green Restaurant,Restaurants,chinese,53.577543,-6.1078733
+K34,Golden Cut,Salons,,53.577025,-6.1056672
+K34,Head to Toe,Salons,,53.5798676,-6.1099099
 K34,Homepatrick Shopping Centre,Shopping_Malls,,53.5706785,-6.1060392
 K34,Skerries Point,Shopping_Malls,,53.5814447,-6.1343331
 K34,C&T's Holmpatrick Supermarket,Supermarkets,,53.5706962,-6.1058087
@@ -4802,6 +5774,24 @@ K36,Sports Pavilion,Restaurants,,53.4481489,-6.1622031
 K36,Sushida,Restaurants,japanese;noodle;sushi,53.4519492,-6.1540306
 K36,The Greenery,Restaurants,burger;italian;sandwich;mexican;chicken;french;ice_cream;salad;dessert;fish_and_chips;steak_house,53.450727,-6.144604
 K36,The Wild Swan,Restaurants,chinese,53.4505723,-6.1542125
+K36,,Salons,,53.4522019,-6.1556127
+K36,A.S Makeup Room,Salons,,53.4877381,-6.1484353
+K36,Absolutely Georgeous,Salons,,53.4554757,-6.1802746
+K36,Avenue Hair Salon,Salons,,53.4874915,-6.1484842
+K36,Barber Shop,Salons,,53.4924187,-6.1360628
+K36,Crows Nest,Salons,,53.4511231,-6.1704754
+K36,Esthétique,Salons,,53.487953,-6.1484314
+K36,Grafton Barber,Salons,,53.4509173,-6.1533214
+K36,Malahide Hair Studio,Salons,,53.4520442,-6.1536694
+K36,Nails by Martina Studio,Salons,,53.4503662,-6.1533924
+K36,Razors Edge Barbers,Salons,,53.4866037,-6.148986
+K36,Salon Tibo,Salons,,53.4505807,-6.1541242
+K36,Studio 19,Salons,,53.4502892,-6.1539534
+K36,Styles,Salons,,53.4923748,-6.1361462
+K36,Sunflowers Beauty Salon,Salons,,53.4868448,-6.1486742
+K36,Susanne Murray Hair Studio,Salons,,53.4862239,-6.1490657
+K36,Tantastic,Salons,,53.4502966,-6.1533425
+K36,Toni & Guy,Salons,,53.4499589,-6.1537387
 K36,Ballalease Mall,Shopping_Malls,,53.4923053,-6.136058
 K36,Donabate Town Centre,Shopping_Malls,,53.4867034,-6.148952
 K36,Fairways Mall,Shopping_Malls,,53.4871685,-6.1481546
@@ -4850,6 +5840,11 @@ K45,,Restaurants,,53.5648495,-6.2116176
 K45,Golden China,Restaurants,chinese,53.5276841,-6.1667289
 K45,Indo Kitchen,Restaurants,indian,53.5261781,-6.1641709
 K45,Winters Restaurant,Restaurants,,53.5065846,-6.1967359
+K45,Barberia,Salons,,53.5278419,-6.1667858
+K45,Between Cuts,Salons,,53.5242899,-6.1740749
+K45,Claire Allan's Hair Design,Salons,,53.5275231,-6.1688571
+K45,Little Paris,Salons,,53.5256811,-6.1644557
+K45,Man Up,Salons,,53.525468,-6.1646191
 K45,Lusk Town Centre,Shopping_Malls,,53.5262582,-6.1642724
 K45,Lidl,Supermarkets,,53.525094,-6.1601653
 K45,Smakpol,Supermarkets,,53.5272658,-6.1690504
@@ -4879,6 +5874,19 @@ K56,,Restaurants,,53.5223772,-6.0936295
 K56,D' Vine at Jacks,Restaurants,,53.5217958,-6.089961
 K56,Haldi By Manish,Restaurants,indian,53.5226398,-6.0955157
 K56,Joyous Garden,Restaurants,,53.5228244,-6.1049308
+K56,Beauty by the Sea,Salons,,53.5220801,-6.0932131
+K56,Beauty by the Sea,Salons,,53.5224986,-6.094815
+K56,Fabulous,Salons,,53.5216078,-6.0902369
+K56,Helenas,Salons,,53.5226557,-6.0956042
+K56,Kerrie,Salons,,53.5221179,-6.093465
+K56,Lashes To Love,Salons,,53.5218847,-6.0886583
+K56,Lux Sun Tanning Salon,Salons,,53.5221599,-6.0937397
+K56,Marion Fynes,Salons,,53.5221367,-6.0910533
+K56,Maurice's Traditional Barber Shop,Salons,,53.5217646,-6.0912038
+K56,Sharon's Health & Beauty Clinic,Salons,,53.5224265,-6.0979906
+K56,Vinnys Barbers,Salons,,53.5225375,-6.0975025
+K56,Warren's Barbers,Salons,,53.5221273,-6.0935163
+K56,Zas,Salons,,53.5216792,-6.0909705
 K56,,Supermarkets,,53.5223686,-6.0956104
 K56,Eurospar,Supermarkets,,53.522387,-6.095442
 K56,Tesco,Supermarkets,,53.522863,-6.101434
@@ -5135,6 +6143,47 @@ K67,The Garden Terrace,Restaurants,,53.4278192,-6.2455408
 K67,The Grill House,Restaurants,turkish,53.4591484,-6.2216553
 K67,The Pink Elephant,Restaurants,thai,53.4580916,-6.2196731
 K67,Whiskey Bread,Restaurants,,53.4235993,-6.2437658
+K67,,Salons,,53.4500516,-6.2052318
+K67,Allure Beauty,Salons,,53.4619559,-6.2314615
+K67,Barber Shop,Salons,,53.403254,-6.302819
+K67,Beauty Laine,Salons,,53.4036278,-6.2600323
+K67,Bogey's Barber Shop,Salons,,53.4619769,-6.231441
+K67,Boston Barbers,Salons,,53.462562,-6.2300133
+K67,Boston Belle,Salons,,53.4556192,-6.2207123
+K67,Cut Above,Salons,,53.4018293,-6.2968787
+K67,Diana Macaria,Salons,,53.4605741,-6.2455167
+K67,Dillon's Hair Salon,Salons,,53.4568003,-6.2214862
+K67,Dillons Barbers,Salons,,53.4568464,-6.2214621
+K67,Diva Hair and Beauty,Salons,,53.458095,-6.2210725
+K67,Glam Beauty,Salons,,53.457476,-6.219886
+K67,HairMaster,Salons,,53.4573288,-6.2202079
+K67,Hairways,Salons,,53.4606504,-6.2453424
+K67,June Rutland Hair Salon,Salons,,53.4565226,-6.2211771
+K67,Kiwi Sun Tanning Salon,Salons,,53.4618978,-6.2181489
+K67,L & A Hair,Salons,,53.4035921,-6.2598259
+K67,La Citadel,Salons,,53.4582355,-6.2213497
+K67,Mane Hair Salon,Salons,,53.4707485,-6.2317726
+K67,Paradise Nails,Salons,,53.4589367,-6.2204041
+K67,Peter Mark,Salons,,53.4542957,-6.2191303
+K67,Peter Marks,Salons,,53.4579906,-6.2203436
+K67,Pink Beauty Clinic,Salons,,53.457203,-6.2204799
+K67,Platnum Barbers,Salons,,53.4553121,-6.2224609
+K67,Ruth Hughes,Salons,,53.4611091,-6.2438873
+K67,Seven Swords,Salons,,53.4586587,-6.2217629
+K67,Studio J,Salons,,53.4591714,-6.2215397
+K67,Studio M,Salons,,53.457197,-6.2204283
+K67,Style Club,Salons,,53.45479,-6.2206957
+K67,Sugardolls,Salons,,53.4537017,-6.2189199
+K67,Tan Me,Salons,,53.4606114,-6.2450353
+K67,The Mall Barber,Salons,,53.4575507,-6.2203267
+K67,The Turkish Barber,Salons,,53.4572904,-6.2199536
+K67,Tracy's Salon,Salons,,53.4619368,-6.2313877
+K67,Turkish Barber,Salons,,53.4568122,-6.2206575
+K67,Ultimate Styling Barbers,Salons,,53.4564052,-6.2209935
+K67,Vanity X Makeup Academy,Salons,,53.4564476,-6.2202933
+K67,Vita Beauty Bat,Salons,,53.4592382,-6.2205966
+K67,Viva Style,Salons,,53.4523389,-6.2435378
+K67,jule beauty and therapy,Salons,,53.470938,-6.2331296
 K67,Airside Retail Park,Shopping_Malls,,53.4469979,-6.224572
 K67,Airside Shopping Centre,Shopping_Malls,,53.4451827,-6.2152886
 K67,Boroimhe Shopping Centre,Shopping_Malls,,53.4466429,-6.237762
