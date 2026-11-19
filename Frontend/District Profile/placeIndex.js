@@ -54,7 +54,7 @@ let built = null
 // How each map category reads under a place's name
 const CATEGORY = {
   Supermarkets: 'Supermarket', Groceries: 'Grocery shop', Restaurants: 'Restaurant', Asian_Restaurants: 'Asian restaurant',
-  Cafes: 'Café', Parks: 'Park', Pharmacies: 'Pharmacy', Gyms: 'Gym', Shopping_Malls: 'Shopping centre', Hospitals: 'Hospital',
+  Cafes: 'Café', Parks: 'Park', Pharmacies: 'Pharmacy', Gyms: 'Gym', Shopping_Malls: 'Shopping centre', Hospitals: 'Hospital', Salons: 'Salon',
 }
 
 // D1 … D24 in number order, D6W after D6, then the County Dublin areas (A41 … K78)
