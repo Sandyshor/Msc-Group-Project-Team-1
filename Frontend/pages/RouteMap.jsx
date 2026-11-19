@@ -114,7 +114,55 @@ function declutterTips(box) {
     else kept.push(r)
   })
 }
-const ctxIcon = (html, size = 24) => L.divIcon({ className: 'rm-ctx', html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
+function fitPermanentTips(map, groups) {
+  const size = map.getSize()
+  groups.forEach((group) => group?.eachLayer((layer) => {
+    const tooltip = layer.getTooltip?.()
+    const element = tooltip?.getElement()
+    if (!tooltip?.options.permanent || !element) return
+    const point = map.latLngToContainerPoint(layer.getLatLng())
+    const topSpace = Math.max(0, point.y - 18)
+    const bottomSpace = Math.max(0, size.y - point.y - 18)
+    const currentSpace = tooltip.options.direction === 'top' ? topSpace : bottomSpace
+    const direction = currentSpace >= element.offsetHeight + 8
+      ? tooltip.options.direction
+      : topSpace >= bottomSpace ? 'top' : 'bottom'
+    const maxHeight = Math.max(0, Math.min(280, Math.max(topSpace, bottomSpace) - 8))
+    const offset = direction === 'top' ? [0, -12] : [0, 12]
+    let changed = false
+    if (tooltip.options.direction !== direction) {
+      tooltip.options.direction = direction
+      changed = true
+    }
+    if (tooltip.options.offset[1] !== offset[1]) {
+      tooltip.options.offset = offset
+      changed = true
+    }
+    if (element.style.maxHeight !== `${maxHeight}px`) {
+      element.style.maxHeight = `${maxHeight}px`
+      element.style.overflowY = 'auto'
+      changed = true
+    }
+    if (changed) tooltip.update()
+  }))
+}
+function declutterHomeLabels(box) {
+  if (!box) return
+  const labels = [...box.querySelectorAll('.rm-home-label')]
+  labels.forEach((label) => label.classList.remove('rm-label-hidden'))
+  if (!box.classList.contains('rm-close')) return
+  const kept = []
+  labels.forEach((label) => {
+    const r = label.getBoundingClientRect()
+    if (!r.width || !r.height) return
+    if (kept.some((q) => r.left < q.right + 4 && r.right > q.left - 4 && r.top < q.bottom + 3 && r.bottom > q.top - 3)) {
+      label.classList.add('rm-label-hidden')
+    } else {
+      kept.push(r)
+    }
+  })
+}
+const ctxIcon = (html, size = 24, className = 'rm-ctx') => L.divIcon({ className, html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
 
 // what the bus/fastest buttons say: "Luas Green", "Bus 11 → 46A"
 function rideWords(itinerary) {
@@ -270,11 +318,24 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     map.on('focus click', () => map.scrollWheelZoom.enable())
     map.on('blur mouseout', () => map.scrollWheelZoom.disable())
     map.on('click', (event) => setStart({ lat: event.latlng.lat, lng: event.latlng.lng, name: 'Point on the map', lookup: true }))
-    // stop and residence names show from street level, so the wider view stays readable
-    const zoomClass = () => boxRef.current?.classList.toggle('rm-near', map.getZoom() >= 15)
+    const zoomClass = () => {
+      const box = boxRef.current
+      if (!box) return
+      const zoom = map.getZoom()
+      box.classList.toggle('rm-overview', zoom < 13)
+      box.classList.toggle('rm-near', zoom >= 15)
+      box.classList.toggle('rm-close', zoom >= 17)
+    }
     map.on('zoomend', zoomClass)
     let tidy
-    map.on('zoomend moveend', () => { clearTimeout(tidy); tidy = setTimeout(() => declutterTips(boxRef.current), 60) })
+    map.on('zoomend moveend', () => {
+      clearTimeout(tidy)
+      tidy = setTimeout(() => {
+        fitPermanentTips(map, [layerRef.current, ctxRef.current])
+        declutterTips(boxRef.current)
+        declutterHomeLabels(boxRef.current)
+      }, 60)
+    })
     mapRef.current = map
     homeLines.current = L.layerGroup().addTo(map)
     cardRef.current = L.popup({ closeButton: false, autoPan: false, offset: [0, -12], maxWidth: 280, minWidth: 240, className: 'rm-hover' })
@@ -286,7 +347,9 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     map.on('zoomend', () => arrangeHomes())
     ctxRef.current = L.layerGroup().addTo(map)
     layerRef.current = L.layerGroup().addTo(map)
+    zoomClass()
     return () => {
+      clearTimeout(tidy)
       resizeObserver.disconnect()
       cancelAnimationFrame(resizeFrame)
       stopTraveller()
@@ -352,7 +415,11 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       map.fitBounds(L.latLngBounds(all.length ? all : [from, to]), { padding: [36, 36], maxZoom: 15 })
     }
     if (animate) animRef.current.timer = setTimeout(() => startTraveller(lines), REDUCED_MOTION ? 0 : delay + 300)
-    setTimeout(() => declutterTips(boxRef.current), animate && !REDUCED_MOTION ? delay + 80 : 80)
+    setTimeout(() => {
+      fitPermanentTips(map, [layerRef.current, ctxRef.current])
+      declutterTips(boxRef.current)
+      declutterHomeLabels(boxRef.current)
+    }, animate && !REDUCED_MOTION ? delay + 80 : 80)
     setTimeout(arrangeHomes, 0)
   }
 
@@ -489,7 +556,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     homes.forEach((r) => {
       // hover: the same card as on the district map, with the website link (it stays open while the pointer is on
       // it); click: the residence becomes the start (A), so the trip and distance to the university are worked out
-      const marker = L.marker([r.lat, r.lon], { icon: ctxIcon(`<span class="rm-home">🏠</span><span class="rm-label rm-home-label">${escapeHtml(r.name)}</span>`, 22), title: `${r.name} (student residence)`, zIndexOffset: 50 })
+      const marker = L.marker([r.lat, r.lon], { icon: ctxIcon(`<span class="rm-home">🏠</span><span class="rm-label rm-home-label">${escapeHtml(r.name)}</span>`, 22, 'rm-ctx rm-home-marker'), title: `${r.name} (student residence)`, zIndexOffset: 50 })
         .on('mouseover', () => { cardKeep(); cardRef.current?.setLatLng(marker.getLatLng()).setContent(homeCard(r)).openOn(mapRef.current); fitCard(cardRef.current, mapRef.current, { pinGap: 12 }) })
         .on('mouseout', cardHide)
         .on('click', (e) => {
@@ -510,19 +577,23 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       }
       if (near.rail) station(near.rail, '<span class="rm-rail">🚆</span>', `<b>${near.rail.kind} · ${escapeHtml(near.rail.name)}</b><br>${fmtKm(near.rail.m / 1000)}`)
       const routeList = (s) => s.routes.map((r) => (s.direct.includes(r) ? `<b>${escapeHtml(r)}</b>` : escapeHtml(r))).join(', ')
-      const busStop = (s, where, nearest) => L.marker([s.lat, s.lng], { icon: ctxIcon(`<span class="rm-bus">${BUS_SVG}</span>`, 24), zIndexOffset: 150, title: `${s.name} bus stop` })
-        .bindTooltip(`<b>${escapeHtml(s.name)}${s.ref ? ` · stop ${escapeHtml(s.ref)}` : ''}</b> · ${fmtKm(s.m / 1000)}<br>Bus ${routeList(s)}${s.direct.length ? `<br><small>${s.direct.join(', ')} ${escapeHtml(where)}</small>` : ''}`,
+      const busStop = (s, nearest) => L.marker([s.lat, s.lng], { icon: ctxIcon(`<span class="rm-bus">${BUS_SVG}</span>`, 24), zIndexOffset: 150, title: `${s.name} bus stop` })
+        .bindTooltip(`<b>${escapeHtml(s.name)}${s.ref ? ` · stop ${escapeHtml(s.ref)}` : ''}</b> · ${fmtKm(s.m / 1000)}<br>Bus ${routeList(s)}`,
           { direction: 'top', offset: [0, -12], permanent: nearest, className: nearest ? 'rm-tip rm-bus-tip rm-perm' : 'rm-tip' })
         .addTo(layer)
-      near.busStops.forEach((s, i) => busStop(s, `to ${toName}`, i === 0))
-      near.uniStops.forEach((s) => busStop(s, `near ${toName}`, false))
+      near.busStops.forEach((s, i) => busStop(s, i === 0))
+      near.uniStops.forEach((s) => busStop(s, false))
     }
     if (near?.kind === 'bikes') {
       ;[[near.a, 'near the start'], [near.b, 'near the university']].forEach(([d, where]) => d && L.marker([d.lat, d.lng], { icon: ctxIcon('<span class="route-bike">🚲</span>', 22), title: d.name })
         .bindTooltip(`<b>Dublin Bikes · ${escapeHtml(d.name)}</b><br>${where}${d.bikes != null ? ` · ${d.bikes} bikes free` : ''}`, { direction: 'top', offset: [0, -10], className: 'rm-tip' }).addTo(layer))
     }
     arrangeHomes()
-    setTimeout(() => declutterTips(boxRef.current), 80)
+    setTimeout(() => {
+      if (mapRef.current) fitPermanentTips(mapRef.current, [layerRef.current, ctxRef.current])
+      declutterTips(boxRef.current)
+      declutterHomeLabels(boxRef.current)
+    }, 80)
   }, [near, homes, toName, toLat, toLon]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // keep the pin's tooltip in step with the street name when it arrives
