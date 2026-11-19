@@ -45,7 +45,7 @@ const STEPS = [
 // onStep(n) when another step is clicked - every step can be clicked, so students
 // can go back and forth (the page decides what to do if a step isn't ready yet). Steps listed in `locked`
 // show a padlock while they are unavailable.
-export function FlowSidebar({ step, onStep, locked = [] }) {
+export function FlowSidebar({ step, onStep, locked = [], onLockedStep }) {
   return (
     <nav className="flow-sidebar" aria-label="Steps">
       {STEPS.map(([label, icon], index) => {
@@ -59,8 +59,12 @@ export function FlowSidebar({ step, onStep, locked = [] }) {
             className={`flow-step${current ? ' is-current' : ''}${isLocked ? ' is-locked' : ''}`}
             aria-current={current ? 'step' : undefined}
             aria-label={isLocked ? `Step ${number}: ${label} (locked until the earlier steps are done)` : undefined}
-            disabled={current || isLocked}
-            onClick={() => onStep(number)}
+            aria-disabled={isLocked || undefined}
+            disabled={current || (isLocked && !onLockedStep)}
+            onClick={() => {
+              if (isLocked) onLockedStep?.(number)
+              else onStep(number)
+            }}
           >
             <FlowIcon name={icon} />
             <span>

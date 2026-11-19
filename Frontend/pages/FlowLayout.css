@@ -491,6 +491,10 @@
   opacity: 0.72;
 }
 
+.flow-step.is-locked:not(:disabled) {
+  cursor: pointer;
+}
+
 .flow-step.is-current {
   background: var(--flow-cream);
   color: var(--flow-green);
@@ -775,6 +779,10 @@
   background: var(--flow-cream);
 }
 
+.flow-row.has-student-room {
+  max-height: 190px;
+}
+
 .flow-row-items {
   max-height: none;
 }
@@ -808,6 +816,13 @@
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+}
+
+.flow-choice-prompt {
+  margin: 0;
+  color: var(--flow-green);
+  font-size: 12px;
+  font-weight: 650;
 }
 
 .flow-row-control input[type="range"] {
@@ -1594,4 +1609,76 @@
   .flow-row-control {
     grid-column: 1 / -1;
   }
+}
+
+.flow-dialog-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 33, 27, 0.58);
+}
+
+.flow-dialog {
+  position: relative;
+  width: min(440px, 100%);
+  padding: 28px;
+  border: 1px solid var(--flow-line, #e3dccd);
+  border-radius: 18px;
+  background: var(--flow-cream, #fffdf7);
+  color: var(--flow-green, #173f32);
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.25);
+}
+
+.flow-dialog-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: #e6ede4;
+  color: var(--flow-green, #173f32);
+}
+
+.flow-dialog h2 {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 23px;
+}
+
+.flow-dialog p {
+  margin: 10px 0 0;
+  color: var(--flow-muted, #617067);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.flow-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.flow-dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--flow-muted, #617067);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.flow-dialog-close:hover {
+  background: #e6ede4;
+  color: var(--flow-green, #173f32);
 }
