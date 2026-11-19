@@ -108,7 +108,7 @@ def add_county():
     merged.to_csv(path, index=False)
     unique = places[places["category"] != "Asian_Restaurants"]
     for area, total in unique.groupby("Area").size().items():
-    print(f"{area}: {total} places")
+        print(f"{area}: {total} places")
     print(f"Added {len(unique)} County Dublin places to {path}")
 
 
