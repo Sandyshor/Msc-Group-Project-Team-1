@@ -117,7 +117,7 @@ function SafetyScores({ area, safety }) {
 }
 
 const RESIDENCES_SHOWN = 4
-const STUDENT_ROOM_NAMES = { shared: 'Shared room', private: 'Private room', studio: 'Studio' }
+const STUDENT_ROOM_NAMES = { shared: 'Twin room', private: 'Private room', any: 'Any room', studio: 'Studio' }
 
 // Student residences in the district (OpenStreetMap) and rental searches for it (Daft.ie, Rent.ie).
 // A residence's published price: monthly range, the weekly price it's quoted in, and whether it fits the budget
@@ -1204,7 +1204,7 @@ function Results() {
               </div>
               <h1>Your top Dublin <em>neighbourhoods.</em></h1>
               <p className="flow-summary">
-                {answers.accommodationLabel}{answers.studentRoom && answers.studentRoom !== 'any' ? ` · ${STUDENT_ROOM_NAMES[answers.studentRoom]}` : ''} · {euro(answers.budget)}/month · {answers.university}
+                {answers.accommodationLabel}{student && answers.studentRoom ? ` · ${STUDENT_ROOM_NAMES[answers.studentRoom] ?? answers.studentRoom}` : ''} · {euro(answers.budget)}/month · {answers.university}
                 {data && <> · compared {data.areas_compared} areas</>}
               </p>
 

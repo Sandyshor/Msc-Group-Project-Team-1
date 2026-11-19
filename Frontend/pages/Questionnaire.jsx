@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import './Questionnaire.css'
 import { NO_LIMIT, TRAVEL_MODES } from './CommuteFields'
-import { FlowChoices, FlowIcon, FlowPhoto, FlowRow, FlowSidebar } from './FlowLayout'
+import { FlowChoices, FlowDialog, FlowIcon, FlowPhoto, FlowRow, FlowSidebar } from './FlowLayout'
 import PrioritySlider, { DEFAULT_IMPORTANCE } from './PrioritySlider'
 
 // Values match the university names in the backend's commute data.
@@ -36,6 +36,11 @@ const ROOM_TYPES = [
   ['Double sharing', 'shared_room'],
   ['Student accommodation', 'student_accommodation'],
 ]
+const STUDENT_ROOM_TYPES = [
+  ['shared', 'Twin room'],
+  ['private', 'Private room'],
+  ['any', 'Any room'],
+]
 
 const MODE_ICONS = { public_transport: 'bus', walk: 'walk', cycle: 'bike' }
 
@@ -65,6 +70,9 @@ function Questionnaire() {
   const [destination, setDestination] = useState(earlier?.university ?? '')
   const [roomType, setRoomType] = useState(
     ROOM_TYPES.some(([label]) => label === earlier?.accommodationLabel) ? earlier.accommodationLabel : 'Private room')
+  const [studentRoom, setStudentRoom] = useState(
+    STUDENT_ROOM_TYPES.some(([value]) => value === earlier?.studentRoom) ? earlier.studentRoom : 'any')
+  const [lockedStep, setLockedStep] = useState(null)
   const [commute, setCommute] = useState({
     travelMode: earlier?.travelMode ?? 'public_transport',
     maxCommute: earlier?.maxCommute ?? null,
@@ -110,6 +118,7 @@ function Questionnaire() {
   useEffect(() => { if (step === 2) setSeenPriorities(true) }, [step])
   const prioritiesDone = seenPriorities && !allNotImportant
   const matchesReady = situationDone && prioritiesDone
+  const closeLockedDialog = useCallback(() => setLockedStep(null), [])
 
   function handleContinue(event) {
     event.preventDefault()
@@ -119,7 +128,7 @@ function Questionnaire() {
 
   function goToStep(number) {
     if (number === 1) setStep(1)
-    else if (number === 2 && situationDone) setStep(2)
+    else if (number === 2) setStep(2)
     else if (number === 3 && matchesReady) showMatches()
   }
 
@@ -135,6 +144,7 @@ function Questionnaire() {
         budget,
         accommodation,
         accommodationLabel: roomType,
+        ...(accommodation === 'student_accommodation' ? { studentRoom } : {}),
         importance: activeImportance,
         travelMode: commute.travelMode,
         maxCommute: commute.maxCommute,
@@ -147,12 +157,27 @@ function Questionnaire() {
       <FlowSidebar
         step={step}
         onStep={goToStep}
+        onLockedStep={setLockedStep}
         locked={[
-          ...(!situationDone ? [2] : []),
           ...(!matchesReady ? [3] : []),
           4,
         ]}
       />
+      {lockedStep && (
+        <FlowDialog
+          title={lockedStep === 4 ? 'Compare your matches' : 'Get your top matches first'}
+          onClose={closeLockedDialog}
+          actions={<button type="button" className="flow-next" onClick={closeLockedDialog}>Got it</button>}
+        >
+          <p>
+            {lockedStep === 4
+              ? matchesReady
+                ? 'View your top three recommendations in Step 3 first. Then you can compare them here.'
+                : 'Complete Step 1 (About you) and Step 2 (Your priorities) to get your top three recommendations. Then you can compare them here.'
+              : 'Complete Step 1 (About you) and rate your priorities in Step 2 to see your top three recommendations.'}
+          </p>
+        </FlowDialog>
+      )}
 
       {step === 1 ? (
         <>
@@ -191,7 +216,12 @@ function Questionnaire() {
               </select>
             </FlowRow>
 
-            <FlowRow icon="home" title="Accommodation" question="What type of accommodation do you prefer?">
+            <FlowRow
+              icon="home"
+              title="Accommodation"
+              question="What type of accommodation do you prefer?"
+              className={roomType === 'Student accommodation' ? 'has-student-room' : ''}
+            >
               <FlowChoices
                 label="Accommodation type"
                 className="flow-choices-rooms"
@@ -199,6 +229,18 @@ function Questionnaire() {
                 value={roomType}
                 onChange={setRoomType}
               />
+              {roomType === 'Student accommodation' && (
+                <>
+                  <p className="flow-choice-prompt">Which room do you prefer?</p>
+                  <FlowChoices
+                    label="Preferred student room"
+                    className="flow-choices-rooms"
+                    options={STUDENT_ROOM_TYPES}
+                    value={studentRoom}
+                    onChange={setStudentRoom}
+                  />
+                </>
+              )}
             </FlowRow>
 
             <FlowRow icon="route" title="Getting there" question="How will you get to university?">
