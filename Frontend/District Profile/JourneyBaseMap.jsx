@@ -92,6 +92,7 @@ const AMENITY_CATEGORIES = {
   restaurants: { label: 'Restaurants', icon: '🍽️', ring: '#d0602b', csv: ['Restaurants', 'Asian_Restaurants'] },
   cafes: { label: 'Cafés', icon: '☕', ring: '#8a5a33', csv: ['Cafes'] },
   gyms: { label: 'Gyms', icon: '🏋️', ring: '#6a4fc4', csv: ['Gyms'] },
+  salons: { label: 'Hair & beauty salons', icon: '💇', ring: '#b5487a', csv: ['Salons'] },
   pharmacies: { label: 'Pharmacies', icon: '💊', ring: '#7054a0', csv: ['Pharmacies'] },
   hospitals: { label: 'Hospitals', icon: '🏥', ring: '#bd4138', csv: ['Hospitals'] },
   shopping: { label: 'Shopping centres', icon: '🛍️', ring: '#bd7627', csv: ['Shopping_Malls'] },
@@ -114,6 +115,7 @@ const POI_STYLE = {
   Pharmacies: ['#c0392b', 'Pharmacy'],
   Hospitals: ['#c0392b', 'Hospital'],
   Gyms: ['#6a4fc4', 'Gym'],
+  Salons: ['#b5487a', 'Salon'],
   Parks: ['#2e7d4f', 'Park'],
 };
 const hasName = (record) => Boolean(record.name && record.name.trim());
