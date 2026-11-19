@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import './Questionnaire.css'
 import { NO_LIMIT, TRAVEL_MODES } from './CommuteFields'
-import { FlowChoices, FlowDialog, FlowIcon, FlowPhoto, FlowRow, FlowSidebar } from './FlowLayout'
+import { FlowChoices, FlowIcon, FlowPhoto, FlowRow, FlowSidebar } from './FlowLayout'
 import PrioritySlider, { DEFAULT_IMPORTANCE } from './PrioritySlider'
 
 // Values match the university names in the backend's commute data.
@@ -29,15 +29,6 @@ const NEEDS_DATA = new Set(['Maynooth University'])
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
 
 // label, backend accommodation key (null = no rent data yet)
-// Room types inside student residences: [value, label, what it is, typical monthly starting price]
-const STUDENT_ROOMS = [
-  ['any', 'Any room', 'Show every residence, cheapest room first', 'from about €820'],
-  ['shared', 'Shared (twin) room', 'Share a bedroom with one other student', 'about €680–€1,190'],
-  ['private', 'Private en-suite room', 'Your own room and bathroom, shared kitchen', 'about €820–€1,400'],
-  ['studio', 'Studio', 'Your own room, bathroom and kitchenette', 'about €1,080–€1,980'],
-]
-const STUDENT_KEYS = { any: 'student_accommodation', shared: 'student_shared', private: 'student_private', studio: 'student_studio' }
-
 const ROOM_TYPES = [
   ['1 bed apartment', 'one_bed'],
   ['2 bed apartment', 'two_bed'],
@@ -74,7 +65,6 @@ function Questionnaire() {
   const [destination, setDestination] = useState(earlier?.university ?? '')
   const [roomType, setRoomType] = useState(
     ROOM_TYPES.some(([label]) => label === earlier?.accommodationLabel) ? earlier.accommodationLabel : 'Private room')
-  const [studentRoom, setStudentRoom] = useState(earlier?.studentRoom ?? 'any')
   const [commute, setCommute] = useState({
     travelMode: earlier?.travelMode ?? 'public_transport',
     maxCommute: earlier?.maxCommute ?? null,
@@ -90,8 +80,7 @@ function Questionnaire() {
   )
   const navigate = useNavigate()
 
-  const isStudent = roomType === 'Student accommodation'
-  const accommodation = isStudent ? STUDENT_KEYS[studentRoom] : ROOM_TYPES.find(([label]) => label === roomType)[1]
+  const accommodation = ROOM_TYPES.find(([label]) => label === roomType)[1]
   const situationDone = Boolean(destination && accommodation)
   // A category rated "separately" is replaced by its items, as in the backend.
   const activeImportance = Object.fromEntries(
@@ -121,7 +110,6 @@ function Questionnaire() {
   useEffect(() => { if (step === 2) setSeenPriorities(true) }, [step])
   const prioritiesDone = seenPriorities && !allNotImportant
   const matchesReady = situationDone && prioritiesDone
-  const [lockedOpen, setLockedOpen] = useState(false)
 
   function handleContinue(event) {
     event.preventDefault()
@@ -129,11 +117,10 @@ function Questionnaire() {
     else setNeedUniversity(true)
   }
 
-  // Steps 1 and 2 can always be opened; step 3 shows a message until steps 1 and 2 are done
   function goToStep(number) {
-    if (number < 3) setStep(number)
-    else if (matchesReady) showMatches()
-    else setLockedOpen(true)
+    if (number === 1) setStep(1)
+    else if (number === 2 && situationDone) setStep(2)
+    else if (number === 3 && matchesReady) showMatches()
   }
 
   function handleSubmit(event) {
@@ -148,7 +135,6 @@ function Questionnaire() {
         budget,
         accommodation,
         accommodationLabel: roomType,
-        studentRoom: isStudent ? studentRoom : undefined,
         importance: activeImportance,
         travelMode: commute.travelMode,
         maxCommute: commute.maxCommute,
@@ -158,34 +144,15 @@ function Questionnaire() {
 
   return (
     <section className="flow-page flow-q" data-site-tour="questionnaire">
-      <FlowSidebar step={step} onStep={goToStep} locked={matchesReady ? [4] : [3, 4]} />
-
-      {lockedOpen && (
-        <FlowDialog
-          title="Your matches are almost ready"
-          onClose={() => setLockedOpen(false)}
-          actions={(
-            <>
-              <button type="button" className="flow-next" onClick={() => { setLockedOpen(false); setNeedUniversity(!situationDone); setStep(situationDone ? 2 : 1) }}>
-                {situationDone ? 'Go to Step 2' : 'Go to Step 1'} <span>→</span>
-              </button>
-              <button type="button" className="flow-back" onClick={() => setLockedOpen(false)}>Not now</button>
-            </>
-          )}
-        >
-          <p className="flow-dialog-text">Complete <b>Step 1</b> and <b>Step 2</b> first, then Step 3 will show the Dublin neighbourhoods that suit you best.</p>
-          <ul className="flow-checklist">
-            <li className={situationDone ? 'is-done' : ''}>
-              <span aria-hidden="true">{situationDone ? <FlowIcon name="check" /> : '1'}</span>
-              <div><b>Step 1 · About you</b><small>{situationDone ? 'Done' : !destination ? 'Choose your university' : 'Choose an accommodation type we have rent data for'}</small></div>
-            </li>
-            <li className={prioritiesDone ? 'is-done' : ''}>
-              <span aria-hidden="true">{prioritiesDone ? <FlowIcon name="check" /> : '2'}</span>
-              <div><b>Step 2 · Your priorities</b><small>{prioritiesDone ? 'Done' : allNotImportant ? 'Move at least one slider above 0' : 'Set how much each thing matters to you'}</small></div>
-            </li>
-          </ul>
-        </FlowDialog>
-      )}
+      <FlowSidebar
+        step={step}
+        onStep={goToStep}
+        locked={[
+          ...(!situationDone ? [2] : []),
+          ...(!matchesReady ? [3] : []),
+          4,
+        ]}
+      />
 
       {step === 1 ? (
         <>
@@ -232,22 +199,6 @@ function Questionnaire() {
                 value={roomType}
                 onChange={setRoomType}
               />
-              {isStudent && (
-                <div className="student-rooms" role="group" aria-label="Student room type">
-                  <p className="student-rooms-q">Which kind of student room?</p>
-                  <div className="student-rooms-grid">
-                    {STUDENT_ROOMS.map(([value, label, what, price]) => (
-                      <button key={value} type="button" aria-pressed={studentRoom === value}
-                        className={`student-room${studentRoom === value ? ' is-on' : ''}`} onClick={() => setStudentRoom(value)}>
-                        <strong>{label}</strong>
-                        <span>{what}</span>
-                        <em>{price} a month</em>
-                      </button>
-                    ))}
-                  </div>
-                  <p className="flow-note">Prices are the published 2026/27 starting prices of Dublin’s purpose-built student residences. We’ll rank the districts that have this kind of room.</p>
-                </div>
-              )}
             </FlowRow>
 
             <FlowRow icon="route" title="Getting there" question="How will you get to university?">
@@ -285,7 +236,7 @@ function Questionnaire() {
                   Choose your university to continue.
                 </p>
               )}
-              <button className="flow-next" type="submit" aria-disabled={!situationDone}>
+              <button className="flow-next" type="submit" disabled={!situationDone}>
                 Continue <span>→</span>
               </button>
             </div>

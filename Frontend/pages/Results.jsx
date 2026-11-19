@@ -597,7 +597,7 @@ function GettingThere({ result, university, universityLocation, mode, onModeChan
           toLon={universityLocation.lon}
           toName={university}
           area={result.area}
-          mode={commute?.walk_faster ? 'walk' : mode}
+          mode={mode}
           defaultMinutes={commute?.minutes ?? null}
           defaultKm={commute?.km ?? null}
           defaultWords={commute?.walk_faster ? 'on foot - quicker than public transport from here' : words}
@@ -840,6 +840,7 @@ function CompareAreas({ results, budget }) {
 const SHARE_ICONS = {
   bookmark: ['M6 3h12v18l-6-4-6 4z'],
   share: ['M12 3v12', 'M7 8l5-5 5 5', 'M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6'],
+  compare: ['M4 5h6v14H4z', 'M14 5h6v14h-6z'],
   copy: ['M9 9h11v11H9z', 'M5 15H4V4h11v1'],
   mail: ['M3 6h18v12H3z', 'M3 7l9 6 9-6'],
   print: ['M7 9V3h10v6', 'M7 17H4v-7h16v7h-3', 'M7 14h10v7H7z'],
@@ -868,7 +869,7 @@ function shareApps(url, text) {
   ]
 }
 
-function ShareResults() {
+function ShareResults({ onCompare }) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const menuRef = useRef(null)
@@ -980,6 +981,10 @@ function ShareResults() {
             </div>
           )}
         </div>
+
+        <button type="button" className="share-button" onClick={onCompare}>
+          <ShareIcon name="compare" /> Compare
+        </button>
       </div>
 
       <p className="result-muted" role="status">
@@ -1221,7 +1226,7 @@ function Results() {
                   ))}
                 </div>
               )}
-              {data && <ShareResults />}
+              {data && <ShareResults onCompare={() => goToResultStep(4)} />}
               {!data && !error && (
                 <div className="results-status" role="status">
                   <span className="results-spinner" aria-hidden="true" />
