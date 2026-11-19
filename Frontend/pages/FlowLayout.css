@@ -486,6 +486,11 @@
   background: rgba(255, 253, 247, 0.1);
 }
 
+.flow-step.is-locked {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
 .flow-step.is-current {
   background: var(--flow-cream);
   color: var(--flow-green);

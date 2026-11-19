@@ -59,7 +59,7 @@ export function FlowSidebar({ step, onStep, locked = [] }) {
             className={`flow-step${current ? ' is-current' : ''}${isLocked ? ' is-locked' : ''}`}
             aria-current={current ? 'step' : undefined}
             aria-label={isLocked ? `Step ${number}: ${label} (locked until the earlier steps are done)` : undefined}
-            disabled={current}
+            disabled={current || isLocked}
             onClick={() => onStep(number)}
           >
             <FlowIcon name={icon} />
