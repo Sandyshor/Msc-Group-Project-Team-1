@@ -55,6 +55,8 @@ CATEGORIES = {
     ("amenity", "hospital"): "Hospitals",
     ("leisure", "fitness_centre"): "Gyms",
     ("leisure", "park"): "Parks",
+    ("shop", "hairdresser"): "Salons",
+    ("shop", "beauty"): "Salons",
 }
 ASIAN_CUISINES = {"asian", "chinese", "indian", "japanese", "korean", "thai", "vietnamese",
                   "sushi", "malaysian", "nepalese", "pakistani", "indonesian", "filipino"}
@@ -106,7 +108,7 @@ def add_county():
     merged.to_csv(path, index=False)
     unique = places[places["category"] != "Asian_Restaurants"]
     for area, total in unique.groupby("Area").size().items():
-        print(f"{area}: {total} places")
+    print(f"{area}: {total} places")
     print(f"Added {len(unique)} County Dublin places to {path}")
 
 
@@ -134,7 +136,7 @@ def fetch_places(bounds):
     query = f"""
     [out:json][timeout:300];
     (
-      nwr["shop"~"^(supermarket|convenience|greengrocer|mall)$"]({bbox});
+      nwr["shop"~"^(supermarket|convenience|greengrocer|mall|hairdresser|beauty)$"]({bbox});
       nwr["amenity"~"^(restaurant|cafe|pharmacy|hospital)$"]({bbox});
       nwr["leisure"~"^(fitness_centre|park)$"]({bbox});
     );
