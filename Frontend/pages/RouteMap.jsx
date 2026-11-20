@@ -210,7 +210,8 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
   const [showAllNearbyRoutes, setShowAllNearbyRoutes] = useState(false)
   const [trip, setTrip] = useState({ status: 'idle' }) // route for a picked start: minutes, km, estimate?
   const [near, setNear] = useState(null) // nearby transport: stations, bus stops (both ends), bike docks
-  const [homes, setHomes] = useState([]) // student residences around the start
+  const [homes, setHomes] = useState([]) // student residences around the start (listed under the map)
+  const [allHomes, setAllHomes] = useState([]) // every residence (drawn on the map: the same pins wherever A is)
   const [locating, setLocating] = useState(false)
   const [locError, setLocError] = useState('')
   const animRef = useRef({ timer: null, frame: null, traveller: null })
@@ -228,30 +229,48 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
   const homeMarkers = useRef([]) // nearby pins (residences, stops, stations: drawn at their true spot, then moved aside if they'd cover something)
   const homeLines = useRef(null)
 
-  // Nearby pins (residences, bus stops, stations) step aside from the A/B pins, the trip's stops and each other, so nothing overlaps;
-  // a dotted line and a dot show where one really is. Re-run when the zoom or the drawing changes.
+  // Pins that would overlap are moved apart on screen, with a dotted line and a dot where one really is. Residences
+  // only make room for each other and B (so they stay put when A moves, even onto or next to one); bus stops and stations
+  // step aside from A, B, the trip's stops and the residences. Re-run when the zoom or the drawing changes.
   function arrangeHomes() {
     const map = mapRef.current
     if (!map || !homeLines.current) return
     homeLines.current.clearLayers()
     if (!homeMarkers.current.length) return
-    const isHome = new Set(homeMarkers.current)
-    const fixed = []
-    ;[ctxRef.current, layerRef.current].forEach((group) => group?.eachLayer((m) => {
-      if (!(m instanceof L.Marker) || isHome.has(m) || m === animRef.current.traveller) return
+    const shown = homeMarkers.current.filter((m) => !m.hidden)
+    const homesOnly = shown.filter((m) => m.isHome)
+    const stops = shown.filter((m) => !m.isHome)
+    const spotOf = (m) => { const p = map.latLngToContainerPoint(m.trueLatLng); return { x: p.x, y: p.y, r: 13, from: p } }
+    const homeSpots = homesOnly.map(spotOf)
+    const b = map.latLngToContainerPoint([toLat, toLon])
+    spreadPins(homeSpots, [{ x: b.x, y: b.y, r: 16 }], 3) // B (the university) never moves, so this never shifts them
+    const fixed = homeSpots.map(({ x, y, r }) => ({ x, y, r }))
+    layerRef.current?.eachLayer((m) => {
+      if (!(m instanceof L.Marker) || m === animRef.current.traveller) return
       const p = map.latLngToContainerPoint(m.getLatLng())
       fixed.push({ x: p.x, y: p.y, r: (m.options.icon?.options?.iconSize?.[0] || 20) / 2 })
-    }))
-    const spots = homeMarkers.current.map((m) => { const p = map.latLngToContainerPoint(m.trueLatLng); return { x: p.x, y: p.y, r: 13, from: p } })
-    spreadPins(spots, fixed, 3)
-    homeMarkers.current.forEach((m, i) => {
+    })
+    const stopSpots = stops.map(spotOf)
+    spreadPins(stopSpots, fixed, 3)
+    // a stop squeezed between two pins that can't move: the nearest free spot in rings around where it really is
+    const taken = (q, i) => fixed.some((f) => Math.hypot(q.x - f.x, q.y - f.y) < q.r + f.r + 2)
+      || stopSpots.some((o, k) => k !== i && Math.hypot(q.x - o.x, q.y - o.y) < q.r + o.r + 2)
+    stopSpots.forEach((q, i) => {
+      if (!taken(q, i)) return
+      for (let ring = 1; ring <= 8; ring++) {
+        const found = Array.from({ length: 12 }, (_, k) => ({ x: q.from.x + Math.cos(k * Math.PI / 6) * ring * 14, y: q.from.y + Math.sin(k * Math.PI / 6) * ring * 14, r: q.r }))
+          .find((c) => !taken(c, i))
+        if (found) { q.x = found.x; q.y = found.y; return }
+      }
+    })
+    ;[[homesOnly, homeSpots], [stops, stopSpots]].forEach(([markers, spots]) => markers.forEach((m, i) => {
       const at = map.containerPointToLatLng([spots[i].x, spots[i].y])
       m.setLatLng(at)
       if (Math.hypot(spots[i].x - spots[i].from.x, spots[i].y - spots[i].from.y) > 5) {
         L.polyline([m.trueLatLng, at], { color: m.ring || RING.home, weight: 1.5, opacity: 0.8, dashArray: '2 4', interactive: false }).addTo(homeLines.current)
         L.circleMarker(m.trueLatLng, { radius: 3, color: '#fff', weight: 1.5, fillColor: m.ring || RING.home, fillOpacity: 1, interactive: false }).addTo(homeLines.current)
       }
-    })
+    }))
   }
 
   function stopTraveller() {
@@ -472,7 +491,9 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
         if (!fastest?.legs?.some((leg) => leg.geometry)) throw new Error('no route line')
         // the bus button only when it is a different trip (and really a bus trip)
         const busPlan = bus && !isAllBus(fastest) && isAllBus(bus) ? bus : null
-        setPlans({ fastest, bus: busPlan })
+        // the planner's bus-only trip can be the quicker one: then it is the fastest (no separate "By bus" button)
+        if (busPlan && busPlan.total_minutes < fastest.total_minutes) setPlans({ fastest: busPlan, bus: null })
+        else setPlans({ fastest, bus: busPlan })
         if (start) setTrip({ status: 'done' })
         else setTrip({ status: 'idle', routeShown: true })
       })
@@ -499,6 +520,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     const metres = (a, b) => Math.round(km(a, b) * 1000)
     getJson(RESIDENCES_URL).then((d) => {
       if (!live) return
+      setAllHomes((old) => (old.length ? old : d?.residences || []))
       const list = (d?.residences || []).map((r) => ({ ...r, m: metres(from, [r.lat, r.lon]) }))
         .filter((r) => r.m <= RESIDENCE_M || (area && r.district === area))
         .sort((a, b) => a.m - b.m)
@@ -575,7 +597,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     if (!layer) return
     layer.clearLayers()
     homeMarkers.current = []
-    homes.forEach((r) => {
+    allHomes.forEach((r) => {
       // hover: the same card as on the district map, with the website link (it stays open while the pointer is on
       // it); click: the residence becomes the start (A), so the trip and distance to the university are worked out
       const marker = L.marker([r.lat, r.lon], { icon: discIcon('🏠', RING.home, `<span class="rm-label rm-home-label">${escapeHtml(r.name)}</span>`, 'rm-ctx rm-home-marker'), title: `${r.name} (student residence)`, zIndexOffset: 50 })
@@ -588,6 +610,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
         })
         .addTo(layer)
       marker.trueLatLng = L.latLng(r.lat, r.lon)
+      marker.isHome = true
       homeMarkers.current.push(marker)
     })
     // stops and stations: their names show on hover (always-on labels covered the pins around them)
@@ -626,7 +649,22 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       declutterTips(boxRef.current)
       declutterHomeLabels(boxRef.current)
     }, 80)
-  }, [near, homes, toName, toLat, toLon]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [near, allHomes, toName, toLat, toLon]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A on a residence (picked, or dropped within 25 m): that residence's pin hides, A stands for it
+  useEffect(() => {
+    const [aLat, aLng] = start ? [start.lat, start.lng] : [fromLat, fromLon]
+    homeMarkers.current.forEach((m) => {
+      if (!m.isHome) return
+      const hide = km([aLat, aLng], [m.trueLatLng.lat, m.trueLatLng.lng]) < 0.025
+      if (hide === Boolean(m.hidden)) return
+      m.hidden = hide
+      m.setOpacity(hide ? 0 : 1)
+      const el = m.getElement()
+      if (el) el.style.pointerEvents = hide ? 'none' : ''
+    })
+    arrangeHomes()
+  }, [start?.lat, start?.lng, fromLat, fromLon, allHomes, near]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // keep the pin's tooltip in step with the street name when it arrives
   useEffect(() => { startRef.current?.setTooltipContent(`${escapeHtml(start ? start.name : fromName)}<br><small>Drag or click the map to start elsewhere</small>`) }, [start?.name, fromName])
@@ -641,7 +679,8 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
   const directBuses = near?.kind === 'transit'
     ? [...new Set([...(rides.length === 1 ? chosenBuses : []), ...near.busRoutes])].sort(naturalSort)
     : []
-  const showPlanned = start || choice === 'bus'
+  // the drawn route's own time (so it matches the steps), once the journey planner has answered
+  const showPlanned = start || choice === 'bus' || Boolean(chosen)
   const nearestBus = near?.kind === 'transit' ? near.busStops[0] : null
   const otherNearbyBuses = nearestBus && near?.kind === 'transit'
     ? near.busRoutes.filter((route) => !nearestBus.direct.includes(route))
@@ -667,11 +706,13 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       <div className="rm-trip">
         <div className="rm-trip-ends" role="group" aria-label="Your trip">
           <div className="rm-trip-a">
+            <p className="rm-trip-label" aria-hidden="true"><span>🔎</span> Where are you starting from? <em>Type a place to change point A</em></p>
+            <div className="rm-trip-a-row">
             <PlaceSearch
               className="rm-search is-a"
               badge="A"
               label="Start point"
-              placeholder="Type where you start: an address, Eircode or residence"
+              placeholder="Type an address, Eircode, residence or station"
               value={placeName}
               onPick={(p) => { setLocError(''); setStart({ lat: p.lat, lng: p.lng, name: p.label }) }}
               onClear={() => setStart(null)}
@@ -679,6 +720,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
             <button type="button" className="rm-locate" onClick={useMyLocation} disabled={locating} title="Start from where you are now">
               <span aria-hidden="true">◎</span> {locating ? 'Finding you…' : 'My location'}
             </button>
+            </div>
           </div>
           <div className="rm-trip-b">
             <b className="rm-trip-badge" aria-hidden="true">B</b>
@@ -693,7 +735,10 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
               : <span>No time for this place yet.</span>)}
             {showPlanned && trip.status === 'loading' && <span className="route-loading">Working out the trip…</span>}
             {showPlanned && chosen && trip.status !== 'loading' && (
-              <><strong>{Math.round(chosen.total_minutes)} min</strong><span>{choice === 'bus' ? 'by bus' : rides.length || mode !== 'public_transport' ? words : 'on foot'} · {fmtKm(chosen.total_distance_km)}{rides.length ? ` · ${rideWords(chosen)}` : ''}{chosen.transfers ? ` · ${chosen.transfers} change${chosen.transfers > 1 ? 's' : ''}` : ''}</span></>
+              <><strong>{Math.round(chosen.total_minutes)} min</strong><span>{!start && `From ${fromName} · `}{choice === 'bus' ? 'by bus' : rides.length || mode !== 'public_transport' ? words : 'on foot'} · {fmtKm(chosen.total_distance_km)}{rides.length ? ` · ${rideWords(chosen)}` : ''}{chosen.transfers ? ` · ${chosen.transfers} change${chosen.transfers > 1 ? 's' : ''}` : ''}</span></>
+            )}
+            {!start && chosen && choice !== 'bus' && defaultMinutes != null && Math.abs(Math.round(chosen.total_minutes) - defaultMinutes) >= 4 && (
+              <small className="rm-trip-note">The match list shows {defaultMinutes} min: a typical weekday trip from the neighbourhood. This map plans the route for 9am.</small>
             )}
             {start && trip.status === 'estimate' && <><strong>≈ {trip.minutes} min</strong><span>{words} · {fmtKm(trip.km)} in a straight line (estimate)</span></>}
           </div>
@@ -723,7 +768,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
         {near?.luas && <span><i className="rm-key-pm" style={{ '--ring': LUAS_COLOURS[near.luas.kind] }}>🚊</i>Luas stop</span>}
         {near?.rail && <span><i className="rm-key-pm" style={{ '--ring': RING.rail }}>🚆</i>{near.rail.kind === 'DART' ? 'DART' : 'Train'} station</span>}
         {near?.kind === 'bikes' && <span><i className="rm-key-pm" style={{ '--ring': RING.bike }}>🚲</i>Dublin Bikes</span>}
-        {homes.length > 0 && <span><i className="rm-key-pm" style={{ '--ring': RING.home }}>🏠</i>Student residence</span>}
+        {allHomes.length > 0 && <span><i className="rm-key-pm" style={{ '--ring': RING.home }}>🏠</i>Student residence</span>}
         <em>Click the map or a 🏠 to start from there</em>
       </p>
       <section className="route-bus-details" aria-live="polite">
