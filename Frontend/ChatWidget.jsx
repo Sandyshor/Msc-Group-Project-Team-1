@@ -1,4 +1,4 @@
-// "Crib Crew Assistant": the AI assistant in the bottom-right corner of every page.
+// "Dublin Buddy": the AI assistant in the bottom-right corner of every page.
 // Replies stream from the backend's POST /chat (Claude). A guest's conversation lives in this tab only; a
 // logged-in student's conversations are saved to their account (Backend/accounts.py): "Your chats" lists their
 // recent ones to pick up again on any device, and "New chat" starts another without losing the old one.
@@ -17,7 +17,7 @@ const STORE_KEY = 'fmd-chat'
 const MAX_CHARS = 2000
 const LANGUAGE_NAMES = { es: 'Spanish', pt: 'Portuguese', hi: 'Hindi', 'zh-Hans': 'Chinese', ar: 'Arabic' } // the site's languages (LanguageSwitcher)
 
-const welcomeText = (name) => `Hi${name ? ` ${name}` : ''}! 👋 I'm the Crib Crew Assistant. Ask me about neighbourhoods, renting, getting around or settling in Dublin.`
+const welcomeText = (name) => `Hi${name ? ` ${name}` : ''}! 👋 I'm Dublin Buddy, your AI assistant. Ask me about neighbourhoods, renting, getting around or settling in Dublin.`
 const HELLO_TEXT = 'Ask me about neighbourhoods, rent, getting around or settling in Dublin. Type, or tap the microphone to say your question.'
 const KEPT = 40 // messages kept in a saved conversation (Backend/accounts.py CHAT_KEPT)
 const CHAT_ID_KEY = 'fmd-chat-id'
@@ -449,11 +449,11 @@ export default function ChatWidget() {
   return (
     <div className={`chatw${open && !closing ? ' is-open' : ''}${tucked && !open ? ' is-tucked' : ''}${onDark ? ' on-dark' : ''}${big ? ' is-big' : ''}`}>
       {open && (
-        <section className={`chatw-panel${closing ? ' is-closing' : ''}${busy ? ' is-thinking' : ''}${listening ? ' is-listening' : ''}`} role="dialog" aria-label="Crib Crew Assistant, AI assistant">
+        <section className={`chatw-panel${closing ? ' is-closing' : ''}${busy ? ' is-thinking' : ''}${listening ? ' is-listening' : ''}`} role="dialog" aria-label="Dublin Buddy, AI assistant">
           <header className="chatw-head">
             <span className="chatw-avatar" aria-hidden="true"><Icon d={ICONS.spark} size={18} /></span>
             <div className="chatw-title">
-              <strong>Crib Crew Assistant</strong>
+              <strong>Dublin Buddy</strong>
               <span>AI · can make mistakes</span>
             </div>
             {uid && (
@@ -576,7 +576,7 @@ export default function ChatWidget() {
         className={`chatw-fab${burst ? (burst % 2 ? ' pop-a' : ' pop-b') : ''}`}
         onClick={toggle}
         aria-expanded={open && !closing}
-        aria-label={open ? 'Close the assistant' : 'Open the Crib Crew Assistant'}
+        aria-label={open ? 'Close the assistant' : 'Ask me: open Dublin Buddy'}
       >
         <span className={`chatw-fab-icon${open && !closing ? ' is-x' : ''}`} aria-hidden="true">
           {/* speech bubble whose three dots "type" now and then */}

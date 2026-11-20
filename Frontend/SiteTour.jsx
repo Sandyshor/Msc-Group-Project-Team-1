@@ -75,7 +75,7 @@ const steps = [
   {
     path: null, selector: '.chatw-fab', corner: 'left', icon: 'chat', place: 'On every page', isNew: true, assistant: true,
     title: 'Ask the AI assistant',
-    description: 'Stuck on something? The “Ask me” button opens the Crib Crew Assistant. Ask about areas, rent, transport or your first weeks in Dublin.',
+    description: 'Stuck on something? The “Ask me” button opens Dublin Buddy, our AI assistant. Ask about areas, rent, transport or your first weeks in Dublin.',
     tip: 'It can make mistakes, so check important details with official sources.',
   },
 ]
