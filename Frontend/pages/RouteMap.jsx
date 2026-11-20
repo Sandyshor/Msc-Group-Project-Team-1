@@ -1,6 +1,7 @@
 // "Getting there" on the results page: an interactive Stadia map from a match to the university.
 // By default the trip starts at the match's neighbourhood centre (times and distance from the recommender).
-// Click anywhere (or drag pin A) to start from that spot instead: the route, time and distance come from the
+// Type a start (an address, Eircode, residence, station...), use the browser's location, click anywhere or drag
+// pin A to start from that spot instead; B is always the university. The route, time and distance come from the
 // journey planner (GET /route, OpenTripPlanner); if it isn't reachable, the straight-line distance is shown
 // with an estimated time. "Back to …" returns to the neighbourhood centre.
 //
@@ -14,6 +15,8 @@ import '../District Profile/leafletNoTitle'
 import { streetName } from '../District Profile/placeNames'
 import { spreadPins } from '../District Profile/spreadPins'
 import { fitCard } from '../District Profile/placeCard'
+import PlaceSearch from '../District Profile/PlaceSearch'
+import './RouteMap.css'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
@@ -164,6 +167,11 @@ function declutterHomeLabels(box) {
   })
 }
 const ctxIcon = (html, size = 24, className = 'rm-ctx') => L.divIcon({ className, html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
+// The same pins as the district map: a white disc with an emoji and a coloured ring (bus stops: a yellow badge)
+const RING = { home: '#7a3fa0', rail: '#7a3e9d', bike: '#1f6fb2' }
+const discIcon = (emoji, ring, extra = '', className = 'rm-ctx') => ctxIcon(`<span class="rm-pm" style="--ring:${ring}">${emoji}</span>${extra}`, 26, className)
+const BUS_ICON = `<span class="rm-busbadge">${BUS_SVG}</span>`
+const inDublin = (lat, lng) => lat > 53.1 && lat < 53.65 && lng > -6.65 && lng < -5.95
 
 // what the bus/fastest buttons say: "Luas Green", "Bus 11 → 46A"
 function rideWords(itinerary) {
@@ -178,6 +186,13 @@ function rideName(leg) {
   if (leg.mode === 'RAIL') return /dart/i.test(leg.line || '') ? 'DART' : 'Train'
   return leg.line || leg.mode
 }
+// a step's place name: the planner's name, unless it is a bare "Origin"/"Destination" placeholder
+// (the journey planner sends names as text; older answers sent { name })
+const stopName = (place, fallback) => {
+  const name = typeof place === 'string' ? place : place?.name
+  return name && !/^(origin|destination|start|end)$/i.test(name) ? name : fallback || 'the next stop'
+}
+const legDetail = (leg) => [leg.minutes != null ? `${Math.max(1, Math.round(leg.minutes))} min` : '', leg.distance_km != null ? fmtKm(leg.distance_km) : ''].filter(Boolean).join(' · ')
 const isAllBus = (itinerary) => {
   const rides = itinerary.legs.filter((leg) => leg.mode !== 'WALK')
   return rides.length > 0 && rides.every((leg) => leg.mode === 'BUS')
@@ -196,6 +211,8 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
   const [trip, setTrip] = useState({ status: 'idle' }) // route for a picked start: minutes, km, estimate?
   const [near, setNear] = useState(null) // nearby transport: stations, bus stops (both ends), bike docks
   const [homes, setHomes] = useState([]) // student residences around the start
+  const [locating, setLocating] = useState(false)
+  const [locError, setLocError] = useState('')
   const animRef = useRef({ timer: null, frame: null, traveller: null })
   const cardRef = useRef(null) // the residence hover card
   const cardTimer = useRef(0)
@@ -208,10 +225,10 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       + `${r.website ? `<a class="rm-web" href="${escapeHtml(r.website)}" target="_blank" rel="noopener noreferrer">Visit website ↗</a>` : ''}`
       + '<em class="rm-hint">Click the pin to start your trip here (A) and see the distance to the university</em></div>'
   }
-  const homeMarkers = useRef([]) // residence pins (drawn at their true spot, then moved aside if they'd cover something)
+  const homeMarkers = useRef([]) // nearby pins (residences, stops, stations: drawn at their true spot, then moved aside if they'd cover something)
   const homeLines = useRef(null)
 
-  // Residences step aside from the A/B pins, the stops and stations, and each other, so nothing overlaps;
+  // Nearby pins (residences, bus stops, stations) step aside from the A/B pins, the trip's stops and each other, so nothing overlaps;
   // a dotted line and a dot show where one really is. Re-run when the zoom or the drawing changes.
   function arrangeHomes() {
     const map = mapRef.current
@@ -225,14 +242,14 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       const p = map.latLngToContainerPoint(m.getLatLng())
       fixed.push({ x: p.x, y: p.y, r: (m.options.icon?.options?.iconSize?.[0] || 20) / 2 })
     }))
-    const spots = homeMarkers.current.map((m) => { const p = map.latLngToContainerPoint(m.trueLatLng); return { x: p.x, y: p.y, r: 11, from: p } })
+    const spots = homeMarkers.current.map((m) => { const p = map.latLngToContainerPoint(m.trueLatLng); return { x: p.x, y: p.y, r: 13, from: p } })
     spreadPins(spots, fixed, 3)
     homeMarkers.current.forEach((m, i) => {
       const at = map.containerPointToLatLng([spots[i].x, spots[i].y])
       m.setLatLng(at)
       if (Math.hypot(spots[i].x - spots[i].from.x, spots[i].y - spots[i].from.y) > 5) {
-        L.polyline([m.trueLatLng, at], { color: '#7a3fa0', weight: 1.5, opacity: 0.8, dashArray: '2 4', interactive: false }).addTo(homeLines.current)
-        L.circleMarker(m.trueLatLng, { radius: 3, color: '#fff', weight: 1.5, fillColor: '#7a3fa0', fillOpacity: 1, interactive: false }).addTo(homeLines.current)
+        L.polyline([m.trueLatLng, at], { color: m.ring || RING.home, weight: 1.5, opacity: 0.8, dashArray: '2 4', interactive: false }).addTo(homeLines.current)
+        L.circleMarker(m.trueLatLng, { radius: 3, color: '#fff', weight: 1.5, fillColor: m.ring || RING.home, fillOpacity: 1, interactive: false }).addTo(homeLines.current)
       }
     })
   }
@@ -432,7 +449,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     points: decodePolyline(leg.geometry),
     colour: LEG_COLOURS[leg.mode] ?? TRANSIT_COLOUR,
     dashed: leg.mode === 'WALK',
-    stops: leg.mode !== 'WALK' && leg.mode !== 'BICYCLE' ? [leg.from, leg.to] : null,
+    stops: leg.mode !== 'WALK' && leg.mode !== 'BICYCLE' ? [leg.from, leg.to].map((x) => (typeof x === 'string' ? x : x?.name)) : null,
     line: rideName(leg),
   }))
 
@@ -461,7 +478,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       })
       .catch((error) => {
         if (error.name === 'AbortError') return
-        draw([{ points: [from, to], colour: TRANSIT_COLOUR }], { fit: false })
+        draw([{ points: [from, to], colour: '#7d8a82', dashed: true }], { fit: false, animate: false }) // as the crow flies: not a real route
         // no route service: straight-line distance and an estimated time
         const road = straightKm * 1.3
         if (start) setTrip({ status: 'estimate', km: straightKm, minutes: Math.max(1, Math.round((road / SPEED_KMH[mode]) * 60 + (mode === 'public_transport' ? 8 : 0))) })
@@ -561,7 +578,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     homes.forEach((r) => {
       // hover: the same card as on the district map, with the website link (it stays open while the pointer is on
       // it); click: the residence becomes the start (A), so the trip and distance to the university are worked out
-      const marker = L.marker([r.lat, r.lon], { icon: ctxIcon(`<span class="rm-home">🏠</span><span class="rm-label rm-home-label">${escapeHtml(r.name)}</span>`, 22, 'rm-ctx rm-home-marker'), title: `${r.name} (student residence)`, zIndexOffset: 50 })
+      const marker = L.marker([r.lat, r.lon], { icon: discIcon('🏠', RING.home, `<span class="rm-label rm-home-label">${escapeHtml(r.name)}</span>`, 'rm-ctx rm-home-marker'), title: `${r.name} (student residence)`, zIndexOffset: 50 })
         .on('mouseover', () => { cardKeep(); cardRef.current?.setLatLng(marker.getLatLng()).setContent(homeCard(r)).openOn(mapRef.current); fitCard(cardRef.current, mapRef.current, { pinGap: 12 }) })
         .on('mouseout', cardHide)
         .on('click', (e) => {
@@ -573,25 +590,35 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       marker.trueLatLng = L.latLng(r.lat, r.lon)
       homeMarkers.current.push(marker)
     })
+    // stops and stations: their names show on hover (always-on labels covered the pins around them)
+    const nearbyPin = (lat, lng, icon, title, tip, ring) => {
+      const m = L.marker([lat, lng], { icon, title, zIndexOffset: 150 })
+        .bindTooltip(tip, { direction: 'top', offset: [0, -14], className: 'rm-tip' }).addTo(layer)
+      m.trueLatLng = L.latLng(lat, lng)
+      m.ring = ring
+      homeMarkers.current.push(m)
+      return m
+    }
     if (near?.kind === 'transit') {
-      const station = (s, html, tip) => s && L.marker([s.lat, s.lng], { icon: ctxIcon(html, 26), zIndexOffset: 200, title: s.name })
-        .bindTooltip(tip, { direction: 'top', offset: [0, -12], permanent: true, className: 'rm-tip rm-station-tip rm-perm' }).addTo(layer)
       if (near.luas) {
         const c = LUAS_COLOURS[near.luas.kind]
-        station(near.luas, `<span class="rm-luas" style="--c:${c}">L</span>`, `<b>Luas · ${escapeHtml(near.luas.name)}</b><br>${near.luas.kind.replace('Luas ', '')} · ${fmtKm(near.luas.m / 1000)}`)
+        nearbyPin(near.luas.lat, near.luas.lng, discIcon('🚊', c), `${near.luas.name} Luas stop`,
+          `<b>Luas · ${escapeHtml(near.luas.name)}</b><br>${near.luas.kind.replace('Luas ', '')} · ${fmtKm(near.luas.m / 1000)} from A`, c)
       }
-      if (near.rail) station(near.rail, '<span class="rm-rail">🚆</span>', `<b>${near.rail.kind} · ${escapeHtml(near.rail.name)}</b><br>${fmtKm(near.rail.m / 1000)}`)
-      const routeList = (s) => s.routes.map((r) => (s.direct.includes(r) ? `<b>${escapeHtml(r)}</b>` : escapeHtml(r))).join(', ')
-      const busStop = (s, nearest) => L.marker([s.lat, s.lng], { icon: ctxIcon(`<span class="rm-bus">${BUS_SVG}</span>`, 24), zIndexOffset: 150, title: `${s.name} bus stop` })
-        .bindTooltip(`<b>${escapeHtml(s.name)}${s.ref ? ` · stop ${escapeHtml(s.ref)}` : ''}</b> · ${fmtKm(s.m / 1000)}<br>Bus ${routeList(s)}`,
-          { direction: 'top', offset: [0, -12], permanent: nearest, className: nearest ? 'rm-tip rm-bus-tip rm-perm' : 'rm-tip' })
-        .addTo(layer)
-      near.busStops.forEach((s, i) => busStop(s, i === 0))
-      near.uniStops.forEach((s) => busStop(s, false))
+      if (near.rail) {
+        nearbyPin(near.rail.lat, near.rail.lng, discIcon('🚆', RING.rail), `${near.rail.name} station`,
+          `<b>${near.rail.kind} · ${escapeHtml(near.rail.name)}</b><br>${fmtKm(near.rail.m / 1000)} from A`, RING.rail)
+      }
+      const routeList = (st) => st.routes.map((r) => (st.direct.includes(r) ? `<b>${escapeHtml(r)}</b>` : escapeHtml(r))).join(', ')
+      const busStop = (st, where) => nearbyPin(st.lat, st.lng, ctxIcon(BUS_ICON, 26), `${st.name} bus stop`,
+        `<b>${escapeHtml(st.name)}${st.ref ? ` · stop ${escapeHtml(st.ref)}` : ''}</b><br>${fmtKm(st.m / 1000)} from ${where} · bus ${routeList(st)}`
+        + `${st.direct.length ? '<small>Buses in bold go to the university</small>' : ''}`, '#173f37')
+      near.busStops.forEach((st) => busStop(st, 'A'))
+      near.uniStops.forEach((st) => busStop(st, 'the university'))
     }
     if (near?.kind === 'bikes') {
-      ;[[near.a, 'near the start'], [near.b, 'near the university']].forEach(([d, where]) => d && L.marker([d.lat, d.lng], { icon: ctxIcon('<span class="route-bike">🚲</span>', 22), title: d.name })
-        .bindTooltip(`<b>Dublin Bikes · ${escapeHtml(d.name)}</b><br>${where}${d.bikes != null ? ` · ${d.bikes} bikes free` : ''}`, { direction: 'top', offset: [0, -10], className: 'rm-tip' }).addTo(layer))
+      ;[[near.a, 'near the start'], [near.b, 'near the university']].forEach(([d, where]) => d && nearbyPin(d.lat, d.lng, discIcon('🚲', RING.bike), d.name,
+        `<b>Dublin Bikes · ${escapeHtml(d.name)}</b><br>${where}${d.bikes != null ? ` · ${d.bikes} bikes free` : ''}`, RING.bike))
     }
     arrangeHomes()
     setTimeout(() => {
@@ -622,99 +649,125 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
 
   useEffect(() => { setShowAllNearbyRoutes(false) }, [start?.lat, start?.lng, mode])
 
+  // the browser's location as the start (asked for only when the button is pressed)
+  function useMyLocation() {
+    setLocError('')
+    if (!navigator.geolocation) { setLocError('Your browser can\'t share your location. Type your start instead.'); return }
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setLocating(false)
+      const { latitude: lat, longitude: lng } = pos.coords
+      if (!inDublin(lat, lng)) { setLocError('You seem to be outside Dublin. Type your start instead.'); return }
+      setStart({ lat, lng, name: 'Your location' })
+    }, () => { setLocating(false); setLocError('Location is blocked or unavailable. Allow it for this site, or type your start.') }, { enableHighAccuracy: true, timeout: 10000 })
+  }
+
   return (
     <div className="route-map-wrap">
-      <div className="route-card" aria-live="polite">
-        <div className="route-ends">
-          <span className="route-end"><i className="route-dot route-dot-from">A</i><span><small>From</small>{placeName}</span></span>
-          <span className="route-end"><i className="route-dot route-dot-to">B</i><span><small>To</small>{toName}</span></span>
-        </div>
-        {plans?.bus && (
-          <div className="rm-options" role="radiogroup" aria-label="Which trip to show">
-            {[['fastest', plans.fastest], ['bus', plans.bus]].map(([key, it]) => (
-              <button type="button" key={key} role="radio" aria-checked={choice === key} onClick={() => setChoice(key)}>
-                <small>{key === 'fastest' ? 'Fastest' : 'By bus'}</small>
-                <b>{Math.round(it.total_minutes)} min</b>
-                <span>{rideWords(it)}</span>
-              </button>
-            ))}
+      <div className="rm-trip">
+        <div className="rm-trip-ends" role="group" aria-label="Your trip">
+          <div className="rm-trip-a">
+            <PlaceSearch
+              className="rm-search is-a"
+              badge="A"
+              label="Start point"
+              placeholder="Type where you start: an address, Eircode or residence"
+              value={placeName}
+              onPick={(p) => { setLocError(''); setStart({ lat: p.lat, lng: p.lng, name: p.label }) }}
+              onClear={() => setStart(null)}
+            />
+            <button type="button" className="rm-locate" onClick={useMyLocation} disabled={locating} title="Start from where you are now">
+              <span aria-hidden="true">◎</span> {locating ? 'Finding you…' : 'My location'}
+            </button>
           </div>
-        )}
-        <div className="route-numbers">
-          {!showPlanned && (defaultMinutes != null
-            ? <><strong>{defaultMinutes} min</strong><span>{defaultWords || words}{defaultKm != null && ` · ${defaultKm} km`}</span></>
-            : <span>No time for this place yet.</span>)}
-          {showPlanned && trip.status === 'loading' && <span className="route-loading">Working out the trip…</span>}
-          {showPlanned && chosen && trip.status !== 'loading' && (
-            <><strong>{Math.round(chosen.total_minutes)} min</strong><span>{choice === 'bus' ? 'by bus' : words} · {fmtKm(chosen.total_distance_km)}{chosen.transfers ? ` · ${chosen.transfers} change${chosen.transfers > 1 ? 's' : ''}` : ''}</span></>
-          )}
-          {start && trip.status === 'estimate' && <><strong>≈ {trip.minutes} min</strong><span>{words} · {fmtKm(trip.km)} in a straight line (estimate)</span></>}
+          <div className="rm-trip-b">
+            <b className="rm-trip-badge" aria-hidden="true">B</b>
+            <span><small>To your university</small>{toName}</span>
+          </div>
         </div>
-        {near?.kind === 'transit' && (
-          <div className="route-near">
-            {directBuses.length > 0 ? (
-              <p><b>Buses to {toName}</b><span className="route-chips">{directBuses.slice(0, 14).map((r) => <i key={r}>{r}</i>)}{directBuses.length > 14 && <em>+{directBuses.length - 14} more</em>}</span></p>
-            ) : chosenBuses.length > 0 && (
-              <p><b>No direct bus · this trip uses</b><span className="route-chips">{chosenBuses.map((r) => <i key={r}>{r}</i>)}</span></p>
+        {locError && <p className="rm-trip-error" role="alert">{locError}</p>}
+        <div className="rm-trip-result" aria-live="polite">
+          <div className="route-numbers">
+            {!showPlanned && (defaultMinutes != null
+              ? <><strong>{defaultMinutes} min</strong><span>{defaultWords || words}{defaultKm != null && ` · ${defaultKm} km`} from {fromName}</span></>
+              : <span>No time for this place yet.</span>)}
+            {showPlanned && trip.status === 'loading' && <span className="route-loading">Working out the trip…</span>}
+            {showPlanned && chosen && trip.status !== 'loading' && (
+              <><strong>{Math.round(chosen.total_minutes)} min</strong><span>{choice === 'bus' ? 'by bus' : rides.length || mode !== 'public_transport' ? words : 'on foot'} · {fmtKm(chosen.total_distance_km)}{rides.length ? ` · ${rideWords(chosen)}` : ''}{chosen.transfers ? ` · ${chosen.transfers} change${chosen.transfers > 1 ? 's' : ''}` : ''}</span></>
             )}
-            {nearestBus && <p><b>Nearest bus stop</b><span>{nearestBus.name}{nearestBus.ref ? ` (stop ${nearestBus.ref})` : ''} · {fmtKm(nearestBus.m / 1000)} · bus {nearestBus.routes.slice(0, 10).join(', ')}{nearestBus.routes.length > 10 ? ' …' : ''}</span></p>}
-            {near.luas && <p><b>Nearest Luas stop</b><span>{near.luas.name} · {near.luas.kind.replace('Luas ', '')} · {fmtKm(near.luas.m / 1000)} from {placeName}</span></p>}
-            {near.rail && <p><b>Nearest {near.rail.kind === 'DART' ? 'DART' : 'train'} station</b><span>{near.rail.name} · {fmtKm(near.rail.m / 1000)} from {placeName}</span></p>}
-            {!near.luas && !near.rail && near.station && <p><b>Nearest Luas or train stop</b><span>{near.station.name} · {fmtKm(near.station.m / 1000)} from {placeName}</span></p>}
+            {start && trip.status === 'estimate' && <><strong>≈ {trip.minutes} min</strong><span>{words} · {fmtKm(trip.km)} in a straight line (estimate)</span></>}
           </div>
-        )}
-        {near?.kind === 'bikes' && near.a && (
-          <div className="route-near">
-            <p><b>Dublin Bikes near {placeName}</b><span>{near.a.name} · {fmtKm(near.a.m / 1000)}{near.a.bikes != null && ` · ${near.a.bikes} bike${near.a.bikes === 1 ? '' : 's'} free`}</span></p>
-            {near.b && <p><b>Near the university</b><span>{near.b.name} · {fmtKm(near.b.m / 1000)}{near.b.stands != null && ` · ${near.b.stands} free stand${near.b.stands === 1 ? '' : 's'}`}</span></p>}
-          </div>
-        )}
-        {homes.length > 0 && (
-          <div className="route-near">
-            <p><b>Student residences nearby</b><span>{homes.length} on the map: {homes.slice(0, 3).map((r) => r.name).join(', ')}{homes.length > 3 ? ` and ${homes.length - 3} more` : ''}</span></p>
-          </div>
-        )}
-        {start && (
-          <button type="button" className="route-reset" onClick={() => setStart(null)}>↺ Back to {fromName}</button>
-        )}
+          {plans?.bus && (
+            <div className="rm-options" role="radiogroup" aria-label="Which trip to show">
+              {[['fastest', plans.fastest], ['bus', plans.bus]].map(([key, it]) => (
+                <button type="button" key={key} role="radio" aria-checked={choice === key} onClick={() => setChoice(key)}>
+                  <small>{key === 'fastest' ? 'Fastest' : 'By bus'}</small>
+                  <b>{Math.round(it.total_minutes)} min</b>
+                  <span>{rideWords(it)}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {start && (
+            <button type="button" className="route-reset" onClick={() => setStart(null)}>↺ Back to {fromName}</button>
+          )}
+        </div>
       </div>
       <div className="route-map-box">
-        <div ref={boxRef} className="route-map" aria-label={`Map of the trip from ${placeName} to ${toName}. Click the map to start from another place.`} />
-        <span className="route-map-hint">Click anywhere to see the trip from there</span>
+        <div ref={boxRef} className="route-map" role="region" aria-label={`Map of the trip from ${placeName} to ${toName}. Click the map to start from another place.`} />
       </div>
-      {mode === 'public_transport' && (
-        <section className="route-bus-details" aria-live="polite">
+      <p className="route-legend rm-legend" aria-label="Map key">
+        <span><i className="rm-key-a">A</i>Start</span>
+        <span><i className="rm-key-b">B</i>University</span>
+        {near?.kind === 'transit' && near.busStops.length + near.uniStops.length > 0 && <span><i className="rm-key-bus" dangerouslySetInnerHTML={{ __html: BUS_SVG }} />Bus stop</span>}
+        {near?.luas && <span><i className="rm-key-pm" style={{ '--ring': LUAS_COLOURS[near.luas.kind] }}>🚊</i>Luas stop</span>}
+        {near?.rail && <span><i className="rm-key-pm" style={{ '--ring': RING.rail }}>🚆</i>{near.rail.kind === 'DART' ? 'DART' : 'Train'} station</span>}
+        {near?.kind === 'bikes' && <span><i className="rm-key-pm" style={{ '--ring': RING.bike }}>🚲</i>Dublin Bikes</span>}
+        {homes.length > 0 && <span><i className="rm-key-pm" style={{ '--ring': RING.home }}>🏠</i>Student residence</span>}
+        <em>Click the map or a 🏠 to start from there</em>
+      </p>
+      <section className="route-bus-details" aria-live="polite">
           <div className="route-bus-details-heading">
-            <h3>Bus routes from point A to point B</h3>
-            {plans?.bus && (
-              <div className="route-bus-plan-options" role="group" aria-label="Public transport route">
-                {[['fastest', plans.fastest, 'Fastest'], ['bus', plans.bus, 'By bus']].map(([key, itinerary, label]) => (
-                  <button key={key} type="button" aria-pressed={choice === key} onClick={() => setChoice(key)}>
-                    {label} · {Math.round(itinerary.total_minutes)} min
-                  </button>
-                ))}
-              </div>
-            )}
+            <h3>{chosen && !rides.length ? `${mode === 'cycle' ? 'Cycling' : 'Walking'} route from A to B` : 'Route from A to B'}</h3>
           </div>
           {chosen && routeLegs.length > 0 ? (
             <ol className="route-bus-itinerary">
               {routeLegs.map((leg, index) => (
-                <li key={`${leg.line ?? 'bus'}-${index}`}>
-                  <strong>{leg.mode === 'WALK' ? 'Walk' : rideName(leg)}</strong>
-                  <span>{leg.mode === 'WALK'
-                    ? `From ${leg.from?.name || placeName} to ${leg.to?.name || toName}`
-                    : `Board at ${leg.from?.name || 'the stop shown on the map'}; get off at ${leg.to?.name || toName}`}</span>
+                <li key={`${leg.line ?? leg.mode}-${index}`}>
+                  <strong>{leg.mode === 'WALK' ? 'Walk' : leg.mode === 'BICYCLE' ? 'Cycle' : rideName(leg)}</strong>
+                  <span>{leg.mode === 'WALK' || leg.mode === 'BICYCLE'
+                    ? `From ${index === 0 ? placeName : stopName(leg.from, 'the stop')} to ${index === routeLegs.length - 1 ? toName
+                      : routeLegs[index + 1] && !['WALK', 'BICYCLE'].includes(routeLegs[index + 1].mode) ? `the ${rideName(routeLegs[index + 1])} stop at ${stopName(leg.to, 'the stop')}` : stopName(leg.to, 'the next stop')}`
+                    : `Board at ${stopName(leg.from, 'the stop shown on the map')}${leg.headsign ? ` towards ${leg.headsign}` : ''}; get off at ${stopName(leg.to, toName)}`}
+                    {legDetail(leg) && <small> · {legDetail(leg)}</small>}</span>
                 </li>
               ))}
             </ol>
           ) : chosen ? (
             <p>No route steps were returned for this trip.</p>
           ) : trip.status === 'loading' ? (
-            <p role="status">Finding a public transport route…</p>
+            <p role="status">Finding the route…</p>
+          ) : trip.status === 'estimate' ? (
+            <p role="status">The journey planner isn&rsquo;t answering right now, so the time above is an estimate from the straight-line distance. The nearby stops below still show which buses go to {toName}.</p>
           ) : (
-            <p role="status">Live bus directions are unavailable right now.</p>
+            <p role="status">Step-by-step directions are unavailable right now. The nearby stops below show which buses go to {toName}.</p>
           )}
 
+          {mode === 'cycle' && near?.kind === 'bikes' && near.a && (
+            <>
+              <h4>Dublin Bikes</h4>
+              <p><b>Near A:</b> <span>{near.a.name} · {fmtKm(near.a.m / 1000)}{near.a.bikes != null && ` · ${near.a.bikes} bike${near.a.bikes === 1 ? '' : 's'} free`}</span></p>
+              {near.b && <p><b>Near the university:</b> <span>{near.b.name} · {fmtKm(near.b.m / 1000)}{near.b.stands != null && ` · ${near.b.stands} free stand${near.b.stands === 1 ? '' : 's'}`}</span></p>}
+            </>
+          )}
+          {mode === 'public_transport' && near?.kind === 'transit' && (near.luas || near.rail) && (
+            <>
+              <h4>Luas and trains near A</h4>
+              {near.luas && <p><b>Luas:</b> <span>{near.luas.name} · {near.luas.kind.replace('Luas ', '')} · {fmtKm(near.luas.m / 1000)}</span></p>}
+              {near.rail && <p><b>{near.rail.kind === 'DART' ? 'DART' : 'Train'}:</b> <span>{near.rail.name} · {fmtKm(near.rail.m / 1000)}</span></p>}
+            </>
+          )}
+          {mode === 'public_transport' && <>
           <h4>Nearby bus stops</h4>
           {near?.kind !== 'transit' ? (
             <p role="status">Finding bus stops near point A…</p>
@@ -763,19 +816,14 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
           ) : (
             <p>No bus stops were found within 450 m of point A.</p>
           )}
-        </section>
-      )}
-      <p className="route-legend rm-legend" aria-label="Map key">
-        <span><i className="rm-key-a">A</i>Start</span>
-        <span><i className="rm-key-b">B</i>University</span>
-        {near?.kind === 'transit' && <span><i className="rm-key-bus" />Bus stop</span>}
-        {near?.luas && <span><i className="rm-key-luas" style={{ '--c': LUAS_COLOURS[near.luas.kind] }}>L</i>Luas stop</span>}
-        {near?.rail && <span><i className="rm-key-rail">🚆</i>{near.rail.kind === 'DART' ? 'DART' : 'Train'} station</span>}
-        {homes.length > 0 && <span><i className="rm-key-home">🏠</i>Student residence</span>}
-      </p>
-      {trip.status === 'estimate' && (
-        <p className="route-map-note">The journey planner isn't reachable right now, so the time is an estimate from the straight-line distance.</p>
-      )}
+          </>}
+          {homes.length > 0 && (
+            <>
+              <h4>Student residences nearby</h4>
+              <p><span>{homes.length} on the map: {homes.slice(0, 3).map((r) => r.name).join(', ')}{homes.length > 3 ? ` and ${homes.length - 3} more` : ''}. Click one to start the trip there.</span></p>
+            </>
+          )}
+      </section>
     </div>
   )
 }

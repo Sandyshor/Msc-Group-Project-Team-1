@@ -585,7 +585,7 @@ function GettingThere({ result, university, universityLocation, mode, onModeChan
             ))}
           </div>
         </div>
-        <p>Choose a place on the map for point A. Your route to the university (point B) will update.</p>
+        <p>Type where you&rsquo;re starting from (point A), or click the map. Point B is your university.</p>
       </div>
       <div className="results-route-map">
       {place && universityLocation ? (
