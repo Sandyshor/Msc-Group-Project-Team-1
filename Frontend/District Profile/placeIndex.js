@@ -9,6 +9,7 @@ import { loadAmenityRecords, loadVerifiedChainShops } from './amenityData';
 import { chainOf } from './shopChains';
 import { universities } from './cityPlaces';
 import { format as streetLabel, nominatimTurn } from './placeNames';
+import profilesUrl from './district-profiles.json?url';
 
 const PLANNER = '/journey-planner/';
 
@@ -75,6 +76,11 @@ export function areaCode(term) {
 // The district page adds its districts and neighbourhoods once its data has loaded
 export function addDistrictPlaces(data) {
   if (!data?.profiles) return
+  extra = districtPlaces(data)
+  built = null
+}
+
+function districtPlaces(data) {
   const list = []
   Object.entries(data.profiles).forEach(([code, p]) => {
     const at = data.labels?.[code]
@@ -85,21 +91,31 @@ export function addDistrictPlaces(data) {
     ;(p.areas || []).forEach(([name, lat, lng]) => list.push({ kind: 'area', label: name, sub: `Neighbourhood in ${code}`, lat, lng, district: code }))
   })
   ;(data.stops || []).forEach((s) => list.push({ kind: 'station', label: `${s.name} (Luas)`, sub: 'Luas stop', lat: s.lat, lng: s.lng, keys: `${s.name} luas` }))
-  extra = list
-  built = null
+  return list
+}
+
+// Pages without the district map (the results page's start box) read the districts, neighbourhoods and Luas stops
+// themselves, so "Rathmines" finds the neighbourhood there too, not only shops named after it
+async function loadDistrictPlaces() {
+  if (extra.length) return extra
+  const [d, county] = await Promise.all([getJson(profilesUrl), getJson('/data/county-dublin-profiles.json')])
+  if (!d?.profiles) return []
+  if (county) ['profiles', 'labels'].forEach((k) => { d[k] = { ...(d[k] || {}), ...(county[k] || {}) } })
+  return districtPlaces(d)
 }
 
 const getJson = (url) => fetch(url, { headers: { Accept: 'application/json' } }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
 
 async function build() {
-  const [places, rail, records, housing, chainShops] = await Promise.all([
+  const [places, rail, records, housing, chainShops, districtList] = await Promise.all([
     getJson(`${PLANNER}places.json`),
     getJson('/data/dublin-rail-stations.geojson'),
     loadAmenityRecords().catch(() => []),
     getJson('/data/student-residences.json'),
     loadVerifiedChainShops().catch(() => []),
+    loadDistrictPlaces().catch(() => []),
   ])
-  const list = [...extra]
+  const list = [...(extra.length ? extra : districtList)]
   universities.forEach((u) => {
     const alias = CAMPUS_ALIASES[u.id.split('-')[0]] || ''
     list.push({ kind: 'uni', label: u.name, sub: u.location, lat: u.coordinates[0], lng: u.coordinates[1], keys: `${u.name} ${alias} university college campus`, short: SHORT_NAMES[u.id.split('-')[0]] || [] })
