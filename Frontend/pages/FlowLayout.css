@@ -229,13 +229,6 @@
   min-height: 340px;
 }
 
-.results-map-only .route-card,
-.results-map-only .route-map-hint,
-.results-map-only .route-legend,
-.results-map-only .route-map-note {
-  display: none;
-}
-
 .route-bus-details {
   flex: none;
   margin: 0 0 8px;
@@ -1476,8 +1469,6 @@
 }
 
 .route-map.rm-overview .rm-ctx,
-.route-map:not(.rm-near) .rm-home-marker,
-.route-map:not(.rm-near) .leaflet-tooltip.rm-tip,
 .route-map:not(.rm-near) .leaflet-tooltip.rm-perm {
   display: none !important;
 }

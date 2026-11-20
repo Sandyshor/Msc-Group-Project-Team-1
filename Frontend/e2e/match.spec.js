@@ -80,3 +80,47 @@ test('a search with no possible match explains why', async ({ page }) => {
   await page.goto(resultsUrl({ university: 'TU Dublin - Tallaght', accommodation: 'student_studio', studentRoom: 'studio', maxCommute: 15 }))
   await expect(page.locator('main')).toContainText(/No student residence|No area is within|Try a longer commute/i, { timeout: 30_000 })
 })
+
+// Google polyline encoding (what the journey planner sends as each leg's line)
+function encodeLine(points) {
+  let out = '', lat = 0, lng = 0
+  const enc = (v) => { let n = v < 0 ? ~(v << 1) : v << 1; let s = ''; while (n >= 0x20) { s += String.fromCharCode((0x20 | (n & 0x1f)) + 63); n >>= 5 } return s + String.fromCharCode(n + 63) }
+  points.forEach(([a, b]) => { const A = Math.round(a * 1e5), B = Math.round(b * 1e5); out += enc(A - lat) + enc(B - lng); lat = A; lng = B })
+  return out
+}
+
+test('Getting there: type a start (A), the trip to the university (B) is drawn with its steps', async ({ page }) => {
+  // the journey planner's answer, fixed here so the test doesn't depend on the live service
+  await page.route('**/route?**', (route) => {
+    const u = new URL(route.request().url())
+    const from = [Number(u.searchParams.get('from_lat')), Number(u.searchParams.get('from_lon'))]
+    const to = [Number(u.searchParams.get('to_lat')), Number(u.searchParams.get('to_lon'))]
+    const mid = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2]
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ itineraries: [{
+      total_minutes: 17, total_distance_km: 2.1, transfers: 0,
+      legs: [
+        { mode: 'WALK', from: 'Start', to: 'Parnell Square East', minutes: 4, distance_km: 0.3, geometry: encodeLine([from, mid]) },
+        { mode: 'BUS', line: '1', headsign: 'Shaw street', from: 'Parnell Square East', to: 'Townsend Street', minutes: 9, distance_km: 1.5, geometry: encodeLine([mid, to]) },
+        { mode: 'WALK', from: 'Townsend Street', to: 'Destination', minutes: 4, distance_km: 0.3, geometry: encodeLine([to, to.map((v) => v + 0.0005)]) },
+      ],
+    }] }) })
+  })
+  const errors = watchErrors(page)
+  await page.goto(resultsUrl())
+  const start = page.getByRole('combobox', { name: 'Start point' })
+  await expect(start).toBeVisible({ timeout: 30_000 })
+  await expect(page.locator('.rm-trip-b')).toContainText('Trinity College Dublin') // B is the university
+  await start.fill('Beckett House')
+  const option = page.locator('.ps-floating li[role="option"]', { hasText: 'Student residence' }).first()
+  await expect(option).toBeVisible({ timeout: 20_000 })
+  await start.press('Enter') // the first suggestion (on a phone the list follows the box as the page scrolls)
+  await expect(page.locator('.rm-trip .route-numbers')).toContainText('17 min')
+  await expect(page.locator('.route-bus-itinerary')).toContainText('Board at Parnell Square East towards Shaw street; get off at Townsend Street')
+  await expect(page.locator('.route-bus-itinerary')).toContainText('From Beckett House to the Bus 1 stop at Parnell Square East')
+  // the route line is drawn and visible (not left invisible by its draw-in animation)
+  await expect.poll(() => page.locator('.route-map path').evaluateAll((paths) =>
+    paths.filter((p) => getComputedStyle(p).opacity !== '0' && (parseFloat(getComputedStyle(p).strokeDashoffset) || 0) === 0).length), { timeout: 8000 }).toBeGreaterThan(2)
+  await page.getByRole('button', { name: /Back to/ }).click()
+  await expect(start).toHaveValue(/\S/)
+  errors.check()
+})
