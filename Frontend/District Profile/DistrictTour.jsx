@@ -15,7 +15,7 @@ const FEATURES = [
   { key: 'compare', icon: '⇄', title: 'Compare districts', spot: '.compare-button',
     text: <>Put any two districts <b>side by side</b>: rent, safety, amenities and distance to your campus. Tick what matters to you and it tells you which fits you better.</> },
   { key: 'journey', icon: '🚌', title: 'Journey', tab: 'journey', spot: '.profile-tabs [data-tab="journey"]',
-    text: <>Type a <b>start and destination</b> (or click the map) to see bus, Luas, train, walking and cycling routes with times.</> },
+    text: <>Type a <b>start and destination</b>, or click any place on the map and press <b>Directions</b>, to see bus, Luas, train, walking and cycling routes with times.</> },
   { key: 'amen', icon: '🛒', title: 'Amenities', tab: 'amen', spot: '.profile-tabs [data-tab="amen"]',
     text: <><b>Supermarkets, cafés, gyms, parks, pharmacies</b> and more in the district. Pick a supermarket chain to see its shops on the map.</> },
   { key: 'safety', icon: '🛡️', title: 'Safety', tab: 'safety', spot: '.profile-tabs [data-tab="safety"]',

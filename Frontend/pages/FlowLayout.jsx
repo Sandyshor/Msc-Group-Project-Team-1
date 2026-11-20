@@ -58,7 +58,6 @@ export function FlowSidebar({ step, onStep, locked = [], onLockedStep }) {
             type="button"
             className={`flow-step${current ? ' is-current' : ''}${isLocked ? ' is-locked' : ''}`}
             aria-current={current ? 'step' : undefined}
-            aria-label={isLocked ? `Step ${number}: ${label} (locked until the earlier steps are done)` : undefined}
             aria-disabled={isLocked || undefined}
             disabled={current || (isLocked && !onLockedStep)}
             onClick={() => {
@@ -68,8 +67,10 @@ export function FlowSidebar({ step, onStep, locked = [], onLockedStep }) {
           >
             <FlowIcon name={icon} />
             <span>
-              <small>Step {number}</small>
+              <small>Step {number}</small>{' '}
               {label}
+              {/* screen readers hear the visible words first, then why it can't be opened yet */}
+              {isLocked && <span className="sr-only"> (locked until the earlier steps are done)</span>}
             </span>
             {isLocked && <span className="flow-step-lock" aria-hidden="true"><FlowIcon name="lock" /></span>}
           </button>

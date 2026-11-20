@@ -28,7 +28,7 @@ const steps = [
     visual: 'journey',
     title: 'Plan your daily journey',
     description: 'Check how you would get from your new area to campus by bus, Luas, DART, on foot or by bike.',
-    detail: 'Type a start and a destination, or click the map, and compare the routes and times.',
+    detail: 'Click any place on the map for its details, then press Directions to compare routes and times.',
     link: '/districts',
     linkText: 'Plan a journey',
   },

@@ -126,7 +126,7 @@
 
 /* The district page's search bar: the first thing the eye lands on. A raised white bar with a slowly moving
    gold-to-lime border and a soft glow, which pulses three times when the page opens. */
-.map-search-kicker { display: flex; align-items: center; gap: 6px; margin: 0 0 6px 4px; color: #9a7445; font: 800 11px 'DM Sans', sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.map-search-kicker { display: flex; align-items: center; gap: 6px; margin: 0 0 6px 4px; color: #7a5a30; font: 800 11px 'DM Sans', sans-serif; letter-spacing: .1em; text-transform: uppercase; }
 .map-search-kicker span { font-size: 12px; }
 .ps.ps-hero {
   padding: 0 8px 0 16px;

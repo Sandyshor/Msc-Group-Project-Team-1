@@ -71,7 +71,7 @@ function useHeaderFit(headerRef, deps) {
 const PAGE_TITLES = {
   '/districts': 'Explore districts', '/campuses': 'Universities', '/attractions': 'Famous attractions',
   '/results': 'Your matches', '/how-it-works': 'How it works', '/questionnaire': 'Find my match',
-  '/login': 'Log in', '/signup': 'Sign up', '/things-to-know': 'Things to know', '/terms': 'Terms of use',
+  '/login': 'Log in', '/signup': 'Sign up', '/my-searches': 'My recent searches', '/things-to-know': 'Things to know', '/terms': 'Terms of use',
   '/privacy': 'Privacy policy', '/contact': 'Contact',
 }
 

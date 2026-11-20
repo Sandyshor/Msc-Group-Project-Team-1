@@ -58,7 +58,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid #d4a94f; outline-offs
 
 .profile-card { animation: profile-in 420ms ease both; }
 .profile-banner { position: relative; overflow: hidden; padding: 24px 24px 26px; background: #214b39; color: #fffdf3; }
-.profile-banner::after { position: absolute; right: -32px; bottom: -92px; width: 210px; height: 210px; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 50%; content: ""; }
+.profile-banner::after { position: absolute; right: -32px; bottom: -92px; width: 210px; height: 210px; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 50%; content: ""; pointer-events: none; /* decoration: taps go through to the Compare button */ }
 .profile-banner-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .profile-kicker { color: #c2d4bc; font-size: 0.64rem; font-weight: 800; letter-spacing: 0.16em; }
 .district-pill { display: inline-grid; min-width: 47px; min-height: 40px; place-items: center; padding: 7px 12px; border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 11px; color: #f8e8b8; background: rgba(255, 255, 255, 0.05); font-family: Manrope, sans-serif; font-size: 0.96rem; font-weight: 800; }
@@ -177,7 +177,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid #d4a94f; outline-offs
 .seg-toggle button { padding: 6px 13px; border: 0; border-radius: 999px; background: transparent; color: #4f6c57; font-size: 0.76rem; font-weight: 700; }
 .seg-toggle button[aria-pressed="true"] { background: #214b39; color: #fffdf3; }
 .profile-section .seg-toggle { margin-bottom: 10px; }
-.tour-button { padding: 8px 14px; border: 0; border-radius: 10px; background: #d94351; color: #fff; font-size: 0.76rem; font-weight: 800; }
+.tour-button { padding: 8px 14px; border: 0; border-radius: 10px; background: #d0404d; color: #fff; font-size: 0.76rem; font-weight: 800; }
 .tour-button[aria-pressed="true"] { background: #214b39; }
 .luas-toggle { display: inline-flex; align-items: center; gap: 5px; padding: 7px 12px; border: 1px solid #dfe8da; border-radius: 999px; background: #fffefa; color: #4f6c57; font-size: 0.76rem; font-weight: 700; }
 .luas-toggle i { display: inline-block; width: 14px; height: 3px; border-radius: 3px; }
@@ -260,7 +260,7 @@ button.amenity-tile:disabled { cursor: default; }
 .district-controls { align-items: center; }
 .district-select { height: 38px; max-width: 280px; padding: 0 12px; border: 1px solid #dfe8da; border-radius: 999px; background: #fffefa; color: #214b39; font: 700 0.8rem Manrope, sans-serif; }
 .toolbar-spacer { flex: 1; }
-.tour-button.tour-link { padding: 8px 6px; background: transparent; color: #d94351; }
+.tour-button.tour-link { padding: 8px 6px; background: transparent; color: #b8303c; }
 .tour-button.tour-link[aria-pressed="true"] { background: transparent; color: #214b39; }
 .tour-button.compare-button { padding: 9px 16px; border-radius: 999px; background: #214b39; color: #fff; }
 .layers-wrap { position: relative; }

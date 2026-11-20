@@ -5,12 +5,13 @@ import DistrictProfile, { TABS } from './DistrictProfile';
 import JourneyPlannerPanel, { routeTabLabel } from './JourneyPlannerPanel';
 import { fetchRoutes } from './journey';
 import { chainShops as buildChainShops, loadAmenityRecords, loadVerifiedAmenityCounts, loadVerifiedChainShops } from './amenityData';
-import { streetName } from './placeNames';
 import PlaceSearch from './PlaceSearch';
 import { addDistrictPlaces } from './placeIndex';
 import { districtProfiles } from './districtProfiles';
 import DistrictTour from './DistrictTour';
 import CompareDistricts from './CompareDistricts';
+import PlacePanel from './PlacePanel';
+import './PlacePanel.css';
 import { setChatContext } from '../chatContext';
 import './App.css';
 import './Safety.css';
@@ -155,8 +156,11 @@ export default function App() {
   const [rentMode, setRentMode] = useState('rooms');
   const [chain, setChain] = useState(null); // supermarket chain shown on the map (Tesco, Lidl...)
   const [hoverPlace, setHoverPlace] = useState(null);
-  // Journey planner trip: A and B are set by clicking the map, like the journey planner page
+  // Journey planner trip: A and B come from the place panel's Directions / Start here buttons or are typed
   const [trip, setTrip] = useState(EMPTY_TRIP);
+  // Like Google Maps: the place clicked on the map is shown in the side panel; "directions" shows the route planner there
+  const [place, setPlace] = useState(null);
+  const [directions, setDirections] = useState(false);
   const [csvRecords, setCsvRecords] = useState(null); // amenities_osm.csv: shops in every district
   const [verifiedShops, setVerifiedShops] = useState(null); // chain shops checked against the district boundaries
   const [amenityCounts, setAmenityCounts] = useState(null);
@@ -235,16 +239,19 @@ export default function App() {
   // Clicking the chosen district again clears it: back to the plain map with the universities
   const clearDistrict = useCallback(() => {
     setTouring(false);
+    setPlace(null);
     setSelectedId(null);
     setHoverPlace(null);
     setChain(null);
   }, []);
   const toggleDistrict = useCallback((code) => {
-    if (code === selectedId) clearDistrict(); else { setTouring(false); setSelectedId(code); setHoverPlace(null); }
+    if (code === selectedId) clearDistrict(); else { setTouring(false); setPlace(null); setDirections(false); setSelectedId(code); setHoverPlace(null); }
   }, [selectedId, clearDistrict]);
 
   const selectDistrict = useCallback((code, fromTour = false) => {
     if (!fromTour) setTouring(false);
+    setPlace(null);
+    setDirections(false);
     setSelectedId(code);
     setHoverPlace(null);
   }, []);
@@ -259,10 +266,11 @@ export default function App() {
     const tabName = (TABS.find(([k]) => k === tab) || [])[1];
     setChatContext([
       `The student is looking at the district profile for ${selectedId} ${profile.name}${tabName ? ` (the ${tabName} tab)` : ''} on Explore districts.`,
+      place ? `On the map they opened the details of ${place.name || 'a spot'}${place.district ? ` (in ${place.district})` : ''}.` : '',
       trip.from && trip.to ? `They planned a journey from ${trip.from.label || 'a point on the map'} to ${trip.to.label || 'a point on the map'}.` : '',
     ].filter(Boolean).join('\n'));
     return () => setChatContext(null);
-  }, [data, selectedId, tab, trip.from?.label, trip.to?.label]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [data, selectedId, tab, place?.name, trip.from?.label, trip.to?.label]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Leaving the Amenities tab (to Rent, Journey...) clears the chosen chain, so its shops leave the map
   useEffect(() => { if (tab !== 'amen') setChain(null); }, [tab]);
@@ -312,62 +320,35 @@ export default function App() {
   const team = null;
   const places = placesByDistrict[selectedId] || [];
 
+  // A famous place picked on the map or in the Places tab: its details in the side panel
   const onPlaceClick = (code, i) => {
     setTouring(false);
     if (code !== selectedId) setSelectedId(code);
     setTab('places');
     setHoverPlace(i);
+    const p = (placesByDistrict[code] || [])[i];
+    if (p?.lngLat) setPlace({ kind: 'famous', name: p.name, description: p.description, image: p.image, category: p.cat, lat: p.lngLat[1], lng: p.lngLat[0], district: code });
     mapApi.current?.flyToPlace(code, i);
   };
 
-  // Journey planner behaviour: first click sets A, second sets B; after that a landmark moves B.
-  // A plain map click or a dragged pin gets its exact street / shop name from the address lookup;
-  // the nearby-place name shows until the answer arrives (and stays if the lookup fails).
-  const nameExactly = (which, p) => {
-    if (!p.lookup) return;
-    streetName(p.lat, p.lng).then((label) => {
-      if (!label) return;
-      setTrip((t) => (t[which] && t[which].lat === p.lat && t[which].lng === p.lng ? { ...t, [which]: { ...t[which], label } } : t));
-    });
-  };
-  // Map clicks only set A and B while the journey planner is on screen (the Journey tab, or the
-  // "Plan a journey" panel before a district is picked). On Places, Rent, Amenities etc. they do nothing.
-  const planning = !selectedId || tab === 'journey';
-  const onMapPoint = (p) => {
-    if (!planning || (trip.from && trip.to)) return;
-    const which = trip.from ? 'to' : 'from';
+  // The route is on the map while the directions panel or the Journey tab is open
+  const planning = directions || (Boolean(selectedId) && tab === 'journey');
+  const onPlace = (p) => { setTouring(false); setPlace(p); };
+  const closePlace = () => setPlace(null);
+  const openDirections = (patch) => {
     setTouring(false);
-    setTrip((t) => ({ ...t, [which]: p }));
-    nameExactly(which, p);
-    if (tab !== 'journey') setTab('journey');
+    setTrip((t) => ({ ...t, ...patch }));
+    setPlace(null);
+    setDirections(true);
   };
-  const onDragPoint = (which, p) => {
-    setTrip((t) => ({ ...t, [which]: p }));
-    nameExactly(which, p);
-  };
-  const onLandmarkPoint = (p) => {
-    if (!planning) return;
-    if (trip.from && trip.to) { setTrip((t) => ({ ...t, to: p })); if (tab !== 'journey') setTab('journey'); return; }
-    onMapPoint(p);
-  };
+  const closeDirections = () => setDirections(false);
+  const resetTrip = () => setTrip((t) => ({ ...EMPTY_TRIP, mode: t.mode, timeType: t.timeType, time: t.time }));
 
-  // The search box above the map: a district opens its profile; anything else gets a pin on the map
+  // The search box above the map: a district opens its profile; anything else opens in the place panel
   const onSearchPick = (p) => {
-    if ((p.kind === 'district' || (p.kind === 'eircode' && p.approx)) && data.profiles[p.code]) { mapApi.current?.clearSearchPin(); selectDistrict(p.code); return; }
-    mapApi.current?.showSearchResult(p);
-  };
-  // A student residence clicked on the map: it becomes the start (A), or the destination (B) once A is set
-  // (replacing B when both are set), and the journey planner works out the distance and route
-  const onHousingPoint = (p) => {
-    setTouring(false);
-    setTrip((t) => (!t.from ? { ...t, from: p } : { ...t, to: p }));
-    if (selectedId && tab !== 'journey') setTab('journey');
-  };
-  // "Directions from / to here" on the search pin
-  const onSearchDirections = (which, p) => {
-    setTouring(false);
-    setTrip((t) => ({ ...t, [which]: { lat: p.lat, lng: p.lng, label: p.label } }));
-    if (selectedId && tab !== 'journey') setTab('journey');
+    if ((p.kind === 'district' || (p.kind === 'eircode' && p.approx)) && data.profiles[p.code]) { selectDistrict(p.code); return; }
+    const kind = { uni: 'campus', place: 'landmark', housing: 'residence', amenity: 'amenity' }[p.kind] || 'search';
+    setPlace({ kind, name: p.label, category: p.cat || p.sub, lat: p.lat, lng: p.lng, zoom: true, district: mapApi.current?.districtAt(p.lat, p.lng) || undefined });
   };
 
   const hasCounty = COUNTY_AREAS.some((c) => data.profiles[c]);
@@ -384,7 +365,7 @@ export default function App() {
       <header className="page-header page-header-compact">
         <div>
           <h1>Dublin district profiles</h1>
-          <p className="page-description">Pick a Dublin district (D1–D24) or a County Dublin area to see its rent, amenities, safety and famous places, use <b>Compare districts</b> to put two side by side, or click the map to plan a journey.</p>
+          <p className="page-description">Pick a Dublin district (D1–D24) or a County Dublin area to see its rent, amenities, safety and famous places, use <b>Compare districts</b> to put two side by side, or click any place on the map to see what it is and get directions.</p>
         </div>
       </header>
 
@@ -399,7 +380,7 @@ export default function App() {
                 label="Search the map"
                 placeholder={typeof window !== 'undefined' && window.innerWidth < 560 ? 'Place, street, D8 or Eircode…' : 'Search a university, place, street, district or Eircode, e.g. UCD, Temple Bar, D07 ED7R'}
                 onPick={onSearchPick}
-                onClear={() => mapApi.current?.clearSearchPin()}
+                onClear={closePlace}
               />
             </div>
                        <div className="district-controls">
@@ -477,11 +458,8 @@ export default function App() {
             onPlaceClick={onPlaceClick}
             trip={trip}
             planning={planning}
-            onSearchDirections={onSearchDirections}
-            onHousingPoint={onHousingPoint}
-            onMapPoint={onMapPoint}
-            onLandmarkPoint={onLandmarkPoint}
-            onDragPoint={onDragPoint}
+            selectedPlace={place}
+            onPlace={onPlace}
             onSelectItinerary={(i) => setTrip((t) => ({ ...t, selected: i }))}
             routeTabLabel={(it) => routeTabLabel(it, trip.queryMode)}
           />
@@ -512,16 +490,45 @@ export default function App() {
           </div>
         </section>
 
-        {!selectedId && (
+        {place && (
+          <PlacePanel
+            place={place}
+            data={data}
+            mapApi={mapApi.current}
+            placesByDistrict={placesByDistrict}
+            selectedId={selectedId}
+            hasDirections={directions}
+            onClose={closePlace}
+            onDirectionsTo={(p) => openDirections({ to: p })}
+            onDirectionsFrom={(p) => openDirections({ from: p })}
+            onRoute={(from, to) => openDirections({ from, to })}
+            onOpen={onPlace}
+            onOpenDistrict={(c) => selectDistrict(c)}
+          />
+        )}
+        {!place && directions && (
+          <aside className="profile-card side-panel directions-panel" aria-label="Directions">
+            <div className="pp-top">
+              <button type="button" className="pp-back" onClick={closeDirections}>← {selectedId ? `${selectedId} profile` : 'Back'}</button>
+              <h2>Directions</h2>
+              <button type="button" className="pp-close" aria-label="Close directions" onClick={closeDirections}>×</button>
+            </div>
+            <div className="dir-scroll">
+              <JourneyPlannerPanel trip={trip} setTrip={setTrip} onReset={resetTrip} quickStarts={selectedId ? journeyQuickStarts : []} />
+            </div>
+          </aside>
+        )}
+        {!place && !directions && !selectedId && (
           <aside className="profile-card welcome-card">
             <p className="eyebrow">District profiles</p>
             <h2>Choose a district</h2>
             <p>Pick a Dublin district (D1–D24) or a County Dublin area (A and K Eircodes) above to see its rent, amenities, safety and famous places.</p>
-            <h3>Plan a journey</h3>
-            <JourneyPlannerPanel trip={trip} setTrip={setTrip} onReset={() => setTrip((t) => ({ ...EMPTY_TRIP, mode: t.mode, timeType: t.timeType, time: t.time }))} />
+            <h3>Explore the map</h3>
+            <p>Click any place on the map, such as a university, shop, bus stop, residence or street, to see what it is, what's nearby and how far the universities are.</p>
+            <button type="button" className="welcome-directions" onClick={() => setDirections(true)}>➜ Get directions</button>
           </aside>
         )}
-        {selectedId && <DistrictProfile
+        {!place && !directions && selectedId && <DistrictProfile
           key={selectedId}
           selectedId={selectedId}
           data={data}
@@ -539,7 +546,7 @@ export default function App() {
           onSelect={(c) => selectDistrict(c)}
           trip={trip}
           setTrip={setTrip}
-          onTripReset={() => setTrip((t) => ({ ...EMPTY_TRIP, mode: t.mode, timeType: t.timeType, time: t.time }))}
+          onTripReset={resetTrip}
           journeyQuickStarts={journeyQuickStarts}
           chainShops={chainShops}
           amenityCounts={amenityCounts}

@@ -12,7 +12,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './leafletNoTitle';
 import proj4 from 'proj4';
-import { ACTIVE_DISTRICTS, ALL_DISTRICTS, AMENITY_TYPES, heatColor, safetyLabel, strongColor, textOnHeat } from './mapShared';
+import { ALL_DISTRICTS, heatColor, safetyLabel, strongColor, textOnHeat } from './mapShared';
 // Safety score per Census area (crime-heatmap.geojson is cut off, so the complete copy is used)
 import crimeAreasUrl from './crime-heatmap1.geojson?url';
 const countyAreasUrl = '/data/county-dublin-areas.geojson'; // approximate A/K routing areas
@@ -35,8 +35,6 @@ const busStopsUrl = '/data/dublin-bus-stops.geojson';
 const railLinesUrl = '/data/dublin-rail-lines.geojson';
 const railStationsUrl = '/data/dublin-rail-stations.geojson';
 const BIKES_INFO_URL = 'https://api.cyclocity.fr/contracts/dublin/gbfs/v2/station_information.json';
-const BIKES_STATUS_URL = 'https://api.cyclocity.fr/contracts/dublin/gbfs/v2/station_status.json';
-const BIKES_STATUS_MAX_AGE_MS = 60 * 1000;
 
 const DUBLIN_CENTRE = [53.3498, -6.2603];
 const DUBLIN_BOUNDS = L.latLngBounds([53.24, -6.48], [53.46, -6.0]);
@@ -133,13 +131,6 @@ function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 }
 
-function el(tag, className, text) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text != null) node.textContent = text;
-  return node;
-}
-
 const shortName = (name) => String(name)
   .replace('Technological University Dublin', 'TU Dublin')
   .replace('Dublin City University', 'DCU')
@@ -205,26 +196,6 @@ function recordMatchesAmenityLayer(record, key) {
   if (!category.csv.includes(record.category)) return false;
   if (key === 'supermarkets' || key === 'groceries') return !brandOf(record);
   return true;
-}
-
-function createPlacePopup(place) {
-  const container = el('div', 'landmark-popup');
-  if (place.image) {
-    const image = el('img', 'landmark-popup-image');
-    image.src = place.image;
-    image.alt = place.name;
-    image.onerror = () => { image.style.display = 'none'; };
-    container.append(image);
-  }
-  container.append(el('h3', null, place.name), el('p', null, place.description || ''));
-  if (place.sourceUrl) {
-    const link = el('a', null, 'View photo source');
-    link.href = place.sourceUrl;
-    link.target = '_blank';
-    link.rel = 'noreferrer';
-    container.append(link);
-  }
-  return container;
 }
 
 function distanceMetres(a, b) {
@@ -400,7 +371,6 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       named: { landmarks: [], stations: [], areas: [] }, // to name a clicked point (journey A and B)
       amenityRecords: null,
       amenityLoad: null,
-      bikeStatus: null,
     };
     st.names.addLayer(st.codes).addLayer(st.areas);
     st.placeLayer = L.layerGroup([st.cityPlaces, st.districtPlaces]);
@@ -437,7 +407,8 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     // ---------------- universities (on at start), famous places, landmarks
     const universityLayer = L.layerGroup().addTo(map);
     const cityLandmarkLayer = L.layerGroup();
-    const pickLandmark = (latlng, label) => latest.current.onLandmarkPoint?.({ lat: latlng.lat, lng: latlng.lng, label });
+    // Every click on the map (a pin or any spot) opens that place's details in the side panel, like Google Maps
+    const pickLandmark = (latlng, label, extra = {}) => openPlace({ kind: 'landmark', name: label, lat: latlng.lat, lng: latlng.lng, ...extra });
 
     const addLandmarks = (list, layer, kind) => {
       const groups = [];
@@ -454,7 +425,9 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         const label = items.length > 1 ? `${shortName(items[0].name)} +${items.length - 1}` : shortName(items[0].name);
         L.marker(latlng, { icon: pinIcon({ emoji: items[0].icon || '🎓', ring: RING[kind], kind, label }), title: items.map((i) => i.name).join(' / '), riseOnHover: true })
           .bindTooltip(tooltip, { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip' })
-          .on('click', () => pickLandmark(latlng, items.map((i) => i.name).join(' / ')))
+          .on('click', () => pickLandmark(latlng, items.map((i) => i.name).join(' / '), {
+            kind: kind === 'uni' ? 'campus' : 'landmark', category: items[0].category, names: items.map((i) => i.name),
+          }))
           .addTo(layer);
       });
     };
@@ -497,7 +470,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         + `${who ? `<span class="sh-addr">${who}</span>` : ''}`
         + `${r.from || r.rooms ? `<span class="sh-price">${r.from ? `From <b>${euro(r.from)}</b> a month` : ''}${r.from && r.rooms ? ' · ' : ''}${r.rooms ? `<span class="sh-rooms">${escapeHtml(r.rooms)}</span>` : ''}</span>` : ''}`
         + `<span class="sh-actions">${r.website ? `<a class="sh-web" href="${escapeHtml(r.website)}" target="_blank" rel="noopener noreferrer">Visit website ↗</a>` : ''}</span>`
-        + `<span class="sh-hint">Click the pin to use it as point <b class="is-a">A</b> or <b class="is-b">B</b> and get the distance</span></div>`;
+        + '<span class="sh-hint">Click the pin for details and directions</span></div>';
     };
     const residenceMarker = (r, at) => {
       const marker = L.marker(at, { icon: pinIcon({ emoji: '🏠', ring: RING.housing, kind: 'housing', label: r.name }), title: `${r.name} (student residence)`, riseOnHover: true });
@@ -509,7 +482,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       marker.on('mouseout', hideCard);
       marker.on('click', () => {
         map.closePopup(card);
-        latest.current.onHousingPoint?.({ lat: r.lat, lng: r.lon, label: r.name });
+        openPlace({ kind: 'residence', name: r.name, lat: r.lat, lng: r.lon, district: r.district, residence: r });
       });
       return marker;
     };
@@ -547,7 +520,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       if (map.hasLayer(universityLayer)) uniSpots.forEach((p) => fixed.push({ x: p.x, y: p.y, r: size / 2 }));
       [st.cityPlaces, st.districtPlaces, cityLandmarkLayer].filter((layer) => map.hasLayer(layer) || layer === st.districtPlaces)
         .forEach((layer) => layer.eachLayer((m) => { if (m instanceof L.Marker) fixed.push(fixedPoint(m.getLatLng(), size / 2)); }));
-      if (st.searchPin) fixed.push(fixedPoint(st.searchPin.getLatLng(), 18));
+      if (st.placePin) fixed.push(fixedPoint(st.placePin.getLatLng(), 18));
       const groups = z < HOUSING_GROUP_ZOOM ? groupPins(items, size + 8) : items.map((item) => ({ items: [item], cx: item.point.x, cy: item.point.y }));
       const spots = groups.map((g) => ({ x: g.cx, y: g.cy, r: g.items.length > 1 ? badgeR : size / 2 }));
       spreadPins(spots, fixed, 3);
@@ -619,7 +592,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         riseOnHover: true,
       })
         .bindTooltip(`${escapeHtml(name)}<small>${escapeHtml(typeLabel)} · ${escapeHtml(record.area)}</small>`, { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-        .on('click', () => pickLandmark(latlng, name));
+        .on('click', () => pickLandmark(latlng, name, { kind: 'amenity', category: POI_STYLE[record.category]?.[1] || typeLabel, area: record.area }));
     };
 
     const activeAmenityKeys = () => Object.keys(AMENITY_CATEGORIES).filter((k) => map.hasLayer(amenityLayers[k]));
@@ -663,7 +636,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
           title: `${name} · ${style[1]} · ${record.area}`,
         })
           .bindTooltip(`${escapeHtml(name)}<small>${escapeHtml(style[1])} · ${escapeHtml(record.area)}</small>`, { direction: 'top', offset: [0, -8], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-          .on('click', () => pickLandmark(latlng, name))
+          .on('click', () => pickLandmark(latlng, name, { kind: 'amenity', category: style[1], area: record.area }))
           .addTo(st.pois);
       });
     };
@@ -724,7 +697,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
           const [lng, lat] = f.geometry.coordinates;
           L.circleMarker([lat, lng], { renderer: busRenderer, radius: 6, color: '#173f37', weight: 2.5, fillColor: BUS_YELLOW, fillOpacity: 1, bubblingMouseEvents: false })
             .bindTooltip(tip([f]), { direction: 'top', offset: [0, -6], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-            .on('click', () => pickLandmark(L.latLng(lat, lng), `${f.properties.name} (bus stop)`))
+            .on('click', () => pickLandmark(L.latLng(lat, lng), f.properties.name, { kind: 'bus', stops: [f.properties] }))
             .addTo(st.bus);
         });
         updateStatus();
@@ -755,7 +728,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
           keyboard: false,
         })
           .bindTooltip(tip(stops), { direction: 'top', offset: [0, -size / 2], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-          .on('click', () => pickLandmark(L.latLng(lat, lng), `${stops[0].properties.name} (bus stop)`))
+          .on('click', () => pickLandmark(L.latLng(lat, lng), stops[0].properties.name, { kind: 'bus', stops: stops.map((x) => x.properties) }))
           .addTo(st.bus);
       });
       updateStatus();
@@ -765,12 +738,12 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     map.on('overlayadd overlayremove', (e) => { if (Object.values(amenityLayers).includes(e.layer)) updateAmenities(); });
     map.on('moveend', () => { updateAmenities(); renderBusStops(); });
 
-    // ---------------- click the map to set A then B (journey planner)
+    // ---------------- click any spot on the map: its details (address, district, what's nearby) in the side panel
     // District famous places, Luas stops and neighbourhoods also give names to clicked points
     Object.values(placesByDistrict).flat().forEach((p) => { if (p.lngLat) st.named.landmarks.push({ name: p.name, lat: p.lngLat[1], lng: p.lngLat[0] }); });
     profileData.stops.forEach((x) => st.named.stations.push({ name: `${x.name} (Luas)`, lat: x.lat, lng: x.lng }));
     Object.entries(profileData.profiles).forEach(([d, pr]) => (pr.areas || []).forEach(([name, lat, lng]) => st.named.areas.push({ name, d, lat, lng })));
-    map.on('click', (e) => latest.current.onMapPoint?.({ lat: e.latlng.lat, lng: e.latlng.lng, label: nameFor(e.latlng.lat, e.latlng.lng), lookup: true }));
+    map.on('click', (e) => openPlace({ kind: 'point', lat: e.latlng.lat, lng: e.latlng.lng, name: nameFor(e.latlng.lat, e.latlng.lng) }));
 
     // ---------------- district outlines
     fetch(boundariesUrl)
@@ -799,7 +772,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     profileData.stops.forEach((stop) => {
       L.marker([stop.lat, stop.lng], { icon: stopIcon(stop.line === 'Red' ? LUAS_RED : LUAS_GREEN, stop.name, 'luas'), riseOnHover: true })
         .bindTooltip(`${escapeHtml(stop.name)}<small>Luas ${escapeHtml(stop.line)} Line</small>`, { direction: 'top', offset: [0, -10], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-        .on('click', () => openStopPopup(stop))
+        .on('click', () => openPlace({ kind: 'luas', name: stop.name, lat: stop.lat, lng: stop.lng, line: stop.line, district: stop.d || undefined }))
         .addTo(st.luasStops);
     });
 
@@ -814,9 +787,10 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         const { name, dart } = f.properties;
         L.marker([lat, lng], { icon: stopIcon(dart ? DART_GREEN : RAIL_PURPLE, name, 'rail'), riseOnHover: true })
           .bindTooltip(`🚆 ${escapeHtml(name)}<small>${dart ? 'DART and rail station' : 'Rail station'}</small>`, { direction: 'top', offset: [0, -10], className: 'jp-landmark-tooltip jp-amenity-tooltip' })
-          .on('click', () => pickLandmark(L.latLng(lat, lng), `${name} station`))
+          .on('click', () => pickLandmark(L.latLng(lat, lng), `${name} station`, { kind: 'rail', dart: Boolean(dart) }))
           .addTo(st.railStations);
         st.named.stations.push({ name: `${name} station`, lat, lng });
+        st.railStations.list = [...(st.railStations.list || []), { name, dart: Boolean(dart), lat, lng }];
       });
     }).catch(() => { /* stations file is optional */ });
 
@@ -828,7 +802,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
           (json.data?.stations || []).forEach((dock) => {
             L.marker([dock.lat, dock.lon], { icon: pinIcon({ emoji: '🚲', ring: BIKES_BLUE, kind: 'bike', label: dock.name }), riseOnHover: true })
               .bindTooltip(`Dublin Bikes · ${escapeHtml(dock.name)}`, { direction: 'top', offset: [0, -16], className: 'jp-landmark-tooltip' })
-              .on('click', () => openBikePopup({ id: dock.station_id, name: dock.name, address: dock.address, capacity: dock.capacity }, [dock.lat, dock.lon]))
+              .on('click', () => openPlace({ kind: 'bike', name: dock.name, lat: dock.lat, lng: dock.lon, dock: { id: dock.station_id, address: dock.address, capacity: dock.capacity } }))
               .addTo(st.bikes);
           });
           st.declutter?.();
@@ -863,7 +837,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
               layer.on('mouseover', () => layer.setStyle({ weight: 2.5, color: '#173f37', fillOpacity: 0.55 }));
               layer.on('mouseout', () => layer.setStyle({ ...base, fillColor: heatColor(sc) }));
             },
-          }).addTo(st.safety); // clicks still reach the map, so the journey planner keeps working
+          }).addTo(st.safety); // clicks still reach the map, so the spot's details open as usual
         })
         .catch((e) => { st.safetyLoad = null; console.error('Could not load the safety map', e); setStatus('Could not load the safety map.'); });
       return st.safetyLoad;
@@ -993,7 +967,6 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         riseOnHover: true,
         title: place.name,
       })
-        .bindPopup(createPlacePopup(place), { maxWidth: 280, offset: [0, -14] })
         .on('mouseover', () => latest.current.onHoverPlace(i))
         .on('mouseout', () => latest.current.onHoverPlace(null))
         .on('click', () => latest.current.onPlaceClick(sel, i));
@@ -1025,72 +998,63 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     return area ? `Near ${area.name}` : 'Dropped pin';
   }
 
-  // ------------------------------------------------------------ popups
-  function openStopPopup(stop) {
+  // ------------------------------------------------------------ places
+  // Which district or County Dublin area a point is in (district outlines, checked by point-in-polygon)
+  function districtAt(lat, lng) {
     const st = s.current;
-    const { profiles, amenities, lines } = profileData;
-    const lngLat = [stop.lng, stop.lat];
-    const line = lines[stop.line.toLowerCase()] || {};
-    const box = el('div', 'stop-popup');
-    box.append(el('span', `stop-line ${stop.line.toLowerCase()}`, `${stop.line} Line`), el('h3', null, stop.name));
-    const tags = el('div', 'stop-tags');
-    tags.append(el('span', null, stop.d ? `${stop.d}${profiles[stop.d] ? ` · ${profiles[stop.d].name}` : ''}` : 'Outside Dublin postal districts'));
-    if (line.interval) tags.append(el('span', null, `Every ${line.peak || line.interval} min at peak`));
-    box.append(tags);
-    const counts = {};
-    (amenities[stop.d] || []).forEach(([, cat, lat, lng]) => { if (distanceMetres(lngLat, [lng, lat]) < 500) counts[cat] = (counts[cat] || 0) + 1; });
-    const near = AMENITY_TYPES.filter(([k]) => counts[k]);
-    if (near.length) {
-      box.append(el('p', 'stop-heading', 'Within 500 m'));
-      const tagRow = el('div', 'stop-tags');
-      near.forEach(([k, label, , colour]) => { const t = el('span', null, `${counts[k]} ${label.toLowerCase()}`); t.style.borderColor = colour; tagRow.append(t); });
-      box.append(tagRow);
+    if (!st) return null;
+    const inRing = (ring) => {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const [xi, yi] = ring[i], [xj, yj] = ring[j];
+        if ((yi > lat) !== (yj > lat) && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) inside = !inside;
+      }
+      return inside;
+    };
+    const inPolygon = (rings) => inRing(rings[0]) && !rings.slice(1).some(inRing);
+    for (const [code, f] of Object.entries(st.features)) {
+      const g = f.geometry;
+      if (!g || !profileData.profiles[code]) continue;
+      if (g.type === 'Polygon' ? inPolygon(g.coordinates) : g.type === 'MultiPolygon' && g.coordinates.some(inPolygon)) return code;
     }
-    const actions = el('div', 'dp-popup-actions');
-    if (stop.d && ACTIVE_DISTRICTS.includes(stop.d)) {
-      const btn = el('button', 'stop-open', `Open ${stop.d} profile`);
-      btn.type = 'button';
-      btn.style.background = strongColor(profiles[stop.d].hue);
-      btn.onclick = () => { st.map.closePopup(); latest.current.onSelectDistrict(stop.d); };
-      actions.append(btn);
-    }
-    const go = el('button', 'stop-open dp-route-here', 'Route to this stop');
-    go.type = 'button';
-    go.onclick = () => { st.map.closePopup(); latest.current.onLandmarkPoint?.({ lat: stop.lat, lng: stop.lng, label: `${stop.name} (Luas ${stop.line})` }); };
-    actions.append(go);
-    box.append(actions);
-    L.popup({ maxWidth: 280, offset: [0, -6] }).setLatLng([stop.lat, stop.lng]).setContent(box).openOn(st.map);
+    return null;
   }
 
-  async function bikeStatus() {
-    const st = s.current;
-    if (st.bikeStatus && Date.now() - st.bikeStatus.at < BIKES_STATUS_MAX_AGE_MS) return st.bikeStatus.byId;
-    const response = await fetch(BIKES_STATUS_URL);
-    if (!response.ok) throw new Error(`Dublin Bikes status returned ${response.status}`);
-    const stations = (await response.json()).data?.stations || [];
-    const byId = Object.fromEntries(stations.map((x) => [String(x.station_id), x]));
-    st.bikeStatus = { at: Date.now(), byId };
-    return byId;
+  function openPlace(place) {
+    latest.current.onPlace?.({ ...place, district: place.district ?? districtAt(place.lat, place.lng) });
   }
 
-  function openBikePopup(dock, latlng) {
+  // What's around a point, for the place panel: the nearest Luas stop, train station and bus stop, and how many
+  // shops, cafés and other places are within 500 m
+  async function nearby(lat, lng) {
     const st = s.current;
-    const box = el('div', 'stop-popup');
-    box.append(el('span', 'stop-line bikes', 'Dublin Bikes'), el('h3', null, dock.name));
-    if (dock.address && dock.address.toLowerCase() !== dock.name.toLowerCase()) box.append(el('p', 'bike-address', dock.address));
-    const tags = el('div', 'stop-tags');
-    tags.append(el('span', null, `${dock.capacity} stands`));
-    box.append(tags);
-    const live = el('p', 'bike-live', 'Checking live availability…');
-    box.append(live);
-    L.popup({ maxWidth: 280, offset: [0, -12] }).setLatLng(latlng).setContent(box).openOn(st.map);
-    bikeStatus().then((byId) => {
-      const x = byId[String(dock.id)];
-      if (!x) { live.textContent = 'No live data for this dock right now.'; return; }
-      if (!x.is_installed || !x.is_renting) { live.textContent = 'This dock is closed at the moment.'; return; }
-      const ebikes = x.vehicle_types_available?.find((v) => v.vehicle_type_id === 'electrical')?.count ?? 0;
-      live.textContent = `${x.num_bikes_available} bikes${ebikes ? ` (${ebikes} electric)` : ''} · ${x.num_docks_available} free stands`;
-    }).catch(() => { live.textContent = 'Live availability could not be loaded.'; });
+    if (!st) return null;
+    if (!st.busStops) {
+      try { st.busStops = (await (await fetch(busStopsUrl)).json()).features; } catch { st.busStops = null; }
+    }
+    if (!st.amenityRecords) {
+      try { st.amenityRecords = await loadCsv(); } catch { /* counts left out */ }
+    }
+    const here = [lat, lng];
+    const nearest = (list, at) => list.reduce((best, item) => {
+      const m = metres(here, at(item));
+      return !best || m < best.m ? { ...item, m } : best;
+    }, null);
+    const luas = nearest(profileData.stops, (x) => [x.lat, x.lng]);
+    const rail = nearest(st.railStations.list || [], (x) => [x.lat, x.lng]);
+    const busFeature = st.busStops && nearest(st.busStops, (f) => [f.geometry.coordinates[1], f.geometry.coordinates[0]]);
+    const bus = busFeature && { ...busFeature.properties, m: busFeature.m };
+    const GROUPS = [['Supermarkets & shops', ['Supermarkets', 'Groceries']], ['Cafés', ['Cafes']], ['Restaurants', ['Restaurants', 'Asian_Restaurants']],
+      ['Pharmacies', ['Pharmacies']], ['Gyms', ['Gyms']], ['Parks', ['Parks']], ['Hospitals', ['Hospitals']]];
+    const counts = st.amenityRecords ? GROUPS.map(([label, cats]) => {
+      const seen = new Set();
+      st.amenityRecords.forEach((r) => {
+        if (!cats.includes(r.category) || Math.abs(r.latitude - lat) > 0.006 || Math.abs(r.longitude - lng) > 0.009) return;
+        if (metres(here, [r.latitude, r.longitude]) <= 500) seen.add(`${(r.name || '').trim()}|${r.latitude.toFixed(4)}|${r.longitude.toFixed(4)}`);
+      });
+      return [label, seen.size];
+    }).filter(([, n]) => n) : null;
+    return { luas, rail, bus, counts };
   }
 
   // ------------------------------------------------------------ journey drawing
@@ -1124,14 +1088,8 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
         return;
       }
       ripple([p.lat, p.lng]);
-      const marker = L.marker([p.lat, p.lng], { draggable: true, autoPan: true, riseOnHover: true, zIndexOffset: 1200, icon: routePinIcon(label, cls), title: k === 'from' ? 'Start' : 'Destination' }).addTo(st.map);
-      marker.on('dragstart', () => marker.getElement()?.classList.add('jp-is-dragging'));
-      marker.on('dragend', () => {
-        marker.getElement()?.classList.remove('jp-is-dragging');
-        const ll = marker.getLatLng();
-        ripple(ll);
-        latest.current.onDragPoint?.(k, { lat: ll.lat, lng: ll.lng, label: nameFor(ll.lat, ll.lng), lookup: true });
-      });
+      const marker = L.marker([p.lat, p.lng], { riseOnHover: true, zIndexOffset: 1200, icon: routePinIcon(label, cls), title: `${k === 'from' ? 'Start' : 'Destination'}: ${p.label || ''}` }).addTo(st.map);
+      marker.on('click', () => openPlace({ kind: 'point', lat: p.lat, lng: p.lng, name: p.label || nameFor(p.lat, p.lng) }));
       st.pins[k] = marker;
     });
   }
@@ -1143,9 +1101,11 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     const loading = trip.status === 'loading';
     let html;
     if (loading) html = 'Finding the best routes…';
-    else if (!trip.from) html = 'Click the map to drop your <strong>start (A)</strong>, or type a place in box A';
-    else if (!trip.to) html = 'Now click the map to drop your <strong>destination (B)</strong>';
-    else html = '<strong>Drag the A or B pin</strong> on the map to change your route';
+    else if (!trip.from && !trip.to) html = 'Click any place on the map, then choose <strong>Directions</strong>';
+    else if (!trip.from) html = 'Choose a <strong>start</strong>: type it, use your location, or click a place and pick <strong>Start here</strong>';
+    else if (!trip.to) html = 'Choose a <strong>destination</strong>: type it, or click a place and pick <strong>Directions</strong>';
+    else html = '';
+    node.hidden = !html || latest.current.planning === false;
     if (node.dataset.html === html) return;
     node.dataset.html = html;
     node.classList.toggle('jp-is-loading', loading);
@@ -1286,7 +1246,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     const [, label, colour] = chainInfo(chain);
     list.forEach((shop) => {
       L.marker([shop.lat, shop.lng], { icon: pinIcon({ emoji: '🛒', ring: colour, kind: 'amenity', label: shop.name, brand: CHAIN_LOGO[chain] }), riseOnHover: true, zIndexOffset: 500 })
-        .bindPopup(`<div class="chain-popup"><b>${escapeHtml(shop.name)}</b><span>${escapeHtml(shop.district)} · ${escapeHtml(label)}</span></div>`, { offset: [0, -16], closeButton: false })
+        .on('click', () => openPlace({ kind: 'amenity', name: shop.name, category: label, lat: shop.lat, lng: shop.lng, district: shop.district }))
         .addTo(st.chains);
     });
     if (list.length) st.map.fitBounds(L.latLngBounds(list.map((x) => [x.lat, x.lng])), { padding: [70, 70], maxZoom: 15.5 });
@@ -1358,6 +1318,25 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
   // leaving / returning to the journey planner: take the journey off the map or put it back (the trip itself is kept)
   useEffect(() => { syncPins(); drawRoute(); }, [props.planning]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // The place shown in the side panel gets a red pin (like Google Maps); a searched place is zoomed to
+  const sel = props.selectedPlace;
+  useEffect(() => {
+    const st = s.current;
+    if (!st) return;
+    st.placePin?.remove();
+    st.placePin = null;
+    if (!sel) { st.renderHousing?.(); return; }
+    const ll = L.latLng(sel.lat, sel.lng);
+    st.placePin = L.marker(ll, {
+      icon: L.divIcon({ className: 'jp-search-pin', html: '<span></span>', iconSize: [30, 40], iconAnchor: [15, 38] }),
+      zIndexOffset: 1400, interactive: false, keyboard: false,
+    }).addTo(st.map);
+    ripple(ll);
+    if (sel.zoom) st.map.setView(ll, Math.max(st.map.getZoom(), 16), { animate: !REDUCED_MOTION });
+    else if (!st.map.getBounds().pad(-0.12).contains(ll)) st.map.panTo(ll, { animate: !REDUCED_MOTION });
+    st.renderHousing?.();
+  }, [sel?.lat, sel?.lng, sel?.name]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useImperativeHandle(ref, () => ({
     getMap() { return s.current?.map; },
     flyToPlace(code, index) {
@@ -1366,45 +1345,16 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       if (!marker) return;
       if (!st.map.hasLayer(st.placeLayer)) st.placeLayer.addTo(st.map);
       if (!st.districtPlaces.hasLayer(marker)) marker.addTo(st.districtPlaces);
-      st.map.setView(marker.getLatLng(), 15.5, { animate: !REDUCED_MOTION });
-      st.map.once('moveend', () => marker.openPopup());
+      st.map.setView(marker.getLatLng(), Math.max(st.map.getZoom(), 15.5), { animate: !REDUCED_MOTION });
     },
-    // A place picked in the search box: a pin with its name and "Directions from / to here"
-    showSearchResult(place) {
-      const st = s.current;
-      if (!st) return;
-      st.searchPin?.remove();
-      const ll = L.latLng(place.lat, place.lng);
-      const html = `<div class="jp-search-pop"><strong>${escapeHtml(place.label)}</strong>${place.sub ? `<small>${escapeHtml(place.sub)}</small>` : ''}`
-        + '<div class="jp-search-actions"><button type="button" data-end="from">Directions from here</button><button type="button" data-end="to">Directions to here</button></div></div>';
-      const marker = L.marker(ll, {
-        icon: L.divIcon({ className: 'jp-search-pin', html: '<span></span>', iconSize: [30, 40], iconAnchor: [15, 38] }),
-        zIndexOffset: 1000,
-        title: place.label,
-      }).bindPopup(html, { offset: [0, -32], className: 'jp-search-popup', maxWidth: 280 }).addTo(st.map);
-      marker.on('popupclose', () => boxRef.current?.classList.remove('has-search-pop'));
-      marker.on('popupopen', (e) => {
-        boxRef.current?.classList.add('has-search-pop'); // the "click the map" hint would cover it
-        e.popup.getElement()?.querySelectorAll('[data-end]').forEach((btn) => L.DomEvent.on(btn, 'click', (ev) => {
-          L.DomEvent.stop(ev);
-          marker.closePopup();
-          latest.current.onSearchDirections?.(btn.dataset.end, place);
-        }));
-      });
-      st.searchPin = marker;
-      st.renderHousing?.();
-      let opened = false;
-      const open = () => { if (!opened && st.searchPin === marker) { opened = true; marker.openPopup(); } };
-      st.map.once('moveend', open);
-      setTimeout(open, 700); // the map may already be there, so no move happens
-      st.map.setView(ll, Math.max(st.map.getZoom(), 16), { animate: !REDUCED_MOTION });
-    },
+    districtAt,
+    nearby,
     // A typed A or B: bring it into view if it's off the map
     reveal(lat, lng) {
       const st = s.current;
       if (st && !st.map.getBounds().pad(-0.1).contains([lat, lng])) st.map.setView([lat, lng], Math.max(st.map.getZoom(), 14), { animate: !REDUCED_MOTION });
     },
-    clearSearchPin() { s.current?.searchPin?.remove(); if (s.current) s.current.searchPin = null; },
+    clearSearchPin() { /* the selected-place pin is removed when the panel closes */ },
     focusCampus(id) {
       const st = s.current;
       const campus = campusList.find((u) => u.id === id);
@@ -1415,7 +1365,9 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
 
   return (
     <div ref={boxRef} className={`district-map jp-scope z-far z-low${props.planning === false ? ' is-browsing' : ''}`}>
-      <div ref={containerRef} className="jp-route-map" aria-label={props.planning === false ? 'Map of Dublin districts' : 'Map: click to set start and end points'} />
+      {/* position is set here, not only in the CSS: if Leaflet starts before the stylesheet applies (it can on
+          Safari), it sees no position, forces "relative" and the map collapses to 0 px high */}
+      <div ref={containerRef} className="jp-route-map" style={{ position: 'absolute', inset: 0 }} aria-label="Map of Dublin: click any place for its details and directions" />
       <div className="jp-map-vignette" aria-hidden="true" />
       <div ref={hintRef} className="jp-map-hint" aria-live="polite" hidden={props.planning === false} />
       <div ref={statusRef} className="jp-amenity-status" role="status" aria-live="polite" hidden />

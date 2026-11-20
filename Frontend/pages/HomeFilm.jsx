@@ -106,7 +106,7 @@ export default function HomeFilm() {
               Your browser does not support embedded video.
             </video>
             {!started && (
-              <button type="button" className="hf-overlay" onClick={() => play(0)} aria-label="Play the film about Dublin">
+              <button type="button" className="hf-overlay" onClick={() => play(0)}>
                 <span className="hf-play"><Icon name="play" filled /></span>
                 <span className="hf-overlay-text">
                   <strong>Watch the intro</strong>

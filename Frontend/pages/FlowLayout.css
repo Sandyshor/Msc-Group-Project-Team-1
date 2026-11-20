@@ -453,6 +453,7 @@
 }
 
 .flow-step {
+  position: relative; /* keeps its hidden screen-reader text inside the scrolling step bar on phones */
   display: flex;
   align-items: center;
   gap: 12px;

@@ -55,9 +55,12 @@ neighbourhoods for them, with rent, commute time, a safety section, census facts
 - "Explore districts": an interactive map of every Dublin postal district (D1-D24) and County Dublin areas. Each \
 district profile has tabs for places, journey, rent, amenities, safety and the area (census). The search box finds \
 colleges, places, streets, districts and any Eircode (e.g. D07 ED7R pins that address). Layers show Luas, bus stops, \
-DART and rail, Dublin Bikes, supermarkets and the safety map. Student residences are pinned too: hover for the price, \
-click to make one point A or B of the journey planner, which gives door-to-door times to any campus. "Compare \
-districts" puts two side by side.
+DART and rail, Dublin Bikes, supermarkets and the safety map. Student residences are pinned too. Like Google Maps, \
+clicking anything on the map (a campus, shop, bus or Luas stop, residence or any street) opens its details on the \
+right: photo and description, address, distance to the universities, the nearest Luas, train and bus stops, what's \
+within 500 m and the district's rent and safety. Its "Directions" and "Start here" buttons (or typing a place, or \
+"Use my location") give door-to-door times by bus, Luas, train, walking or bike. "Compare districts" puts two side \
+by side.
 - The results page also has a "Compare" tab for the student's matches and a "Letting agents" tab with licensed agents \
 (PSRA register).
 - Logging in (free) saves the student's recent searches ("My recent searches" under their name) and their chats with \
