@@ -121,9 +121,16 @@
 .pp-nohours { display: grid; justify-items: start; gap: 4px; margin-bottom: 10px; }
 
 .pp-photo-credit { position: absolute; right: 8px; bottom: 6px; padding: 2px 7px; border-radius: 999px; color: #fff; background: rgba(0, 0, 0, .45); font-size: .66rem; text-decoration: none; }
-.pp-photo.is-logo { display: grid; place-items: center; background: #fff; }
-.pp-photo.is-logo img { width: auto; max-width: 70%; height: auto; max-height: 70%; object-fit: contain; }
+/* logos: centred on white at a readable size (small website icons are scaled up, wide wordmarks fit the width) */
+.pp-photo.is-logo { display: grid; height: 170px; place-items: center; border-bottom: 1px solid #eef1ea; background: #fff; }
+.pp-photo.is-logo img { width: 76%; height: 112px; object-fit: contain; image-rendering: auto; }
+.pp-photo.is-logo .pp-photo-credit { color: #4a5a50; background: #f1f4ee; }
+/* chains with no logo file: the map's brand word logo, drawn large */
+.pp-brand-badge { display: grid; height: 170px; place-items: center; border-bottom: 1px solid #eef1ea; background: #fff; }
+.pp-brand-badge .jp-brand-logo { width: 46px; height: 28px; transform: scale(3); }
+.pp-brand-badge .jp-brand-logo-daybreak { padding-top: 9px; font-size: 7px; }
 .pp-photo-icon { background: linear-gradient(135deg, var(--tint, #dfe9dc), #fbf8ef); }
 .pp-photo-icon.is-loading { background: linear-gradient(90deg, #eef2ea 25%, #f7f9f3 50%, #eef2ea 75%); background-size: 200% 100%; animation: pp-shimmer 1.2s infinite linear; }
 .pp-photo-icon.is-loading span { opacity: .35; }
 @media (prefers-reduced-motion: reduce) { .pp-photo-icon.is-loading { animation: none; } }
+.jp-brand-logo-boots { border-color: #05054b; color: #fff; background: #05054b; font: italic 800 10px/1 Georgia, serif; letter-spacing: 0; }
