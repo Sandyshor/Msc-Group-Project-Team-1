@@ -164,6 +164,28 @@ test('a street search offers OpenStreetMap addresses', async ({ page }) => {
   await expect(page.locator('.ps-floating')).toContainText(/Search streets and addresses|Camden/)
 })
 
+test('a place with no hours on OpenStreetMap gets them from its own website', async ({ page }) => {
+  await page.route('**/place-info?**', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+    source: 'osm-snapshot',
+    place: { name: 'Test Barber Co', type: 'Barber', key: 'shop', value: 'barber', appointment: true, osm: 'https://www.openstreetmap.org/node/2',
+      tags: { website: 'https://barber.example.ie' } },
+    inside: null, nearby: [],
+  }) }))
+  await page.route('**/place-hours?**', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+    hours: { opening_hours: 'Mo-Fr 10:00-19:00; Sa 10:00-17:00; Su off', source: 'barber.example.ie', page: 'https://barber.example.ie' },
+  }) }))
+  await page.locator('.ps-hero input').fill("Ali's Turkish Barber")
+  const option = page.locator('.ps-floating li[role="option"]', { hasText: /Salon/ }).first()
+  await expect(option).toContainText("Ali's Turkish Barber", { timeout: 20_000 })
+  await page.waitForTimeout(1500)
+  await option.click()
+  const panel = page.locator('.place-panel')
+  await expect(panel.locator('.pp-week tr')).toHaveCount(7)
+  await expect(panel.locator('.pp-week')).toContainText('10:00–19:00')
+  await expect(panel.locator('.pp-status')).toContainText(/^(Open|Closed)/)
+  await expect(panel.locator('.pp-source')).toContainText('barber.example.ie')
+})
+
 test('a clicked salon shows whether it is open, its week of hours and how to book', async ({ page }) => {
   // OpenStreetMap's answer for the salon (fixed here so the test doesn't depend on the live service)
   await page.route('**/place-info?**', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({

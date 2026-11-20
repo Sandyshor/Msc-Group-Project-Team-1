@@ -36,6 +36,8 @@
 .pp-desc { margin: 0; color: #34463b; font-size: .88rem; line-height: 1.6; }
 .pp-credit { display: inline-block; margin-top: 6px; color: #5b6f60; font-size: .72rem; }
 .pp-note { margin: 0 0 8px; color: #788878; font-size: .74rem; line-height: 1.45; }
+.pp-source { margin: 6px 0 0; color: #5d6b60; font-size: .72rem; }
+.pp-source a { color: inherit; }
 .pp-line { margin: 0 0 6px; color: #34463b; font-size: .84rem; line-height: 1.5; }
 
 .pp-facts { display: grid; gap: 6px; margin: 0; }
@@ -134,3 +136,10 @@
 .pp-photo-icon.is-loading span { opacity: .35; }
 @media (prefers-reduced-motion: reduce) { .pp-photo-icon.is-loading { animation: none; } }
 .jp-brand-logo-boots { border-color: #05054b; color: #fff; background: #05054b; font: italic 800 10px/1 Georgia, serif; letter-spacing: 0; }
+
+/* the photo box shimmers until the picture has arrived, then it fades in */
+.pp-photo.is-waiting { background: linear-gradient(90deg, #eef2ea 25%, #f7f9f3 50%, #eef2ea 75%); background-size: 200% 100%; animation: pp-shimmer 1.2s infinite linear; }
+.pp-photo img { transition: opacity .3s ease; }
+.pp-photo.is-waiting img { opacity: 0; }
+.pp-photo.is-waiting .pp-photo-credit { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .pp-photo.is-waiting { animation: none; } }

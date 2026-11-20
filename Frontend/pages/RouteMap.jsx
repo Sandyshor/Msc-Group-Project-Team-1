@@ -115,6 +115,7 @@ function declutterTips(box) {
   })
 }
 function fitPermanentTips(map, groups) {
+  if (!map?._mapPane || !map._loaded) return // the map was removed (the page or tab changed a moment ago)
   const size = map.getSize()
   groups.forEach((group) => group?.eachLayer((layer) => {
     const tooltip = layer.getTooltip?.()
@@ -331,6 +332,7 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
     map.on('zoomend moveend', () => {
       clearTimeout(tidy)
       tidy = setTimeout(() => {
+        if (mapRef.current !== map) return // removed meanwhile
         fitPermanentTips(map, [layerRef.current, ctxRef.current])
         declutterTips(boxRef.current)
         declutterHomeLabels(boxRef.current)
@@ -353,8 +355,9 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       resizeObserver.disconnect()
       cancelAnimationFrame(resizeFrame)
       stopTraveller()
-      map.remove()
       mapRef.current = null
+      map.stop() // a zoom still animating would otherwise touch the removed map ("_leaflet_pos" error)
+      map.remove()
     }
   }, [])
 
@@ -415,12 +418,14 @@ function RouteMap({ fromLat, fromLon, fromName, toLat, toLon, toName, area, mode
       map.fitBounds(L.latLngBounds(all.length ? all : [from, to]), { padding: [36, 36], maxZoom: 15 })
     }
     if (animate) animRef.current.timer = setTimeout(() => startTraveller(lines), REDUCED_MOTION ? 0 : delay + 300)
+    // tidy-ups that run a moment later: skipped if the map was removed meanwhile (leaving the page or tab quickly)
     setTimeout(() => {
+      if (mapRef.current !== map) return
       fitPermanentTips(map, [layerRef.current, ctxRef.current])
       declutterTips(boxRef.current)
       declutterHomeLabels(boxRef.current)
     }, animate && !REDUCED_MOTION ? delay + 80 : 80)
-    setTimeout(arrangeHomes, 0)
+    setTimeout(() => { if (mapRef.current === map) arrangeHomes() }, 0)
   }
 
   const linesOf = (itinerary) => itinerary.legs.filter((leg) => leg.geometry).map((leg) => ({

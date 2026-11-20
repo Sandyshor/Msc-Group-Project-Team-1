@@ -132,6 +132,9 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
   const [bike, setBike] = useState('');
   const [found, setFound] = useState(null); // a searched residence's details
   const [osm, setOsm] = useState(null); // opening hours, phone, website... from OpenStreetMap (GET /place-info)
+  const [imgReady, setImgReady] = useState(false); // the picture has arrived (until then the box shimmers)
+  const [photo, setPhoto] = useState(null); // its photo or logo (GET /place-photo), asked for once the details are in
+  const [siteHours, setSiteHours] = useState(null); // opening hours from its own website (GET /place-hours), when OpenStreetMap has none
   const key = `${place.lat},${place.lng},${place.name}`;
   const info = siteInfo(place, placesByDistrict);
   const res = place.residence || found;
@@ -144,7 +147,7 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
   const unnamed = (name) => (place.kind === 'point' && !spotIsPlace) || unnamedName(name);
 
   useEffect(() => {
-    setAddress(''); setWiki(null); setNear(null); setBike(''); setFound(null); setOsm(null);
+    setAddress(''); setWiki(null); setNear(null); setBike(''); setFound(null); setOsm(null); setPhoto(null); setSiteHours(null); setImgReady(false);
     const ctrl = new AbortController();
     let alive = true;
     // opening hours and contact details (not for bus, Luas, train and bike stations: the panel has their own details)
@@ -155,7 +158,7 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
       if (named) params.set('name', (place.names?.[0] || place.name).split(' — ')[0]);
       fetch(`${API_BASE}/place-info?${params}`, { signal: ctrl.signal })
         .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-        .then((d) => { if (alive) setOsm(d); })
+        .then((d) => { if (alive) setOsm({ ...d, forKey: key }); })
         .catch(() => { if (alive) setOsm({ error: true }); });
     }
     if (place.kind === 'residence' && !place.residence) loadResidences().then((list) => { if (alive) setFound(list.find((r) => norm(r.name) === norm(place.name)) || null); });
@@ -182,9 +185,43 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
     return () => { alive = false; ctrl.abort(); };
   }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // A spot that turned out to be a park or named place: its Wikipedia description, as for places clicked by name
+  // The photo, once the details are in (they give the website, Wikidata item and brand to look it up with). Kept
+  // separate so the opening hours appear first instead of waiting for the photo.
+  const isLandmark = ['landmark', 'famous', 'campus'].includes(place.kind) || ['leisure', 'tourism', 'historic'].includes(osm?.place?.key)
+    || /park|garden|square|green/i.test(`${place.category || ''} ${osm?.place?.type || ''}`);
   useEffect(() => {
-    if (!spotIsPlace || info.description || wiki) return undefined;
+    if (!osm || osm.loading || osm.forKey !== key || info.image) return undefined; // not the previous place's answer
+    const name = osm.place?.name || (!unnamedName(place.name) && place.kind !== 'point' ? (place.names?.[0] || place.name).split(' — ')[0] : '');
+    if (!name) return undefined;
+    const t = osm.place?.tags || {};
+    const params = new URLSearchParams({ lat: place.lat.toFixed(6), lng: place.lng.toFixed(6), name, landmark: String(isLandmark) });
+    [['brand', t.brand], ['website', t.website || t['contact:website'] || t.url], ['wikidata', t.wikidata], ['brand_wikidata', t['brand:wikidata']],
+      ['image', t.image], ['wikimedia_commons', t.wikimedia_commons]].forEach(([k, v]) => { if (v) params.set(k, v); });
+    let alive = true;
+    setPhoto({ loading: true });
+    fetch(`${API_BASE}/place-photo?${params}`).then((r) => (r.ok ? r.json() : null)).then((d) => { if (alive) setPhoto(d || {}); })
+      .catch(() => { if (alive) setPhoto({}); });
+    return () => { alive = false; };
+  }, [key, osm]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // No opening hours in OpenStreetMap but a website: many websites state their hours, read by the backend
+  useEffect(() => {
+    const t = osm?.forKey === key ? osm.place?.tags : null;
+    const site = t && (t.website || t['contact:website'] || t.url);
+    if (!site || t.opening_hours || transport) return undefined;
+    let alive = true;
+    setSiteHours({ loading: true });
+    const params = new URLSearchParams({ website: site, name: osm.place.name || '', chain: String(Boolean(t.brand || t['brand:wikidata'])) });
+    fetch(`${API_BASE}/place-hours?${params}`).then((r) => (r.ok ? r.json() : null)).then((d) => { if (alive) setSiteHours(d?.hours || {}); })
+      .catch(() => { if (alive) setSiteHours({}); });
+    return () => { alive = false; };
+  }, [key, osm]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A park, landmark or spot that turned out to be a named place: its Wikipedia description, as for places clicked
+  // by name (only an article about this place: same name, within 1 km)
+  useEffect(() => {
+    const parkLike = o && ['leisure', 'tourism', 'historic'].includes(o.key);
+    if (!(spotIsPlace || parkLike) || info.description || wiki) return undefined;
     let alive = true;
     wikipediaSummary(o.name, place.lat, place.lng).then((w) => { if (alive) setWiki(w); }).catch(() => {});
     return () => { alive = false; };
@@ -216,7 +253,8 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
   const phone = telOf(tags.phone || tags['contact:phone'] || tags.mobile || tags['contact:mobile']);
   const email = tags.email || tags['contact:email'];
   const booking = urlOf(tags.booking || tags['website:booking'] || (/^https?:/.test(tags.reservation || '') ? tags.reservation : ''));
-  const hoursText = tags.opening_hours;
+  const fromSite = !tags.opening_hours && siteHours?.opening_hours ? siteHours : null; // read from their website
+  const hoursText = tags.opening_hours || fromSite?.opening_hours;
   const week = parseOpeningHours(hoursText);
   const status = openStatus(week);
   const today = todayIndex();
@@ -230,7 +268,7 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
         : place.kind === 'campus' ? KIND_LABEL.campus
           : info.category || (place.kind === 'landmark' && place.category) || KIND_LABEL[place.kind] || 'Place';
   // the site's own photo, else the place's photo from OpenStreetMap / its website (backend), else Wikipedia's
-  const fetched = osm?.place?.photo || osm?.photo;
+  const fetched = photo?.photo;
   const osmPhoto = !info.image && fetched?.url ? fetched : null;
   const image = info.image || osmPhoto?.url || wiki?.image || '';
   const description = info.description || wiki?.extract || '';
@@ -264,14 +302,14 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
         const [, key, text] = BRAND_BADGES.find(([re]) => re.test(title));
         return <div className="pp-brand-badge" role="img" aria-label={`${title} logo`}><span className={`jp-brand-logo jp-brand-logo-${key}`}>{text}</span></div>;
       })() : image ? (
-        <div className={`pp-photo${osmPhoto?.logo ? ' is-logo' : ''}`}>
-          <img src={image} alt={osmPhoto?.logo ? `${title} logo` : title} referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.parentElement.hidden = true; }} />
+        <div className={`pp-photo${osmPhoto?.logo ? ' is-logo' : ''}${imgReady ? ' is-ready' : ' is-waiting'}`}>
+          <img src={image} onLoad={() => setImgReady(true)} alt={osmPhoto?.logo ? `${title} logo` : title} referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.parentElement.hidden = true; }} />
           {osmPhoto && (osmPhoto.page
             ? <a className="pp-photo-credit" href={osmPhoto.page} target="_blank" rel="noopener noreferrer">{osmPhoto.logo ? 'Logo' : osmPhoto.street ? 'Street view' : 'Photo'} · {osmPhoto.source}</a>
             : <span className="pp-photo-credit">{osmPhoto.street ? 'Street view' : 'Photo'} · {osmPhoto.source}</span>)}
         </div>
       ) : (
-        <div className={`pp-photo pp-photo-icon${osm?.loading && !wiki ? ' is-loading' : ''}`} aria-hidden="true" style={{ '--tint': TYPE_TINT[o?.type || place.category] || TYPE_TINT[place.kind] || '#dfe9dc' }}>
+        <div className={`pp-photo pp-photo-icon${(osm?.loading || photo?.loading) && !wiki ? ' is-loading' : ''}`} aria-hidden="true" style={{ '--tint': TYPE_TINT[o?.type || place.category] || TYPE_TINT[place.kind] || '#dfe9dc' }}>
           <span>{TYPE_ICON[o?.type || place.category] || KIND_ICON[place.kind] || '📍'}</span>
         </div>
       )}
@@ -326,12 +364,16 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
                 </tbody>
               </table>
             ) : hoursText ? <p className="pp-line">{readableHours(hoursText)}</p>
+              : siteHours?.loading ? <div className="pp-skeleton" aria-label="Checking their website for opening hours"><span /></div>
               : (
                 <div className="pp-nohours">
-                  <p className="pp-note">{o.key === 'leisure' && /park|garden|nature/.test(o.value || '') ? `Opening hours aren’t listed for ${o.name}. Many city parks close at dusk, so check before an evening visit.` : `Opening hours aren’t listed for ${o.name} on OpenStreetMap.`}</p>
+                  <p className="pp-note">{o.key === 'leisure' && /park|garden|nature/.test(o.value || '') ? `Opening hours aren’t listed for ${o.name}. Many city parks close at dusk, so check before an evening visit.` : `Opening hours aren’t listed for ${o.name} on OpenStreetMap${osmWebsite ? ' or its website' : ''}.`}</p>
                   <a className="pp-act" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${o.name} ${fullAddress || osmStreet || 'Dublin'}`)}`} target="_blank" rel="noopener noreferrer">🕒 Hours and reviews on Google Maps ↗</a>
                 </div>
               )}
+            {fromSite && (
+              <p className="pp-source">Hours from <a href={fromSite.page} target="_blank" rel="noopener noreferrer">{fromSite.source} ↗</a>, their own website.</p>
+            )}
             {o.appointment && (
               <div className="pp-book">
                 {booking || osmWebsite || phone

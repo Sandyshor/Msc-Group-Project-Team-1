@@ -69,3 +69,55 @@ def test_wrong_shop_type_is_corrected_from_the_name():
     assert max_pizza["type"] == "Pizza takeaway"
     spar = placeinfo.describe({"type": "node", "id": 2, "lat": 53.35, "lon": -6.23, "tags": {"name": "Spar", "shop": "convenience"}}, 53.35, -6.23)
     assert spar["type"] == "Convenience shop"
+
+
+def test_park_photo_titles_may_leave_out_the_word_park():
+    assert placeinfo._names_place("File:Elizabeth O’Farrell stone, Dublin.jpg", "Elizabeth O'Farrell Park")
+    assert not placeinfo._names_place("File:Herbert Street, Dublin.jpg", "Herbert Park")  # one specific word: "park" still needed
+
+
+def test_place_photo_endpoint_answers_for_a_chain_without_any_lookup():
+    from fastapi.testclient import TestClient
+    import app
+    r = TestClient(app.app).get("/place-photo", params={"lat": 53.3386, "lng": -6.2654, "name": "Tesco Express"})
+    assert r.status_code == 200 and r.json()["photo"]["source"] == "Tesco"
+
+
+def test_clicks_in_dublin_are_answered_from_the_snapshot_without_any_lookup(monkeypatch):
+    def no_network(*a, **k):
+        raise AssertionError("OpenStreetMap's servers were asked")
+    monkeypatch.setattr(placeinfo, "ask_overpass", no_network)
+    monkeypatch.setattr(placeinfo, "ask_nominatim", no_network)
+    assert placeinfo.in_snapshot(53.3383, -6.2591)
+    park = placeinfo.lookup(53.3556, -6.3290, "", 60)  # a click in the middle of Phoenix Park
+    assert park["source"] == "osm-snapshot" and park["place"]["name"] == "Phoenix Park"
+    named = placeinfo.lookup(53.3354, -6.2620, "Iveagh Gardens", 120)
+    assert named["place"]["name"] == "Iveagh Gardens" and named["place"]["type"] == "Park"
+    assert not placeinfo.in_snapshot(53.61, -6.18)  # Balbriggan is outside the extract: OpenStreetMap is asked there
+
+
+def test_opening_hours_from_schema_org_data():
+    page = '''<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Restaurant", "name": "X",
+      "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00", "closes": "17:30"}, {"dayOfWeek": "https://schema.org/Saturday", "opens": "10:00:00", "closes": "16:00:00"},
+      {"dayOfWeek": "Sunday", "opens": "12:00", "closes": "14:00", "validFrom": "2026-12-25", "validThrough": "2026-12-25"}]}</script>'''
+    items = [i for b in placeinfo.LD_JSON.findall(page) for i in placeinfo._ld_items(__import__("json").loads(b))]
+    assert placeinfo._hours_of(items[0]) == "Mo-Fr 09:00-17:30; Sa 10:00-16:00"  # the Christmas Day hours are left out
+    assert placeinfo._clean_rules(["Mo-Fr 9:00 - 18:00", "Sa 10:00-16:00"]) == "Mo-Fr 09:00-18:00; Sa 10:00-16:00"
+    assert placeinfo._clean_rules(["Weekdays 9 to 5"]) is None  # unreadable: no hours rather than wrong ones
+
+
+def test_opening_hours_written_as_text_on_a_website():
+    assert placeinfo.text_hours("<h3>Opening Hours</h3><p>Mon - Fri - 10am - 7pm<br>Sat 10am - 5pm<br>Sun Closed</p>") == "Mo-Fr 10:00-19:00; Sa 10:00-17:00; Su off"
+    assert placeinfo.text_hours("Opening Hours: Monday-Saturday 10:00 -5:30 Tel") == "Mo-Sa 10:00-17:30"  # half five, not 5 am
+    assert placeinfo.text_hours("Opening Hours MON-THURS: 4PM-12PM FRIDAY: 4PM-1AM SATURDAY: 1PM-1AM SUNDAY: 1PM-11:30PM") == \
+        "Mo-Th 16:00-24:00; Fr 16:00-01:00; Sa 13:00-01:00; Su 13:00-23:30"
+    assert placeinfo.text_hours("<b>Opening hours</b> Mon-Fri 12:00-15:00, 17:00-22:00 Sat-Sun 12:00 - 23:00") == "Mo-Fr 12:00-15:00,17:00-22:00; Sa,Su 12:00-23:00"
+    assert placeinfo.text_hours("<b>Open</b> Mon 9-5 Tue 9-5 Wed 9-5") is None  # am or pm isn't certain
+    assert placeinfo.text_hours("Opening hours Mon-Fri 9am-5pm. Our Cork branch: hours Mon-Fri 8am-8pm") is None  # two different weeks
+    assert placeinfo.text_hours("<p>New mon bra mistakes and how to fix them</p>") is None
+
+
+def test_website_hours_never_fetches_local_addresses(monkeypatch):
+    monkeypatch.setattr(placeinfo.requests, "get", lambda *a, **k: (_ for _ in ()).throw(AssertionError("fetched")))
+    assert placeinfo.website_hours("http://127.0.0.1/admin") is None
