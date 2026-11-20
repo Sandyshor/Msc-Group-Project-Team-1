@@ -531,10 +531,11 @@ function splitName(name) {
 const districtOf = (location) => { const m = location.match(/Dublin (\d{1,2})\b/); return m ? `D${m[1]}` : null }
 
 // filter groups
+// TU Dublin is a university (a technological university since 2019). "Colleges" alone could mean a secondary
+// school in Ireland, so the other group is named "Higher education colleges".
 function campusGroup(school) {
-  if (school.name.startsWith('Technological University Dublin')) return 'TU Dublin'
   if (/University|Trinity College|Royal College of Surgeons/.test(school.name)) return 'Universities'
-  return 'Colleges'
+  return 'Higher education colleges'
 }
 function attractionGroup(place) {
   const c = place.category
@@ -655,8 +656,8 @@ function GuidePage({ kicker, title, accent, description, banner, stats, groups, 
   )
 }
 
-const CAMPUS_GROUPS = ['Universities', 'TU Dublin', 'Colleges']
-const CAMPUS_TAGS = { Universities: 'University', 'TU Dublin': 'TU Dublin campus', Colleges: 'College' }
+const CAMPUS_GROUPS = ['Universities', 'Higher education colleges']
+const CAMPUS_TAGS = { Universities: 'University', 'Higher education colleges': 'Higher education college' }
 const PLACE_GROUPS = ['History & culture', 'Parks & nature', 'City life']
 
 export function UniversitiesPage() {
