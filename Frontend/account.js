@@ -4,8 +4,8 @@ import { idToken } from './firebase'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
 
-async function call(method, path, body) {
-  const token = await idToken()
+async function call(method, path, body, freshToken = false) {
+  const token = await idToken(freshToken)
   if (!token) return null // nobody logged in: nothing to save or load
   const response = await fetch(`${API_URL}/account${path}`, {
     method,
@@ -35,3 +35,7 @@ export const openChat = (id) => call('GET', `/chats/${id}`)
 export const createChat = (messages) => call('POST', '/chats', { messages })
 export const updateChat = (id, messages) => call('PUT', `/chats/${id}`, { messages })
 export const deleteChat = (id) => call('DELETE', `/chats/${id}`)
+
+// Deletes the student's name, email, searches and chats from the database. Call it straight after
+// confirmPassword (firebase.js): the backend only accepts a login from the last few minutes.
+export const deleteMyAccount = () => call('DELETE', '', undefined, true)
