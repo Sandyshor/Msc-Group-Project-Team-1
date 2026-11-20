@@ -1,7 +1,9 @@
 // The journey planner's side panel (public/journey-planner/route.html), shown in the profile's Journey tab.
 // The route itself is drawn on the main map by JourneyBaseMap.
+import { useState } from 'react';
 import { MODE_STYLE, TRAVEL_MODES, dublinNowInputValue, formatDistance, formatMinutes, formatTime, legColor, lineLabel } from './journey';
 import PlaceSearch from './PlaceSearch';
+import { universities as campusList } from './cityPlaces';
 import './JourneyPlanner.css';
 import './JourneyBaseMap.css';
 
@@ -36,20 +38,41 @@ function stepDetail(leg, trip) {
   return `Board at ${placeName(leg.from, trip)} at ${formatTime(leg.departure)}${towards} · ${formatDistance(leg.distance_km)}`;
 }
 
+// Shortcuts for the destination: the main campuses
+const POPULAR = ['tcd', 'ucd', 'dcu', 'tu-grangegorman', 'maynooth', 'griffith', 'nci', 'rcsi']
+  .map((id) => campusList.find((c) => c.id === id)).filter(Boolean)
+  .map((c) => [c.name.replace('Technological University Dublin — ', 'TU Dublin ').replace('University College Dublin — Belfield', 'UCD')
+    .replace('Dublin City University — Glasnevin Campus', 'DCU').replace('Trinity College Dublin', 'Trinity').replace(' Campus', '')
+    .replace('Royal College of Surgeons in Ireland', 'RCSI').replace('National College of Ireland — IFSC', 'NCI').replace('Griffith College Dublin', 'Griffith'),
+  { lat: c.coordinates[0], lng: c.coordinates[1], label: c.name }]);
+
 const pointLabel = (p) => p?.label || (p ? `${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}` : '');
 
 export default function JourneyPlannerPanel({ trip, setTrip, onReset, quickStarts = [] }) {
   const itinerary = trip.itineraries[trip.selected];
   const set = (patch) => setTrip((t) => ({ ...t, ...patch }));
+  const [locating, setLocating] = useState(false);
+  const [locError, setLocError] = useState('');
+  // The browser's location as the start (asked for only when the button is pressed)
+  const useMyLocation = () => {
+    setLocError('');
+    if (!navigator.geolocation) { setLocError('Your browser cannot share your location. Type your start instead.'); return; }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setLocating(false);
+      const { latitude: lat, longitude: lng } = pos.coords;
+      if (lat < 53.1 || lat > 53.65 || lng < -6.65 || lng > -5.95) { setLocError('You seem to be outside Dublin. Type your start instead.'); return; }
+      set({ from: { lat, lng, label: 'Your location' } });
+    }, () => { setLocating(false); setLocError('Location is blocked or unavailable. Allow it for this site, or type your start.'); }, { enableHighAccuracy: true, timeout: 10000 });
+  };
 
   return (
     <div className="jp-scope jp-panel">
-      {/* Evaluation feedback: people looked for a search bar and didn't know the pins can be dragged */}
-      <div className="jp-howto" aria-label="How to plan a journey">
-        <b>How to plan a journey</b>
+      <div className="jp-howto" aria-label="How to get directions">
+        <b>How to get directions</b>
         <ol>
-          <li><span className="jp-howto-pin is-a">A</span><span className="jp-howto-pin is-b">B</span>Click the map to drop your start (A) and destination (B), or type a place in the boxes below.</li>
-          <li><span className="jp-howto-drag" aria-hidden="true">✥</span><span><strong>Drag the A or B pin on the map</strong> to move it. The route and times update straight away.</span></li>
+          <li><span className="jp-howto-pin is-a">A</span><span className="jp-howto-pin is-b">B</span>Type your start and destination, or press <strong>Use my location</strong>.</li>
+          <li><span className="jp-howto-drag" aria-hidden="true">👆</span><span>Or click any place on the map and press <strong>Directions</strong> or <strong>Start here</strong>.</span></li>
         </ol>
       </div>
       <div className="jp-route-controls">
@@ -73,13 +96,13 @@ export default function JourneyPlannerPanel({ trip, setTrip, onReset, quickStart
           )}
           <button type="button" className="jp-reset-button jp-route-reset" title="Clear start and end points" onClick={onReset}>↻ <span>Reset</span></button>
         </div>
-        {/* A and B: type a place, street or university, or click the map */}
+        {/* A and B: type a place, street or university (or use a place panel's Directions / Start here) */}
         <div className="jp-ends" role="group" aria-label="Your journey">
           <PlaceSearch
             className="is-a"
             badge="A"
             label="Start point"
-            placeholder="From: type a place, or click the map"
+            placeholder="From: type a place or street"
             value={trip.from ? pointLabel(trip.from) : ''}
             onPick={(p) => set({ from: { lat: p.lat, lng: p.lng, label: p.label } })}
             onClear={() => set({ from: null, status: 'idle', itineraries: [] })}
@@ -88,7 +111,7 @@ export default function JourneyPlannerPanel({ trip, setTrip, onReset, quickStart
             className="is-b"
             badge="B"
             label="Destination"
-            placeholder="To: type a place, or click the map"
+            placeholder="To: type a place or street"
             value={trip.to ? pointLabel(trip.to) : ''}
             onPick={(p) => set({ to: { lat: p.lat, lng: p.lng, label: p.label } })}
             onClear={() => set({ to: null, status: 'idle', itineraries: [] })}
@@ -96,6 +119,20 @@ export default function JourneyPlannerPanel({ trip, setTrip, onReset, quickStart
           <button type="button" className="jp-swap" title="Swap start and destination" aria-label="Swap start and destination"
             disabled={!trip.from && !trip.to} onClick={() => set({ from: trip.to, to: trip.from })}>⇅</button>
         </div>
+        {!trip.from && (
+          <div className="jp-pick-row" role="group" aria-label="Quick start points">
+            <span>Start from</span>
+            <button type="button" className="is-loc" onClick={useMyLocation} disabled={locating}>{locating ? 'Finding you…' : '◎ Use my location'}</button>
+            {quickStarts.map(([label, point]) => <button type="button" key={label} onClick={() => set({ from: point })}>{label.replace(/^Start from /, '')}</button>)}
+          </div>
+        )}
+        {locError && <p className="jp-loc-error" role="alert">{locError}</p>}
+        {!trip.to && (
+          <div className="jp-pick-row" role="group" aria-label="Popular destinations">
+            <span>Popular destinations</span>
+            {POPULAR.map(([label, point]) => <button type="button" key={label} onClick={() => set({ to: point })}>🎓 {label}</button>)}
+          </div>
+        )}
       </div>
 
       {trip.status === 'loading' && (
@@ -151,12 +188,7 @@ export default function JourneyPlannerPanel({ trip, setTrip, onReset, quickStart
             <g className="jp-empty-pin jp-empty-pin-b" transform="translate(210 30)"><path d="M0 0 C -9 -12 -11 -16 -11 -21 a11 11 0 0 1 22 0 c0 5 -2 9 -11 21z" /><text y="-17">B</text></g>
           </svg>
           <strong>Where are you going?</strong>
-          <p>Type a university, place or street in the A and B boxes, or click the map. Drag either pin to adjust the route.</p>
-          {quickStarts.length > 0 && (
-            <div className="jp-quick">
-              {quickStarts.map(([label, point]) => <button type="button" key={label} onClick={() => set({ from: point })}>{label}</button>)}
-            </div>
-          )}
+          <p>Type a start and destination above, or click any place on the map and press Directions. You get the time, distance and every step by bus, Luas, train, walking or bike.</p>
         </div>
       )}
     </div>

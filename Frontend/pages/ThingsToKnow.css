@@ -31,7 +31,7 @@
 .ttk-phase-head { position: relative; display: flex; align-items: center; gap: 16px; margin: 0 0 18px -64px; }
 .ttk-num { display: grid; flex: none; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: #173f32; color: #dff27f; font-family: 'Fraunces', Georgia, serif; font-size: 21px; font-weight: 700; box-shadow: 0 8px 18px rgba(23, 63, 50, 0.22); }
 .ttk-phase-head h2 { margin: 0; color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: clamp(26px, 2.4vw, 34px); font-weight: 700; font-variation-settings: 'opsz' 48, 'WONK' 0; }
-.ttk-phase-head p { margin: 2px 0 0; color: #66736b; font-size: 15px; }
+.ttk-phase-head p { margin: 2px 0 0; color: #626f67; font-size: 15px; }
 
 .ttk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
 .ttk-card {
@@ -83,7 +83,7 @@
 .ttk-cta p { margin: 6px 0 0; color: rgba(255, 255, 255, 0.82); font-size: 15.5px; }
 .ttk-cta-btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 24px; border-radius: 999px; background: linear-gradient(180deg, #f1fbb8, #dff27f 55%, #c7ec5c); color: #0d3b26; font-size: 16px; font-weight: 800; text-decoration: none; box-shadow: 0 10px 26px rgba(199, 236, 92, 0.3); transition: transform .2s ease; }
 .ttk-cta-btn:hover { transform: translateY(-2px); }
-.ttk-disclaimer { max-width: 1500px; margin: 0 auto; color: #7a857c; font-size: 13px; text-align: center; }
+.ttk-disclaimer { max-width: 1500px; margin: 0 auto; color: #666f68; font-size: 13px; text-align: center; }
 
 @media (max-width: 700px) {
   .ttk-progress { grid-template-columns: 1fr; top: 6px; padding: 14px; }
@@ -110,4 +110,4 @@
 .ttk-option-price b { color: #173f32; font-family: 'Fraunces', Georgia, serif; font-size: 18px; }
 .ttk-option-price em { color: #8a5a17; font-style: normal; font-size: 11.5px; font-weight: 700; }
 .ttk-option-detail { color: #66736b; font-size: 12.5px; line-height: 1.4; }
-.ttk-options-note { margin: 2px 0 0; color: #7a857c; font-size: 11.5px; line-height: 1.45; }
+.ttk-options-note { margin: 2px 0 0; color: #6c766e; font-size: 11.5px; line-height: 1.45; }

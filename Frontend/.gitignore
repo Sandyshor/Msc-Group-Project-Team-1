@@ -3,3 +3,8 @@ dist/
 .env
 .env.*
 !.env.example
+
+# test reports (re-created by every run)
+playwright-report/
+test-results/
+lighthouse-report/

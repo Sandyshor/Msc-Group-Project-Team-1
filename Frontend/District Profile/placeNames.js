@@ -32,7 +32,8 @@ export function nominatimTurn() {
   return turn;
 }
 
-export async function streetName(lat, lng) {
+// The raw reverse-geocoder answer for a point (cached, one request a second)
+async function lookup(lat, lng) {
   const key = `${lat.toFixed(4)},${lng.toFixed(4)}`; // ~10 m
   if (cache.has(key)) return cache.get(key);
   await nominatimTurn();
@@ -40,10 +41,22 @@ export async function streetName(lat, lng) {
     const params = new URLSearchParams({ format: 'jsonv2', lat: lat.toFixed(6), lon: lng.toFixed(6), zoom: '18', addressdetails: '1', 'accept-language': 'en' });
     const response = await fetch(`${ENDPOINT}?${params}`, { headers: { Accept: 'application/json' } });
     if (!response.ok) return null;
-    const label = format(await response.json());
-    if (label) cache.set(key, label);
-    return label;
+    const result = await response.json();
+    cache.set(key, result);
+    return result;
   } catch {
     return null;
   }
+}
+
+export async function streetName(lat, lng) {
+  return format(await lookup(lat, lng));
+}
+
+// Street address only (house number, street, area, Dublin district), without the name of a shop or building there:
+// for the address line of a place that already has its own name
+export async function streetAddress(lat, lng) {
+  const result = await lookup(lat, lng);
+  if (!result) return null;
+  return format({ ...result, name: '' });
 }

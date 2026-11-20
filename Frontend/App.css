@@ -1745,7 +1745,7 @@ h1 em { color: #8a9d79; font-weight: 500; }
 }
 
 .login-note {
-  color: #8a9488;
+  color: #6e766c;
   font-size: 11px;
   margin-bottom: 9px;
 }
@@ -1797,7 +1797,7 @@ h1 em { color: #8a9d79; font-weight: 500; }
   align-items: center;
   gap: 14px;
   margin: 29px 0 22px;
-  color: #9a9f91;
+  color: #71756b;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 1.5px;
@@ -1855,7 +1855,7 @@ h1 em { color: #8a9d79; font-weight: 500; }
 
 .signup-hint {
   margin: 7px 0 0;
-  color: #718075;
+  color: #69776c;
   font-size: 11px;
 }
 

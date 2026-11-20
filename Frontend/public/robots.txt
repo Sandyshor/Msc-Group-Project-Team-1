@@ -1,0 +1,3 @@
+# Find My Dublin: every page may be crawled
+User-agent: *
+Allow: /

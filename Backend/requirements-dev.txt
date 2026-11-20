@@ -1,2 +1,10 @@
 -r ../requirements.txt
 pytest==9.1.1
+# FastAPI's TestClient
+httpx==0.28.1
+# safety pipeline and map tests
+geopandas==1.2.0
+shapely==2.2.0
+pyproj==3.8.0
+# login tests sign their own test tokens
+rsa==4.9.1

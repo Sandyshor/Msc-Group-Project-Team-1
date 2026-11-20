@@ -1,0 +1,130 @@
+# Automated tests on every push and pull request (see Frontend/e2e/README.md):
+#   1. backend tests (pytest), including the log in / saved chats tests against a real PostgreSQL database
+#   2. end-to-end tests (Playwright): real browsers clicking through the website, desktop and phone sizes
+#   3. Google Lighthouse scores for every page
+# Each job keeps its report as a downloadable artifact on the run's page (Actions tab).
+name: Tests
+
+on:
+  push:
+    branches: [main, website-redesign]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend tests (pytest)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: findmydublin_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/findmydublin_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            Backend/requirements-dev.txt
+      - run: pip install -r Backend/requirements-dev.txt
+      - name: Run the tests
+        working-directory: Backend
+        run: python -m pytest -q --junitxml=pytest-report.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-report
+          path: Backend/pytest-report.xml
+
+  e2e:
+    name: End-to-end tests (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [desktop-chrome, desktop-firefox, desktop-safari, mobile-chrome, mobile-safari]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -r requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+      - name: Install the website and the test browser
+        working-directory: Frontend
+        run: |
+          npm ci
+          case "${{ matrix.project }}" in
+            *firefox*) npx playwright install --with-deps firefox ;;
+            *safari*)  npx playwright install --with-deps webkit ;;
+            *)         npx playwright install --with-deps chromium ;;
+          esac
+      - name: Run the tests
+        working-directory: Frontend
+        env:
+          E2E_PYTHON: python
+        run: npx playwright test --project=${{ matrix.project }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: Frontend/playwright-report
+          retention-days: 14
+
+  lighthouse:
+    name: Lighthouse scores
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -r requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+      - name: Start the backend and the website
+        run: |
+          (cd Backend && python -m uvicorn app:app --host 127.0.0.1 --port 8000 &)
+          cd Frontend
+          npm ci
+          VITE_API_URL=http://127.0.0.1:8000 npm run build
+          (npx vite preview --port 4173 --strictPort &)
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:8000/health >/dev/null && curl -sf http://localhost:4173 >/dev/null && break; sleep 2; done
+      - name: Score every page
+        working-directory: Frontend
+        run: npm run test:lighthouse
+      - name: Show the scores on the run's summary page
+        if: always()
+        run: cat Frontend/lighthouse-report/summary.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: Frontend/lighthouse-report
+          retention-days: 14

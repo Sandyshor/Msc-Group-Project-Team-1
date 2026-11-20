@@ -698,3 +698,6 @@ export function AttractionsPage() {
     />
   )
 }
+
+// The campus and attraction lists, for the district map's place panel (photos, addresses, descriptions)
+export { universities as campusGuide, attractions as attractionGuide }
