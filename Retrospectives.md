@@ -349,4 +349,16 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Santhosh fixed the recommendation engine
 - Sowmiya is working on the recommendation page frontend.
 - Catherine is working on the Explore Dublin frontend.
-- Viknesh fine-tuned the chatbot. 
+- Viknesh fine-tuned the chatbot.
+
+
+**Week 7 Lead: Vikneshwaran**
+**Meeting 1 Friday (1 - 2 pm)**
+- attendees: Sowmiya, Catherine, Shreyas, Santhosh, Vignesh
+- discussed on the feedback we received
+- Viknesh assigned tasks for everyone
+- shreyas agreed to work on the color theme of the whole website and do language testing
+- viknesh agreed to work on map correction, university column change, AI assistant name change.
+- catherine agreed to work on manual and automated testing
+- sowmiya agreed to work on video gen and how it works tab
+- santhosh agreed to work on properties integration.
