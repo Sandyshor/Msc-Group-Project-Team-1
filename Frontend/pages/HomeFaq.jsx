@@ -41,7 +41,7 @@ export default function HomeFaq() {
           <p className="faq-lead">Quick answers to help you plan your move to Dublin.</p>
           <div className="faq-actions">
             <button type="button" className="faq-btn faq-btn-solid" onClick={() => window.dispatchEvent(new Event('chatw-open'))}>
-              <span aria-hidden="true">💬</span> Ask the Crib Crew Assistant
+              <span aria-hidden="true">💬</span> Ask Dublin Buddy
             </button>
             <Link className="faq-btn" to="/things-to-know">Things to know <span aria-hidden="true">→</span></Link>
           </div>
