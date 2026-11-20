@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './HomeFilm.css'
 
-const FILM = '/videos/dublin-intro.mp4'
+const FILM = '/video/dublin-intro.mp4'
 const POSTER = '/images/film/poster-liffey.jpg'
 
 const HIGHLIGHTS = [
@@ -68,7 +68,7 @@ export default function HomeFilm() {
               <path d="M4 17C80 6 190 4 296 10" />
             </svg>
           </h2>
-          <p className="hf-lead">A one-minute film about the streets, the river and the everyday energy of the city you&rsquo;re moving to.</p>
+          <p className="hf-lead">A short film about the streets, the river and the everyday energy of the city you&rsquo;re moving to.</p>
 
           <ul className="hf-points">
             {HIGHLIGHTS.map((h) => (
@@ -83,7 +83,7 @@ export default function HomeFilm() {
             <button type="button" className="hf-btn hf-btn-primary" aria-pressed={playing}
               onClick={() => (playing ? video.current?.pause() : play(started && !ended ? undefined : 0))}>
               <Icon name={playing ? 'pause' : 'play'} filled />
-              {playing ? 'Pause' : ended ? 'Play again' : started ? 'Resume' : 'Play the film'} <small>1:16</small>
+              {playing ? 'Pause' : ended ? 'Play again' : started ? 'Resume' : 'Play the film'} <small>1:28</small>
             </button>
             <Link className="hf-btn hf-btn-ghost" to="/questionnaire">Find my match <Icon name="arrow" /></Link>
           </div>
@@ -112,7 +112,7 @@ export default function HomeFilm() {
                   <strong>Watch the intro</strong>
                   <span>A short film about your new city</span>
                 </span>
-                <span className="hf-duration">1:16</span>
+                <span className="hf-duration">1:28</span>
               </button>
             )}
           </div>
