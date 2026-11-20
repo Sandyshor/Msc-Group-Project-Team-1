@@ -129,9 +129,23 @@ def same_name(a, b):
     return a == b or (len(b) > 3 and a.startswith(b)) or (len(a) > 3 and b.startswith(a)) or (len(a) > 6 and a in b) or (len(b) > 6 and b in a)
 
 
+# Words in a name that say what a place is, used when OpenStreetMap's shop type contradicts the name
+NAME_TYPES = [
+    (r"pizz", "restaurant", "Pizza takeaway"), (r"kebab|chipper|\bchips?\b|burger|chicken|takeaway|take away", "fast_food", "Fast food"),
+    (r"\bcaf[eé]\b|coffee|espresso", "cafe", "Café"), (r"pharmacy|chemist", "pharmacy", "Pharmacy"), (r"barber", "barber", "Barber"),
+    (r"\bsalon\b|hair|beauty|nails?\b", "hairdresser", "Hair salon"), (r"\bgym\b|fitness|crossfit|pilates|yoga", "fitness_centre", "Gym"),
+    (r"restaurant|bistro|kitchen|grill|sushi|thai|indian|noodle|ramen", "restaurant", "Restaurant"),
+]
+
+
 def describe(element, lat, lng):
     tags = element.get("tags", {})
     key, value, label = kind_of(tags)
+    if value in ("supermarket", "convenience", "yes", "general") and not chain_logo(tags.get("name", ""), tags.get("brand", "")):
+        for pattern, v, l in NAME_TYPES:
+            if re.search(pattern, (tags.get("name") or "").lower()):
+                value, label = v, l
+                break
     at = element.get("center") or {"lat": element.get("lat"), "lon": element.get("lon")}
     out = {
         "name": tags.get("name:en") or tags.get("name"),
@@ -333,7 +347,7 @@ def _mly_points(z, x, y):
                 n_tiles = 2 ** z
                 lng_p = (x + px) / n_tiles * 360 - 180
                 lat_p = math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * (y + py) / n_tiles))))
-                points.append((lat_p, lng_p, props["id"], bool(props.get("is_pano"))))
+                points.append((lat_p, lng_p, props["id"], bool(props.get("is_pano")), props.get("compass_angle")))
     _mly_tiles[key] = points
     while len(_mly_tiles) > 40:
         _mly_tiles.popitem(last=False)
@@ -343,8 +357,16 @@ def _mly_points(z, x, y):
 _mly_refused_until = [0.0]
 
 
+def _bearing(lat1, lng1, lat2, lng2):
+    """Compass direction (degrees) from point 1 to point 2."""
+    y = math.sin(math.radians(lng2 - lng1)) * math.cos(math.radians(lat2))
+    x = math.cos(math.radians(lat1)) * math.sin(math.radians(lat2)) - math.sin(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.cos(math.radians(lng2 - lng1))
+    return (math.degrees(math.atan2(y, x)) + 360) % 360
+
+
 def _mapillary_photo(lat, lng):
-    """The nearest flat street-level photo from Mapillary (free, needs MAPILLARY_TOKEN), within about 40 m."""
+    """A street-level photo from Mapillary (free, needs MAPILLARY_TOKEN) taken within 30 m of the place by a camera
+    pointing at it (like Street View), so it shows the place and not just the street."""
     if not MAPILLARY_TOKEN or time.time() < _mly_refused_until[0]:
         return None
     try:
@@ -352,10 +374,15 @@ def _mapillary_photo(lat, lng):
         n = 2 ** z
         x = int((lng + 180) / 360 * n)
         y = int((1 - math.log(math.tan(math.radians(lat)) + 1 / math.cos(math.radians(lat))) / math.pi) / 2 * n)
-        near = sorted((metres(lat, lng, p[0], p[1]), p) for p in _mly_points(z, x, y) if not p[3])
-        for dist, (_, _, image_id, _) in near[:3]:
-            if dist > 40:
-                break
+        facing = []
+        for p in _mly_points(z, x, y):
+            dist = metres(lat, lng, p[0], p[1])
+            if p[3] or p[4] is None or not 4 <= dist <= 30:
+                continue
+            off = abs((_bearing(p[0], p[1], lat, lng) - float(p[4]) + 180) % 360 - 180)
+            if off <= 30:
+                facing.append((dist + off, p))
+        for _, (_, _, image_id, _, _) in sorted(facing)[:3]:
             r = requests.get(f"https://graph.mapillary.com/{image_id}", params={"access_token": MAPILLARY_TOKEN, "fields": "thumb_1024_url"}, timeout=6)
             if r.status_code in (400, 401, 403) and "permission" in r.text:
                 # the key can't read photos (its app needs the Read permission): stop asking for a while
@@ -381,8 +408,17 @@ PLACE_WORD = re.compile(r"street|road|avenue|lane|square|quay|place|terrace|row|
                         r"pharmacy|salon|bakery|corner|junction|village|parade|mall|gallery|museum|garden|canal|harbour", re.I)
 
 
-def _commons_nearby(lat, lng, radius=60):
-    """A photo taken at this spot, from Wikimedia Commons (the building or street), nearest first."""
+def _names_place(title, name):
+    """True if a photo's title names the place (all of the name's main words appear in it)."""
+    words = [w for w in norm(re.sub(r"\b(the|of|and|ltd|limited|dublin|shop|store)\b", " ", (name or "").lower())).split() if len(w) > 2]
+    t = norm(title)
+    return bool(words) and all(re.search(rf"\b{re.escape(w)}", t) for w in words)
+
+
+def _commons_nearby(lat, lng, radius=60, name=""):
+    """A photo of the place from Wikimedia Commons: taken within the radius and with the place's name in its title."""
+    if not name:
+        return None
     try:
         r = requests.get("https://commons.wikimedia.org/w/api.php", params={
             "action": "query", "format": "json", "generator": "geosearch", "ggscoord": f"{lat}|{lng}", "ggsradius": radius,
@@ -397,14 +433,14 @@ def _commons_nearby(lat, lng, radius=60):
             # only photos of buildings and streets: Geograph's collection, or a title naming a street or building (people
             # also upload geotagged photos of their cars and events, which say nothing about the place)
             title = pg.get("title", "")
-            if VEHICLE.search(title) or not ("geograph" in title.lower() or PLACE_WORD.search(title)):
+            if VEHICLE.search(title) or not _names_place(title, name):
                 continue
             score = metres(lat, lng, co["lat"], co["lon"]) + (0 if "geograph" in title.lower() else 35)
             photos.append((score, info.get("thumburl") or info.get("url"), info.get("descriptionurl")))
         if not photos:
             return None
         _, url, page = min(photos)
-        return {"url": url, "source": "Wikimedia Commons", "page": page, "nearby": True}
+        return {"url": url, "source": "Wikimedia Commons", "page": page}
     except (requests.RequestException, ValueError, KeyError):
         return None
 
@@ -440,10 +476,49 @@ def _website_photo(url):
         for src in re.findall(r'<img[^>]+src=["\']([^"\']+\.(?:jpe?g|webp)(?:\?[^"\']*)?)["\']', page, re.I):
             if not re.search(r"icon|logo|sprite|pixel|avatar|badge|flag|payment|placeholder", src, re.I):
                 return urljoin(url, html.unescape(src)), False
-        icons = re.findall(r'<link[^>]+rel=["\']apple-touch-icon[^"\']*["\'][^>]*href=["\']([^"\']+)["\']', page, re.I)
-        if icons:
-            return urljoin(url, html.unescape(icons[-1])), True
+        # the site's logo image (alt, class or file name says "logo"), its sharpest version from srcset. Small app
+        # icons (apple-touch-icon) aren't used: blown up to fill the panel they're blurry and hard to read.
+        for tag in re.findall(r"<img\b[^>]*>", page, re.I):
+            if not re.search(r"logo", tag, re.I) or re.search(r"google.?play|app.?store|payment|visa|mastercard|facebook|instagram|twitter|tripadvisor", tag, re.I):
+                continue
+            srcset = re.search(r'srcset=["\']([^"\']+)["\']', tag, re.I)
+            src = srcset.group(1).split(",")[-1].strip().split(" ")[0] if srcset else (re.search(r'\ssrc=["\']([^"\']+)["\']', tag, re.I) or [None, None])[1]
+            if src and not src.startswith("data:"):
+                return urljoin(url, html.unescape(src)), True
         return None
+    return None
+
+
+# Logos of the main chains in Dublin, each checked by eye on Wikimedia Commons (the file shows the brand's current
+# logo as used in Ireland). Matched on the start of the place's name, or its OpenStreetMap brand.
+CHAIN_LOGOS = [
+    (r"tesco", "Tesco logo.png", "Tesco"), (r"lidl", "Lidl-Logo.svg", "Lidl"), (r"aldi", "Aldi Süd 2017 logo.svg", "Aldi"),
+    (r"dunnes", "Logo of Dunnes Stores.svg", "Dunnes Stores"), (r"super ?valu", "SuperValuLogo.svg", "SuperValu"),
+    (r"m s\b|marks (and )?spencer", "M&S logo.svg", "M&S"), (r"eurospar", "Eurospar-logo.svg", "Eurospar"), (r"spar\b", "Spar-logo.svg", "Spar"),
+    (r"centra", "Centra logo.svg", "Centra"), (r"mace\b", "MACENIlogo.JPG", "Mace"), (r"londis", "Londis logo.svg", "Londis"),
+    (r"costcutter", "Costcutter.png", "Costcutter"), (r"circle ?k\b", "Circle K logo 2015.svg", "Circle K"), (r"applegreen", "Applegreen Logo.png", "Applegreen"),
+    (r"iceland\b", "Iceland (supermarket) logo.svg", "Iceland"), (r"mc ?donald", "McDonald's with slogan 2020.svg", "McDonald's"),
+    (r"burger king", "Burger King 2020.svg", "Burger King"), (r"subway\b", "Subway 2016 logo.svg", "Subway"), (r"kfc\b|kentucky fried", "Kfc textlogo.svg", "KFC"),
+    (r"supermac", "Supermac's.PNG", "Supermac's"), (r"starbucks", "Starbucks coffee wordmark.png", "Starbucks"), (r"costa( coffee)?$|costa coffee", "Costa Coffee Logo white on red.png", "Costa Coffee"),
+    (r"insomnia", "New-logo Insomnia coffee.svg", "Insomnia"), (r"domino", "Domino's 2025.svg", "Domino's"), (r"four star pizza|4 star pizza", "4starlogo.png", "Four Star Pizza"),
+    (r"papa john", "Papa John's Logo 2019.svg", "Papa John's"), (r"pizza hut", "Pizza Hut classic logo.svg", "Pizza Hut"), (r"penneys|primark", "Primark Stores Logo.svg", "Penneys"),
+    (r"bank of ireland", "Bank of Ireland Logo 2020.svg", "Bank of Ireland"), (r"aib\b|allied irish", "AIB BANK Logo.svg", "AIB"),
+    (r"permanent ?tsb|ptsb", "Permanent tsb.png", "PTSB"), (r"an post\b", "An Post logo.svg", "An Post"), (r"nando", "Nando's wordmark.svg", "Nando's"),
+    (r"five guys", "Five Guys logo.svg", "Five Guys"), (r"pret\b|pret a manger", "PretAManger logo.svg", "Pret"), (r"specsavers", "Specsavers logo.svg", "Specsavers"),
+    (r"vodafone", "Vodafone logo 2017.svg", "Vodafone"), (r"smyths", "Smyths Logo.svg", "Smyths"), (r"dealz", "Dealz Logo 2023.png", "Dealz"),
+    (r"tk ?maxx", "TK Maxx Logo.svg", "TK Maxx"), (r"h m$|h m (store|clothing|fashion)", "H&M-Logo.svg", "H&M"), (r"tim hortons", "Tim Hortons Logo.svg", "Tim Hortons"),
+    (r"wagamama", "Wagamama-Logo.svg", "Wagamama"), (r"maxol", "Maxol Logo.jpg", "Maxol"), (r"texaco", "Texaco logo.svg", "Texaco"),
+    (r"decathlon", "Decathlon - logo (France, 2024).svg", "Decathlon"), (r"eason", "Eason.png", "Eason"), (r"freshii", "Freshii logo.svg", "Freshii"),
+]
+
+
+def chain_logo(name, brand=""):
+    for text in (brand, name):
+        t = norm(text)  # "M&S Food" -> "m s food", "McDonald's" -> "mcdonald s"
+        for pattern, file, label in CHAIN_LOGOS:
+            if t and re.match(pattern, t, re.I):
+                return {"url": _commons_file(file).replace("width=640", "width=480"), "logo": True, "source": label,
+                        "page": f"https://commons.wikimedia.org/wiki/File:{quote(file.replace(' ', '_'))}", "chain": True}
     return None
 
 
@@ -454,6 +529,9 @@ def photo_for(place, lat=None, lng=None):
     tags = (place or {}).get("tags", {})
     if place and place.get("lat") is not None:
         lat, lng = place["lat"], place["lng"]
+    chain = chain_logo((place or {}).get("name") or "", tags.get("brand", ""))
+    if chain:
+        return chain  # a chain's own logo beats its website's promotional banner
     image = tags.get("image", "")
     if image.startswith("File:") or "commons.wikimedia.org" in image:
         return {"url": _commons_file(image.split("/wiki/")[-1]), "source": "Wikimedia Commons", "page": image if image.startswith("http") else None}
@@ -484,7 +562,10 @@ def photo_for(place, lat=None, lng=None):
         return site_logo
     if lat is None:
         return None
-    return _mapillary_photo(lat, lng) or _commons_nearby(lat, lng) or _commons_nearby(lat, lng, 150)
+    name = (place or {}).get("name") or ""
+    if not name:
+        return None  # a spot with no named place: a nearby photo would be of something else
+    return _commons_nearby(lat, lng, 120, name) or _mapillary_photo(lat, lng)
 
 
 class Busy(Exception):
@@ -618,8 +699,9 @@ def place_info(
     result = lookup(lat, lng, clean, 120 if clean else 60)
     if result.get("place"):
         result["place"]["photo"] = photo_for(result["place"], lat, lng)
-    else:
-        result["photo"] = photo_for(None, lat, lng)  # no named place here: a photo of the spot
+    elif clean:
+        result["photo"] = photo_for({"name": clean, "tags": {}}, lat, lng)
+
     _cache[key] = (time.time(), result)
     _cache.move_to_end(key)
     while len(_cache) > CACHE_SIZE:

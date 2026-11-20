@@ -40,6 +40,9 @@ const TYPE_TINT = {
   Hospital: '#f3d9d7', bus: '#fbefc4', luas: '#f3d9d7', rail: '#dcefd0', bike: '#d6e6f5', residence: '#e7dcf0', campus: '#dbe8e2',
 };
 
+// Irish chains with no logo file on Wikimedia Commons: drawn with the map's brand word logo instead
+const BRAND_BADGES = [[/^daybreak\b/i, 'daybreak', 'DAYBREAK'], [/^gala\b/i, 'gala', 'GALA'], [/^polonez\b/i, 'polonez', 'POLONEZ'], [/^day[- ]?today\b/i, 'daytoday', 'DAY-TODAY'], [/^boots\b/i, 'boots', 'Boots']];
+
 const norm = (v) => String(v || '').toLowerCase().replace(/[’']/g, '').replace(/\s+/g, ' ').trim();
 const euro = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
 function metres(a, b) {
@@ -257,12 +260,15 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
         <button type="button" className="pp-close" aria-label="Close details" onClick={onClose}>×</button>
       </div>
 
-      {image ? (
+      {BRAND_BADGES.find(([re]) => re.test(title)) && !info.image ? (() => {
+        const [, key, text] = BRAND_BADGES.find(([re]) => re.test(title));
+        return <div className="pp-brand-badge" role="img" aria-label={`${title} logo`}><span className={`jp-brand-logo jp-brand-logo-${key}`}>{text}</span></div>;
+      })() : image ? (
         <div className={`pp-photo${osmPhoto?.logo ? ' is-logo' : ''}`}>
           <img src={image} alt={osmPhoto?.logo ? `${title} logo` : title} referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.parentElement.hidden = true; }} />
           {osmPhoto && (osmPhoto.page
-            ? <a className="pp-photo-credit" href={osmPhoto.page} target="_blank" rel="noopener noreferrer">{osmPhoto.logo ? 'Logo' : osmPhoto.nearby ? 'Photo near here' : 'Photo'} · {osmPhoto.source}</a>
-            : <span className="pp-photo-credit">{osmPhoto.nearby ? 'Photo near here' : 'Photo'} · {osmPhoto.source}</span>)}
+            ? <a className="pp-photo-credit" href={osmPhoto.page} target="_blank" rel="noopener noreferrer">{osmPhoto.logo ? 'Logo' : osmPhoto.street ? 'Street view' : 'Photo'} · {osmPhoto.source}</a>
+            : <span className="pp-photo-credit">{osmPhoto.street ? 'Street view' : 'Photo'} · {osmPhoto.source}</span>)}
         </div>
       ) : (
         <div className={`pp-photo pp-photo-icon${osm?.loading && !wiki ? ' is-loading' : ''}`} aria-hidden="true" style={{ '--tint': TYPE_TINT[o?.type || place.category] || TYPE_TINT[place.kind] || '#dfe9dc' }}>

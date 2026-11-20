@@ -36,15 +36,36 @@ def test_place_info_rejects_points_outside_dublin():
     assert r.status_code == 422
 
 
-def test_nearby_photos_must_show_a_building_or_street():
-    keep = ["Central_Bar,_Aungier_Street_-_geograph.org.uk_-_683751.jpg", "File:Father_Browns_at_the_Village,_Rathmines.jpg"]
-    drop = ["File:2004 Ford Mondeo - Dublin.jpg", "File:Bentley Continental GT.jpg", "File:Basic Income Ireland protest.jpg"]
-    ok = lambda t: not placeinfo.VEHICLE.search(t) and not placeinfo.SKIP_FILE.search(t) and ("geograph" in t.lower() or bool(placeinfo.PLACE_WORD.search(t)))
-    assert all(ok(t) for t in keep)
-    assert not any(ok(t) for t in drop)
+def test_nearby_photos_must_name_the_place():
+    assert placeinfo._names_place("File:Bewley's Coffee House, Grafton Street - geograph.org.uk.jpg", "Bewley's")
+    assert placeinfo._names_place("File:Central Bar, Aungier Street.jpg", "The Central Bar")
+    assert not placeinfo._names_place("File:Richmond Road, Dublin - rain.jpg", "Richmond Road Express Shop")
+    assert not placeinfo._names_place("File:Basic Income Ireland.jpg", "Ali's Turkish Barber")
+    assert placeinfo._commons_nearby(53.34, -6.26, name="") is None  # no name: no nearby photo at all
+
+
+def test_camera_direction():
+    assert round(placeinfo._bearing(53.34, -6.26, 53.35, -6.26)) == 0     # north
+    assert round(placeinfo._bearing(53.34, -6.26, 53.34, -6.25)) == 90    # east
 
 
 def test_photo_lookup_never_fetches_local_addresses():
     assert not placeinfo._public_url("http://127.0.0.1:8000/")
     assert not placeinfo._public_url("http://192.168.1.1/admin")
     assert not placeinfo._public_url("file:///etc/passwd")
+
+
+def test_main_chains_get_their_logo_and_lookalikes_dont():
+    for name, brand in [("Tesco Express", "Tesco"), ("SuperValu Ranelagh", "SuperValu"), ("Super Valu", "SuperValu"), ("Spar", "Spar"),
+                        ("Eurospar", "Eurospar"), ("M&S Foodhall", "M&S"), ("Marks & Spencer", "M&S"), ("McDonald's", "McDonald's"),
+                        ("Centra", "Centra"), ("Lidl", "Lidl"), ("Aldi", "Aldi"), ("Dunnes Stores", "Dunnes Stores"), ("Costa", "Costa Coffee")]:
+        assert placeinfo.chain_logo(name)["source"] == brand, name
+    for name in ["Spartan Gym", "Costa Rica Bar", "Hm Kebab", "Maceys Cafe", "Pretty Nails", "Max Pizza"]:
+        assert placeinfo.chain_logo(name) is None, name
+
+
+def test_wrong_shop_type_is_corrected_from_the_name():
+    max_pizza = placeinfo.describe({"type": "node", "id": 1, "lat": 53.35, "lon": -6.23, "tags": {"name": "Max Pizza", "shop": "supermarket"}}, 53.35, -6.23)
+    assert max_pizza["type"] == "Pizza takeaway"
+    spar = placeinfo.describe({"type": "node", "id": 2, "lat": 53.35, "lon": -6.23, "tags": {"name": "Spar", "shop": "convenience"}}, 53.35, -6.23)
+    assert spar["type"] == "Convenience shop"
