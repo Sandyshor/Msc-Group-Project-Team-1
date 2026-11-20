@@ -23,10 +23,11 @@ SIGNER = crypt.RSASigner.from_string(_private.save_pkcs1().decode(), key_id="tes
 OTHER_SIGNER = crypt.RSASigner.from_string(rsa.newkeys(1024)[1].save_pkcs1().decode(), key_id="test-key")
 
 
-def token(uid="student-1", email="sam@example.com", name=None, signer=SIGNER, project=PROJECT, expires_in=3600):
+def token(uid="student-1", email="sam@example.com", name=None, signer=SIGNER, project=PROJECT, expires_in=3600,
+          logged_in_ago=10):
     now = int(time.time())
     claims = {"iss": f"https://securetoken.google.com/{project}", "aud": project, "sub": uid, "user_id": uid,
-              "email": email, "iat": now - 10, "exp": now + expires_in, "auth_time": now - 10}
+              "email": email, "iat": now - 10, "exp": now + expires_in, "auth_time": now - logged_in_ago}
     if name:
         claims["name"] = name
     return jwt.encode(signer, claims).decode()
@@ -183,3 +184,42 @@ class TestWithDatabase:
         assert [c["title"] for c in chats] == ["Where should I live?"]
         with engine.connect() as conn:
             assert conn.execute(text("SELECT to_regclass('chat_history')")).scalar() is None
+
+
+def test_without_the_database_an_account_cant_be_deleted(client):
+    datastore._engine = None
+    assert client.delete("/account", headers=auth()).status_code == 503
+
+
+@pytest.mark.skipif(not TEST_DB, reason="set TEST_DATABASE_URL to run against PostgreSQL")
+class TestDeletingAnAccount:
+    def _fill(self, db, **who):
+        db.post("/account/login", json={"name": "Sam"}, headers=auth(**who))
+        db.post("/account/history", json={"answers": {"university": "TU Dublin"}, "top_areas": ["D7"]}, headers=auth(**who))
+        db.post("/account/chats", json={"messages": [{"role": "user", "content": "Is D7 safe?"}]}, headers=auth(**who))
+
+    def _rows(self, uid):
+        from sqlalchemy import text
+
+        with datastore._engine.connect() as conn:
+            return {table: conn.execute(text(f"SELECT count(*) FROM {table} WHERE uid = :uid"), {"uid": uid}).scalar()
+                    for table in ("app_users", "search_history", "chat_conversations")}
+
+    def test_deleting_removes_the_student_and_everything_saved(self, db):
+        self._fill(db)
+        self._fill(db, uid="student-2", email="kim@example.com")
+        assert self._rows("student-1") == {"app_users": 1, "search_history": 1, "chat_conversations": 1}
+        assert db.delete("/account", headers=auth()).json() == {"deleted": True}
+        assert self._rows("student-1") == {"app_users": 0, "search_history": 0, "chat_conversations": 0}
+        # another student's account is untouched
+        assert self._rows("student-2") == {"app_users": 1, "search_history": 1, "chat_conversations": 1}
+        # deleting again (e.g. a retry after the login couldn't be closed) is fine
+        assert db.delete("/account", headers=auth()).status_code == 200
+
+    def test_a_login_and_a_recent_password_are_needed(self, db):
+        self._fill(db)
+        assert db.delete("/account").status_code == 401
+        assert db.delete("/account", headers=auth(signer=OTHER_SIGNER)).status_code == 401
+        old = auth(logged_in_ago=accounts.RECENT_LOGIN_SECONDS + 60)
+        assert db.delete("/account", headers=old).status_code == 401
+        assert self._rows("student-1")["app_users"] == 1

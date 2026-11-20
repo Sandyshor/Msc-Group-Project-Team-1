@@ -14,6 +14,8 @@ Tables (created here; not data files, so datastore.sync never touches them):
     chat_conversations  one row per conversation with the AI assistant: its title (the first question) and messages,
                     so a student can pick any of their recent chats up again, on any device
                     (replaces the older one-chat-per-student chat_history table, whose rows are moved over once)
+
+A student can delete their account (DELETE /account): their rows in all three tables are removed.
 """
 import json
 import os
@@ -38,6 +40,7 @@ MAX_ANSWERS_BYTES = 10_000  # a questionnaire is about 1 KB; anything far bigger
 CHAT_KEPT = 40              # messages kept per conversation (the oldest are dropped)
 CHATS_KEPT = 10             # conversations kept per student (the oldest are deleted)
 MAX_CHAT_MESSAGE = 8_000    # characters per message (the assistant's longest replies are well under this)
+RECENT_LOGIN_SECONDS = 300  # deleting an account needs a password typed in the last 5 minutes, not just any token
 
 _certs = {"keys": None, "until": 0.0}
 _certs_lock = threading.Lock()
@@ -365,3 +368,24 @@ def delete_all_chats(authorization: Optional[str] = Header(None)):
     with engine.begin() as conn:
         conn.execute(text("DELETE FROM chat_conversations WHERE uid = :uid"), {"uid": claims["sub"]})
     return {"cleared": True}
+
+
+@router.delete("")
+def delete_account(authorization: Optional[str] = Header(None)):
+    """Delete the student and everything saved for them: their name and email, searches and chats.
+
+    The website asks for the password again first, so the token must come from a login in the last
+    RECENT_LOGIN_SECONDS: a token left open on a shared computer can't delete the account. The website then
+    deletes the login itself from Firebase, which keeps the password.
+    """
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    if time.time() - float(claims.get("auth_time", 0)) > RECENT_LOGIN_SECONDS:
+        raise HTTPException(401, "Please type your password again to delete your account.")
+    with engine.begin() as conn:
+        # searches and chats would also go with the student (ON DELETE CASCADE); deleted here too to be plain
+        for table in ("search_history", "chat_conversations", "app_users"):
+            conn.execute(text(f"DELETE FROM {table} WHERE uid = :uid"), {"uid": claims["sub"]})
+    return {"deleted": True}

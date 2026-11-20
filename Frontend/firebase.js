@@ -1,6 +1,6 @@
 
 import { initializeApp } from 'firebase/app'
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth'
+import { deleteUser, EmailAuthProvider, getAuth, onAuthStateChanged, reauthenticateWithCredential, signOut } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -64,13 +64,28 @@ export function profileChanged() {
   window.dispatchEvent(new Event('fmd-profile-changed'))
 }
 
-// The logged-in student's ID token for the backend (it proves who they are), or null if nobody is logged in
-export async function idToken() {
+// The logged-in student's ID token for the backend (it proves who they are), or null if nobody is logged in.
+// fresh: get a new token rather than the saved one (after confirmPassword, so it carries the new login time)
+export async function idToken(fresh = false) {
   if (!auth) return null
   await auth.authStateReady()
-  return auth.currentUser ? auth.currentUser.getIdToken() : null
+  return auth.currentUser ? auth.currentUser.getIdToken(fresh) : null
 }
 
 export function logOut() {
   return auth ? signOut(auth) : Promise.resolve()
+}
+
+// Deleting an account: the student types their password again first. Firebase (and the backend) only let a
+// recent login delete an account, so a computer left logged in can't be used to delete someone's account.
+export async function confirmPassword(password) {
+  const user = requireAuth().currentUser
+  if (!user) throw { code: 'auth/no-current-user' }
+  await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password))
+}
+
+// Removes the login itself from Firebase (which keeps the password); the student is logged out
+export function deleteLogin() {
+  const user = auth?.currentUser
+  return user ? deleteUser(user) : Promise.resolve()
 }

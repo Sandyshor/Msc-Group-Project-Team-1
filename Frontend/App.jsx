@@ -111,7 +111,7 @@ function App() {
     const t = setTimeout(() => setWelcome(null), 7000)
     return () => clearTimeout(t)
   }, [user?.uid]) // eslint-disable-line react-hooks/exhaustive-deps
-  // "Hi, name" opens a small menu: My recent searches, Log out
+  // "Hi, name" opens a small menu: My recent searches, Delete my account, Log out
   const [accountOpen, setAccountOpen] = useState(false)
   const accountRef = useRef(null)
   useEffect(() => { setAccountOpen(false) }, [location.pathname, user])
@@ -186,6 +186,7 @@ function App() {
         <div className="account-dropdown" role="menu">
           <p className="account-who">{user.email}</p>
           <Link role="menuitem" to="/my-searches">My recent searches</Link>
+          <Link role="menuitem" to="/my-searches#delete-account">Delete my account</Link>
           <button role="menuitem" type="button" onClick={() => { setAccountOpen(false); logOut() }}>Log out</button>
         </div>
       )}

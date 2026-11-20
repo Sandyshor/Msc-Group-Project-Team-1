@@ -57,7 +57,7 @@ const PAGES = {
       },
       {
         heading: 'Deleting your data',
-        text: 'Want your account and everything in it gone? Get in touch through the Contact page and we will remove it.',
+        text: 'You can delete your account and everything in it yourself, at any time: log in, open the menu under your name and choose Delete my account. Your name, email address, saved searches and chats are removed straight away.',
       },
     ],
   },
