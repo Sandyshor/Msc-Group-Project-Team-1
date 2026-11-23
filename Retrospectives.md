@@ -375,7 +375,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 
 
 **Week 10**
-  **Meeting Monday 9.30pm -10pm**
+  **Meeting 3 Monday 9.30pm -10pm**
 - Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
 - Viknesh completed the fixes on Universities page, changed AI chatbot name and fixes on the maps
 - Santhosh completed the delete account button
