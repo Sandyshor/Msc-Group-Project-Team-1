@@ -141,7 +141,7 @@ function App() {
     <div className="site-shell">
       <header ref={headerRef} className={`navbar ${location.pathname === '/' ? 'navbar-home' : ''}${headerLevel ? ` ${headerLevel}` : ''}${menuOpen ? ' menu-open' : ''}`}>
         
-<BrandLogo light={location.pathname !== '/'} />
+<BrandLogo />
 
 
         
