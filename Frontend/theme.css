@@ -1,0 +1,107 @@
+:root {
+  --mist-bg: linear-gradient(120deg, #cfdccb 0%, #dfe4dc 45%, #dcdde8 100%);
+  --mist-card: rgba(255, 255, 255, 0.72);
+  --mist-card-solid: #f7f9f5;
+  --mist-ink: #1f3b2d;
+  --mist-muted: #5c6f64;
+  --mist-pill: #dff3d4;
+  --mist-accent: #2f5d50;
+  --mist-accent-hover: #24493f;
+  --mist-line: rgba(31, 59, 45, 0.09);
+  --mist-shadow: 0 10px 30px rgba(31, 59, 45, 0.08);
+
+  --cream: #eef2ec;
+  --paper: var(--mist-card-solid);
+  --sage: #dbe4d4;
+  --muted: var(--mist-muted);
+  --line: var(--mist-line);
+  color: var(--mist-ink);
+  background: #dfe4dc;
+}
+
+html body {
+  background: var(--mist-bg) fixed;
+  color: var(--mist-ink);
+}
+
+html body .district-section,
+html body .how-section,
+html body .how-page,
+html body .login-page,
+html body .cg-page,
+html body .flow-page,
+html body .district-page,
+html body .fd-attractions-section,
+html body .fd-university-section,
+html body .closing-cta {
+  background: transparent;
+}
+
+html body .navbar {
+  position: relative;
+  z-index: 1000;
+  margin: 12px 4% 0;
+  min-height: 66px;
+  padding: 10px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  background: rgba(244, 247, 242, 0.8);
+  color: var(--mist-ink);
+  box-shadow: 0 10px 35px rgba(8, 35, 26, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+html body .navbar-home {
+  position: absolute;
+  top: 16px;
+  left: 4%;
+  width: 92%;
+  margin: 0;
+  background: rgba(244, 247, 242, 0.8);
+}
+html body .navbar .brand { color: var(--mist-ink); }
+html body .navbar .nav-links a { color: #29483a; border-radius: 999px; }
+html body .navbar .nav-links a:hover { color: var(--mist-ink); background: rgba(31, 59, 45, 0.06); }
+html body .navbar .nav-links a.active { background: var(--mist-pill); color: var(--mist-ink); font-weight: 700; box-shadow: none; }
+html body .navbar .nav-cta { border-radius: 999px; background: var(--mist-accent); color: #fff; box-shadow: 0 6px 16px rgba(31, 59, 45, 0.22); }
+html body .navbar .nav-cta:hover { background: var(--mist-accent-hover); }
+html body .navbar .login-link { color: var(--mist-ink); }
+html body .navbar .login-link:hover { background: rgba(31, 59, 45, 0.06); }
+html body .navbar .tour-trigger { border-color: var(--mist-ink); border-radius: 999px; color: var(--mist-ink); }
+html body .navbar .tour-trigger:hover { background: rgba(31, 59, 45, 0.06); }
+html body .navbar .lang-switch-button { border-color: rgba(31, 59, 45, 0.25); background: rgba(255, 255, 255, 0.6); color: var(--mist-ink); }
+html body .navbar .lang-switch-button:hover { border-color: var(--mist-ink); background: #fff; }
+html body .navbar.nav-compact .menu-toggle { border-color: rgba(31, 59, 45, 0.35); color: var(--mist-ink); }
+html body .navbar.nav-compact .menu-toggle:hover { background: rgba(31, 59, 45, 0.06); }
+html body .nav-compact .site-menu { background: var(--mist-card-solid); border-color: var(--mist-line); }
+html body .nav-compact .site-menu a:hover,
+html body .nav-compact .site-menu button:hover { background: #e9efe6; }
+html body .nav-compact .site-menu a.active { background: var(--mist-pill); }
+
+html body .district-card,
+html body .how-page .step-card,
+html body .map-preview,
+html body .account-dropdown {
+  border: 1px solid var(--mist-line);
+  border-radius: 22px;
+  background: var(--mist-card);
+  box-shadow: var(--mist-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+html body .tag,
+html body .district-code { border-radius: 999px; }
+
+html body .button-primary,
+html body .button-secondary,
+html body .button-light,
+html body .how-button { border-radius: 999px; }
+html body .button-primary { background: var(--mist-accent); color: #fff; }
+html body .button-primary:hover { background: var(--mist-accent-hover); }
+html body .button-secondary { background: var(--mist-card); border: 1px solid var(--mist-line); color: var(--mist-ink); }
+html body .button-secondary:hover { background: #fff; }
+
+@media (max-width: 700px) {
+  html body .navbar { margin: 8px 3% 0; padding: 8px 12px; }
+  html body .navbar-home { top: 9px; left: 3%; width: 94%; margin: 0; }
+}
