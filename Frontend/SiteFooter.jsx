@@ -18,7 +18,7 @@ export default function SiteFooter() {
         <div className="sf-brand">
           <Link to="/" className="sf-logo" aria-label="Find My Dublin home">
             <img src="/images/find-your-dublin-logo.png" alt="" />
-            <img src="/images/find-my-dublin-wordmark-light.png" alt="Find My Dublin" className="sf-wordmark" />
+            <img src="/images/find-my-dublin-wordmark-4k.png" alt="Find My Dublin" className="sf-wordmark" />
           </Link>
           <p>Helping international students find the right neighbourhood, settle in, and feel at home in Dublin.</p>
           <div className="sf-cta">
