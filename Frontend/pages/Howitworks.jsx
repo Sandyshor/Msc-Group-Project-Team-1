@@ -28,7 +28,7 @@ const steps = [
     visual: 'journey',
     title: 'Plan your daily journey',
     description: 'Check how you would get from your new area to campus by bus, Luas, DART, on foot or by bike.',
-    detail: 'Click any place on the map for its details, then press Directions to compare routes and times.',
+    detail: 'Type a start and a destination, or click the map, and compare the routes and times.',
     link: '/districts',
     linkText: 'Plan a journey',
   },
@@ -160,7 +160,7 @@ function HowItWorks() {
         <div className="how-section-heading">
           <div>
             <p className="how-section-kicker">YOUR JOURNEY, STEP BY STEP</p>
-            <h1 id="how-process-title">From first choices to a Dublin routine.</h1>
+            <h1 id="how-process-title">A simple guide to finding your place in Dublin.</h1>
           </div>
           <p>Start with your needs, compare neighbourhoods, then see how getting around could work.</p>
         </div>
