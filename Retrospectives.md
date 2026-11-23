@@ -352,7 +352,7 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Viknesh fine-tuned the chatbot.
 
 
-**Week 7 Lead: Vikneshwaran**
+**Week 10 Lead: Vikneshwaran**
 **Meeting 1 Friday (1 - 2 pm)**
 - attendees: Sowmiya, Catherine, Shreyas, Santhosh, Vignesh
 - discussed on the feedback we received
@@ -362,3 +362,23 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - catherine agreed to work on manual and automated testing
 - sowmiya agreed to work on video gen and how it works tab
 - santhosh agreed to work on properties integration.
+
+
+**Week 10**
+  **Meeting 2 Sunday 9.30pm -10pm**
+- Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
+- Viknesh started working on the district profile maps to fix the drag and drop location.
+- Santhosh started working on delete account button.
+- Catherine started to do testing.
+- Sowmiya started working on the video generation.
+- Shreyas started working on changing to a light color theme for the whole website.
+
+
+**Week 10**
+  **Meeting Monday 9.30pm -10pm**
+- Attendees: Shreyash, Santosh, Catherine, Viknesh, Sowmiya.
+- Viknesh completed the fixes on Universities page, changed AI chatbot name and fixes on the maps
+- Santhosh completed the delete account button
+- Catherine completed manual testing 
+- Sowmiya worked on the how it works page fix and video generation.
+- Shreyas changed to a lighter color theme for the whole website.
