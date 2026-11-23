@@ -81,10 +81,8 @@ function App() {
     const page = location.pathname === '/' ? null : (PAGE_TITLES[location.pathname] || 'Page not found')
     document.title = page ? `${page} · Find My Dublin` : 'Find My Dublin · Student housing guide'
   }, [location.pathname])
+  // (the tour moves between pages itself, and closes by itself when the visitor goes to another page: SiteTour.jsx)
   const [tourOpen, setTourOpen] = useState(false)
-  useEffect(() => {
-    if (location.pathname !== '/') setTourOpen(false)
-  }, [location.pathname])
   // The tour opens by itself every time someone opens (or reloads) the website on the home page.
   // Pages opened from a link (a district, the results...) are left alone so the tour doesn't pull people away.
   // (once per page load; if they leave the home page before it opens, it doesn't open)

@@ -3,7 +3,7 @@
   --mist-card: rgba(255, 255, 255, 0.72);
   --mist-card-solid: #f7f9f5;
   --mist-ink: #1f3b2d;
-  --mist-muted: #5c6f64;
+  --mist-muted: #4d5f55; /* 4.5:1 or more on the whole background (WCAG AA); #5c6f64 was 3.8:1 */
   --mist-pill: #dff3d4;
   --mist-accent: #2f5d50;
   --mist-accent-hover: #24493f;
@@ -159,7 +159,7 @@ html body .hf-frame { box-shadow: 0 24px 60px rgba(31, 59, 45, 0.2); }
 html body .faq { background: transparent; }
 html body .faq h2 { color: var(--mist-ink); }
 html body .faq h2 em { color: #3f7a5f; }
-html body .faq-kicker { color: #4f7a63; }
+html body .faq-kicker { color: #3a6450; } /* small text: 4.7:1 (was 3.4:1) */
 html body .faq-item { border-color: var(--mist-line); background: var(--mist-card); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 html body .faq-item.is-open { border-color: rgba(47, 93, 80, 0.25); }
 html body .faq-plus { background: #e9efe6; }
@@ -222,5 +222,6 @@ html body .profile-card.pc {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
+html body .profile-card.side-panel { background: var(--mist-card-solid); } /* over the map on phones: solid, not see-through */
 html body .map-toolbar .seg-toggle,
 html body .map-toolbar .tr-toggle { background: rgba(255, 255, 255, 0.75); }
