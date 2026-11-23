@@ -7,7 +7,7 @@ const PAGES = [
   ['/districts', 'Explore districts · Find My Dublin', /Dublin district profiles/i],
   ['/campuses', 'Universities · Find My Dublin', /Find your campus/i],
   ['/attractions', 'Famous attractions · Find My Dublin', /Famous attractions/i],
-  ['/how-it-works', 'How it works · Find My Dublin', /From first choices to a Dublin routine/i],
+  ['/how-it-works', 'How it works · Find My Dublin', /A simple guide to finding your place in Dublin/i],
   ['/questionnaire', 'Find my match · Find My Dublin', /tell us a little about/i],
   ['/things-to-know', 'Things to know · Find My Dublin', /Things to know/i],
   ['/login', 'Log in · Find My Dublin', /Your Dublin story continues here/i],
