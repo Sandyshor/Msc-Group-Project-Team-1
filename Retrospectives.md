@@ -382,3 +382,11 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Catherine completed manual testing 
 - Sowmiya worked on the how it works page fix and video generation.
 - Shreyas changed to a lighter color theme for the whole website.
+
+**Week 10**
+  **Meeting 4 Tuesday 9.45pm -10:20pm**
+- Attendees: Santosh, Catherine, Viknesh, Sowmiya.
+- Viknesh is working on porting the map from openstreetmaps to google map
+- Santhosh added forget password feature
+- Catherine did automated testing using playwright and did testing with 5 users
+- Sowmiya completed video generation and started user evaluations.
