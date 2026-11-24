@@ -11,6 +11,7 @@ import { universities as campusList } from './cityPlaces';
 import { campusGuide, attractionGuide } from '../pages/CityGuide';
 import { API_BASE } from './journey';
 import { DAYS, dayText, openStatus, parseOpeningHours, readableHours, todayIndex } from './openingHours';
+import { findGooglePlace, googlePlace } from './googleMaps';
 import './PlacePanel.css';
 
 const BIKES_STATUS_URL = 'https://api.cyclocity.fr/contracts/dublin/gbfs/v2/station_status.json';
@@ -125,7 +126,7 @@ function offers(t) {
 
 const unnamedName = (name) => !name || /^(Near |Dropped pin)/.test(name);
 
-export default function PlacePanel({ place, data, mapApi, placesByDistrict, selectedId, hasDirections, onOpen, onClose, onDirectionsTo, onDirectionsFrom, onRoute, onOpenDistrict }) {
+export default function PlacePanel({ google = false, place, data, mapApi, placesByDistrict, selectedId, hasDirections, onOpen, onClose, onDirectionsTo, onDirectionsFrom, onRoute, onOpenDistrict }) {
   const [address, setAddress] = useState('');
   const [wiki, setWiki] = useState(null);
   const [near, setNear] = useState(null);
@@ -135,23 +136,36 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
   const [imgReady, setImgReady] = useState(false); // the picture has arrived (until then the box shimmers)
   const [photo, setPhoto] = useState(null); // its photo or logo (GET /place-photo), asked for once the details are in
   const [siteHours, setSiteHours] = useState(null); // opening hours from its own website (GET /place-hours), when OpenStreetMap has none
+  const [gp, setGp] = useState(null); // a place clicked on the Google map: Google's details (photo, hours, rating, reviews...)
+  const isGoogle = Boolean(place.placeId);
   const key = `${place.lat},${place.lng},${place.name}`;
   const info = siteInfo(place, placesByDistrict);
   const res = place.residence || found;
   // the shop, salon, park... OpenStreetMap knows at this spot
   const transport = ['bus', 'luas', 'rail', 'bike'].includes(place.kind);
-  const o = transport ? null : osm?.place; // a stop's own details are shown below; OpenStreetMap only adds its photo
+  // a stop's own details are shown below; Google's details, when there are some, replace OpenStreetMap's
+  const o = transport || gp ? null : osm?.place;
   // a spot clicked on the map is titled by its street address (its nearest named place is shown underneath),
   // unless it was right on a shop or inside a park: then it's that place, like Google Maps
   const spotIsPlace = place.kind === 'point' && o?.name;
   const unnamed = (name) => (place.kind === 'point' && !spotIsPlace) || unnamedName(name);
 
   useEffect(() => {
-    setAddress(''); setWiki(null); setNear(null); setBike(''); setFound(null); setOsm(null); setPhoto(null); setSiteHours(null); setImgReady(false);
+    setAddress(''); setWiki(null); setNear(null); setBike(''); setFound(null); setOsm(null); setPhoto(null); setSiteHours(null); setImgReady(false); setGp(null);
     const ctrl = new AbortController();
     let alive = true;
-    // opening hours and contact details (not for bus, Luas, train and bike stations: the panel has their own details)
-    {
+    // a Google place: its details come from Google (Places API) instead of OpenStreetMap
+    if (place.placeId) {
+      setGp({ loading: true });
+      googlePlace(place.placeId).then((d) => { if (alive) setGp(d); }).catch(() => { if (alive) setGp({ error: true }); });
+    } else if (google && window.google?.maps && !place.plain && !unnamedName(place.name) && ['campus', 'landmark', 'famous', 'amenity', 'search', 'residence'].includes(place.kind)) {
+      // one of our own pins on the Google map: Google's details for it too (hours, rating, reviews), not a link to Google Maps
+      setGp({ loading: true });
+      findGooglePlace((place.names?.[0] || place.name).split(' / ')[0].replace(' — ', ' '), place.lat, place.lng)
+        .then((d) => { if (alive) setGp(d); }).catch(() => { if (alive) setGp(null); });
+    }
+    // opening hours and contact details from OpenStreetMap: only on our own map (on the Google map everything comes from Google)
+    if (!place.placeId && !google) {
       setOsm({ loading: true });
       const named = place.kind !== 'point' && !unnamedName(place.name);
       const params = new URLSearchParams({ lat: place.lat.toFixed(6), lng: place.lng.toFixed(6) });
@@ -163,10 +177,10 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
     }
     if (place.kind === 'residence' && !place.residence) loadResidences().then((list) => { if (alive) setFound(list.find((r) => norm(r.name) === norm(place.name)) || null); });
     // the street address (OpenStreetMap), unless the site already has one
-    if (!res?.address && !info.address) (unnamed(place.name) ? streetName : streetAddress)(place.lat, place.lng).then((a) => { if (alive && a) setAddress(a); });
+    if (!place.placeId && !res?.address && !info.address) (unnamed(place.name) ? streetName : streetAddress)(place.lat, place.lng).then((a) => { if (alive && a) setAddress(a); });
     mapApi?.nearby(place.lat, place.lng).then((n) => { if (alive) setNear(n); }).catch(() => {});
     // Wikipedia when the site has no description, or only a line or two
-    if (info.description.length < 160 && !unnamed(place.name) && ['campus', 'landmark', 'famous', 'search'].includes(place.kind)) {
+    if (!place.placeId && info.description.length < 160 && !unnamed(place.name) && ['campus', 'landmark', 'famous', 'search'].includes(place.kind)) {
       wikipediaSummary(place.names?.[0] || place.name, place.lat, place.lng, ctrl.signal).then((w) => { if (alive) setWiki(w); }).catch(() => {});
     }
     if (place.kind === 'bike' && place.dock) {
@@ -244,24 +258,29 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
 
   const code = place.district;
   const profile = code && data.profiles[code];
-  const fullAddress = res?.address || info.address || address;
-  const title = spotIsPlace ? o.name : unnamed(place.name) ? (address || place.name || 'Dropped pin') : place.name;
+  const g = gp && !gp.loading && !gp.error ? gp : null;
+  const fullAddress = g?.address || res?.address || info.address || address;
+  const title = isGoogle ? (g?.name || (gp?.loading ? 'Loading…' : place.name || 'Place'))
+    : spotIsPlace ? o.name : unnamed(place.name) ? (address || place.name || 'Dropped pin') : place.name;
   const subtitle = !spotIsPlace && unnamed(place.name) && address && place.name && place.name !== 'Dropped pin' ? (place.name.startsWith('Near ') ? place.name : `Near ${place.name}`) : '';
   const tags = o?.tags || {};
   const osmStreet = [tags['addr:housenumber'], tags['addr:street']].filter(Boolean).join(' ');
   const osmWebsite = urlOf(tags.website || tags['contact:website'] || tags.url);
-  const phone = telOf(tags.phone || tags['contact:phone'] || tags.mobile || tags['contact:mobile']);
+  const phone = g?.phone || telOf(tags.phone || tags['contact:phone'] || tags.mobile || tags['contact:mobile']);
   const email = tags.email || tags['contact:email'];
   const booking = urlOf(tags.booking || tags['website:booking'] || (/^https?:/.test(tags.reservation || '') ? tags.reservation : ''));
   const fromSite = !tags.opening_hours && siteHours?.opening_hours ? siteHours : null; // read from their website
   const hoursText = tags.opening_hours || fromSite?.opening_hours;
   const week = parseOpeningHours(hoursText);
-  const status = openStatus(week);
+  const status = g?.status === 'CLOSED_PERMANENTLY' ? { open: false, text: 'Permanently closed' }
+    : g?.status === 'CLOSED_TEMPORARILY' ? { open: false, text: 'Temporarily closed' }
+      : g ? (g.openNow == null ? null : { open: g.openNow, text: g.openNow ? 'Open now' : 'Closed now' }) : openStatus(week);
   const today = todayIndex();
   const offerList = offers(tags);
   const social = [['Instagram', tags['contact:instagram']], ['Facebook', tags['contact:facebook']]].filter(([, v]) => v)
     .map(([label, v]) => [label, /^https?:/.test(v) ? v : `https://www.${label.toLowerCase()}.com/${v.replace(/^@/, '')}`]);
-  const kicker = place.kind === 'luas' ? `Luas stop · ${place.line} line`
+  const kicker = isGoogle ? (g?.type || (gp?.loading ? 'Loading details…' : 'Place'))
+    : place.kind === 'luas' ? `Luas stop · ${place.line} line`
     : place.kind === 'rail' ? (place.dart ? 'DART and rail station' : 'Rail station')
       : (place.kind === 'point' || place.kind === 'amenity' || place.kind === 'search') && o?.type ? o.type
       : place.kind === 'amenity' || place.kind === 'search' ? (place.category || KIND_LABEL[place.kind])
@@ -270,10 +289,10 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
   // the site's own photo, else the place's photo from OpenStreetMap / its website (backend), else Wikipedia's
   const fetched = photo?.photo;
   const osmPhoto = !info.image && fetched?.url ? fetched : null;
-  const image = info.image || osmPhoto?.url || wiki?.image || '';
-  const description = info.description || wiki?.extract || '';
+  const image = g?.photo?.url || info.image || osmPhoto?.url || wiki?.image || '';
+  const description = g?.summary || info.description || wiki?.extract || '';
   const wikiExtra = info.description && wiki?.extract && !wiki.extract.startsWith(info.description.slice(0, 30)) ? wiki.extract : '';
-  const website = res?.website || info.url || '';
+  const website = g?.website || res?.website || info.url || '';
   const here = [place.lat, place.lng];
   const campuses = campusList
     .map((c) => ({ ...c, m: metres(here, c.coordinates) }))
@@ -303,13 +322,16 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
         return <div className="pp-brand-badge" role="img" aria-label={`${title} logo`}><span className={`jp-brand-logo jp-brand-logo-${key}`}>{text}</span></div>;
       })() : image ? (
         <div className={`pp-photo${osmPhoto?.logo ? ' is-logo' : ''}${imgReady ? ' is-ready' : ' is-waiting'}`}>
-          <img src={image} onLoad={() => setImgReady(true)} alt={osmPhoto?.logo ? `${title} logo` : title} referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.parentElement.hidden = true; }} />
+          <img src={image} onLoad={() => setImgReady(true)} alt={osmPhoto?.logo ? `${title} logo` : title} referrerPolicy={g?.photo ? undefined : 'no-referrer'} onError={(e) => { e.currentTarget.parentElement.hidden = true; }} />
+          {g?.photo && (
+            <span className="pp-photo-credit">Photo{g.photo.by[0]?.name ? ` · ${g.photo.by[0].name}` : ''} · Google</span>
+          )}
           {osmPhoto && (osmPhoto.page
             ? <a className="pp-photo-credit" href={osmPhoto.page} target="_blank" rel="noopener noreferrer">{osmPhoto.logo ? 'Logo' : osmPhoto.street ? 'Street view' : 'Photo'} · {osmPhoto.source}</a>
             : <span className="pp-photo-credit">{osmPhoto.street ? 'Street view' : 'Photo'} · {osmPhoto.source}</span>)}
         </div>
       ) : (
-        <div className={`pp-photo pp-photo-icon${(osm?.loading || photo?.loading) && !wiki ? ' is-loading' : ''}`} aria-hidden="true" style={{ '--tint': TYPE_TINT[o?.type || place.category] || TYPE_TINT[place.kind] || '#dfe9dc' }}>
+        <div className={`pp-photo pp-photo-icon${(osm?.loading || photo?.loading || gp?.loading) && !wiki ? ' is-loading' : ''}`} aria-hidden="true" style={{ '--tint': TYPE_TINT[o?.type || place.category] || TYPE_TINT[place.kind] || '#dfe9dc' }}>
           <span>{TYPE_ICON[o?.type || place.category] || KIND_ICON[place.kind] || '📍'}</span>
         </div>
       )}
@@ -344,6 +366,64 @@ export default function PlacePanel({ place, data, mapApi, placesByDistrict, sele
             </a>
           )}
         </div>
+
+        {gp?.loading && (
+          <section className="pp-section">
+            <h3>Opening hours and reviews</h3>
+            <div className="pp-skeleton"><span /><span /></div>
+          </section>
+        )}
+        {gp?.error && <p className="pp-note">Google&rsquo;s details for this place couldn&rsquo;t be loaded right now. Try again in a moment.</p>}
+
+        {g && (
+          <section className="pp-section pp-google">
+            {g.rating != null && (
+              <p className="pp-rating" aria-label={`Rated ${g.rating} out of 5 from ${g.ratings || 0} Google reviews`}>
+                <b>{g.rating.toFixed(1)}</b>
+                <span className="pp-stars" aria-hidden="true" style={{ '--r': g.rating }} />
+                <span>({(g.ratings || 0).toLocaleString('en-IE')} Google reviews)</span>
+                {g.price != null && <span> · {'€'.repeat(Math.max(1, ['FREE', 'INEXPENSIVE', 'MODERATE', 'EXPENSIVE', 'VERY_EXPENSIVE'].indexOf(g.price)))}</span>}
+              </p>
+            )}
+            <h3>Opening hours</h3>
+            {g.hours ? (
+              <table className="pp-week">
+                <tbody>
+                  {g.hours.map((line, d) => {
+                    const [day, ...rest] = line.split(': ');
+                    return <tr key={day} className={d === today ? 'is-today' : ''}><th scope="row">{day}</th><td>{rest.join(': ').replace(/\u202f/g, ' ')}</td></tr>;
+                  })}
+                </tbody>
+              </table>
+            ) : <p className="pp-note">Google doesn&rsquo;t list opening hours for this place.</p>}
+            {(g.phone || g.website) && (
+              <dl className="pp-facts">
+                {g.phone && <><dt>Phone</dt><dd><a href={`tel:${g.phone.replace(/[^+\d]/g, '')}`}>{g.phone}</a></dd></>}
+                {g.website && <><dt>Website</dt><dd><a href={g.website} target="_blank" rel="noopener noreferrer">{g.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}</a></dd></>}
+              </dl>
+            )}
+            {g.reviews.length > 0 && (
+              <>
+                <h3>What people say</h3>
+                <ul className="pp-reviews">
+                  {g.reviews.map((r, i) => (
+                    <li key={i}>
+                      <p className="pp-review-head">
+                        {r.authorUrl ? <a href={r.authorUrl} target="_blank" rel="noopener noreferrer">{r.author}</a> : <b>{r.author}</b>}
+                        {r.rating != null && <span className="pp-stars is-small" aria-label={`${r.rating} out of 5`} style={{ '--r': r.rating }} />}
+                        {r.when && <small>{r.when}</small>}
+                      </p>
+                      {r.text && <p className="pp-review-text">{r.text.length > 320 ? `${r.text.slice(0, 317)}…` : r.text}</p>}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <p className="pp-osm-credit">
+              Details, photo and reviews from Google. {g.url && <a href={g.url} target="_blank" rel="noopener noreferrer">See it on Google Maps ↗</a>}
+            </p>
+          </section>
+        )}
 
         {osm?.loading && (
           <section className="pp-section">

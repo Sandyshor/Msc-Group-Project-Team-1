@@ -145,7 +145,12 @@
   .district-layout { align-items: start; }
   .map-card { position: sticky; top: 12px; display: flex; flex-direction: column; height: calc(100vh - 24px); min-height: 560px; }
   .map-card .district-map { flex: 1 1 auto; height: auto; min-height: 360px; max-height: none; }
-  .profile-card { top: 12px; max-height: calc(100vh - 24px); }
+  /* The right-hand panel stays on screen beside the map (both pinned 12 px from the top) and scrolls inside, so its
+     top is never cut off while looking at the map */
+  .district-layout .profile-card { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #c9d6c2 transparent; }
+  .district-layout .side-panel { top: 12px; max-height: calc(100vh - 24px); }
+  html.snap-district { scroll-snap-type: y proximity; }
+  html.snap-district .district-layout { scroll-snap-align: start; scroll-margin-top: 12px; }
   /* The welcome card (journey planner before a district is picked) scrolls inside the screen-high card; .profile-card alone hides overflow */
   .profile-card.welcome-card { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c9d6c2 transparent; }
 }
@@ -431,7 +436,10 @@
 /* Short or zoomed-in browser windows (e.g. a laptop at 125%): keep the map big. The two help lines are hidden and
    the map gets most of the window height instead of what is left over under the toolbar. */
 @media (min-width: 1101px) and (max-height: 900px) {
-  .map-card .district-hint, .map-card .legend-more { display: none; }
-  .map-card { height: auto; min-height: 0; }
-  .map-card .district-map { flex: none; height: max(460px, calc(100vh - 140px)); }
+  /* the whole card still fits the screen beside the side panel (both pinned at the top), so nothing is cut off; the
+     toolbar above the map gets tighter instead, to keep the map big */
+  .map-card .district-hint, .map-card .legend-more, .map-card .map-search-kicker { display: none; }
+  .map-card { height: calc(100vh - 24px); min-height: 520px; padding: 12px; }
+  .map-card .map-toolbar { gap: 8px; margin-bottom: 8px; }
+  .map-card .district-map { flex: 1 1 auto; height: auto; min-height: 340px; }
 }

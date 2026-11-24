@@ -172,7 +172,7 @@ export default function PlaceSearch({ value = '', onPick, onClear, placeholder, 
               onPointerEnter={() => setActive(options.length)}
             >
               <span className="ps-kind" aria-hidden="true">{looking ? '⏳' : '🔎'}</span>
-              <span className="ps-text"><strong>{looking ? 'Searching streets and addresses…' : `Search streets and addresses for “${typed}”`}</strong><small>{local.length ? 'From OpenStreetMap' : 'From OpenStreetMap · press Enter'}</small></span>
+              <span className="ps-text"><strong>{looking ? 'Searching streets and addresses…' : `Search streets and addresses for “${typed}”`}</strong><small>{(() => { const src = typeof window !== 'undefined' && window.google?.maps ? 'From Google Maps' : 'From OpenStreetMap'; return local.length ? src : `${src} · press Enter`; })()}</small></span>
             </li>
           )}
         </ul>,

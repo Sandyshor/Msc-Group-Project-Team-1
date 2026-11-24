@@ -50,7 +50,9 @@ export default defineConfig({
     {
       command: 'npm run build && npx vite preview --port 4173 --strictPort',
       url: 'http://localhost:4173',
-      env: { VITE_API_URL: 'http://127.0.0.1:8000' },
+      // no Google Maps key in the test build (as on GitHub): the district page uses its own map, which these tests
+      // know. The Google map is checked separately, on an address the key allows.
+      env: { VITE_API_URL: 'http://127.0.0.1:8000', VITE_GOOGLE_MAPS_API_KEY: '' },
       reuseExistingServer: !CI,
       timeout: 180_000,
     },

@@ -1,0 +1,186 @@
+/* The district map on Google Maps (GoogleBaseMap.jsx): our pins, stops and labels sit on Google's map the same way
+   they sat on the Leaflet map (centred on their point), plus the hover label, the Explore list and the compass. */
+
+/* A marker's HTML hangs from a zero-size anchor at its point; the pin styles centre themselves on it */
+.gm-scope .gm-anchor { position: relative; width: 0; height: 0; }
+.gm-scope .gm-anchor > .gm-centre-box,
+.gm-scope .gm-anchor > .jp-stop-dot { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); width: max-content; white-space: nowrap; }
+.gm-scope .gm-anchor > .dm-code.gm-centre-box.selected { transform: translate(-50%, -50%) scale(1.25); }
+.gm-scope .gm-anchor > .jp-bus-stop { display: grid; justify-items: center; }
+.gm-scope .gm-bottom { position: relative; }
+
+/* Hover label: one box over the map, above whatever the pointer is on */
+.gm-tip {
+  position: absolute;
+  z-index: 700;
+  top: 0;
+  left: 0;
+  max-width: 260px;
+  padding: 7px 10px;
+  border: 1px solid #e1e7de;
+  border-radius: 10px;
+  background: rgba(255, 253, 247, 0.98);
+  color: #173f32;
+  box-shadow: 0 6px 18px rgba(16, 47, 42, 0.2);
+  font: 600 12px/1.4 "DM Sans", Arial, sans-serif;
+  pointer-events: none;
+}
+.gm-tip small { display: block; margin-top: 2px; color: #56665c; font-weight: 500; }
+.gm-tip .gm-tip-hint { margin-top: 5px; padding-top: 5px; border-top: 1px solid #e6e1d6; color: #6a5a7a; }
+.gm-tip .safe-pop { display: flex; gap: 8px; align-items: center; }
+.gm-tip .safe-pop-score { display: grid; place-items: center; min-width: 32px; height: 32px; border-radius: 8px; font-weight: 800; }
+.gm-tip p { margin: 5px 0 0; font-size: 11px; font-weight: 500; }
+
+/* "Explore": universities, student housing, famous places, district names and shop types */
+.gm-explore { position: absolute; z-index: 650; top: 10px; right: 60px; }
+.gm-explore-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  color: #173f32;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  font: 700 13px "DM Sans", Arial, sans-serif;
+  cursor: pointer;
+}
+.gm-explore-button:focus-visible { outline: 3px solid #a8753f; outline-offset: 2px; }
+.gm-explore-count { display: grid; place-items: center; min-width: 18px; height: 18px; border-radius: 9px; background: #173f32; color: #fff; font-size: 11px; }
+.gm-explore-menu {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  display: grid;
+  gap: 2px;
+  width: 250px;
+  max-height: min(60vh, 440px);
+  overflow-y: auto;
+  padding: 8px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(16, 47, 42, 0.22);
+}
+.gm-explore-menu label { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 6px; color: #29483a; font: 600 12.5px "DM Sans", Arial, sans-serif; cursor: pointer; }
+.gm-explore-menu label:hover { background: #f0f5ec; }
+.gm-explore-menu input { accent-color: #173f32; }
+.gm-explore-menu hr { width: 100%; margin: 4px 0; border: 0; border-top: 1px solid #e6e1d6; }
+
+/* Compass: back to the starting view (Google's control area, bottom right) */
+.gm-home {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: 0 10px 10px 0;
+  border: 0;
+  border-radius: 2px;
+  background: #fff;
+  color: #444;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+.gm-home svg { width: 24px; height: 24px; }
+.gm-home:hover { color: #000; }
+
+@media (max-width: 700px) {
+  .gm-explore { top: 58px; right: 10px; }
+  .gm-explore-menu { width: min(250px, calc(100vw - 48px)); }
+}
+
+/* Animations (as on our own map): ripple where a pin lands, the travelling dot, the compass spin */
+.gm-scope .gm-anchor > .jp-click-ripple { position: absolute; }
+.gm-scope .gm-anchor > .jp-traveller { position: absolute; }
+.gm-home .gm-needle { transform-origin: 12px 12px; }
+.gm-home.is-spinning .gm-needle { animation: dp-needle-spin .9s cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes dp-needle-spin { 0% { transform: rotate(0); } 60% { transform: rotate(400deg); } 100% { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .gm-home.is-spinning .gm-needle { animation: none; }
+}
+
+/* University pins: bigger, and always named (on a white label, easy to read on the map) */
+.gm-scope .pm-uni { --size: 34px; --emoji: 18px; z-index: 3; }
+.gm-scope .pm-uni .pm-dot { border-width: 3px; }
+.gm-scope .pm-uni .pm-label {
+  display: block;
+  max-width: 170px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #173f32;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  font-size: 11.5px;
+  text-shadow: none;
+}
+
+/* Street View: our buttons step aside so Google's own back arrow and controls can be used */
+.gm-scope.is-streetview .gm-explore,
+.gm-scope.is-streetview .gm-mode,
+.gm-scope.is-streetview .gm-tip,
+.gm-scope.is-streetview .jp-map-hint,
+.gm-scope.is-streetview .jp-amenity-status,
+.gm-scope.is-streetview .jp-map-legend { display: none !important; }
+
+/* "Find a university" at the top of the Explore menu */
+.gm-explore-title { margin: 2px 6px 4px; color: #6a7a6e; font: 800 10.5px "DM Sans", Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.gm-uni-pick { display: grid; gap: 1px; }
+.gm-uni-pick button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px; border: 0; border-radius: 6px; background: none; color: #1f3b2d; font: 600 12.5px "DM Sans", Arial, sans-serif; text-align: left; cursor: pointer; }
+.gm-uni-pick button:hover, .gm-uni-pick button:focus-visible { background: #f0f5ec; outline: none; }
+.gm-explore-menu { width: 270px; max-height: min(70vh, 520px); }
+
+/* the route key sits above the Map / Satellite button (bottom left) */
+.gm-scope .jp-map-legend { bottom: 64px; }
+
+/* Our map buttons: white rounded boxes with a soft shadow, matching each other (Explore, Map / Satellite / Dark, compass) */
+.gm-mode {
+  position: absolute;
+  z-index: 650;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(16, 47, 42, 0.2);
+}
+.gm-mode button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #3c4a43;
+  font: 600 13px "DM Sans", Arial, sans-serif;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.gm-mode button:hover { background: #f0f5ec; }
+.gm-mode button[aria-pressed="true"] { background: #173f32; color: #fff; }
+.gm-mode button:focus-visible, .gm-explore-button:focus-visible, .gm-home:focus-visible { outline: 3px solid #a8753f; outline-offset: 2px; }
+.gm-explore-button { height: 40px; padding: 0 14px; border-radius: 10px; box-shadow: 0 2px 8px rgba(16, 47, 42, 0.2); transition: background .15s ease; }
+.gm-explore-button:hover { background: #f0f5ec; }
+.gm-explore-button[aria-expanded="true"] { background: #173f32; color: #fff; }
+.gm-explore-menu { border-radius: 12px; }
+.gm-home { width: 40px; height: 40px; border-radius: 10px; box-shadow: 0 2px 8px rgba(16, 47, 42, 0.2); transition: background .15s ease; }
+.gm-home:hover { background: #f0f5ec; }
+.gm-scope .jp-map-legend { bottom: 26px; }
+/* the hint sits under the style switch on narrow maps */
+@media (max-width: 1100px) {
+  .gm-mode button { padding: 0 9px; font-size: 12px; }
+}
+@media (max-width: 700px) {
+  .gm-mode button span { display: none; }
+  .gm-scope .jp-map-hint { top: 104px; }
+}
+/* dark map: our boxes go dark too */
+.gm-scope.is-dark .gm-mode, .gm-scope.is-dark .gm-explore-button, .gm-scope.is-dark .gm-explore-menu { background: #1f2a26; color: #e6efe9; }
+.gm-scope.is-dark .gm-mode button { color: #d5e2da; }
+.gm-scope.is-dark .gm-mode button[aria-pressed="true"] { background: #d9f17e; color: #173f32; }
+.gm-scope.is-dark .gm-explore-menu label, .gm-scope.is-dark .gm-uni-pick button { color: #e6efe9; }
+.gm-scope.is-dark .gm-explore-menu label:hover, .gm-scope.is-dark .gm-uni-pick button:hover, .gm-scope.is-dark .gm-mode button:hover:not([aria-pressed="true"]), .gm-scope.is-dark .gm-explore-button:hover { background: #2c3a35; }
