@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import JourneyBaseMap from './JourneyBaseMap';
+import GoogleBaseMap from './GoogleBaseMap';
+import { hasGoogleMaps } from './googleMaps';
 import { ACTIVE_DISTRICTS, COUNTY_AREAS, DUBLIN_DISTRICTS, strongColor } from './mapShared';
 import DistrictProfile, { TABS } from './DistrictProfile';
 import JourneyPlannerPanel, { routeTabLabel } from './JourneyPlannerPanel';
@@ -165,6 +167,15 @@ export default function App() {
   const [verifiedShops, setVerifiedShops] = useState(null); // chain shops checked against the district boundaries
   const [amenityCounts, setAmenityCounts] = useState(null);
   const mapApi = useRef(null);
+  // Google Maps when the site has a key (VITE_GOOGLE_MAPS_API_KEY); our own map if not, or if Google refuses it
+  const [useGoogle, setUseGoogle] = useState(hasGoogleMaps);
+  const BaseMap = useGoogle ? GoogleBaseMap : JourneyBaseMap;
+  // Map / Satellite / Dark (remembered on this device); a light or dark map is set when the map is made
+  const [mapStyle, setMapStyle] = useState(() => { try { return JSON.parse(localStorage.getItem('fmd-map-style')) || {}; } catch { return {}; } });
+  const changeMapStyle = (next) => {
+    setMapStyle(next);
+    try { localStorage.setItem('fmd-map-style', JSON.stringify({ mapType: next.mapType, scheme: next.scheme })); } catch { /* private mode */ }
+  };
 
   useEffect(() => {
     fetch(DATA_URL)
@@ -181,6 +192,23 @@ export default function App() {
         }))
       .catch((e) => setError(e.message));
   }, []);
+
+  // Scrolling near the map settles with the map and the side panel lined up at the top of the screen (CSS scroll
+  // snapping, computers only: JourneyBaseMap.css), like a full-screen map app
+  useEffect(() => {
+    document.documentElement.classList.add('snap-district');
+    return () => document.documentElement.classList.remove('snap-district');
+  }, []);
+
+  // Computers: when a place or district opens, line the map and the side panel up with the top of the screen, so
+  // the panel's top (photo, name, buttons) is never scrolled out of view beside the map
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.innerWidth <= 1100 || (!place && !selectedId)) return;
+    const layout = document.querySelector('.district-layout');
+    const top = layout?.getBoundingClientRect().top;
+    // a little scrolled (or not yet scrolled down to the map): line it up exactly, so the whole map and panel are on screen
+    if (top != null && Math.abs(top - 12) > 4 && top < 400) window.scrollBy({ top: top - 12, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }, [place, selectedId]);
 
   // The saved "Explore" choice is used once
   useEffect(() => { try { localStorage.removeItem('explore-district'); } catch { /* ignore */ } }, []);
@@ -348,7 +376,8 @@ export default function App() {
   const onSearchPick = (p) => {
     if ((p.kind === 'district' || (p.kind === 'eircode' && p.approx)) && data.profiles[p.code]) { selectDistrict(p.code); return; }
     const kind = { uni: 'campus', place: 'landmark', housing: 'residence', amenity: 'amenity' }[p.kind] || 'search';
-    setPlace({ kind, name: p.label, category: p.cat || p.sub, lat: p.lat, lng: p.lng, zoom: true, district: mapApi.current?.districtAt(p.lat, p.lng) || undefined });
+    setPlace({ kind, name: p.label, category: p.cat || p.sub, lat: p.lat, lng: p.lng, zoom: true, district: mapApi.current?.districtAt(p.lat, p.lng) || undefined,
+      plain: p.kind === 'address' || p.kind === 'eircode' }); // a street or an Eircode: not a business to look up by name
   };
 
   const hasCounty = COUNTY_AREAS.some((c) => data.profiles[c]);
@@ -437,8 +466,14 @@ export default function App() {
           </div>
 
           <div className={`map-stage${touring ? ' is-touring' : ''}`}>
-          <JourneyBaseMap
+          <BaseMap
+            key={useGoogle ? `google-${mapStyle.scheme || 'light'}` : 'own'}
+            mapType={mapStyle.mapType || 'roadmap'}
+            scheme={mapStyle.scheme || 'light'}
+            initialView={mapStyle.center ? { center: mapStyle.center, zoom: mapStyle.zoom } : null}
+            onMapStyle={changeMapStyle}
             ref={mapApi}
+            onUnavailable={() => setUseGoogle(false)}
             profileData={data}
             placesByDistrict={placesByDistrict}
             selectedDistrict={selectedId}
@@ -475,7 +510,7 @@ export default function App() {
           {touring && <DistrictTour data={data} codes={tourCodes} onShow={showTourStop} onFeature={showTourFeature} onEnd={endTour} />}
           </div>
 
-          <div className="map-legend">
+          {!useGoogle && <div className="map-legend">
             {selectedId && <span><i className="legend-line district-outline-line" style={{ borderColor: strongColor(data.profiles[selectedId].hue) }} />{selectedId} boundary</span>}
             <span className="legend-pin"><i>🎓</i>Universities</span>
             {showLuas && <span><i className="legend-line" style={{ background: '#e0312b' }} />Luas Red</span>}
@@ -487,11 +522,12 @@ export default function App() {
             {showSafety && <span className="legend-safety">More crime <i /> Less crime</span>}
             {showBikes && <span><i className="legend-dot" style={{ background: '#1f6fb2' }} />Dublin Bikes (live)</span>}
             <span className="legend-more">Zoom in to see names and nearby shops. More layers (famous places, supermarkets…) are in the layers button on the map.</span>
-          </div>
+          </div>}
         </section>
 
         {place && (
           <PlacePanel
+            google={useGoogle}
             place={place}
             data={data}
             mapApi={mapApi.current}

@@ -32,10 +32,34 @@ export function nominatimTurn() {
   return turn;
 }
 
-// The raw reverse-geocoder answer for a point (cached, one request a second)
+// Google's reverse geocoder (the district page's Google map is loaded): its answer in the same shape as Nominatim's,
+// so format() reads both. null when Google isn't there or doesn't answer (then OpenStreetMap is asked).
+const GOOD = ['street_address', 'premise', 'subpremise', 'establishment', 'point_of_interest', 'route'];
+async function googleLookup(lat, lng) {
+  if (typeof window === 'undefined' || !window.google?.maps?.importLibrary) return null;
+  try {
+    const { Geocoder } = await window.google.maps.importLibrary('geocoding');
+    const { results } = await new Geocoder().geocode({ location: { lat, lng }, language: 'en', region: 'ie' });
+    const r = (results || []).find((x) => x.types.some((t) => GOOD.includes(t))) || results?.[0];
+    if (!r) return null;
+    const part = (type) => r.address_components.find((c) => c.types.includes(type))?.long_name;
+    return {
+      name: part('premise') || part('establishment') || part('point_of_interest') || '',
+      address: { road: part('route'), house_number: part('street_number'), neighbourhood: part('neighborhood'), suburb: part('sublocality') || part('locality') },
+      display_name: r.formatted_address,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// The raw reverse-geocoder answer for a point (cached; Google when the Google map is on, else OpenStreetMap one request a second)
 async function lookup(lat, lng) {
   const key = `${lat.toFixed(4)},${lng.toFixed(4)}`; // ~10 m
   if (cache.has(key)) return cache.get(key);
+  const fromGoogle = await googleLookup(lat, lng);
+  if (fromGoogle) { cache.set(key, fromGoogle); return fromGoogle; }
+  if (typeof window !== 'undefined' && window.google?.maps) return null; // the Google map: no OpenStreetMap lookup
   await nominatimTurn();
   try {
     const params = new URLSearchParams({ format: 'jsonv2', lat: lat.toFixed(6), lon: lng.toFixed(6), zoom: '18', addressdetails: '1', 'accept-language': 'en' });

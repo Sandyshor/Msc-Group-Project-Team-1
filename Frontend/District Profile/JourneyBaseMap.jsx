@@ -11,12 +11,12 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './leafletNoTitle';
-import proj4 from 'proj4';
 import { ALL_DISTRICTS, heatColor, safetyLabel, strongColor, textOnHeat } from './mapShared';
 // Safety score per Census area (crime-heatmap.geojson is cut off, so the complete copy is used)
 import crimeAreasUrl from './crime-heatmap1.geojson?url';
 const countyAreasUrl = '/data/county-dublin-areas.geojson'; // approximate A/K routing areas
 const countySafetyUrl = '/data/county-dublin-safety.geojson';
+import { PLANNER, boundariesUrl, luasRedUrl, luasGreenUrl, busStopsUrl, railLinesUrl, railStationsUrl, BIKES_INFO_URL, LUAS_RED, LUAS_GREEN, DART_GREEN, RAIL_PURPLE, BUS_YELLOW, BUS_ICON, BIKES_BLUE, AMENITY_CATEGORIES, BRAND_KEYS, CHAIN_LOGO, POI_STYLE, hasName, PLACE_EMOJI, RING, RESIDENCES_URL, euro, escapeHtml, shortName, brandLogo, metres, districtIdFromPostcode, convertCoordinates, isBrandName, brandOf, recordMatchesAmenityLayer, distanceMetres, pinHtml, stopHtml } from './mapLayers';
 import { decodePolyline, formatDistance, formatMinutes, legColor, lineLabel, MODE_STYLE } from './journey';
 import { chainInfo } from './shopChains';
 import { loadAmenityRecords as loadCsv } from './amenityData';
@@ -27,14 +27,6 @@ import './JourneyPlanner.css';
 import './JourneyBaseMap.css';
 import './Bikes.css';
 
-const PLANNER = '/journey-planner/';
-const boundariesUrl = '/data/dublin_postcode_boundaries.geojson';
-const luasRedUrl = '/data/luas-red-line.geojson';
-const luasGreenUrl = '/data/luas-green-line.geojson';
-const busStopsUrl = '/data/dublin-bus-stops.geojson';
-const railLinesUrl = '/data/dublin-rail-lines.geojson';
-const railStationsUrl = '/data/dublin-rail-stations.geojson';
-const BIKES_INFO_URL = 'https://api.cyclocity.fr/contracts/dublin/gbfs/v2/station_information.json';
 
 const DUBLIN_CENTRE = [53.3498, -6.2603];
 const DUBLIN_BOUNDS = L.latLngBounds([53.24, -6.48], [53.46, -6.0]);
@@ -52,14 +44,6 @@ const Z_POI = 15.5; // nearby shops, cafés, restaurants... appear by themselves
 const Z_STREET = 16.5; // names under every shop and place
 const Z_STOPS = 12.5; // Luas stops and rail stations appear
 
-const LUAS_RED = '#e0312b';
-const LUAS_GREEN = '#00a651';
-const DART_GREEN = '#7ac143';
-const RAIL_PURPLE = '#6f3f98';
-const BUS_YELLOW = '#f5b400';
-// small bus (front view) for the bus-stop badges
-const BUS_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h12a2 2 0 0 1 2 2V16a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16V5.5a2 2 0 0 1 2-2Z" fill="#173f37"/><path d="M6 6h12v5.5H6z" fill="#fff"/><circle cx="8" cy="14.5" r="1.3" fill="#ffd34d"/><circle cx="16" cy="14.5" r="1.3" fill="#ffd34d"/><path d="M6.5 17.5v2M17.5 17.5v2" stroke="#173f37" stroke-width="2.2" stroke-linecap="round"/></svg>';
-const BIKES_BLUE = '#1f6fb2';
 
 // Basemap: identical to the journey planner (Stadia, OpenStreetMap if Stadia refuses the tiles).
 const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
@@ -67,77 +51,6 @@ const STADIA_ATTRIBUTION = '&copy; <a href="https://stadiamaps.com/attribution/"
 const BASEMAP = { url: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', maxZoom: 20, attribution: STADIA_ATTRIBUTION };
 const FALLBACK_BASEMAP = { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxZoom: 19, attribution: OSM_ATTRIBUTION, className: 'jp-tiles-osm' };
 
-// Layer list categories (as in the journey planner). Brands keep the planner's word logos (TESCO, SPAR...).
-const AMENITY_CATEGORIES = {
-  supermarkets: { label: 'Supermarkets', icon: '🛒', ring: '#2f7b50', csv: ['Supermarkets'] },
-  tesco: { label: 'Tesco stores', logo: 'TESCO', brandNames: ['tesco'], csv: ['Supermarkets'] },
-  spar: { label: 'Spar stores', logo: 'SPAR', brandNames: ['spar'], csv: ['Groceries'] },
-  dunnes: { label: 'Dunnes Stores', logo: 'DUNNES', brandNames: ['dunnes'], csv: ['Supermarkets'] },
-  aldi: { label: 'Aldi stores', logo: 'ALDI', brandNames: ['aldi'], csv: ['Supermarkets'] },
-  centra: { label: 'Centra stores', logo: 'CENTRA', brandNames: ['centra'], csv: ['Groceries'] },
-  lidl: { label: 'Lidl stores', logo: 'LIDL', brandNames: ['lidl'], csv: ['Supermarkets'] },
-  supervalu: { label: 'SuperValu stores', logo: 'SUPERVALU', brandNames: ['supervalu'], csv: ['Groceries'] },
-  circlek: { label: 'Circle K stores', logo: 'CIRCLE K', brandNames: ['circle k'], csv: ['Groceries'] },
-  mace: { label: 'Mace stores', logo: 'MACE', brandNames: ['mace'], csv: ['Groceries'] },
-  daybreak: { label: 'Daybreak stores', logo: 'DAYBREAK', brandNames: ['daybreak'], csv: ['Groceries'] },
-  londis: { label: 'Londis stores', logo: 'LONDIS', brandNames: ['londis'], csv: ['Groceries'] },
-  eurospar: { label: 'Eurospar stores', logo: 'EUROSPAR', brandNames: ['eurospar'], csv: ['Groceries'] },
-  polonez: { label: 'Polonez stores', logo: 'POLONEZ', brandNames: ['polonez'], csv: ['Groceries'] },
-  gala: { label: 'Gala stores', logo: 'GALA', brandNames: ['gala'], csv: ['Groceries'] },
-  costcutter: { label: 'Costcutter stores', logo: 'COSTCUTTER', brandNames: ['costcutter'], csv: ['Groceries'] },
-  daytoday: { label: 'Day-Today stores', logo: 'DAY-TODAY', brandNames: ['day-today'], csv: ['Groceries'] },
-  groceries: { label: 'Groceries & convenience', icon: '🧺', ring: '#58835a', csv: ['Groceries'] },
-  restaurants: { label: 'Restaurants', icon: '🍽️', ring: '#d0602b', csv: ['Restaurants', 'Asian_Restaurants'] },
-  cafes: { label: 'Cafés', icon: '☕', ring: '#8a5a33', csv: ['Cafes'] },
-  gyms: { label: 'Gyms', icon: '🏋️', ring: '#6a4fc4', csv: ['Gyms'] },
-  salons: { label: 'Hair & beauty salons', icon: '💇', ring: '#b5487a', csv: ['Salons'] },
-  pharmacies: { label: 'Pharmacies', icon: '💊', ring: '#7054a0', csv: ['Pharmacies'] },
-  hospitals: { label: 'Hospitals', icon: '🏥', ring: '#bd4138', csv: ['Hospitals'] },
-  shopping: { label: 'Shopping centres', icon: '🛍️', ring: '#bd7627', csv: ['Shopping_Malls'] },
-  parks: { label: 'Parks', icon: '🌳', ring: '#4b8550', csv: ['Parks'] },
-  landmarks: { label: 'Monuments & landmarks', icon: '🏛️', ring: '#a65c3b' },
-};
-const BRAND_KEYS = Object.keys(AMENITY_CATEGORIES).filter((k) => AMENITY_CATEGORIES[k].logo);
-// shopChains.js keys (Amenities tab) that have a word logo
-const CHAIN_LOGO = { tesco: 'tesco', lidl: 'lidl', aldi: 'aldi', dunnes: 'dunnes', supervalu: 'supervalu', spar: 'spar', centra: 'centra', mace: 'mace', londis: 'londis', costcutter: 'costcutter', daybreak: 'daybreak', circlek: 'circlek', polonez: 'polonez' };
-
-// Nearby places that appear by themselves when zoomed in: names only (no emoji), coloured by type
-// like Google Maps. Emoji pins are kept for the layers the user switches on.
-const POI_STYLE = {
-  Restaurants: ['#c2571a', 'Restaurant'],
-  Asian_Restaurants: ['#c2571a', 'Asian restaurant'],
-  Cafes: ['#c2571a', 'Café'],
-  Groceries: ['#2f6db5', 'Grocery'],
-  Supermarkets: ['#2f6db5', 'Supermarket'],
-  Shopping_Malls: ['#2f6db5', 'Shopping centre'],
-  Pharmacies: ['#c0392b', 'Pharmacy'],
-  Hospitals: ['#c0392b', 'Hospital'],
-  Gyms: ['#6a4fc4', 'Gym'],
-  Salons: ['#b5487a', 'Salon'],
-  Parks: ['#2e7d4f', 'Park'],
-};
-const hasName = (record) => Boolean(record.name && record.name.trim());
-
-const PLACE_EMOJI = {
-  park: '🌳', garden: '🌷', university: '🎓', museum: '🏛️', stadium: '🏟️', tower: '🗼', lighthouse: '🗼',
-  beach: '🏖️', water: '🌊', castle: '🏰', church: '⛪', landmark: '📍', monument: '🗿', market: '🏪',
-  shop: '🛍️', cinema: '🎬', venue: '🎭', village: '🏘️', nature: '🌿', hospital: '🏥',
-};
-const RING = { uni: '#173f37', place: '#b8862f', landmark: '#a65c3b', housing: '#7a3fa0' };
-const RESIDENCES_URL = '/data/student-residences.json';
-const euro = (v) => `€${Math.round(v).toLocaleString('en-IE')}`;
-
-function escapeHtml(value) {
-  return String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
-}
-
-const shortName = (name) => String(name)
-  .replace('Technological University Dublin', 'TU Dublin')
-  .replace('Dublin City University', 'DCU')
-  .replace('University College Dublin', 'UCD')
-  .replace(/ Campus$/, '');
-
-const brandLogo = (key) => `<span class="jp-brand-logo jp-brand-logo-${key}">${escapeHtml(AMENITY_CATEGORIES[key].logo)}</span>`;
 
 // One marker style: a white circle with an emoji (or a store's word logo), a coloured ring, and a
 // name label that only shows when zoomed in.
@@ -163,47 +76,6 @@ function stopIcon(colour, label, kind = 'stop') {
 
 const latLngPoints = (encoded) => decodePolyline(encoded).map(([lng, lat]) => [lat, lng]);
 
-function metres(a, b) {
-  const dy = (b[0] - a[0]) * 110540;
-  const dx = (b[1] - a[1]) * 111320 * Math.cos((a[0] * Math.PI) / 180);
-  return Math.hypot(dx, dy);
-}
-
-function districtIdFromPostcode(value) {
-  const match = String(value ?? '').trim().match(/^Dublin\s*(\d{1,2}W?)$/i);
-  return match ? `D${match[1].toUpperCase()}` : '';
-}
-
-function convertCoordinates(coordinates) {
-  if (Array.isArray(coordinates) && typeof coordinates[0] === 'number') return proj4('EPSG:2157', 'EPSG:4326', coordinates);
-  return coordinates.map(convertCoordinates);
-}
-
-function isBrandName(name, brand) {
-  const n = name.trim().toLocaleLowerCase();
-  return n === brand || n.startsWith(`${brand} `);
-}
-
-function brandOf(record) {
-  if (!['Supermarkets', 'Groceries'].includes(record.category)) return null;
-  return BRAND_KEYS.find((k) => AMENITY_CATEGORIES[k].brandNames.some((b) => isBrandName(record.name, b))) || null;
-}
-
-function recordMatchesAmenityLayer(record, key) {
-  const category = AMENITY_CATEGORIES[key];
-  if (!category.csv) return false;
-  if (category.brandNames) return brandOf(record) === key;
-  if (!category.csv.includes(record.category)) return false;
-  if (key === 'supermarkets' || key === 'groceries') return !brandOf(record);
-  return true;
-}
-
-function distanceMetres(a, b) {
-  const R = 6371000, r = Math.PI / 180;
-  const dLat = (b[1] - a[1]) * r, dLng = (b[0] - a[0]) * r;
-  const s = Math.sin(dLat / 2) ** 2 + Math.cos(a[1] * r) * Math.cos(b[1] * r) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(s));
-}
 
 const centredIcon = (html, className = '') => L.divIcon({ className: `dp-icon ${className}`, html: `<div class="dp-anchor">${html}</div>`, iconSize: [0, 0] });
 
@@ -232,7 +104,6 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
   // ------------------------------------------------------------ create the map once
   useEffect(() => {
     if (!containerRef.current || s.current) return undefined;
-    proj4.defs('EPSG:2157', '+proj=tmerc +lat_0=53.5 +lon_0=-8 +k=0.99982 +x_0=600000 +y_0=750000 +ellps=GRS80 +units=m +no_defs');
 
     // Credits live behind the (i) button instead of the usual strip along the bottom edge
     const map = L.map(containerRef.current, { zoomControl: false, attributionControl: false, zoomSnap: 0.25 }).setView(DUBLIN_CENTRE, 11);

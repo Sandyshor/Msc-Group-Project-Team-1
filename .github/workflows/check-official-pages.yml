@@ -1,0 +1,45 @@
+name: Check official pages (laws and rules)
+
+# Every Monday: are the official pages behind Dublin Buddy's answers about laws and rules (visas, work hours,
+# tenancy law, tax, minimum wage, fares) still the same? When one changed, open (or add to) an issue so the team
+# reviews it. See Backend/check_official_pages.py.
+on:
+  schedule:
+    - cron: "0 5 * * 1"   # every Monday 05:00 UTC
+  workflow_dispatch:       # adds a "Run workflow" button
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - run: python Backend/check_official_pages.py
+      - name: Save the pages' text
+        run: |
+          git config user.name "Sandyshor"
+          git config user.email "91480843+Sandyshor@users.noreply.github.com"
+          git add Backend/data/official_pages
+          if ! git diff --cached --quiet; then
+            git commit -m "Weekly check of official pages (laws and rules)"
+            git push
+          fi
+      - name: Ask the team to review
+        if: hashFiles('changed.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Official rules pages changed: review Dublin Buddy and Things to know"
+          open=$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body-file changed.md
+          else
+            gh issue create --title "$title" --body-file changed.md
+          fi

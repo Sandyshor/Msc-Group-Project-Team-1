@@ -5,6 +5,8 @@ import { districts } from '../District Profile/districtData.js'
 import { TRAVEL_MODES } from './CommuteFields'
 import { FlowIcon, FlowSidebar } from './FlowLayout'
 import RouteMap from './RouteMap'
+import RouteMapLeaflet from './RouteMapLeaflet'
+import { hasGoogleMaps } from '../District Profile/googleMaps'
 import { setChatContext } from '../chatContext'
 import { saveSearch } from '../account'
 
@@ -559,6 +561,9 @@ function commuteText(result, modeWords) {
 // The selected match's commute by the way of travelling the student picks, with the route on a map.
 // The matches themselves stay as searched (to change them, go back to "About you").
 function GettingThere({ result, university, universityLocation, mode, onModeChange }) {
+  // Google Maps when the site has a key; our own map only if Google can't load
+  const [useGoogle, setUseGoogle] = useState(hasGoogleMaps)
+  const MapView = useGoogle ? RouteMap : RouteMapLeaflet
   const commute = result.commute_by_mode?.[mode]
   const place = result.neighbourhood
   const [, , words] = TRAVEL_MODES.find(([value]) => value === mode)
@@ -589,7 +594,9 @@ function GettingThere({ result, university, universityLocation, mode, onModeChan
       </div>
       <div className="results-route-map">
       {place && universityLocation ? (
-        <RouteMap
+        <MapView
+          key={useGoogle ? 'google' : 'own'}
+          onUnavailable={() => setUseGoogle(false)}
           fromLat={place.lat}
           fromLon={place.lon}
           fromName={place.name}

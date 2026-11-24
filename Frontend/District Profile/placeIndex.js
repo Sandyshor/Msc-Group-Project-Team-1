@@ -233,10 +233,38 @@ export function searchPlaces(list, query, limit = 60) {
 const addressCache = new Map()
 
 // Streets and addresses in County Dublin
+// Google's geocoder for a typed street or address (when the district page's Google map is loaded): up to 3 matches in
+// County Dublin, listed before OpenStreetMap's
+async function googleAddresses(q) {
+  if (typeof window === 'undefined' || !window.google?.maps?.importLibrary) return []
+  try {
+    const { Geocoder } = await window.google.maps.importLibrary('geocoding')
+    const { results } = await new Geocoder().geocode({
+      address: /dublin|\bco\.?\s|\bD\d/i.test(q) ? q : `${q}, Dublin`, componentRestrictions: { country: 'IE' }, region: 'ie', language: 'en',
+      bounds: { south: 53.17, west: -6.55, north: 53.64, east: -6.0 },
+    })
+    return (results || []).filter((r) => {
+      const at = r.geometry.location
+      return at.lat() > 53.17 && at.lat() < 53.64 && at.lng() > -6.55 && at.lng() < -6.0 && !r.types.includes('country') && !r.types.includes('administrative_area_level_1')
+    }).slice(0, 3).map((r) => {
+      const parts = r.formatted_address.split(',').map((t) => t.trim())
+      return { kind: 'address', label: parts[0], sub: parts.slice(1, 3).join(', ') || 'Dublin', lat: r.geometry.location.lat(), lng: r.geometry.location.lng() }
+    })
+  } catch {
+    return []
+  }
+}
+
 export async function searchAddresses(query) {
   const q = query.trim()
   if (q.length < 3) return []
   if (addressCache.has(q)) return addressCache.get(q)
+  const fromGoogle = await googleAddresses(q)
+  // on the Google map only Google's addresses are used (OpenStreetMap is for our own map)
+  if (fromGoogle.length || (typeof window !== 'undefined' && window.google?.maps)) {
+    addressCache.set(q, fromGoogle)
+    return fromGoogle
+  }
   await nominatimTurn()
   const params = new URLSearchParams({
     q, format: 'jsonv2', limit: '6', countrycodes: 'ie', viewbox: '-6.55,53.64,-6.0,53.17', bounded: '1', addressdetails: '1', 'accept-language': 'en',
@@ -294,10 +322,34 @@ export async function searchEircode(text) {
         lat: p.lat, lng: p.lng,
       }]
     }
-  } catch { /* server unreachable: try OpenStreetMap */ }
-  // 2. OpenStreetMap, which has many Eircodes (used when the server's lookup isn't set up or doesn't answer)
-  if (!out.length) await nominatimTurn()
-  if (!out.length) try {
+  } catch { /* server unreachable: try Google in the browser */ }
+  // 2. Google's Geocoder, in the browser, when the district page's Google map is loaded (same key as the map; needs
+  //    the Geocoding API switched on for it). Google has every Eircode; only an exact match is used.
+  if (!out.length && typeof window !== 'undefined' && window.google?.maps?.importLibrary) {
+    try {
+      const { Geocoder } = await window.google.maps.importLibrary('geocoding')
+      const { results } = await new Geocoder().geocode({ address: code, componentRestrictions: { country: 'IE' }, region: 'ie', language: 'en' })
+      const exact = (results || []).find((r) => (r.address_components || []).some((c) => c.types.includes('postal_code') && c.long_name.replace(/\s+/g, '').toUpperCase() === flat))
+      if (exact) {
+        const part = (type) => exact.address_components.find((c) => c.types.includes(type))?.long_name
+        const street = [part('street_number'), part('route')].filter(Boolean).join(' ')
+        const area = part('neighborhood') || part('sublocality') || part('postal_town') || part('locality')
+        const firstLine = exact.formatted_address.split(',')[0].trim()
+        const title = part('premise') || part('establishment') || part('point_of_interest') || street
+          || (firstLine.replace(/\s+/g, '').toUpperCase() !== flat && !/^(dublin|co\.? dublin|ireland)/i.test(firstLine) ? firstLine : '')
+        const at = exact.geometry.location
+        out = [{
+          kind: 'eircode', label: title || `Eircode ${code}`,
+          sub: [title ? `Eircode ${code}` : null, title && street && title !== street ? street : null, area].filter(Boolean).join(' · ') || 'Dublin',
+          lat: at.lat(), lng: at.lng(),
+        }]
+      }
+    } catch { /* Geocoding API not switched on, or the daily limit reached: try OpenStreetMap */ }
+  }
+  // 3. OpenStreetMap, which has many Eircodes (used when the server's lookup isn't set up or doesn't answer)
+  const onGoogle = typeof window !== 'undefined' && Boolean(window.google?.maps) // the Google map: no OpenStreetMap lookup
+  if (!out.length && !onGoogle) await nominatimTurn()
+  if (!out.length && !onGoogle) try {
     const params = new URLSearchParams({ q: code, format: 'jsonv2', limit: '5', countrycodes: 'ie', addressdetails: '1', namedetails: '1', 'accept-language': 'en' })
     const r = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, { headers: { Accept: 'application/json' } })
     const rows = r.ok ? await r.json() : []
@@ -324,7 +376,7 @@ export async function searchEircode(text) {
       }]
     }
   } catch { /* no network: fall back to the area below */ }
-  // 3. the Eircode's routing key still says which Dublin area it is in
+  // 4. the Eircode's routing key still says which Dublin area it is in
   if (!out.length) {
     const key = code.slice(0, 3)
     const district = key.startsWith('D') && key !== 'D6W' ? `D${Number(key.slice(1))}` : key
@@ -332,7 +384,7 @@ export async function searchEircode(text) {
     if (hit) {
       out = [{
         kind: 'eircode', approx: true, code: district, label: code,
-        sub: `Exact address isn’t on the open map · shows ${hit.label.split(' · ')[1] || district} (${district})`,
+        sub: `Exact address not found · shows ${hit.label.split(' · ')[1] || district} (${district})`,
         lat: hit.lat, lng: hit.lng,
       }]
     }

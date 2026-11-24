@@ -1,0 +1,56 @@
+{
+  "about": "The official Irish sources Dublin Buddy (the AI assistant, Backend/chat.py) points to for laws and rules that change: visas and work rules, tenancy law and rent rules, tax, wages, health and fares. (With CHAT_WEB_SEARCH=on, which costs extra, it also searches these domains live.) check_official_pages.py checks the pages below every week: when one changes, a GitHub issue asks the team to review the assistant and the Things to know page. After reviewing, update last_reviewed.",
+  "last_reviewed": "2026-11-23",
+  "search_domains": [
+    "irishimmigration.ie",
+    "citizensinformation.ie",
+    "rtb.ie",
+    "threshold.ie",
+    "revenue.ie",
+    "gov.ie",
+    "hse.ie",
+    "mywelfare.ie",
+    "transportforireland.ie",
+    "leapcard.ie",
+    "workplacerelations.ie",
+    "irishstatutebook.ie"
+  ],
+  "topics": [
+    {
+      "topic": "Student visas, IRP registration and renewal (Stamp 2)",
+      "pages": [
+        "https://www.irishimmigration.ie/coming-to-study-in-ireland/",
+        "https://www.irishimmigration.ie/registering-your-immigration-permission/",
+        "https://www.irishimmigration.ie/registering-your-immigration-permission/how-to-renew-your-current-permission/renewing-your-registration-permission-if-you-live-in-the-republic-of-ireland/"
+      ]
+    },
+    {
+      "topic": "Work rules for non-EEA students (hours in term and holidays)",
+      "pages": ["https://www.citizensinformation.ie/en/moving-country/moving-to-ireland/studying-in-ireland/immigration-nonEEA-students/"]
+    },
+    {
+      "topic": "Renting: tenants' rights, deposits, rent increases and notice periods",
+      "pages": [
+        "https://www.citizensinformation.ie/en/housing/renting-a-home/",
+        "https://www.citizensinformation.ie/en/housing/renting-a-home/tenants-rights-and-responsibilities/",
+        "https://rtb.ie/renting/beginning-a-tenancy/students/",
+        "https://rtb.ie/renting/ending-a-tenancy/"
+      ]
+    },
+    {
+      "topic": "Minimum wage",
+      "pages": ["https://www.citizensinformation.ie/en/employment/employment-rights-and-conditions/pay-and-employment/minimum-wage/"]
+    },
+    {
+      "topic": "Tax when starting work (Revenue myAccount, PPS)",
+      "pages": [
+        "https://www.revenue.ie/en/jobs-and-pensions/starting-your-first-job/index.aspx",
+        "https://www.mywelfare.ie/"
+      ]
+    },
+    {
+      "topic": "Public transport fares and the Student Leap Card",
+      "pages": ["https://www.transportforireland.ie/fares/"]
+    }
+  ]
+}
