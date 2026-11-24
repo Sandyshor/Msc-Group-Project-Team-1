@@ -1750,6 +1750,70 @@ h1 em { color: #8a9d79; font-weight: 500; }
   margin-bottom: 9px;
 }
 
+.forgot-link {
+  margin-bottom: 9px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #173f32;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.forgot-link:hover {
+  color: #245542;
+}
+
+.forgot-link:focus-visible,
+.reset-back:focus-visible {
+  outline: 2px solid #173f32;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.reset-intro {
+  margin: 0;
+  color: #52685b;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.reset-back {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #52685b;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reset-back:hover {
+  color: #173f32;
+}
+
+.reset-sent {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.reset-sent p {
+  margin: 0;
+  padding: 14px;
+  border-radius: 7px;
+  background: #e8f1ea;
+  color: #173f32;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
 .password-input-wrap {
   position: relative;
   display: flex;
