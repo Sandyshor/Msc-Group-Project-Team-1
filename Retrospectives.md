@@ -390,3 +390,13 @@ Sowmiya agreed to work on the home page making it more attractive and user speci
 - Santhosh added forget password feature
 - Catherine did automated testing using playwright and did testing with 5 users
 - Sowmiya completed video generation and started user evaluations.
+
+
+**Week 10**
+  **Meeting 5 Wednesday 9.30pm - 9:50pm**
+- Attendees: Santosh, Catherine, Viknesh, Sowmiya, Shreyash.
+- Viknesh completed the map porting on both district profile and recommendation page. 
+- Santhosh compared other websites with findmydublin website.
+- Catherine did testing with 500 users work load and some manual testing.
+- Sowmiya completed user evaluations.
+- Shreyas worked on home page and did language testing with users.
