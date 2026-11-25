@@ -107,36 +107,6 @@ html body .button-secondary:hover { background: #fff; }
 }
 
 
-html body .hx-hero { background: transparent; color: var(--mist-ink); }
-html body .hx-bg {
-  -webkit-mask-image: linear-gradient(90deg, transparent 24%, #000 58%), linear-gradient(180deg, #000 52%, transparent 78%);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(90deg, transparent 24%, #000 58%), linear-gradient(180deg, #000 52%, transparent 78%);
-  mask-composite: intersect;
-}
-html body .hx-bg-shade { display: none; }
-html body .hx-hero::after { display: none; }
-@media (max-width: 1100px) {
-  html body .hx-bg {
-    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 70%, transparent 100%);
-    mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 70%, transparent 100%);
-  }
-}
-html body .hx-pill { border-color: rgba(31, 59, 45, 0.35); background: rgba(255, 255, 255, 0.55); color: var(--mist-ink); }
-html body .hx-line1 { color: var(--mist-ink); }
-html body .hx-line2 { background: linear-gradient(100deg, #2f5d50 0%, #3f7a5f 60%, #5b8f6a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-html body .hx-brush path { stroke: #7fae6e; }
-html body .hx-lead { color: #3d5246; }
-html body .hx-btn-primary { background: var(--mist-accent); color: #fff; box-shadow: 0 10px 24px rgba(31, 59, 45, 0.22); }
-html body .hx-btn-primary:hover { background: var(--mist-accent-hover); box-shadow: 0 14px 30px rgba(31, 59, 45, 0.28); }
-html body .hx-btn-outline { border-color: rgba(31, 59, 45, 0.45); background: rgba(255, 255, 255, 0.5); color: var(--mist-ink); }
-html body .hx-btn-outline:hover { background: rgba(255, 255, 255, 0.8); }
-html body .hx-btn:focus-visible { outline-color: var(--mist-accent); }
-html body .hx-card { background: rgba(255, 255, 255, 0.82); border: 1px solid rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-html body .hx-card-link { background: var(--mist-pill); color: var(--mist-ink); }
-html body .hx-card-link b { color: var(--mist-accent); }
-html body .hx-card-arrow { background: var(--mist-accent); color: #fff; }
-
 html body .hf { background: transparent; color: var(--mist-ink); }
 html body .hf-glow-1 { background: rgba(255, 255, 255, 0.35); }
 html body .hf-glow-2 { background: rgba(127, 174, 110, 0.18); }
