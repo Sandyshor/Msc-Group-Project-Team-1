@@ -1406,3 +1406,28 @@
   .home-card > * { grid-column: 1 / -1; justify-self: start; text-align: left; }
   .result-card { padding: 16px; }
 }
+
+/* "Save area" on a match's detail view (saved areas: pages/SavedAreas.jsx) */
+.save-area { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.save-area-button { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 8px 14px; border: 1px solid #c9d6cc; border-radius: 999px; background: #fffdf7; color: #123d31; font: inherit; font-size: 13.5px; font-weight: 700; text-decoration: none; cursor: pointer; }
+.save-area .save-area-button { margin-top: 0; }
+.save-area-button:hover:not(:disabled) { border-color: #123d31; background: #eef5ef; }
+.save-area-button:focus-visible { outline: 2px solid #123d31; outline-offset: 2px; }
+.save-area-button:disabled { opacity: 0.6; cursor: wait; }
+.save-area-button span { color: #b4463a; font-size: 15px; line-height: 1; }
+.save-area-done { margin: 10px 0 0; color: #123d31; font-size: 13.5px; font-weight: 700; }
+.save-area-done span { color: #b4463a; }
+.save-area-done a { color: #123d31; }
+.save-area-error { color: #a3261b; font-size: 13px; font-weight: 600; }
+
+/* "From the airport" tab */
+.airport { display: flex; flex-direction: column; gap: 12px; }
+.airport h3 { margin: 0; color: #123d31; font-size: 1.05rem; }
+.airport-total { margin: 0; color: #123d31; font-size: 15px; }
+.airport-legs { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.airport-legs li { display: flex; align-items: flex-start; gap: 10px; color: #123d31; font-size: 14px; line-height: 1.45; }
+.airport-dot { flex: none; width: 12px; height: 12px; margin-top: 4px; border-radius: 50%; }
+.airport-tip { margin: 0; font-size: 13px; line-height: 1.5; }
+.airport-maps { align-self: flex-start; padding: 9px 14px; border-radius: 999px; background: #123d31; color: #fffaf1; font-size: 13.5px; font-weight: 700; text-decoration: none; }
+.airport-maps:hover { background: #1d5443; }
+.airport-maps:focus-visible { outline: 2px solid #123d31; outline-offset: 2px; }

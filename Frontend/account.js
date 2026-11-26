@@ -36,6 +36,11 @@ export const createChat = (messages) => call('POST', '/chats', { messages })
 export const updateChat = (id, messages) => call('PUT', `/chats/${id}`, { messages })
 export const deleteChat = (id) => call('DELETE', `/chats/${id}`)
 
+// Areas the student saved from their results ("Save area"), to compare later, even across different searches
+export const listSavedAreas = () => call('GET', '/saved-areas')
+export const saveArea = (area) => call('POST', '/saved-areas', area)
+export const removeSavedArea = (id) => call('DELETE', `/saved-areas/${id}`)
+
 // Deletes the student's name, email, searches and chats from the database. Call it straight after
 // confirmPassword (firebase.js): the backend only accepts a login from the last few minutes.
 export const deleteMyAccount = () => call('DELETE', '', undefined, true)

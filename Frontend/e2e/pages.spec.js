@@ -13,6 +13,7 @@ const PAGES = [
   ['/login', 'Log in · Find My Dublin', /Your Dublin story continues here/i],
   ['/signup', 'Sign up · Find My Dublin', /Make Dublin feel like home/i],
   ['/my-searches', 'My recent searches · Find My Dublin', /Your searches/i],
+  ['/saved-areas', 'Saved areas · Find My Dublin', /Saved areas/i],
   ['/terms', 'Terms of use · Find My Dublin', /Terms of use/i],
   ['/privacy', 'Privacy policy · Find My Dublin', /Privacy policy/i],
   ['/contact', 'Contact · Find My Dublin', /Get in touch/i],

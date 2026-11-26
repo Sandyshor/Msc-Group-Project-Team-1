@@ -1,0 +1,24 @@
+/* Saved areas page: the My searches page's cards (MySearches.css) plus the side-by-side comparison */
+.sa-hint { margin: 0 0 18px; padding: 12px 16px; border: 1px dashed #d9d2c1; border-radius: 14px; background: #fffdf7; color: #4f6c57; }
+.sa-pick { display: inline-flex; align-items: center; gap: 8px; color: #123d31; font-size: 13px; font-weight: 700; cursor: pointer; }
+.sa-pick input { width: 17px; height: 17px; accent-color: #123d31; cursor: pointer; }
+.sa-pick input:disabled { cursor: not-allowed; }
+.sa-pick:has(input:disabled) { color: #9aa59a; cursor: not-allowed; }
+.ms-card.sa-picked { border-color: #123d31; box-shadow: 0 0 0 2px rgba(18, 61, 49, 0.18), 0 6px 20px rgba(18, 61, 49, 0.06); }
+
+.sa-compare { margin-bottom: 28px; padding: 20px; border: 1px solid #e6dfcf; border-radius: 18px; background: #fffdf7; }
+.sa-compare h2 { margin: 0 0 10px; font-size: 1.2rem; }
+.sa-compare-note { margin: 0 0 10px; padding: 8px 12px; border-radius: 10px; background: #fdf3e3; color: #7a4a12; font-size: 13.5px; }
+.sa-table-wrap { overflow-x: auto; }
+.sa-table { width: 100%; min-width: 520px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.sa-table th, .sa-table td { padding: 12px 14px; border-bottom: 1px solid #ece5d6; text-align: left; vertical-align: top; }
+.sa-table thead th { color: #123d31; font-size: 14px; }
+.sa-table tbody th { width: 150px; color: #4f6c57; font-size: 13px; font-weight: 700; }
+.sa-table tr:last-child th, .sa-table tr:last-child td { border-bottom: 0; }
+.sa-table td.is-best { background: #eef5ef; }
+.sa-value { display: block; color: #123d31; font-weight: 700; }
+.sa-best { color: #2d6a4f; font-size: 12px; }
+.sa-note { display: block; margin-top: 2px; color: #7a8579; font-size: 12px; }
+.sa-na { color: #9aa59a; font-size: 13px; }
+.sa-small { margin: 12px 0 0; color: #7a8579; font-size: 12.5px; }
+.sa-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
