@@ -15,7 +15,7 @@ export default function HomeHero() {
     <section className="hm-hero" aria-labelledby="hm-title" data-site-tour="home">
       <div className="hm-copy">
         <p className="hm-kicker">Neighbourhood guide for students</p>
-        <h1 id="hm-title">Know the area <em>before you move in.</em></h1>
+        <h1 id="hm-title">Find the Dublin area that fits you best.</h1>
         <p className="hm-lead">
           Every Dublin district scored on rent, safety, transport and amenities, so you can choose where to live with confidence.
         </p>
