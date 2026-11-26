@@ -41,7 +41,7 @@ const PAGES = {
       },
       {
         heading: 'If you create an account',
-        text: 'We keep your name, email address, your recent searches and your latest chat with the assistant, only so you can sign in and pick up where you left off. Passwords are kept securely and never in readable form, and we will never email you asking for yours.',
+        text: 'We keep your name, email address, your recent searches, the areas you save and your recent chats with the assistant, only so you can sign in and pick up where you left off. Passwords are kept securely and never in readable form, and we will never email you asking for yours.',
       },
       {
         heading: 'Your search answers',
@@ -57,7 +57,7 @@ const PAGES = {
       },
       {
         heading: 'Deleting your data',
-        text: 'You can delete your account and everything in it yourself, at any time: log in, open the menu under your name and choose Delete my account. Your name, email address, saved searches and chats are removed straight away.',
+        text: 'You can delete your account and everything in it yourself, at any time: log in, open the menu under your name and choose Delete my account. Your name, email address, saved searches, saved areas and chats are removed straight away.',
       },
     ],
   },

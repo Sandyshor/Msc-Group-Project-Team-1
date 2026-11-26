@@ -54,6 +54,7 @@ def db(client):
 
     engine = create_engine(TEST_DB)
     with engine.begin() as conn:
+        conn.execute(text("DROP TABLE IF EXISTS saved_areas"))
         conn.execute(text("DROP TABLE IF EXISTS chat_conversations"))
         conn.execute(text("DROP TABLE IF EXISTS chat_history"))
         conn.execute(text("DROP TABLE IF EXISTS search_history"))
@@ -197,22 +198,23 @@ class TestDeletingAnAccount:
         db.post("/account/login", json={"name": "Sam"}, headers=auth(**who))
         db.post("/account/history", json={"answers": {"university": "TU Dublin"}, "top_areas": ["D7"]}, headers=auth(**who))
         db.post("/account/chats", json={"messages": [{"role": "user", "content": "Is D7 safe?"}]}, headers=auth(**who))
+        db.post("/account/saved-areas", json=area(), headers=auth(**who))
 
     def _rows(self, uid):
         from sqlalchemy import text
 
         with datastore._engine.connect() as conn:
             return {table: conn.execute(text(f"SELECT count(*) FROM {table} WHERE uid = :uid"), {"uid": uid}).scalar()
-                    for table in ("app_users", "search_history", "chat_conversations")}
+                    for table in ("app_users", "search_history", "chat_conversations", "saved_areas")}
 
     def test_deleting_removes_the_student_and_everything_saved(self, db):
         self._fill(db)
         self._fill(db, uid="student-2", email="kim@example.com")
-        assert self._rows("student-1") == {"app_users": 1, "search_history": 1, "chat_conversations": 1}
+        assert self._rows("student-1") == {"app_users": 1, "search_history": 1, "chat_conversations": 1, "saved_areas": 1}
         assert db.delete("/account", headers=auth()).json() == {"deleted": True}
-        assert self._rows("student-1") == {"app_users": 0, "search_history": 0, "chat_conversations": 0}
+        assert self._rows("student-1") == {"app_users": 0, "search_history": 0, "chat_conversations": 0, "saved_areas": 0}
         # another student's account is untouched
-        assert self._rows("student-2") == {"app_users": 1, "search_history": 1, "chat_conversations": 1}
+        assert self._rows("student-2") == {"app_users": 1, "search_history": 1, "chat_conversations": 1, "saved_areas": 1}
         # deleting again (e.g. a retry after the login couldn't be closed) is fine
         assert db.delete("/account", headers=auth()).status_code == 200
 
@@ -223,3 +225,56 @@ class TestDeletingAnAccount:
         old = auth(logged_in_ago=accounts.RECENT_LOGIN_SECONDS + 60)
         assert db.delete("/account", headers=old).status_code == 401
         assert self._rows("student-1")["app_users"] == 1
+
+
+def area(**changes):
+    """A saved area as the results page sends it."""
+    return {"area": "D7", "neighbourhood": "Stoneybatter", "lat": 53.353, "lon": -6.281,
+            "university": "TU Dublin - Grangegorman", "accommodation": "Private room", "budget": 900, "rent": 850,
+            "travel_mode": "public_transport", "commute_minutes": 9, "walk_faster": True, "safety": 47.5,
+            "match_score": 88.4, "answers": {"university": "TU Dublin - Grangegorman", "budget": 900}, **changes}
+
+
+def test_without_the_database_saved_areas_are_unavailable(client):
+    datastore._engine = None
+    assert client.get("/account/saved-areas", headers=auth()).status_code == 503
+
+
+@pytest.mark.skipif(not TEST_DB, reason="set TEST_DATABASE_URL to run against PostgreSQL")
+class TestSavedAreas:
+    def test_a_login_is_needed(self, db):
+        assert db.get("/account/saved-areas").status_code == 401
+        assert db.post("/account/saved-areas", json=area()).status_code == 401
+
+    def test_areas_are_saved_newest_first_and_saving_again_updates(self, db):
+        first = db.post("/account/saved-areas", json=area(), headers=auth()).json()["id"]
+        second = db.post("/account/saved-areas", json=area(area="D8", neighbourhood="Portobello"), headers=auth()).json()["id"]
+        saved = db.get("/account/saved-areas", headers=auth()).json()["areas"]
+        assert [a["id"] for a in saved] == [second, first]
+        assert saved[1]["neighbourhood"] == "Stoneybatter" and saved[1]["rent"] == 850 and saved[1]["answers"]["budget"] == 900
+        # the same place from the same kind of search: updated and moved to the top, not copied
+        again = db.post("/account/saved-areas", json=area(rent=870), headers=auth()).json()["id"]
+        saved = db.get("/account/saved-areas", headers=auth()).json()["areas"]
+        assert again == first and [a["id"] for a in saved] == [first, second] and saved[0]["rent"] == 870
+        # the same place for another room type is a separate entry
+        db.post("/account/saved-areas", json=area(accommodation="Shared room"), headers=auth())
+        assert len(db.get("/account/saved-areas", headers=auth()).json()["areas"]) == 3
+
+    def test_students_only_see_and_remove_their_own(self, db):
+        mine = db.post("/account/saved-areas", json=area(), headers=auth()).json()["id"]
+        kim = auth(uid="student-2", email="kim@example.com")
+        assert db.get("/account/saved-areas", headers=kim).json() == {"areas": []}
+        db.delete(f"/account/saved-areas/{mine}", headers=kim)
+        assert len(db.get("/account/saved-areas", headers=auth()).json()["areas"]) == 1
+        db.delete(f"/account/saved-areas/{mine}", headers=auth())
+        assert db.get("/account/saved-areas", headers=auth()).json() == {"areas": []}
+
+    def test_only_the_latest_are_kept_and_bad_areas_are_refused(self, db):
+        for i in range(accounts.SAVED_AREAS_KEPT + 3):
+            db.post("/account/saved-areas", json=area(neighbourhood=f"Place {i}"), headers=auth())
+        saved = db.get("/account/saved-areas", headers=auth()).json()["areas"]
+        assert len(saved) == accounts.SAVED_AREAS_KEPT and saved[0]["neighbourhood"] == f"Place {accounts.SAVED_AREAS_KEPT + 2}"
+        assert db.post("/account/saved-areas", json=area(area="D" * 50), headers=auth()).status_code == 422
+        assert db.post("/account/saved-areas", json=area(lat=40.0), headers=auth()).status_code == 422
+        too_big = area(answers={"notes": "x" * (accounts.MAX_ANSWERS_BYTES + 10)})
+        assert db.post("/account/saved-areas", json=too_big, headers=auth()).status_code == 413

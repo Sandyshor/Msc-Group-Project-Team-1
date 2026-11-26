@@ -14,8 +14,10 @@ Tables (created here; not data files, so datastore.sync never touches them):
     chat_conversations  one row per conversation with the AI assistant: its title (the first question) and messages,
                     so a student can pick any of their recent chats up again, on any device
                     (replaces the older one-chat-per-student chat_history table, whose rows are moved over once)
+    saved_areas     one row per area the student saved from their results ("Save area"), with the figures shown
+                    when they saved it, so areas from different searches can be compared side by side
 
-A student can delete their account (DELETE /account): their rows in all three tables are removed.
+A student can delete their account (DELETE /account): their rows in all four tables are removed.
 """
 import json
 import os
@@ -40,6 +42,7 @@ MAX_ANSWERS_BYTES = 10_000  # a questionnaire is about 1 KB; anything far bigger
 CHAT_KEPT = 40              # messages kept per conversation (the oldest are dropped)
 CHATS_KEPT = 10             # conversations kept per student (the oldest are deleted)
 MAX_CHAT_MESSAGE = 8_000    # characters per message (the assistant's longest replies are well under this)
+SAVED_AREAS_KEPT = 20       # saved areas per student (the oldest are deleted)
 RECENT_LOGIN_SECONDS = 300  # deleting an account needs a password typed in the last 5 minutes, not just any token
 
 _certs = {"keys": None, "until": 0.0}
@@ -113,6 +116,15 @@ def _engine():
                     messages   jsonb NOT NULL
                 )"""))
             conn.execute(text("CREATE INDEX IF NOT EXISTS chat_conversations_uid_time ON chat_conversations (uid, updated_at DESC)"))
+            conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS saved_areas (
+                    id         bigserial PRIMARY KEY,
+                    uid        text NOT NULL REFERENCES app_users (uid) ON DELETE CASCADE,
+                    place_key  text NOT NULL,
+                    created_at timestamptz NOT NULL,
+                    area       jsonb NOT NULL,
+                    UNIQUE (uid, place_key)
+                )"""))
             # The first version kept one chat per student in chat_history: move those chats over, once
             conn.execute(text("SELECT pg_advisory_xact_lock(20261115)"))  # only one worker moves them
             if conn.execute(text("SELECT to_regclass('chat_history')")).scalar() is not None:
@@ -172,6 +184,24 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: List[ChatMessage] = Field(..., max_length=200)
+
+
+class SavedArea(BaseModel):
+    """One area from the student's results, with the figures the results page showed for it."""
+    area: str = Field(..., max_length=10, description="District or County Dublin area code, e.g. D7")
+    neighbourhood: Optional[str] = Field(None, max_length=80, description="e.g. Stoneybatter")
+    lat: Optional[float] = Field(None, ge=52.5, le=54.5)
+    lon: Optional[float] = Field(None, ge=-7.5, le=-5.5)
+    university: str = Field(..., max_length=160)
+    accommodation: str = Field(..., max_length=80, description="The room type as the website names it")
+    budget: Optional[float] = Field(None, ge=0, le=100_000)
+    rent: Optional[float] = Field(None, ge=0, le=100_000)
+    travel_mode: str = Field("public_transport", max_length=30)
+    commute_minutes: Optional[int] = Field(None, ge=0, le=600)
+    walk_faster: bool = False
+    safety: Optional[float] = Field(None, ge=0, le=100)
+    match_score: Optional[float] = Field(None, ge=0, le=100)
+    answers: dict = Field(default_factory=dict, description="The search it came from, to open it again")
 
 
 class SearchRequest(BaseModel):
@@ -370,9 +400,64 @@ def delete_all_chats(authorization: Optional[str] = Header(None)):
     return {"cleared": True}
 
 
+def _place_key(area):
+    """The same place for the same kind of search: saving it again updates it rather than adding a copy."""
+    return "|".join([area.area, area.neighbourhood or "", area.university, area.accommodation, area.travel_mode]).lower()
+
+
+@router.get("/saved-areas")
+def saved_areas(authorization: Optional[str] = Header(None)):
+    """The areas the student saved, newest first."""
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    with engine.connect() as conn:
+        rows = conn.execute(text("""
+            SELECT id, created_at, area FROM saved_areas WHERE uid = :uid
+            ORDER BY created_at DESC, id DESC LIMIT :limit"""), {"uid": claims["sub"], "limit": SAVED_AREAS_KEPT}).mappings()
+        return {"areas": [{**r["area"], "id": r["id"], "saved_at": r["created_at"].isoformat()} for r in rows]}
+
+
+@router.post("/saved-areas")
+def save_area(body: SavedArea, authorization: Optional[str] = Header(None)):
+    """Save an area from the results. Only the student's SAVED_AREAS_KEPT most recent are kept."""
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    area = body.model_dump()
+    if len(json.dumps(area["answers"]).encode()) > MAX_ANSWERS_BYTES:
+        raise HTTPException(413, "That search is too big to save.")
+    with engine.begin() as conn:
+        _upsert_user(conn, claims)
+        saved_id = conn.execute(text("""
+            INSERT INTO saved_areas (uid, place_key, created_at, area) VALUES (:uid, :key, :now, CAST(:area AS jsonb))
+            ON CONFLICT (uid, place_key) DO UPDATE SET created_at = EXCLUDED.created_at, area = EXCLUDED.area
+            RETURNING id"""),
+            {"uid": claims["sub"], "key": _place_key(body), "now": datetime.now(timezone.utc),
+             "area": json.dumps(area)}).scalar_one()
+        conn.execute(text("""
+            DELETE FROM saved_areas WHERE uid = :uid AND id NOT IN (
+                SELECT id FROM saved_areas WHERE uid = :uid ORDER BY created_at DESC, id DESC LIMIT :keep)"""),
+            {"uid": claims["sub"], "keep": SAVED_AREAS_KEPT})
+    return {"id": saved_id}
+
+
+@router.delete("/saved-areas/{saved_id}")
+def remove_saved_area(saved_id: int, authorization: Optional[str] = Header(None)):
+    from sqlalchemy import text
+
+    engine = _engine()
+    claims = _student(authorization)
+    with engine.begin() as conn:
+        conn.execute(text("DELETE FROM saved_areas WHERE id = :id AND uid = :uid"), {"id": saved_id, "uid": claims["sub"]})
+    return {"deleted": saved_id}
+
+
 @router.delete("")
 def delete_account(authorization: Optional[str] = Header(None)):
-    """Delete the student and everything saved for them: their name and email, searches and chats.
+    """Delete the student and everything saved for them: their name and email, searches, chats and saved areas.
 
     The website asks for the password again first, so the token must come from a login in the last
     RECENT_LOGIN_SECONDS: a token left open on a shared computer can't delete the account. The website then
@@ -386,6 +471,6 @@ def delete_account(authorization: Optional[str] = Header(None)):
         raise HTTPException(401, "Please type your password again to delete your account.")
     with engine.begin() as conn:
         # searches and chats would also go with the student (ON DELETE CASCADE); deleted here too to be plain
-        for table in ("search_history", "chat_conversations", "app_users"):
+        for table in ("search_history", "chat_conversations", "saved_areas", "app_users"):
             conn.execute(text(f"DELETE FROM {table} WHERE uid = :uid"), {"uid": claims["sub"]})
     return {"deleted": True}

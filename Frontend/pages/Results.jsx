@@ -6,9 +6,11 @@ import { TRAVEL_MODES } from './CommuteFields'
 import { FlowIcon, FlowSidebar } from './FlowLayout'
 import RouteMap from './RouteMap'
 import RouteMapLeaflet from './RouteMapLeaflet'
-import { hasGoogleMaps } from '../District Profile/googleMaps'
+import { hasGoogleMaps, loadGoogleMaps } from '../District Profile/googleMaps'
 import { setChatContext } from '../chatContext'
-import { saveSearch } from '../account'
+import { saveArea, saveSearch } from '../account'
+import { watchUser } from '../firebase'
+import { googleRoutes, legColor, lineLabel } from '../District Profile/journey'
 
 // '' = same address as the website (Azure serves both); unset = the Render API.
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://crib-crew-recommender-api.onrender.com'
@@ -617,6 +619,168 @@ function GettingThere({ result, university, universityLocation, mode, onModeChan
   )
 }
 
+// "Save area": keeps this match in the student's account with the figures shown here, so they can compare it
+// later with areas from other searches (Saved areas page). Logged-out students are asked to log in.
+function SaveAreaButton({ result, answers, university, modeWords }) {
+  const [user, setUser] = useState(undefined)
+  const [state, setState] = useState('idle') // idle | saving | saved | error
+  useEffect(() => watchUser(setUser), [])
+  useEffect(() => { setState('idle') }, [result])
+
+  if (user === undefined) return null
+  if (!user) {
+    return (
+      <Link className="save-area-button" to="/login">
+        <span aria-hidden="true">♡</span> Log in to save this area
+      </Link>
+    )
+  }
+
+  async function save() {
+    setState('saving')
+    try {
+      await saveArea({
+        area: result.area,
+        neighbourhood: result.neighbourhood?.name ?? null,
+        lat: result.neighbourhood?.lat ?? null,
+        lon: result.neighbourhood?.lon ?? null,
+        university: university || answers.university,
+        accommodation: answers.accommodationLabel || String(answers.accommodation || '').replace(/_/g, ' '),
+        budget: answers.budget ?? null,
+        rent: result.rent ?? null,
+        travel_mode: answers.travelMode ?? 'public_transport',
+        commute_minutes: result.commute_minutes ?? null,
+        walk_faster: Boolean(result.walk_faster),
+        safety: result.safety?.index ?? null,
+        match_score: result.match_score ?? null,
+        answers,
+      })
+      setState('saved')
+    } catch {
+      setState('error')
+    }
+  }
+
+  if (state === 'saved') {
+    return (
+      <p className="save-area-done" role="status">
+        <span aria-hidden="true">♥</span> Saved. <Link to="/saved-areas">See your saved areas</Link>
+      </p>
+    )
+  }
+  return (
+    <span className="save-area">
+      <button type="button" className="save-area-button" onClick={save} disabled={state === 'saving'}
+        title={`Save to compare later (${modeWords})`}>
+        <span aria-hidden="true">♡</span> {state === 'saving' ? 'Saving…' : 'Save area'}
+      </button>
+      {state === 'error' && <span className="save-area-error" role="alert">Couldn’t save it. Please try again.</span>}
+    </span>
+  )
+}
+
+// "From the airport": the public transport journey from Dublin Airport to this area, as on a weekday morning, for
+// students arriving in Dublin for the first time. Google's directions when the Google map is in use, otherwise our
+// own journey planner on the server.
+const AIRPORT = { lat: 53.4264, lng: -6.2499, name: 'Dublin Airport' }
+
+// Next Monday-Friday at 10:00, Dublin time, as "YYYY-MM-DDTHH:MM"
+function nextWeekdayMorning() {
+  const dayParts = (d) => Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Dublin', year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short',
+  }).formatToParts(d).map((p) => [p.type, p.value]))
+  for (let i = 1; i <= 7; i += 1) {
+    const p = dayParts(new Date(Date.now() + i * 86400000))
+    if (p.weekday !== 'Sat' && p.weekday !== 'Sun') return `${p.year}-${p.month}-${p.day}T10:00`
+  }
+  return null
+}
+
+async function airportJourney(to, signal) {
+  const time = nextWeekdayMorning()
+  const request = { from: AIRPORT, to, mode: 'transit', timeType: 'depart', time }
+  if (hasGoogleMaps()) await loadGoogleMaps().catch(() => {}) // Google's directions need its script on the page
+  try {
+    const fromGoogle = await googleRoutes(request, signal)
+    if (fromGoogle?.length) return fromGoogle[0]
+  } catch (e) {
+    if (e.name === 'AbortError') throw e
+  }
+  const params = new URLSearchParams({
+    from_lat: AIRPORT.lat.toFixed(6), from_lon: AIRPORT.lng.toFixed(6),
+    to_lat: to.lat.toFixed(6), to_lon: to.lng.toFixed(6), mode: 'transit', when: time, arrive_by: 'false',
+  })
+  const response = await fetch(`${API_URL}/route?${params}`, { signal })
+  const body = await response.json().catch(() => null)
+  if (!response.ok || !body?.itineraries?.length) throw new Error('no route')
+  return body.itineraries[0]
+}
+
+function AirportRoute({ result }) {
+  const place = result.neighbourhood
+  const name = place ? `${place.name}, ${result.area}` : result.area
+  const [journey, setJourney] = useState(null)
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    if (!place?.lat) return undefined
+    const controller = new AbortController()
+    setJourney(null)
+    setFailed(false)
+    airportJourney({ lat: place.lat, lng: place.lon }, controller.signal)
+      .then(setJourney)
+      .catch((e) => { if (e.name !== 'AbortError') setFailed(true) })
+    return () => controller.abort()
+  }, [place?.lat, place?.lon]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const mapsLink = place?.lat
+    ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Dublin Airport')}&destination=${place.lat},${place.lon}&travelmode=transit`
+    : null
+
+  return (
+    <div className="airport">
+      <h3>Arriving in Dublin? From the airport to {name}</h3>
+      {!place?.lat && <p className="result-muted">We don’t have a location for this area yet.</p>}
+      {place?.lat && !journey && !failed && (
+        <p className="result-muted" role="status">Finding the journey from Dublin Airport…</p>
+      )}
+      {failed && (
+        <p className="result-muted">We couldn’t plan this journey right now. Google Maps can show you the way.</p>
+      )}
+      {journey && (
+        <>
+          <p className="airport-total">
+            <strong>About {Math.round(journey.total_minutes)} min</strong> by public transport
+            {journey.transfers > 0 ? `, ${journey.transfers} change${journey.transfers > 1 ? 's' : ''}` : ', no changes'}
+            <span className="result-muted"> · as on a weekday morning</span>
+          </p>
+          <ol className="airport-legs">
+            {journey.legs.filter((leg) => leg.minutes >= 1).map((leg, i) => (
+              <li key={i}>
+                <span className="airport-dot" style={{ background: legColor(leg) }} aria-hidden="true" />
+                <span>
+                  <b>{leg.mode === 'WALK' ? 'Walk' : lineLabel(leg)}</b>
+                  {leg.to ? ` to ${leg.to === 'Destination' ? name : leg.to}` : ''}
+                  <span className="result-muted"> · {Math.round(leg.minutes)} min</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+      <p className="result-muted airport-tip">
+        Buses leave from outside Terminals 1 and 2. A student Leap card or TFI Go app ticket is usually cheaper than
+        cash on Dublin Bus, but airport express coaches have their own fares.
+      </p>
+      {mapsLink && (
+        <a className="airport-maps" href={mapsLink} target="_blank" rel="noreferrer">
+          Open this journey in Google Maps <span aria-hidden="true">↗</span>
+        </a>
+      )}
+    </div>
+  )
+}
+
 // One of the top matches, opened on its own detail view when selected.
 function MatchCard({ result, modeWords, selected, onSelect }) {
   return (
@@ -646,9 +810,9 @@ function MatchCard({ result, modeWords, selected, onSelect }) {
   )
 }
 
-const DETAIL_TABS = ['Why it fits', 'About the area', 'Safety', 'Places to live', 'Letting agents']
+const DETAIL_TABS = ['Why it fits', 'About the area', 'Safety', 'Places to live', 'Letting agents', 'From the airport']
 
-function MatchDetail({ result, budget, tab, onTab, student, room }) {
+function MatchDetail({ result, budget, tab, onTab, student, room, answers, university, modeWords }) {
   const navigate = useNavigate()
   const isCounty = /^[AK]\d{2}$/.test(result.area) // County Dublin areas have profiles on the same page
   const hasProfile = isCounty || districts.some((d) => d.id === result.area)
@@ -662,6 +826,7 @@ function MatchDetail({ result, budget, tab, onTab, student, room }) {
           <p className="result-muted">
             {euro(result.rent)}/month · <RentNote result={result} student={student} />
           </p>
+          <SaveAreaButton result={result} answers={answers} university={university} modeWords={modeWords} />
         </div>
         {hasProfile && (
           <button
@@ -699,6 +864,7 @@ function MatchDetail({ result, budget, tab, onTab, student, room }) {
         )}
         {tab === 'Places to live' && <PlacesToLive area={result.area} places={result.places_to_live} budget={budget} student={student} room={room} />}
         {tab === 'Letting agents' && <LettingAgents />}
+        {tab === 'From the airport' && <AirportRoute result={result} />}
       </div>
     </article>
   )
@@ -1200,6 +1366,9 @@ function Results() {
               onTab={setTab}
               student={student}
               room={room}
+              answers={answers}
+              university={data?.university}
+              modeWords={modeWords}
             />
           </div>
         ) : (

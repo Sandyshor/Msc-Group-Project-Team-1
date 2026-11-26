@@ -31,6 +31,17 @@ async function openFirstMatch(page) {
   return main
 }
 
+test('a match can be saved for later once logged in, and the airport tab links to Google Maps', async ({ page }) => {
+  const errors = watchErrors(page)
+  await page.goto(resultsUrl())
+  const main = await openFirstMatch(page)
+  // these tests run without log in, so "Save area" asks the student to log in first
+  await expect(main.getByRole('link', { name: /Log in to save this area/ })).toHaveAttribute('href', '/login')
+  await clickTab(main, 'From the airport')
+  await expect(main.getByRole('link', { name: /Open this journey in Google Maps/ })).toHaveAttribute('href', /travelmode=transit/)
+  errors.check()
+})
+
 test('every results tab shows its content', async ({ page }) => {
   const errors = watchErrors(page)
   await page.goto(resultsUrl())
@@ -41,6 +52,7 @@ test('every results tab shows its content', async ({ page }) => {
     ['Safety', /Safety score|safety/i],
     ['Places to live', /Daft\.ie|Rent\.ie|residence/i],
     ['Letting agents', /PSRA/],
+    ['From the airport', /From the airport to/],
   ]
   for (const [name, expected] of tabs) {
     await clickTab(main, name)

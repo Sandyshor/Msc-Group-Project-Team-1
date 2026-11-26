@@ -19,6 +19,7 @@ import BrandLogo from './BrandLogo'
 import InfoPage, { NotFound } from './pages/InfoPages'
 import ThingsToKnow from './pages/ThingsToKnow'
 import MySearches from './pages/MySearches'
+import SavedAreas from './pages/SavedAreas'
 import { watchUser, logOut, firstNameOf, WELCOME_KEY } from './firebase'
 
 // Fits the header to whatever room it has - window size, browser zoom, Windows display scaling, scrollbars,
@@ -71,7 +72,7 @@ function useHeaderFit(headerRef, deps) {
 const PAGE_TITLES = {
   '/districts': 'Explore districts', '/campuses': 'Universities', '/attractions': 'Famous attractions',
   '/results': 'Your matches', '/how-it-works': 'How it works', '/questionnaire': 'Find my match',
-  '/login': 'Log in', '/signup': 'Sign up', '/my-searches': 'My recent searches', '/things-to-know': 'Things to know', '/terms': 'Terms of use',
+  '/login': 'Log in', '/signup': 'Sign up', '/my-searches': 'My recent searches', '/saved-areas': 'Saved areas', '/things-to-know': 'Things to know', '/terms': 'Terms of use',
   '/privacy': 'Privacy policy', '/contact': 'Contact',
 }
 
@@ -109,7 +110,7 @@ function App() {
     const t = setTimeout(() => setWelcome(null), 7000)
     return () => clearTimeout(t)
   }, [user?.uid]) // eslint-disable-line react-hooks/exhaustive-deps
-  // "Hi, name" opens a small menu: My recent searches, Delete my account, Log out
+  // "Hi, name" opens a small menu: My recent searches, Saved areas, Delete my account, Log out
   const [accountOpen, setAccountOpen] = useState(false)
   const accountRef = useRef(null)
   useEffect(() => { setAccountOpen(false) }, [location.pathname, user])
@@ -184,6 +185,7 @@ function App() {
         <div className="account-dropdown" role="menu">
           <p className="account-who">{user.email}</p>
           <Link role="menuitem" to="/my-searches">My recent searches</Link>
+          <Link role="menuitem" to="/saved-areas">Saved areas</Link>
           <Link role="menuitem" to="/my-searches#delete-account">Delete my account</Link>
           <button role="menuitem" type="button" onClick={() => { setAccountOpen(false); logOut() }}>Log out</button>
         </div>
@@ -215,6 +217,7 @@ function App() {
       {user ? (
         <>
           <Link to="/my-searches">My searches</Link>
+          <Link to="/saved-areas">Saved areas</Link>
           <button type="button" onClick={() => { setMenuOpen(false); logOut() }}>Log out ({firstName})</button>
         </>
       ) : <Link to="/login">Log in</Link>}
@@ -250,6 +253,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/my-searches" element={<MySearches />} />
+          <Route path="/saved-areas" element={<SavedAreas />} />
           <Route path="/things-to-know" element={<ThingsToKnow />} />
           <Route path="/terms" element={<InfoPage page="terms" />} />
           <Route path="/privacy" element={<InfoPage page="privacy" />} />

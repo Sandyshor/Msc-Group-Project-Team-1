@@ -78,7 +78,7 @@ function DeleteAccount({ startOpen, onDeleted }) {
   return (
     <section id="delete-account" className="ms-delete" ref={box} aria-labelledby="ms-delete-title">
       <h2 id="ms-delete-title">Delete my account</h2>
-      <p>This permanently deletes your account, your saved searches and your chats with the assistant. It can’t be undone.</p>
+      <p>This permanently deletes your account, your saved searches, your saved areas and your chats with the assistant. It can’t be undone.</p>
       {!open ? (
         <button type="button" className="ms-delete-start" onClick={() => setOpen(true)}>Delete my account</button>
       ) : (
