@@ -590,7 +590,15 @@ const GoogleBaseMap = forwardRef(function GoogleBaseMap(props, ref) {
     const st = s.current;
     const f = code && st?.features[code];
     if (!f) return;
-    fitTo(ringsOf(f.geometry).flat().map(([lng, lat]) => [lat, lng]), 50, 14);
+    const ring = ringsOf(f.geometry).flat().map(([lng, lat]) => [lat, lng]);
+    // A planned journey to this district is on the map (e.g. from the airport, opened from the results page): keep
+    // all of it in view rather than zooming in on the district
+    const to = latest.current.trip?.to;
+    const lats = ring.map(([lat]) => lat);
+    const lngs = ring.map(([, lng]) => lng);
+    const inDistrict = to && to.lat >= Math.min(...lats) && to.lat <= Math.max(...lats) && to.lng >= Math.min(...lngs) && to.lng <= Math.max(...lngs);
+    if (st.routePoints?.length && journeyShown() && inDistrict) { fitTo(st.routePoints, 60, 16); return; }
+    fitTo(ring, 50, 14);
   }
 
   function drawOutline() {
@@ -867,6 +875,7 @@ const GoogleBaseMap = forwardRef(function GoogleBaseMap(props, ref) {
     stopTraveller();
     clear(st.route);
     clear(st.alt);
+    st.routePoints = null;
     if (!journeyShown()) { if (legendRef.current) legendRef.current.hidden = true; return; }
     const itineraries = trip.itineraries || [];
     const itinerary = itineraries[trip.selected];
@@ -932,6 +941,7 @@ const GoogleBaseMap = forwardRef(function GoogleBaseMap(props, ref) {
     });
     showLines(st.route.filter((x) => 'setMap' in x), true);
     showLines(st.alt, true);
+    st.routePoints = points;
     fitTo(points, 60, 16);
     st.travelTimer = setTimeout(() => startTraveller(itinerary, pathsByLeg, token), REDUCED_MOTION ? 0 : delay + 300);
   }

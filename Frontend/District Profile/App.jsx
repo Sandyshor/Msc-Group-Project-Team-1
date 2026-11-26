@@ -135,6 +135,17 @@ function buildPlaces(profileData, photos) {
 
 const EMPTY_TRIP = { from: null, to: null, mode: 'transit', timeType: 'now', time: '', status: 'idle', error: '', itineraries: [], selected: 0, queryMode: 'transit' };
 
+// A journey another page asked for, e.g. the results page's "From the airport" tab:
+// navigate('/districts', { state: { district, journey: { from, to, timeType, time } } }), from and to as { lat, lng, label }.
+// The district then opens on its Journey tab with A and B filled in, and the route drawn on the map.
+function journeyFromPage() {
+  const j = typeof window !== 'undefined' ? window.history.state?.usr?.journey : null;
+  const isPoint = (p) => p && Number.isFinite(p.lat) && Number.isFinite(p.lng);
+  if (!j || !isPoint(j.from) || !isPoint(j.to)) return null;
+  const timeType = ['now', 'depart', 'arrive'].includes(j.timeType) ? j.timeType : 'now';
+  return { ...EMPTY_TRIP, from: j.from, to: j.to, timeType, time: timeType === 'now' ? '' : String(j.time || '') };
+}
+
 export default function App() {
   const [data, setData] = useState(null);
   const [comparing, setComparing] = useState(false); // the "Compare two districts" window
@@ -154,12 +165,16 @@ export default function App() {
   const [layersOpen, setLayersOpen] = useState(false); // the Layers menu over the map
   const layersRef = useRef(null);
   // A saved tab that no longer exists (Commute, Universities) falls back to Places
-  const [tab, setTabState] = useState(() => { const t = storage.get('district-tab', 'places'); return TABS.some(([k]) => k === t) ? t : 'places'; });
+  const [tab, setTabState] = useState(() => {
+    if (journeyFromPage()) return 'journey';
+    const t = storage.get('district-tab', 'places');
+    return TABS.some(([k]) => k === t) ? t : 'places';
+  });
   const [rentMode, setRentMode] = useState('rooms');
   const [chain, setChain] = useState(null); // supermarket chain shown on the map (Tesco, Lidl...)
   const [hoverPlace, setHoverPlace] = useState(null);
   // Journey planner trip: A and B come from the place panel's Directions / Start here buttons or are typed
-  const [trip, setTrip] = useState(EMPTY_TRIP);
+  const [trip, setTrip] = useState(() => journeyFromPage() || EMPTY_TRIP);
   // Like Google Maps: the place clicked on the map is shown in the side panel; "directions" shows the route planner there
   const [place, setPlace] = useState(null);
   const [directions, setDirections] = useState(false);
