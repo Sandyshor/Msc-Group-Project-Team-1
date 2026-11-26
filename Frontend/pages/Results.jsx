@@ -716,7 +716,8 @@ async function airportJourney(to, signal) {
   return body.itineraries[0]
 }
 
-function AirportRoute({ result }) {
+function AirportRoute({ result, hasProfile }) {
+  const navigate = useNavigate()
   const place = result.neighbourhood
   const name = place ? `${place.name}, ${result.area}` : result.area
   const [journey, setJourney] = useState(null)
@@ -733,6 +734,19 @@ function AirportRoute({ result }) {
     return () => controller.abort()
   }, [place?.lat, place?.lon]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // The same journey on the district profile's map (its Journey tab), so the student stays on the site.
+  // Areas without a profile page link to Google Maps instead.
+  const showOnMap = () => navigate('/districts', {
+    state: {
+      district: result.area,
+      journey: {
+        from: { lat: AIRPORT.lat, lng: AIRPORT.lng, label: AIRPORT.name },
+        to: { lat: place.lat, lng: place.lon, label: name },
+        timeType: 'depart',
+        time: nextWeekdayMorning(),
+      },
+    },
+  })
   const mapsLink = place?.lat
     ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Dublin Airport')}&destination=${place.lat},${place.lon}&travelmode=transit`
     : null
@@ -772,7 +786,12 @@ function AirportRoute({ result }) {
         Buses leave from outside Terminals 1 and 2. A student Leap card or TFI Go app ticket is usually cheaper than
         cash on Dublin Bus, but airport express coaches have their own fares.
       </p>
-      {mapsLink && (
+      {place?.lat && hasProfile && (
+        <button type="button" className="airport-maps" onClick={showOnMap}>
+          See this journey on the {result.area} map <span aria-hidden="true">→</span>
+        </button>
+      )}
+      {mapsLink && !hasProfile && (
         <a className="airport-maps" href={mapsLink} target="_blank" rel="noreferrer">
           Open this journey in Google Maps <span aria-hidden="true">↗</span>
         </a>
@@ -864,7 +883,7 @@ function MatchDetail({ result, budget, tab, onTab, student, room, answers, unive
         )}
         {tab === 'Places to live' && <PlacesToLive area={result.area} places={result.places_to_live} budget={budget} student={student} room={room} />}
         {tab === 'Letting agents' && <LettingAgents />}
-        {tab === 'From the airport' && <AirportRoute result={result} />}
+        {tab === 'From the airport' && <AirportRoute result={result} hasProfile={hasProfile} />}
       </div>
     </article>
   )

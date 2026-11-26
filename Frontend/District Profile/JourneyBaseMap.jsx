@@ -791,6 +791,13 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     if (!st) return;
     const f = code && st.features[code];
     if (!f) return;
+    // A planned journey to this district is on the map (e.g. from the airport, opened from the results page): keep
+    // all of it in view rather than zooming in on the district
+    const to = latest.current.trip?.to;
+    if (st.routeBounds && journeyShown() && to && L.geoJSON(f).getBounds().contains([to.lat, to.lng])) {
+      st.map.fitBounds(st.routeBounds, { padding: [60, 60], maxZoom: 16, animate: animate && !REDUCED_MOTION });
+      return;
+    }
     st.map.fitBounds(L.geoJSON(f).getBounds(), { padding: [50, 50], maxZoom: 14, animate: animate && !REDUCED_MOTION });
   }
 
@@ -1052,6 +1059,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
     stopTraveller();
     st.route.clearLayers();
     st.alt.clearLayers();
+    st.routeBounds = null;
     if (!journeyShown()) { if (legendRef.current) legendRef.current.hidden = true; return; }
     const itineraries = trip.itineraries || [];
     const itinerary = itineraries[trip.selected];
@@ -1101,6 +1109,7 @@ const JourneyBaseMap = forwardRef(function JourneyBaseMap(props, ref) {
       points.forEach((p) => bounds.extend(p));
       delay += duration;
     });
+    st.routeBounds = bounds;
     st.map.fitBounds(bounds, { padding: [60, 60], maxZoom: 16, animate: !REDUCED_MOTION });
     st.travelTimer = setTimeout(() => startTraveller(itinerary, pointsByLeg), REDUCED_MOTION ? 0 : delay + 300);
   }

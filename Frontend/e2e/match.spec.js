@@ -31,14 +31,18 @@ async function openFirstMatch(page) {
   return main
 }
 
-test('a match can be saved for later once logged in, and the airport tab links to Google Maps', async ({ page }) => {
+test('a match can be saved for later once logged in, and the airport journey opens on the district map', async ({ page }) => {
   const errors = watchErrors(page)
   await page.goto(resultsUrl())
   const main = await openFirstMatch(page)
   // these tests run without log in, so "Save area" asks the student to log in first
   await expect(main.getByRole('link', { name: /Log in to save this area/ })).toHaveAttribute('href', '/login')
   await clickTab(main, 'From the airport')
-  await expect(main.getByRole('link', { name: /Open this journey in Google Maps/ })).toHaveAttribute('href', /travelmode=transit/)
+  await main.getByRole('button', { name: /See this journey on the .* map/ }).click()
+  // the district profile opens on its Journey tab, from Dublin Airport to the matched area
+  await expect(page).toHaveURL(/\/districts/)
+  await expect(page.locator('input[aria-label="Start point"]').first()).toHaveValue('Dublin Airport')
+  await expect(page.locator('input[aria-label="Destination"]').first()).toHaveValue(/, (D\d+W?|[AK]\d{2})$/)
   errors.check()
 })
 
